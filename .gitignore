@@ -1,0 +1,27 @@
+# Fichiers compilés COBOL
+*.exe
+*.o
+*.so
+*.dylib
+*.dll
+
+# Fichiers de sortie
+*.lis
+*.lst
+
+# Fichiers temporaires
+*~
+*.bak
+*.tmp
+
+# Fichiers de données
+*.dat
+*.idx
+
+# Répertoires
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
