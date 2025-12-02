@@ -30,12 +30,13 @@
            05 CLI-DATE-NAIS        PIC 9(08).                           
            05 CLI-SEXE             PIC X(01).                           
            05 CLI-ACTIVITE         PIC 9(02).                           
-           05 CLI-SITUATION        PIC X(01).                           
-           05 CLI-SOLDE            PIC 9(10).                           
-           05 CLI-POSITION         PIC X(02).                           
-              88 EST-DEBITEUR      VALUE 'DB'.                          
-              88 EST-CREDITEUR     VALUE 'CR'.                          
-           05 FILLER               PIC X(29).                           
+           05 CLI-SITUATION        PIC X(01).
+           05 CLI-ADRESSE          PIC X(10).
+           05 CLI-SOLDE            PIC 9(10).
+           05 CLI-POSITION         PIC X(02).
+              88 EST-DEBITEUR      VALUE 'DB'.
+              88 EST-CREDITEUR     VALUE 'CR'.
+           05 FILLER               PIC X(19).                           
                                                                         
        FD F-EDITION.                                                    
        01 ENR-EDITION              PIC X(80).                           

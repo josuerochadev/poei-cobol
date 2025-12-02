@@ -26,10 +26,11 @@
          05 CLI-DATE-NAISSANCE PIC 9(8).                                
          05 CLI-SEXE PIC X(1).                                          
          05 CLI-ACTIVITE PIC 9(2).                                      
-         05 CLI-SITUATION PIC X(1).                                     
-         05 CLI-SOLDE PIC 9(10).                                        
-         05 CLI-POSITION PIC X(2).                                      
-         05 FILLER PIC X(29).                                           
+         05 CLI-SITUATION PIC X(1).
+         05 CLI-ADRESSE PIC X(10).
+         05 CLI-SOLDE PIC 9(10).
+         05 CLI-POSITION PIC X(2).
+         05 FILLER PIC X(19).                                           
                                                                         
        WORKING-STORAGE SECTION.                                         
        01 WS-FS-CLIENT PIC X(2).                                        
@@ -47,8 +48,9 @@
          05 WS-DATE-NAISSANCE PIC 9(8).                                 
          05 WS-SEXE PIC X(1).                                           
          05 WS-ACTIVITE PIC 9(2).                                       
-         05 WS-SITUATION PIC X(1).                                      
-         05 WS-SOLDE PIC 9(10).                                         
+         05 WS-SITUATION PIC X(1).
+         05 WS-ADRESSE PIC X(10).
+         05 WS-SOLDE PIC 9(10).
          05 WS-POSITION PIC X(2).                                       
                                                                         
        01 WS-MSG PIC X(50).                                             
@@ -80,8 +82,9 @@
             MOVE 19990115 TO WS-DATE-NAISSANCE                          
             MOVE 'M' TO WS-SEXE                                         
             MOVE 10 TO WS-ACTIVITE                                      
-            MOVE 'C' TO WS-SITUATION                                    
-            MOVE 0000050000 TO WS-SOLDE                                 
+            MOVE 'C' TO WS-SITUATION
+            MOVE 'LYON      ' TO WS-ADRESSE
+            MOVE 0000050000 TO WS-SOLDE
             MOVE 'CR' TO WS-POSITION                                    
                                                                         
       * TRANSFERER VERS L'ENREGISTREMENT DU FICHIER                     
@@ -93,8 +96,9 @@
             MOVE WS-DATE-NAISSANCE TO CLI-DATE-NAISSANCE                
             MOVE WS-SEXE TO CLI-SEXE                                    
             MOVE WS-ACTIVITE TO CLI-ACTIVITE                            
-            MOVE WS-SITUATION TO CLI-SITUATION                          
-            MOVE WS-SOLDE TO CLI-SOLDE                                  
+            MOVE WS-SITUATION TO CLI-SITUATION
+            MOVE WS-ADRESSE TO CLI-ADRESSE
+            MOVE WS-SOLDE TO CLI-SOLDE
             MOVE WS-POSITION TO CLI-POSITION                            
                                                                         
       * ECRIRE DANS LE KSDS                                             

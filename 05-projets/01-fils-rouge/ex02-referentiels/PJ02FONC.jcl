@@ -25,7 +25,7 @@
 //*====================================================================*
 //ETAPE2 EXEC PGM=SORT                                                  
 //SYSOUT DD SYSOUT=*                                                    
-//SORTIN DD DSN=ROCHA.FINANCE.SOURCEPS,DISP=SHR                         
+//SORTIN DD DSN=ROCHA.FINANCE.CLIENT,DISP=SHR                         
 //SORTOUT DD DSN=ROCHA.FINANCE.FONCT,DISP=SHR                           
 //SYSIN DD *                                                            
          SORT FIELDS=COPY                                               

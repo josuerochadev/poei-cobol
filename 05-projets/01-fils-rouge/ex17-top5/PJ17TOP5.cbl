@@ -31,10 +31,11 @@
            05 SORT-DATE-NAIS       PIC 9(08).                           
            05 SORT-SEXE            PIC X(01).                           
            05 SORT-ACTIVITE        PIC 9(02).                           
-           05 SORT-SITUATION       PIC X(01).                           
-           05 SORT-SOLDE           PIC 9(10).                           
-           05 SORT-POSITION        PIC X(02).                           
-           05 FILLER               PIC X(29).                           
+           05 SORT-SITUATION       PIC X(01).
+           05 SORT-ADRESSE         PIC X(10).
+           05 SORT-SOLDE           PIC 9(10).
+           05 SORT-POSITION        PIC X(02).
+           05 FILLER               PIC X(19).                           
                                                                         
        FD F-CLIENT.                                                     
        01 ENR-CLIENT               PIC X(80).                           
@@ -61,10 +62,11 @@
            05 WS-DATE-NAIS         PIC 9(08).                           
            05 WS-SEXE              PIC X(01).                           
            05 WS-ACTIVITE          PIC 9(02).                           
-           05 WS-SITUATION         PIC X(01).                           
-           05 WS-SOLDE             PIC 9(10).                           
-           05 WS-POSITION          PIC X(02).                           
-           05 FILLER               PIC X(29).                           
+           05 WS-SITUATION         PIC X(01).
+           05 WS-ADRESSE           PIC X(10).
+           05 WS-SOLDE             PIC 9(10).
+           05 WS-POSITION          PIC X(02).
+           05 FILLER               PIC X(19).                           
                                                                         
       * LIGNES D'EDITION                                                
        01 WS-LIGNE-SEP             PIC X(70) VALUE ALL '*'.             

@@ -33,10 +33,11 @@
            05 DEB-DATE-NAIS        PIC 9(08).                           
            05 DEB-SEXE             PIC X(01).                           
            05 DEB-ACTIVITE         PIC 9(02).                           
-           05 DEB-SITUATION        PIC X(01).                           
-           05 DEB-SOLDE            PIC 9(10).                           
-           05 DEB-POSITION         PIC X(02).                           
-           05 FILLER               PIC X(29).                           
+           05 DEB-SITUATION        PIC X(01).
+           05 DEB-ADRESSE          PIC X(10).
+           05 DEB-SOLDE            PIC 9(10).
+           05 DEB-POSITION         PIC X(02).
+           05 FILLER               PIC X(19).                           
                                                                         
        FD F-CREDIT.                                                     
        01 ENR-CREDIT.                                                   
@@ -48,10 +49,11 @@
            05 CRE-DATE-NAIS        PIC 9(08).                           
            05 CRE-SEXE             PIC X(01).                           
            05 CRE-ACTIVITE         PIC 9(02).                           
-           05 CRE-SITUATION        PIC X(01).                           
-           05 CRE-SOLDE            PIC 9(10).                           
-           05 CRE-POSITION         PIC X(02).                           
-           05 FILLER               PIC X(29).                           
+           05 CRE-SITUATION        PIC X(01).
+           05 CRE-ADRESSE          PIC X(10).
+           05 CRE-SOLDE            PIC 9(10).
+           05 CRE-POSITION         PIC X(02).
+           05 FILLER               PIC X(19).                           
                                                                         
        FD F-EDITION.                                                    
        01 ENR-EDITION              PIC X(60).                           

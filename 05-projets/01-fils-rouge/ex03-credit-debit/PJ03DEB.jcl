@@ -25,11 +25,11 @@
 //*====================================================================*
 //ETAPE2 EXEC PGM=SORT                                                  
 //SYSOUT DD SYSOUT=*                                                    
-//SORTIN DD DSN=ROCHA.FINANCE.SOURCEPS,DISP=SHR                         
+//SORTIN DD DSN=ROCHA.FINANCE.CLIENT,DISP=SHR                         
 //SORTOUT DD DSN=ROCHA.FINANCE.DEB,DISP=SHR                             
 //SYSIN DD *                                                            
          SORT FIELDS=COPY                                               
-         INCLUDE COND=(50,2,CH,EQ,C'DB')                                
+         INCLUDE COND=(60,2,CH,EQ,C'DB')                                
 /*             
 //*====================================================================*
 //* PRINT DU FICHIER                                              *

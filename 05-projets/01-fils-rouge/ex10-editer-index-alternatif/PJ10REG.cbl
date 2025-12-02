@@ -33,9 +33,10 @@
            05 CLI-SEXE             PIC X(01).
            05 CLI-ACTIVITE         PIC 9(02).
            05 CLI-SITUATION        PIC X(01).
+           05 CLI-ADRESSE          PIC X(10).
            05 CLI-SOLDE            PIC 9(10).
            05 CLI-POSITION         PIC X(02).
-           05 FILLER               PIC X(29).
+           05 FILLER               PIC X(19).
 
        FD F-EDITION.
        01 ENR-EDITION              PIC X(80).
