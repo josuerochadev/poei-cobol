@@ -1,7 +1,7 @@
 //PJ18MOUV JOB (COMPTE),'CREATION MOUVEMENT',CLASS=A,MSGCLASS=X,        
 //             NOTIFY=&SYSUID                                           
 //*====================================================================*
-//* TROISIEME PARTIE MàJ DES DONNEES ET PROGRAMMATION COBOL *           
+//* TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL *           
 //* DEFINITION D'UN DATA SET POUR GERER LES MOUVEMENTS DES CLIENTS     *
 //* DELETE DU FICHIER SI EXISTANT *                                     
 //*====================================================================*

@@ -1,7 +1,7 @@
 //PJ14JCL2 JOB (COMPTE),'EXEC TABLES',MSGLEVEL=(1,1),REGION=8M,         
 //          MSGCLASS=Y,CLASS=A,NOTIFY=&SYSUID,TYPRUN=HOLD               
 //*====================================================================*
-//* TROISIEME PARTIE MàJ DES DONNEES ET PROGRAMMATION COBOL            *
+//* TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL            *
 //* EXECUTION PROGRAMME PRINCIPAL                                      *
 //*====================================================================*
 //RUN EXEC PGM=PJ14MAIN                                                 

@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.                                         
        PROGRAM-ID. PJ13AJOU.                                            
       *================================================================*
-      * TROISIEME PARTIE MàJ DES DONNéES ET PROGRAMMATION COBOL         
+      * TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL         
       * AJOUT D'UN CLIENT DANS LE DATA SET CLIENT KSDS                  
       *================================================================*
        ENVIRONMENT DIVISION.                                            
@@ -37,7 +37,7 @@
            88 FS-DUPKEY VALUE '22'.                                     
            88 FS-NOTFND VALUE '23'.                                     
                                                                         
-      * NOUVEAU CLIENT à AJOUTER                                        
+      * NOUVEAU CLIENT A AJOUTER                                        
        01 WS-NOUVEAU-CLIENT.                                            
          05 WS-NUM-COMPTE PIC 9(3).                                     
          05 WS-CODE-REGION PIC 9(2).                                    
@@ -102,7 +102,7 @@
                                                                         
             EVALUATE TRUE                                               
               WHEN FS-OK                                                
-                 DISPLAY 'CLIENT AJOUTé AVEC SUCCéS'                    
+                 DISPLAY 'CLIENT AJOUTE AVEC SUCCES'                    
                  DISPLAY 'NUMERO COMPTE : ' CLI-NUM-COMPTE              
               WHEN FS-DUPKEY                                            
                  DISPLAY 'ERREUR : KEY DUPLIQUEE - CLIENT DEJA EXISTANT'

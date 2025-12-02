@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.                                         
        PROGRAM-ID. PJ15MONT.                                            
       *================================================================*
-      * TROISIEME PARTIE MàJ DES DONNéES ET PROGRAMMATION COBOL         
+      * TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL         
       * CALCUL MONTANT GENERAL ET MOYENNE DEBITEURS/CREDITEURS          
       *================================================================*
        ENVIRONMENT DIVISION.                                            

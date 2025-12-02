@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.                                         
        PROGRAM-ID. PJ14PRO.                                             
       *================================================================*
-      * TROISIEME PARTIE MàJ DES DONNéES ET PROGRAMMATION COBOL         
+      * TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL         
       * SOUS PROGRAMME - EDITION DE LA TABLE ACTIVITE PROFISSIONNELLE   
       *================================================================*
        ENVIRONMENT DIVISION.                                            

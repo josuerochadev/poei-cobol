@@ -17,7 +17,7 @@
                     NONINDEXED -                                        
                     REUSE) -                                            
             DATA (NAME(ROCHA.FINANCE.FONCT.DATA))                       
-      IF LASTCC=0 THEN -                                                
+      IF LASTCC=0 THEN
             LISTCAT ALL LEVEL(ROCHA.FINANCE.FONCT)                      
 /*                                                                      
 //*====================================================================*

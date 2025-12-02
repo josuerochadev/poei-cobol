@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.                                         
        PROGRAM-ID. PJ16COND.                                            
       *================================================================*
-      * TROISIEME PARTIE MàJ DES DONNéES ET PROGRAMMATION COBOL         
+      * TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL         
       * CALCUL DEBITEURS/CREDITEURS PAR REGION AVEC NIVEAU 88           
       *================================================================*
        ENVIRONMENT DIVISION.                                            

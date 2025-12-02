@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.                                         
        PROGRAM-ID. PJ14MAIN.                                            
       *================================================================*
-      * TROISIEME PARTIE MàJ DES DONNéES ET PROGRAMMATION COBOL         
+      * TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL         
       * PROGRAMME PRINCIPAL - EDITION DES 3 TABLES                      
       *================================================================*
        ENVIRONMENT DIVISION.                                            

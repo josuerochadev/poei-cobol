@@ -1,4 +1,4 @@
-//PJ01REG JOB PJ01REG,'PJ01REG',MSGLEVEL=(1,1),REGION=4M,               
+//PJ01CPT JOB PJ01CPT,'PJ01CPT',MSGLEVEL=(1,1),REGION=4M,               
 //          MSGCLASS=A,CLASS=A,NOTIFY=&SYSUID                           
 //*====================================================================*
 //* PREMIERE PARTIE - CHARGEMENT DES DONNEES DE BASE                   *

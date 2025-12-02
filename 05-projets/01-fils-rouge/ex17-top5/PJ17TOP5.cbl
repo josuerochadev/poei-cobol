@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.                                         
        PROGRAM-ID. PJ17TOP5.                                            
       *================================================================*
-      * TROISIEME PARTIE MàJ DES DONNéES ET PROGRAMMATION COBOL         
+      * TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL         
       * LISTER LES 5 PREMIERS CLIENTS DEBITEURS (EN VALEUR)             
       *================================================================*
        ENVIRONMENT DIVISION.                                            

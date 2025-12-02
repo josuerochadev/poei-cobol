@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.                                         
        PROGRAM-ID. PJ21MERG.                                            
       *================================================================*
-      * TROISIEME PARTIE MàJ DES DONNéES ET PROGRAMMATION COBOL         
+      * TROISIEME PARTIE MAJ DES DONNEES ET PROGRAMMATION COBOL         
       * FUSION DES MOUVEMENTS DE 3 MOIS AVEC MERGE INTERNE              
       *================================================================*
        ENVIRONMENT DIVISION.                                            

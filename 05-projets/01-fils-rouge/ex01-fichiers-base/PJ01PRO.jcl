@@ -46,7 +46,7 @@
        LISTCAT ALL LEVEL(ROCHA.PROFES.KSDS)                             
 /*                                                                      
 //*====================================================================*
-//* CHARGEMENT DU FICHIER KSDS à PARTIR DU PS                          *
+//* CHARGEMENT DU FICHIER KSDS A PARTIR DU PS                          *
 //*====================================================================*                                                             
 //ETAPE3 EXEC PGM=IDCAMS                                                
 //SYSPRINT DD SYSOUT=*                                                  
