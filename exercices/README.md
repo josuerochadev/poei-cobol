@@ -20,6 +20,13 @@ Les exercices sont organisés par chapitre du cours.
 | `PG03CH03.cbl` | Niveau 88 (conditions), niveau 66 (RENAMES) |
 | `PG04CH03.cbl` | INITIALIZE, édition flottante (++), REDEFINES |
 
+### Chapitre 04 - Opérations sur les données
+
+| Programme | Description |
+|-----------|-------------|
+| `PG05CH04.cbl` | ADD, SUBTRACT, MULTIPLY, DIVIDE, ON SIZE ERROR |
+| `PG06CH04.cbl` | COMPUTE, calcul facture avec TVA et remises |
+
 ## Compilation
 
 ```bash

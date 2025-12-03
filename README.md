@@ -14,7 +14,8 @@ poei-cobol/
 │
 ├── exercices/          # Programmes COBOL par chapitre
 │   ├── chapitre-02/    # DISPLAY, chaînes, debug
-│   └── chapitre-03/    # Variables, PICTURE, REDEFINES
+│   ├── chapitre-03/    # Variables, PICTURE, REDEFINES
+│   └── chapitre-04/    # MOVE, ADD, SUBTRACT, MULTIPLY, DIVIDE, COMPUTE
 │
 ├── projets/            # Projets complets
 │   └── fil-rouge/      # Projet fil rouge (21 exercices)
@@ -31,7 +32,7 @@ poei-cobol/
 | I | Structure d'un programme COBOL | ✅ | - |
 | II | Interface ISPF et commandes | ✅ | PG01CH01, PG02CH01 |
 | III | Déclaration des variables | ✅ | PG03CH03, PG04CH03 |
-| IV | Opérations sur les données | ✅ | - |
+| IV | Opérations sur les données | ✅ | PG05CH04, PG06CH04 |
 
 ## Environnement
 
