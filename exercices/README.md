@@ -35,6 +35,13 @@ Les exercices sont organisés par chapitre du cours.
 | `PG08CH05.cbl` | PERFORM VARYING (boucle simple avec somme) |
 | `PG09CH05.cbl` | PERFORM avec 3 boucles imbriquées |
 
+### Chapitre 06 - Gestion des Tables
+
+| Programme | Description |
+|-----------|-------------|
+| `PG10CH06.cbl` | TINDICE - Indice d'adressage des tables |
+| `PG11CH06.cbl` | TINDEX - Instruction SET sur les index |
+
 ## Compilation
 
 ```bash
