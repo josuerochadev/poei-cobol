@@ -16,7 +16,8 @@ poei-cobol/
 ├── exercices/          # Programmes COBOL par chapitre
 │   ├── chapitre-02/    # DISPLAY, chaînes, debug
 │   ├── chapitre-03/    # Variables, PICTURE, REDEFINES
-│   └── chapitre-04/    # MOVE, ADD, SUBTRACT, MULTIPLY, DIVIDE, COMPUTE
+│   ├── chapitre-04/    # MOVE, ADD, SUBTRACT, MULTIPLY, DIVIDE, COMPUTE
+│   └── chapitre-05/    # IF, EVALUATE, PERFORM
 │
 ├── projets/            # Projets complets
 │   └── fil-rouge/      # Projet fil rouge (21 exercices)

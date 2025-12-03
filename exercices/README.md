@@ -27,6 +27,14 @@ Les exercices sont organisés par chapitre du cours.
 | `PG05CH04.cbl` | ADD, SUBTRACT, MULTIPLY, DIVIDE, ON SIZE ERROR |
 | `PG06CH04.cbl` | COMPUTE, calcul facture avec TVA et remises |
 
+### Chapitre 05 - Traitement conditionnel
+
+| Programme | Description |
+|-----------|-------------|
+| `PG07CH05.cbl` | EVALUATE avec ALSO (notes examen + stage) |
+| `PG08CH05.cbl` | PERFORM VARYING (boucle simple avec somme) |
+| `PG09CH05.cbl` | PERFORM avec 3 boucles imbriquées |
+
 ## Compilation
 
 ```bash
