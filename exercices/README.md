@@ -4,53 +4,57 @@
 
 Les exercices sont organisés par chapitre du cours.
 
+**Convention de nommage :** `CXX-SUJET.cbl` où XX = numéro de chapitre
+
 ## Chapitres
 
 ### Chapitre 02 - ISPF et premiers programmes
 
 | Programme | Description |
 |-----------|-------------|
-| `PG01CH01.cbl` | DISPLAY, chaînes de caractères, continuation, debug |
-| `PG02CH01.cbl` | Nombres décimaux (V), signés (S), édition |
+| `C02-DISPLAY.cbl` | DISPLAY, chaînes de caractères, continuation, debug |
+| `C02-DECIMAL.cbl` | Nombres décimaux (V), signés (S), édition |
 
 ### Chapitre 03 - Déclaration des variables
 
 | Programme | Description |
 |-----------|-------------|
-| `PG03CH03.cbl` | Niveau 88 (conditions), niveau 66 (RENAMES) |
-| `PG04CH03.cbl` | INITIALIZE, édition flottante (++), REDEFINES |
+| `C03-NIVEAU88.cbl` | Niveau 88 (conditions), niveau 66 (RENAMES) |
+| `C03-REDEFINES.cbl` | INITIALIZE, édition flottante (++), REDEFINES |
 
 ### Chapitre 04 - Opérations sur les données
 
 | Programme | Description |
 |-----------|-------------|
-| `PG05CH04.cbl` | ADD, SUBTRACT, MULTIPLY, DIVIDE, ON SIZE ERROR |
-| `PG06CH04.cbl` | COMPUTE, calcul facture avec TVA et remises |
+| `C04-ARITHM.cbl` | ADD, SUBTRACT, MULTIPLY, DIVIDE, ON SIZE ERROR |
+| `C04-FACTURE.cbl` | COMPUTE, calcul facture avec TVA et remises |
 
 ### Chapitre 05 - Traitement conditionnel
 
 | Programme | Description |
 |-----------|-------------|
-| `PG07CH05.cbl` | EVALUATE avec ALSO (notes examen + stage) |
-| `PG08CH05.cbl` | PERFORM VARYING (boucle simple avec somme) |
-| `PG09CH05.cbl` | PERFORM avec 3 boucles imbriquées |
+| `C05-EVALUATE.cbl` | EVALUATE avec ALSO (notes examen + stage) |
+| `C05-PERFORM.cbl` | PERFORM VARYING (boucle simple avec somme) |
+| `C05-BOUCLES.cbl` | PERFORM avec 3 boucles imbriquées |
 
 ### Chapitre 06 - Gestion des Tables
 
 | Programme | Description |
 |-----------|-------------|
-| `PG10CH06.cbl` | TINDICE - Indice d'adressage des tables |
-| `PG11CH06.cbl` | TINDEX - Instruction SET sur les index |
+| `C06-TINDICE.cbl` | Indice d'adressage des tables (subscript) |
+| `C06-TINDEX.cbl` | Instruction SET sur les index |
+| `C06-BANQUE01.cbl` | TD Banque - Déclaration des 5 tables |
+| `C06-BANQUE02.cbl` | TD Banque - Chargement buffer et dispatch |
 
 ## Compilation
 
 ```bash
 # Se placer dans le dossier du chapitre
-cd chapitre-03
+cd chapitre-06
 
 # Compiler
-cobc -x PG03CH03.cbl -o PG03CH03
+cobc -x C06-TINDICE.cbl -o C06-TINDICE
 
 # Exécuter
-./PG03CH03
+./C06-TINDICE
 ```

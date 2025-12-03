@@ -6,8 +6,11 @@
 *.dll
 
 # Exécutables GnuCOBOL (sans extension)
-PG*CH*
+# Nouveau format CXX-SUJET
+C[0-9][0-9]-*
 !*.cbl
+# Ancien format (legacy)
+PG*CH*
 
 # Fichiers de sortie
 *.lis
