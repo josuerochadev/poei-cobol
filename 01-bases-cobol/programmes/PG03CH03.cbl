@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. PG03CH03.
-       AUTHOR.     N GAIGI.
-      *----------------------------------------------------------------
+       AUTHOR.     ROCHA.
+      *--------------------------------------------------------------
       * PROGRAMME D'AFFICHAGE: - VARIABLES CONDITIONS OU BOOLEENNES 88
       *                        - VARIABLE DE REARRANGEMENT 66
       *----------------------------------------------------------------
@@ -14,7 +14,7 @@
        WORKING-STORAGE SECTION.
        01  WS-INDIVIDU.
            05   WS-ADRESSE.
-                10  WS-RUE        PIC X(20).
+                10  WS-RUE        PIC X(15).
                 10  WS-CODEPOSTAL PIC X(5) VALUE '84200'.
            05   WS-IDENTITE.
                10 WS-NOM        PIC X(15) VALUE 'MAE'.
