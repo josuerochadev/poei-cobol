@@ -45,6 +45,7 @@ Les exercices sont organisés par chapitre du cours.
 | `C06-TINDEX.cbl` | Instruction SET sur les index |
 | `C06-BANQUE01.cbl` | TD Banque - Déclaration des 5 tables |
 | `C06-BANQUE02.cbl` | TD Banque - Chargement buffer et dispatch |
+| `C06-BANQUE03.cbl` | TD Banque - Fichiers E/S (SEQUENTIAL → INDEXED) |
 
 ## Compilation
 
