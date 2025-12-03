@@ -9,6 +9,9 @@
 | `03-declaration-variables.md` | III | Niveaux, PICTURE, VALUE, édition, REDEFINES |
 | `04-operations-donnees.md` | IV | MOVE, ADD, SUBTRACT, MULTIPLY, DIVIDE, COMPUTE |
 | `05-traitement-conditionnel.md` | V | IF, EVALUATE, PERFORM, GO TO |
+| `06-gestion-tables.md` | VI | OCCURS, indices, index, SET, SEARCH |
+| `07-gestion-fichiers.md` | VII | SEQUENTIAL, INDEXED, FILE STATUS, READ/WRITE |
+| `08-operations-es.md` | VIII | RRDS (RELATIVE), REWRITE, DELETE, FILLER |
 
 ## Progression
 
@@ -17,4 +20,6 @@
 - [x] Chapitre III - Déclaration des variables
 - [x] Chapitre IV - Opérations sur les données
 - [x] Chapitre V - Traitement conditionnel
-- [ ] Chapitre VI - (à venir)
+- [x] Chapitre VI - Gestion des Tables
+- [x] Chapitre VII - Gestion des Fichiers
+- [x] Chapitre VIII - Opérations E/S avancées

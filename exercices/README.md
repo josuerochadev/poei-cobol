@@ -55,6 +55,19 @@ Les exercices sont organisés par chapitre du cours.
 | `C07-EMPLOYE-READ.cbl` | Lecture fichier SEQUENTIAL (INPUT) |
 | `C07-EMPLOYE-EXTEND.cbl` | Ajout en fin de fichier (EXTEND) |
 
+### Chapitre 08 - Opérations E/S avancées
+
+| Programme | Description |
+|-----------|-------------|
+| `C08-EMPL-WRITE.cbl` | Création fichier EMPLOYE étendu (ID, NOM, PRENOM, ADRESSE, DEBIT, CREDIT, SALAIRE) |
+| `C08-EMPL-PRINT.cbl` | Lecture et affichage format tableau avec symbole Euro |
+| `C08-RRDS-WRITE.cbl` | Création fichier RRDS (RELATIVE) avec 10 enregistrements |
+| `C08-RRDS-READ.cbl` | Lecture enregistrement N°6 (ACCESS RANDOM) |
+| `C08-RRDS-ADD.cbl` | Écriture enregistrement N°13 à position spécifique |
+| `C08-RRDS-REWRITE.cbl` | Modification enregistrement N°4 |
+| `C08-RRDS-DELETE.cbl` | Suppression enregistrement N°3 |
+| `C08-RRDS-LIST.cbl` | Liste complète du fichier RRDS |
+
 ## Compilation
 
 ```bash
