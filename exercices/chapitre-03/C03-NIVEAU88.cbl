@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG03CH03.
+       PROGRAM-ID. C03-NIVEAU88.
        AUTHOR.     ROCHA.
       *--------------------------------------------------------------
       * PROGRAMME D'AFFICHAGE: - VARIABLES CONDITIONS OU BOOLEENNES 88

@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG04CH03.
+       PROGRAM-ID. C03-REDEFINES.
        AUTHOR.     N GAIGI.
       *----------------------------------------------------------------
       * PROGRAMME INITIALIZE VARIABLE GROUPE

@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. TINDICE.
+       PROGRAM-ID. C06-TINDICE.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : Indice d'adressage des Tables

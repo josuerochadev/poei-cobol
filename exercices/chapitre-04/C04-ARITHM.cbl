@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG05CH04.
+       PROGRAM-ID. C04-ARITHM.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : Instructions arithmetiques

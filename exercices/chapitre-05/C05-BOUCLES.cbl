@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG09CH05.
+       PROGRAM-ID. C05-BOUCLES.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : PERFORM avec boucles imbriquees

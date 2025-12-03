@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG01CH01.
+       PROGRAM-ID. C02-DISPLAY.
        AUTHOR.     ROCHA.  
       * PROGRAMME D'AFFICHAGE (LE DISPLAY)
       *---------------------------------------------------------

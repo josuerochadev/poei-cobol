@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. EMPLOYE-WRITE.
+       PROGRAM-ID. C07-EMPWRITE.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : Ecriture fichier EMPLOYE (SEQUENTIAL)

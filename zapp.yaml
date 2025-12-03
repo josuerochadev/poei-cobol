@@ -1,0 +1,25 @@
+name: Document ZAPP généré
+description: >-
+  CRRZG5299I Notez que ce fichier par défaut recherche tous vos dossiers locaux
+  dans tous les espaces de travail VS Code ouverts, ce qui peut être très
+  inefficace. Modifiez les entrées de localisation pour qu'elles soient aussi
+  spécifiques que possible. Ajoutez une nouvelle entrée de type "MVS" pour
+  spécifier des localisations distantes. Voir la documentation pour plus de
+  détails : <
+  https://ibm.github.io/zopeneditor-about/Docs/setting_propertygroup.html >
+author: IBM Z Open Editor
+propertyGroups:
+  - name: search-all
+    libraries:
+      - name: syslib
+        type: local
+        locations:
+          - '**'
+      - name: maclib
+        type: local
+        locations:
+          - '**'
+      - name: proclib
+        type: local
+        locations:
+          - '**'

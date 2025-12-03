@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG02CH01.
+       PROGRAM-ID. C02-DECIMAL.
        AUTHOR.     ROCHA
        .
       *---------------------------------------------------------

@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. TINDEX.
+       PROGRAM-ID. C06-TINDEX.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : Instruction SET sur les Index

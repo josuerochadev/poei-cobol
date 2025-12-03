@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. BANQUE01.
+       PROGRAM-ID. C06-BANQUE01.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * TD BANQUE VIRTUELLE - Exercices 1 et 2

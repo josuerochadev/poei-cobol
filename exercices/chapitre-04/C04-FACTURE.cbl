@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG06CH04.
+       PROGRAM-ID. C04-FACTURE.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : Calcul de facture avec COMPUTE

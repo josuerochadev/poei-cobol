@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG08CH05.
+       PROGRAM-ID. C05-PERFORM.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : PERFORM VARYING

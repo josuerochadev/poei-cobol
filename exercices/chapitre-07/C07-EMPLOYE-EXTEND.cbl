@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. EMPLOYE-EXTEND.
+       PROGRAM-ID. C07-EMPEXT.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : Ajout en fin de fichier EMPLOYE (EXTEND)

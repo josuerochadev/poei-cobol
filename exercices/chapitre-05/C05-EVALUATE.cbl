@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PG07CH05.
+       PROGRAM-ID. C05-EVALUATE.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : EVALUATE avec ALSO

@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. EMPLOYE-READ.
+       PROGRAM-ID. C07-EMPREAD.
        AUTHOR. ROCHA.
       *----------------------------------------------------------------
       * PROGRAMME : Lecture fichier EMPLOYE (SEQUENTIAL)
