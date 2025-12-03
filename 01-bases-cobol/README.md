@@ -6,6 +6,7 @@ Ce dossier contient les concepts fondamentaux de COBOL.
 
 - [x] Structure d'un programme COBOL → `01-structure-programme.md`
 - [x] Interface ISPF et commandes → `02-ispf-commandes.md`
+- [x] Déclaration des variables → `03-declaration-variables.md`
 - [ ] DIVISIONS (IDENTIFICATION, ENVIRONMENT, DATA, PROCEDURE)
 - [ ] Variables et types de données
 - [ ] PICTURE clauses
