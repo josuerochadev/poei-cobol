@@ -47,6 +47,14 @@ Les exercices sont organisés par chapitre du cours.
 | `C06-BANQUE02.cbl` | TD Banque - Chargement buffer et dispatch |
 | `C06-BANQUE03.cbl` | TD Banque - Fichiers E/S (SEQUENTIAL → INDEXED) |
 
+### Chapitre 07 - Gestion des Fichiers
+
+| Programme | Description |
+|-----------|-------------|
+| `C07-EMPLOYE-WRITE.cbl` | Écriture fichier SEQUENTIAL (OUTPUT) |
+| `C07-EMPLOYE-READ.cbl` | Lecture fichier SEQUENTIAL (INPUT) |
+| `C07-EMPLOYE-EXTEND.cbl` | Ajout en fin de fichier (EXTEND) |
+
 ## Compilation
 
 ```bash
