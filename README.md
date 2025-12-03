@@ -10,7 +10,8 @@ poei-cobol/
 │   ├── 01-structure-programme.md
 │   ├── 02-ispf-commandes.md
 │   ├── 03-declaration-variables.md
-│   └── 04-operations-donnees.md
+│   ├── 04-operations-donnees.md
+│   └── 05-traitement-conditionnel.md
 │
 ├── exercices/          # Programmes COBOL par chapitre
 │   ├── chapitre-02/    # DISPLAY, chaînes, debug
@@ -33,6 +34,7 @@ poei-cobol/
 | II | Interface ISPF et commandes | ✅ | PG01CH01, PG02CH01 |
 | III | Déclaration des variables | ✅ | PG03CH03, PG04CH03 |
 | IV | Opérations sur les données | ✅ | PG05CH04, PG06CH04 |
+| V | Traitement conditionnel | ✅ | - |
 
 ## Environnement
 
