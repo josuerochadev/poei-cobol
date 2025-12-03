@@ -6,43 +6,50 @@ Répertoire de formation COBOL, JCL et technologies Mainframe.
 
 ```
 poei-cobol/
-├── 01-bases-cobol/     # Concepts de base COBOL
-├── 02-exercices/       # Exercices pratiques
-├── 03-jcl/            # Job Control Language
-├── 04-mainframe/      # Concepts mainframe (CICS, DB2, VSAM, etc.)
-├── 05-projets/        # Projets plus complets
-├── docs/              # Documentation et notes de cours
-├── exemples/          # Exemples de code commentés
-└── utils/             # Scripts utilitaires
+├── cours/              # Fiches de révision par chapitre
+│   ├── 01-structure-programme.md
+│   ├── 02-ispf-commandes.md
+│   └── 03-declaration-variables.md
+│
+├── exercices/          # Programmes COBOL par chapitre
+│   ├── chapitre-02/    # DISPLAY, chaînes, debug
+│   └── chapitre-03/    # Variables, PICTURE, REDEFINES
+│
+├── projets/            # Projets complets
+│   └── fil-rouge/      # Projet fil rouge (21 exercices)
+│
+├── docs/               # Documentation et mémos
+├── exemples/           # Exemples de code commentés
+└── utils/              # Scripts utilitaires
 ```
+
+## Chapitres couverts
+
+| Chapitre | Sujet | Cours | Exercices |
+|----------|-------|-------|-----------|
+| I | Structure d'un programme COBOL | ✅ | - |
+| II | Interface ISPF et commandes | ✅ | PG01CH02, PG02CH02 |
+| III | Déclaration des variables | ✅ | PG03CH03, PG04CH03 |
 
 ## Environnement
 
-- **Compilateur** : GNU COBOL 3.2.0
+- **Compilateur** : GnuCOBOL 3.2.0
 - **OS** : macOS
 
 ## Compilation et exécution
 
-### Compiler un programme COBOL
 ```bash
-cobc -x nom_programme.cbl
-```
+# Compiler un programme
+cobc -x programme.cbl -o programme
 
-### Compiler avec options de débogage
-```bash
-cobc -x -debug -g nom_programme.cbl
-```
+# Compiler avec mode debug
+cobc -x -fdebugging-line programme.cbl -o programme
 
-### Exécuter
-```bash
-./nom_programme
+# Exécuter
+./programme
 ```
 
 ## Ressources
 
 - [GnuCOBOL Documentation](https://gnucobol.sourceforge.io/)
 - [COBOL Programming Course](https://www.tutorialspoint.com/cobol/index.htm)
-
-## Notes
-
-Ce répertoire contient tous les exercices, exemples et projets réalisés pendant la formation.

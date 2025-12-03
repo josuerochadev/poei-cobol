@@ -5,6 +5,10 @@
 *.dylib
 *.dll
 
+# Exécutables GnuCOBOL (sans extension)
+PG*CH*
+!*.cbl
+
 # Fichiers de sortie
 *.lis
 *.lst
