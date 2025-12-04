@@ -12,6 +12,8 @@
 | `06-gestion-tables.md` | VI | OCCURS, indices, index, SET, SEARCH |
 | `07-gestion-fichiers.md` | VII | SEQUENTIAL, INDEXED, FILE STATUS, READ/WRITE |
 | `08-operations-es.md` | VIII | RRDS (RELATIVE), REWRITE, DELETE, FILLER |
+| `09-programmes-sous-programmes.md` | IX | CALL, LINKAGE SECTION, BY REFERENCE/CONTENT, GOBACK |
+| `10-traitement-fichiers.md` | X | Synthèse fichiers, OPTIONAL, RESERVE, AIX/PATH, JCL |
 
 ## Progression
 
@@ -23,3 +25,5 @@
 - [x] Chapitre VI - Gestion des Tables
 - [x] Chapitre VII - Gestion des Fichiers
 - [x] Chapitre VIII - Opérations E/S avancées
+- [x] Chapitre IX - Programmes et Sous-programmes
+- [x] Chapitre X - Traitement des Fichiers (synthèse)

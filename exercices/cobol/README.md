@@ -81,6 +81,35 @@ Les exercices sont organisés par chapitre du cours.
 | `C09-MODIF.cbl` | Démonstration modification paramètres BY REFERENCE |
 | `C09-BYREF-DEMO.cbl` | Démonstration BY REFERENCE vs BY CONTENT |
 
+### Chapitre 10 - Traitement des Fichiers (synthèse)
+
+#### Démonstrations
+
+| Programme | Description |
+|-----------|-------------|
+| `C10-OPTIONAL.cbl` | Clause OPTIONAL - Fichier pouvant ne pas exister |
+| `C10-ALTKEY.cbl` | ALTERNATE RECORD KEY - Accès par clé secondaire |
+
+#### TP Complet : Manipulation fichier KSDS PERSONNEL
+
+| Programme | Exercice | Description |
+|-----------|----------|-------------|
+| `C10-PERS-CREATE.cbl` | Préparation | Création fichier KSDS avec clé primaire (MATRICULE) et secondaire (NUM-SS) |
+| `C10-PERS-LIST.cbl` | Ex. 1 | Lecture séquentielle avec DISPLAY de chaque enregistrement |
+| `C10-PERS-BYSS.cbl` | Ex. 2-3 | Lecture par clé secondaire (N° Sécurité Sociale) |
+| `C10-PERS-UPDATE.cbl` | Ex. 4 | Modification Nom/Prénom d'un salarié (REWRITE) |
+| `C10-PERS-ADD.cbl` | Ex. 5-6 | Ajout nouveau salarié + vérification mise à jour index secondaire |
+| `C10-PERS-START.cbl` | Ex. 8 | Lecture enregistrement le plus proche avec START >= |
+
+**Ordre d'exécution du TP :**
+1. `C10-PERS-CREATE` - Créer le fichier PERSONNEL.KSDS
+2. `C10-PERS-LIST` - Vérifier le contenu
+3. `C10-PERS-BYSS` - Rechercher par N° SS
+4. `C10-PERS-UPDATE` - Modifier un salarié
+5. `C10-PERS-ADD` - Ajouter un nouveau salarié
+6. `C10-PERS-LIST` - Vérifier les modifications
+7. `C10-PERS-START` - Tester START avec clé inexistante
+
 ## Compilation
 
 ```bash
