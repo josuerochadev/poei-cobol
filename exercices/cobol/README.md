@@ -152,6 +152,21 @@ Les exercices sont organisés par chapitre du cours.
 | `C12-FACTURE.cbl` | TP complet - Édition facture avec en-tête et totaux |
 | `C12-RAPPORT.cbl` | Rapport multi-pages avec WRITE AFTER ADVANCING |
 
+#### TP Relevé Bancaire (Exercices 05-06)
+
+| Programme | Exercice | Description |
+|-----------|----------|-------------|
+| `C12-RELEVE-PREP.cbl` | Ex. 5 | Préparation fichier AIMPRIM (E=Entête, D=Détail, P=Pied) |
+| `C12-RELEVE-PRINT.cbl` | Ex. 6 | Impression relevé bancaire (57 lignes/page) |
+
+**Prérequis** : Exécuter d'abord les programmes du chapitre 08 pour créer les fichiers KSDS :
+1. `C08-RELEVE-INIT` - Créer le fichier BUFFER.DAT
+2. `C08-RELEVE` - Dispatcher vers AGENCE.DAT, CLIENT.DAT, RIB.DAT, MVTC.DAT
+
+**Ordre d'exécution du TP :**
+1. `C12-RELEVE-PREP` - Génère AIMPRIM.DAT (client 01210, mai 2025)
+2. `C12-RELEVE-PRINT` - Génère RELEVE.TXT (relevé imprimable)
+
 ## Compilation
 
 ```bash
