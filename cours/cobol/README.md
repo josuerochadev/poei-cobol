@@ -14,6 +14,7 @@
 | `08-operations-es.md` | VIII | RRDS (RELATIVE), REWRITE, DELETE, FILLER |
 | `09-programmes-sous-programmes.md` | IX | CALL, LINKAGE SECTION, BY REFERENCE/CONTENT, GOBACK |
 | `10-traitement-fichiers.md` | X | Synthèse fichiers, OPTIONAL, RESERVE, AIX/PATH, JCL |
+| `11-tri-interne.md` | XI | SORT, MERGE, INPUT/OUTPUT PROCEDURE, RELEASE, RETURN |
 
 ## Progression
 
@@ -27,3 +28,4 @@
 - [x] Chapitre VIII - Opérations E/S avancées
 - [x] Chapitre IX - Programmes et Sous-programmes
 - [x] Chapitre X - Traitement des Fichiers (synthèse)
+- [x] Chapitre XI - Tri Interne (SORT / MERGE)

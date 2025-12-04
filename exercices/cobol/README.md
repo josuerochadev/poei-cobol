@@ -110,6 +110,38 @@ Les exercices sont organisés par chapitre du cours.
 6. `C10-PERS-LIST` - Vérifier les modifications
 7. `C10-PERS-START` - Tester START avec clé inexistante
 
+### Chapitre 11 - Tri Interne (SORT / MERGE)
+
+#### Démonstrations
+
+| Programme | Description |
+|-----------|-------------|
+| `C11-SORT-SIMPLE.cbl` | SORT avec USING/GIVING - tri simple mono et multi-clés |
+| `C11-SORT-INPUT.cbl` | INPUT PROCEDURE avec RELEASE - filtrage avant tri |
+| `C11-SORT-OUTPUT.cbl` | OUTPUT PROCEDURE avec RETURN - édition avec ruptures |
+| `C11-MERGE.cbl` | MERGE - fusion de fichiers régionaux pré-triés |
+| `C11-SORT-COMPLET.cbl` | TP complet - INPUT + OUTPUT PROCEDURE combinées |
+
+#### TP Institution Financière - Fichier CLIENT
+
+| Programme | Exercice | Description |
+|-----------|----------|-------------|
+| `C11-CLIENT-CREATE.cbl` | Préparation | Création fichier CLIENT.PS (10 clients en désordre) |
+| `C11-CLIENT-TRI-ASC.cbl` | Ex. 1 | TRI ASCENDING sur ID-CLIENT (USING/GIVING) |
+| `C11-CLIENT-TRI-DESC.cbl` | Ex. 2 | TRI DESCENDING sur ID-CLIENT (USING/GIVING) |
+| `C11-CLIENT-TRI-PROC.cbl` | Ex. 3 | TRI PROCÉDURAL (INPUT/OUTPUT PROCEDURE) |
+| `C11-CLIENT-SPLIT.cbl` | Ex. 4 | Création 2 DS avec clés spécifiques (C-, E-) |
+| `C11-CLIENT-MERGE.cbl` | Ex. 5 | MERGE des 3 Data Sets en un seul fichier |
+
+**Ordre d'exécution du TP :**
+
+1. `C11-CLIENT-CREATE` - Créer le fichier CLIENT.PS
+2. `C11-CLIENT-TRI-ASC` - Tri ascendant
+3. `C11-CLIENT-TRI-DESC` - Tri descendant
+4. `C11-CLIENT-TRI-PROC` - Tri procédural
+5. `C11-CLIENT-SPLIT` - Séparer en CLIENT-COURANT.PS et CLIENT-EPARGNE.PS
+6. `C11-CLIENT-MERGE` - Fusionner les 3 fichiers
+
 ## Compilation
 
 ```bash
