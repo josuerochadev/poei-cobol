@@ -142,6 +142,16 @@ Les exercices sont organisés par chapitre du cours.
 5. `C11-CLIENT-SPLIT` - Séparer en CLIENT-COURANT.PS et CLIENT-EPARGNE.PS
 6. `C11-CLIENT-MERGE` - Fusionner les 3 fichiers
 
+### Chapitre 12 - Fichier d'impression
+
+| Programme | Description |
+|-----------|-------------|
+| `C12-EDITION-SIMPLE.cbl` | Insertion simple (B, /, 0) - dates, téléphones, SIRET |
+| `C12-EDITION-MONTANT.cbl` | Suppression zéros (Z), astérisques (*), symboles Euro |
+| `C12-EDITION-SIGNE.cbl` | Signes (+, -) fixes et flottants, CR/DB |
+| `C12-FACTURE.cbl` | TP complet - Édition facture avec en-tête et totaux |
+| `C12-RAPPORT.cbl` | Rapport multi-pages avec WRITE AFTER ADVANCING |
+
 ## Compilation
 
 ```bash
