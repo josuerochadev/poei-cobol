@@ -68,6 +68,19 @@ Les exercices sont organisés par chapitre du cours.
 | `C08-RRDS-DELETE.cbl` | Suppression enregistrement N°3 |
 | `C08-RRDS-LIST.cbl` | Liste complète du fichier RRDS |
 
+### Chapitre 09 - Programmes et Sous-programmes
+
+| Programme | Description |
+|-----------|-------------|
+| `C09-PERSREV.cbl` | **TP Formateur** - Programme principal calcul revenu annuel (CALL) |
+| `C09-CALREV.cbl` | **TP Formateur** - Sous-programme calcul (LINKAGE SECTION, GOBACK) |
+| `C09-APPELANT.cbl` | Programme appelant démonstration CALL (TVA, validation, tri) |
+| `C09-CALCUL.cbl` | Sous-programme calcul TVA (BY CONTENT, BY REFERENCE) |
+| `C09-VALID.cbl` | Sous-programme validation données (numérique, alphabétique) |
+| `C09-TRIEUR.cbl` | Sous-programme tri de tableau (bubble sort) |
+| `C09-MODIF.cbl` | Démonstration modification paramètres BY REFERENCE |
+| `C09-BYREF-DEMO.cbl` | Démonstration BY REFERENCE vs BY CONTENT |
+
 ## Compilation
 
 ```bash
@@ -79,4 +92,22 @@ cobc -x C06-TINDICE.cbl -o C06-TINDICE
 
 # Exécuter
 ./C06-TINDICE
+```
+
+### Compilation avec sous-programmes (Chapitre 09)
+
+```bash
+cd chapitre-09
+
+# Compiler le sous-programme
+cobc -c -x C09-CALREV.cbl
+
+# Compiler le programme principal
+cobc -c -x C09-PERSREV.cbl
+
+# Édition de liens
+cobc -x -o C09-PERSREV C09-PERSREV.o C09-CALREV.o
+
+# Exécuter
+./C09-PERSREV
 ```
