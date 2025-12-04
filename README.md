@@ -1,6 +1,8 @@
 # Formation COBOL - POEI
 
-Répertoire de formation COBOL, JCL et technologies Mainframe.
+Dépôt de suivi de ma formation POEI Développeur Mainframe COBOL dispensée par M2i Formation à Strasbourg (octobre 2025 – janvier 2026).
+Technologies couvertes : z/OS, TSO/ISPF, JCL, VSAM, COBOL, DB2/SQL, CICS
+Ce repository documente ma progression et regroupe les exercices, TP et projets réalisés durant la formation.
 
 ## Structure du projet
 
