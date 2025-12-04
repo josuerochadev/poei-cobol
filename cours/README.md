@@ -1,25 +1,30 @@
-# Cours COBOL - Fiches de révision
+# Cours - Formation Mainframe
 
-## Chapitres disponibles
+Ce dossier contient les supports de cours organisés par module.
 
-| Fichier | Chapitre | Contenu |
-|---------|----------|---------|
-| `01-structure-programme.md` | I | Structure programme, 4 divisions, règles de codage |
-| `02-ispf-commandes.md` | II | Interface ISPF, commandes ligne, compilation |
-| `03-declaration-variables.md` | III | Niveaux, PICTURE, VALUE, édition, REDEFINES |
-| `04-operations-donnees.md` | IV | MOVE, ADD, SUBTRACT, MULTIPLY, DIVIDE, COMPUTE |
-| `05-traitement-conditionnel.md` | V | IF, EVALUATE, PERFORM, GO TO |
-| `06-gestion-tables.md` | VI | OCCURS, indices, index, SET, SEARCH |
-| `07-gestion-fichiers.md` | VII | SEQUENTIAL, INDEXED, FILE STATUS, READ/WRITE |
-| `08-operations-es.md` | VIII | RRDS (RELATIVE), REWRITE, DELETE, FILLER |
+## Modules disponibles
 
-## Progression
+| Module | Description | Chapitres |
+|--------|-------------|-----------|
+| [COBOL](cobol/) | Langage COBOL et programmation mainframe | 9 chapitres |
+| [CICS](cics/) | Moniteur transactionnel et IMS | 3 chapitres |
 
-- [x] Chapitre I - Structure d'un programme COBOL
-- [x] Chapitre II - Interface ISPF et commandes de base
-- [x] Chapitre III - Déclaration des variables
-- [x] Chapitre IV - Opérations sur les données
-- [x] Chapitre V - Traitement conditionnel
-- [x] Chapitre VI - Gestion des Tables
-- [x] Chapitre VII - Gestion des Fichiers
-- [x] Chapitre VIII - Opérations E/S avancées
+## Parcours recommandé
+
+```
+1. Module COBOL (prérequis)
+   └── Chapitres I à IX
+
+2. Module CICS (après COBOL)
+   └── Chapitres I à III
+```
+
+## Prérequis par module
+
+### COBOL
+- Aucun prérequis spécifique
+- Connaissance de base en programmation utile
+
+### CICS
+- Maîtrise du module COBOL
+- Connaissance de l'environnement z/OS
