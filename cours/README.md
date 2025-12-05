@@ -6,7 +6,7 @@ Ce dossier contient les supports de cours organisés par module.
 
 | Module | Description | Chapitres |
 |--------|-------------|-----------|
-| [Z/OS et TSO/ISPF](zos-tso/) | Système z/OS, TSO, ISPF, JCL, VSAM | 5 chapitres |
+| [Z/OS et TSO/ISPF](zos-tso/) | Système z/OS, TSO, ISPF, JCL, VSAM | 6 chapitres |
 | [COBOL](cobol/) | Langage COBOL et programmation mainframe | 12 chapitres |
 | [CICS](cics/) | Moniteur transactionnel et IMS | 3 chapitres |
 
@@ -14,7 +14,7 @@ Ce dossier contient les supports de cours organisés par module.
 
 ```
 1. Module Z/OS et TSO/ISPF (fondamentaux)
-   └── Chapitres I à V
+   └── Chapitres I à VI
 
 2. Module COBOL (programmation)
    └── Chapitres I à XII
