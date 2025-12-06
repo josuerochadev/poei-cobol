@@ -12,6 +12,7 @@ exercices/jcl/
 ├── README.md
 ├── 02-exercices-fichiers.md      # Documentation chapitre 02
 ├── 03-exercices-procedures.md    # Documentation chapitre 03
+├── 04-exercices-utilitaires.md   # Documentation chapitre 04
 ├── chapitre-02/
 │   ├── ex01-creation-esds.jcl
 │   ├── ex02-copie-iebgener.jcl
@@ -19,11 +20,18 @@ exercices/jcl/
 │   ├── ex04-concatenation.jcl
 │   ├── ex-bonus-complet.jcl
 │   └── cleanup.jcl
-└── chapitre-03/
-    ├── ex01-proc-instream.jcl
-    ├── ex02-deux-procs.jcl
-    ├── ex03-proc-imbriquees.jcl
-    ├── ex04-param-symboliques.jcl
+├── chapitre-03/
+│   ├── ex01-proc-instream.jcl
+│   ├── ex02-deux-procs.jcl
+│   ├── ex03-proc-imbriquees.jcl
+│   ├── ex04-param-symboliques.jcl
+│   └── cleanup.jcl
+└── chapitre-04/
+    ├── ex01-iefbr14-iebgener.jcl
+    ├── ex02-iebcopy-pds.jcl
+    ├── ex03-sort-filtrage.jcl
+    ├── ex04-idcams-vsam.jcl
+    ├── ex-bonus-workflow.jcl
     └── cleanup.jcl
 ```
 
@@ -66,7 +74,26 @@ exercices/jcl/
 
 ---
 
-### Chapitre 04 - Utilitaires *(a venir)*
+### Chapitre 04 - Utilitaires
+
+| Fichier | Description |
+|---------|-------------|
+| `ex01-iefbr14-iebgener.jcl` | IEFBR14 et IEBGENER : creation et chargement |
+| `ex02-iebcopy-pds.jcl` | IEBCOPY : gestion des PDS |
+| `ex03-sort-filtrage.jcl` | SORT : tri et filtrage |
+| `ex04-idcams-vsam.jcl` | IDCAMS : gestion VSAM |
+| `ex-bonus-workflow.jcl` | Workflow complet multi-utilitaires |
+| `cleanup.jcl` | Nettoyage des datasets |
+
+**Concepts couverts :**
+- IEFBR14 pour creation/suppression
+- IEBGENER pour copie sequentielle
+- IEBCOPY pour gestion PDS (COPY, SELECT, compression)
+- IDCAMS (DELETE, DEFINE, REPRO, PRINT, LISTCAT)
+- SORT (FIELDS, INCLUDE/OMIT, OUTREC, OUTFIL)
+- Gestion fichiers VSAM KSDS
+
+---
 
 ### Chapitre 05 - Travaux pratiques *(a venir)*
 
@@ -104,6 +131,14 @@ ex-bonus-complet (tout en un)
 **Chapitre 03 :**
 ```
 Chaque exercice est independant
+```
+
+**Chapitre 04 :**
+```
+ex01 (creation donnees) -> ex03 (utilise ex01)
+                        -> ex04 (utilise ex01)
+ex02 est independant
+ex-bonus-workflow (tout en un)
 ```
 
 ### Nettoyage

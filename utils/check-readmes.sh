@@ -77,8 +77,8 @@ else
     print_status "WARN" "Aucun chapitre JCL trouvé"
 fi
 
-# Vérifier chapitres 01, 02 et 03
-for i in 01 02 03; do
+# Vérifier chapitres 01, 02, 03 et 04
+for i in 01 02 03 04; do
     if [ -f "$PROJECT_ROOT/cours/jcl/$i-"*.md ]; then
         print_status "OK" "Chapitre $i présent"
     else
@@ -100,7 +100,7 @@ JCL_JCL_COUNT=$(count_files "$PROJECT_ROOT/exercices/jcl" "*.jcl")
 JCL_EX_DIRS=$(find "$PROJECT_ROOT/exercices/jcl" -type d -name "chapitre-*" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$JCL_JCL_COUNT" -ge 1 ]; then
     print_status "OK" "Fichiers JCL: $JCL_JCL_COUNT fichiers .jcl"
-    print_status "OK" "Répertoires exercices: $JCL_EX_DIRS (chapitre-02, chapitre-03)"
+    print_status "OK" "Répertoires exercices: $JCL_EX_DIRS (chapitre-02, 03, 04)"
 else
     print_status "WARN" "Aucun fichier .jcl trouvé"
 fi
