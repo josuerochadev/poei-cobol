@@ -10,10 +10,8 @@ Chaque chapitre contient des fichiers `.jcl` directement executables.
 ```
 exercices/jcl/
 ├── README.md
-├── 02-exercices-fichiers.md      # Documentation chapitre 02
-├── 03-exercices-procedures.md    # Documentation chapitre 03
-├── 04-exercices-utilitaires.md   # Documentation chapitre 04
 ├── chapitre-02/
+│   ├── README.md                   # Documentation et enonces
 │   ├── ex01-creation-esds.jcl
 │   ├── ex02-copie-iebgener.jcl
 │   ├── ex03-fichier-temporaire.jcl
@@ -21,12 +19,14 @@ exercices/jcl/
 │   ├── ex-bonus-complet.jcl
 │   └── cleanup.jcl
 ├── chapitre-03/
+│   ├── README.md                   # Documentation et enonces
 │   ├── ex01-proc-instream.jcl
 │   ├── ex02-deux-procs.jcl
 │   ├── ex03-proc-imbriquees.jcl
 │   ├── ex04-param-symboliques.jcl
 │   └── cleanup.jcl
 └── chapitre-04/
+    ├── README.md                   # Documentation et enonces
     ├── ex01-iefbr14-iebgener.jcl
     ├── ex02-iebcopy-pds.jcl
     ├── ex03-sort-filtrage.jcl
@@ -147,6 +147,6 @@ Apres les exercices, executer `cleanup.jcl` pour supprimer les datasets crees.
 
 ## Notes
 
-- Les fichiers markdown (`02-exercices-*.md`, `03-exercices-*.md`) contiennent la documentation detaillee et les explications
+- Chaque dossier `chapitre-XX/` contient un `README.md` avec la documentation detaillee et les enonces
 - Les fichiers `.jcl` sont les solutions executables
 - Adapter les noms de datasets selon votre environnement
