@@ -91,7 +91,7 @@ JCL_JCL_COUNT=$(count_files "$PROJECT_ROOT/exercices/jcl" "*.jcl")
 JCL_EX_DIRS=$(find "$PROJECT_ROOT/exercices/jcl" -type d -name "chapitre-*" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$JCL_JCL_COUNT" -ge 1 ]; then
     print_status "OK" "Fichiers JCL: $JCL_JCL_COUNT fichiers .jcl"
-    print_status "OK" "Répertoires exercices: $JCL_EX_DIRS (chapitre-02, 03, 04)"
+    print_status "OK" "Répertoires exercices: $JCL_EX_DIRS (chapitre-02 à 05)"
 else
     print_status "WARN" "Aucun fichier .jcl trouvé"
 fi

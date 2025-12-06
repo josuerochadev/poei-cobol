@@ -25,13 +25,22 @@ exercices/jcl/
 │   ├── ex03-proc-imbriquees.jcl
 │   ├── ex04-param-symboliques.jcl
 │   └── cleanup.jcl
-└── chapitre-04/
-    ├── README.md                   # Documentation et enonces
-    ├── ex01-iefbr14-iebgener.jcl
-    ├── ex02-iebcopy-pds.jcl
-    ├── ex03-sort-filtrage.jcl
-    ├── ex04-idcams-vsam.jcl
-    ├── ex-bonus-workflow.jcl
+├── chapitre-04/
+│   ├── README.md                   # Documentation et enonces
+│   ├── ex01-iefbr14-iebgener.jcl
+│   ├── ex02-iebcopy-pds.jcl
+│   ├── ex03-sort-filtrage.jcl
+│   ├── ex04-idcams-vsam.jcl
+│   ├── ex-bonus-workflow.jcl
+│   └── cleanup.jcl
+└── chapitre-05/
+    ├── README.md                   # QCM + enonces TP
+    ├── tp01-dataset-ps.jcl
+    ├── tp02-dataset-po.jcl
+    ├── tp03-concatenation.jcl
+    ├── tp04-utilitaires.jcl
+    ├── tp05-sort.jcl
+    ├── tp06-analyse-erreurs.jcl
     └── cleanup.jcl
 ```
 
@@ -95,7 +104,22 @@ exercices/jcl/
 
 ---
 
-### Chapitre 05 - Travaux pratiques *(a venir)*
+### Chapitre 05 - Travaux Pratiques
+
+| Fichier | Description |
+|---------|-------------|
+| `tp01-dataset-ps.jcl` | Creation d'un dataset sequentiel (PS) |
+| `tp02-dataset-po.jcl` | Creation d'un dataset partitionne (PDS) |
+| `tp03-concatenation.jcl` | Concatenation de datasets |
+| `tp04-utilitaires.jcl` | Utilisation des utilitaires IBM |
+| `tp05-sort.jcl` | Manipulation SORT complete |
+| `tp06-analyse-erreurs.jcl` | Analyse des erreurs et codes retour |
+| `cleanup.jcl` | Nettoyage des datasets |
+
+**Contenu :**
+- QCM de comprehension (10 questions)
+- 6 travaux pratiques de synthese
+- Manipulation complete avec ISPF et TSO
 
 ## Prerequis
 
@@ -139,6 +163,12 @@ ex01 (creation donnees) -> ex03 (utilise ex01)
                         -> ex04 (utilise ex01)
 ex02 est independant
 ex-bonus-workflow (tout en un)
+```
+
+**Chapitre 05 :**
+```
+tp01 -> tp02 -> tp03 -> tp04 -> tp05 -> tp06
+(Ordre recommande mais chaque TP peut etre fait independamment)
 ```
 
 ### Nettoyage
