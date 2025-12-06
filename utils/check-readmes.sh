@@ -86,13 +86,23 @@ for i in 01 02 03; do
     fi
 done
 
-# Vérifier exercices JCL
+# Vérifier exercices JCL (documentation markdown)
 JCL_EX_COUNT=$(count_files "$PROJECT_ROOT/exercices/jcl" "*.md")
 JCL_EX_COUNT=$((JCL_EX_COUNT - 1)) # Exclure README.md
 if [ "$JCL_EX_COUNT" -ge 1 ]; then
-    print_status "OK" "Exercices: $JCL_EX_COUNT fichiers"
+    print_status "OK" "Documentation exercices: $JCL_EX_COUNT fichiers .md"
 else
-    print_status "WARN" "Aucun exercice JCL trouvé"
+    print_status "WARN" "Aucune documentation exercice JCL trouvée"
+fi
+
+# Vérifier fichiers .jcl exécutables
+JCL_JCL_COUNT=$(count_files "$PROJECT_ROOT/exercices/jcl" "*.jcl")
+JCL_EX_DIRS=$(find "$PROJECT_ROOT/exercices/jcl" -type d -name "chapitre-*" 2>/dev/null | wc -l | tr -d ' ')
+if [ "$JCL_JCL_COUNT" -ge 1 ]; then
+    print_status "OK" "Fichiers JCL: $JCL_JCL_COUNT fichiers .jcl"
+    print_status "OK" "Répertoires exercices: $JCL_EX_DIRS (chapitre-02, chapitre-03)"
+else
+    print_status "WARN" "Aucun fichier .jcl trouvé"
 fi
 
 echo ""
@@ -170,7 +180,7 @@ echo ""
 echo "   Module             | Cours | Exercices"
 echo "   -------------------|-------|----------"
 printf "   Z/OS TSO           | %5s | %s fichiers\n" "$ZOS_COURS_COUNT" "$ZOS_EX_COUNT"
-printf "   JCL                | %5s | %s fichiers\n" "$JCL_COURS_COUNT" "$JCL_EX_COUNT"
+printf "   JCL                | %5s | %s .jcl, %s .md\n" "$JCL_COURS_COUNT" "$JCL_JCL_COUNT" "$JCL_EX_COUNT"
 printf "   COBOL              | %5s | %s .cbl\n" "$COBOL_COURS_COUNT" "$COBOL_CBL_COUNT"
 printf "   CICS               | %5s | (à venir)\n" "$CICS_COURS_COUNT"
 printf "   Fil Rouge          |   -   | %s JCL, %s CBL\n" "$FR_JCL" "$FR_CBL"
