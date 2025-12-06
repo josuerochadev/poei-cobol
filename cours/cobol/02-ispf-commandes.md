@@ -159,3 +159,14 @@ cobc -x -fdebugging-line programme.cbl -o programme
 7. **V** = virgule virtuelle (pas stockée)
 8. **S** = nombre signé
 9. **Z** = suppression des zéros de tête
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre I - Structure Programme](01-structure-programme.md) | [Chapitre III - Déclaration Variables](03-declaration-variables.md) |
+
+---
+*Formation COBOL - Module COBOL*

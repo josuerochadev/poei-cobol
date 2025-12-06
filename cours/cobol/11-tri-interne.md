@@ -648,3 +648,14 @@ L'instruction **MERGE** fusionne plusieurs fichiers **déjà triés** en un seul
 | Fusion | `MERGE ... USING ... GIVING` | Fusion de fichiers pré-triés |
 | Ordre croissant | `ASCENDING KEY` | A→Z, 0→9 |
 | Ordre décroissant | `DESCENDING KEY` | Z→A, 9→0 |
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre X - Traitement Fichiers](10-traitement-fichiers.md) | [Chapitre XII - Fichier Impression](12-fichier-impression.md) |
+
+---
+*Formation COBOL - Module COBOL*

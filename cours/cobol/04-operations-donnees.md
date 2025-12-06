@@ -184,3 +184,14 @@ Expression arithmétique complète en une instruction.
 - Opération simple
 - Besoin de REMAINDER
 - Code plus explicite
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre III - Déclaration Variables](03-declaration-variables.md) | [Chapitre V - Traitement Conditionnel](05-traitement-conditionnel.md) |
+
+---
+*Formation COBOL - Module COBOL*

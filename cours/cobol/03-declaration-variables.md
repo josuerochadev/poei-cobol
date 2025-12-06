@@ -267,3 +267,14 @@ Plusieurs VUES sur la MÊME zone mémoire.
 | **VALUE** | Initialisation, ZEROS, SPACES, ALL, THRU pour 88 |
 | **REDEFINES** | Plusieurs vues sur même mémoire |
 | **USAGE** | DISPLAY (défaut), COMP (binaire), COMP-3 (packed) |
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre II - Interface ISPF](02-ispf-commandes.md) | [Chapitre IV - Opérations Données](04-operations-donnees.md) |
+
+---
+*Formation COBOL - Module COBOL*

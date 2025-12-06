@@ -225,3 +225,14 @@ Pointeur optimisé contenant le déplacement en octets.
 | Recherche séquentielle | `SEARCH table AT END ... WHEN ...` |
 | Recherche binaire | `SEARCH ALL table` (KEY + triée) |
 | Initialiser table | REDEFINES avec VALUE sur FILLER |
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre V - Traitement Conditionnel](05-traitement-conditionnel.md) | [Chapitre VII - Gestion Fichiers](07-gestion-fichiers.md) |
+
+---
+*Formation COBOL - Module COBOL*

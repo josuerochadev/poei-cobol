@@ -1292,3 +1292,14 @@ Empêche la réouverture du fichier dans le même programme.
 | `46` | Erreur | READ/START sans positionnement |
 | `48` | Erreur | WRITE sans OPEN correct |
 | `49` | Erreur | REWRITE/DELETE sans OPEN I-O |
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre VII - Gestion Fichiers](07-gestion-fichiers.md) | [Chapitre IX - Programmes et Sous-Programmes](09-programmes-sous-programmes.md) |
+
+---
+*Formation COBOL - Module COBOL*

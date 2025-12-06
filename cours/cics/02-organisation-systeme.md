@@ -994,3 +994,14 @@ La **COMMAREA** permet de passer des données entre transactions ou programmes :
 - [← Précédent : Présentation générale](01-presentation-generale.md)
 - [Suivant : SGBD IMS →](03-sgbd-ims.md)
 - [Retour au sommaire](README.md)
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre I - Présentation Générale](01-presentation-generale.md) | [Chapitre III - SGBD IMS](03-sgbd-ims.md) |
+
+---
+*Formation COBOL - Module CICS*

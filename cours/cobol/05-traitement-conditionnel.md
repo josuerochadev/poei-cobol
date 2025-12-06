@@ -243,3 +243,14 @@
 3. Utiliser les niveaux 88 pour les conditions lisibles
 4. Éviter `GO TO` - utiliser `PERFORM` à la place
 5. Choisir `WITH TEST BEFORE` (while) ou `WITH TEST AFTER` (do-while) selon le besoin
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre IV - Opérations Données](04-operations-donnees.md) | [Chapitre VI - Gestion Tables](06-gestion-tables.md) |
+
+---
+*Formation COBOL - Module COBOL*

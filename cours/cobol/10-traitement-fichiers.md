@@ -854,3 +854,14 @@ Un **PATH** combine le fichier de base et l'AIX pour permettre l'accès par la c
 - Chapitre VIII - Opérations E/S (OPEN, READ, WRITE, REWRITE, DELETE, START, CLOSE)
 - IBM Enterprise COBOL for z/OS - File Processing
 - IBM VSAM - Virtual Storage Access Method
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre IX - Programmes et Sous-Programmes](09-programmes-sous-programmes.md) | [Chapitre XI - Tri Interne](11-tri-interne.md) |
+
+---
+*Formation COBOL - Module COBOL*

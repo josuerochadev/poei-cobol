@@ -628,3 +628,14 @@ Le `*` remplace les zéros non significatifs par des **astérisques** (protectio
 | Symbole flottant | `$$$$`, `€€€€` | `$$$9,99` → $ devant chiffres |
 | Suppression zéros | `Z` | `ZZZ9` → espaces |
 | Astérisques | `*` | `***9` → protection |
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre XI - Tri Interne](11-tri-interne.md) | [Module CICS](../cics/README.md) |
+
+---
+*Formation COBOL - Module COBOL*

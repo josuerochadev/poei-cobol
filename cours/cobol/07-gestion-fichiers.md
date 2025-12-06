@@ -322,3 +322,14 @@ Combine séquentiel ET direct.
 | Modification | `REWRITE ... INVALID KEY` |
 | Suppression | `DELETE ... INVALID KEY` |
 | Positionnement | `START ... KEY >= ...` |
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre VI - Gestion Tables](06-gestion-tables.md) | [Chapitre VIII - Opérations E/S](08-operations-es.md) |
+
+---
+*Formation COBOL - Module COBOL*

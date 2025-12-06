@@ -683,3 +683,14 @@ Créer un programme principal qui appelle plusieurs sous-programmes avec gestion
 
 ### Exercice 4 : Passage de tableau
 Créer un sous-programme qui trie un tableau de 10 éléments en ordre croissant.
+
+---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre VIII - Opérations E/S](08-operations-es.md) | [Chapitre X - Traitement Fichiers](10-traitement-fichiers.md) |
+
+---
+*Formation COBOL - Module COBOL*
