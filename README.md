@@ -9,11 +9,16 @@ Ce repository documente ma progression et regroupe les exercices, TP et projets 
 ```
 poei-cobol/
 ├── cours/                  # Cours par module
-│   ├── cobol/              # Module COBOL (9 chapitres)
+│   ├── zos-tso/            # Module Z/OS et TSO/ISPF (4 chapitres)
+│   │   ├── 01-presentation-zos.md
+│   │   ├── 02-fonctionnement-zos.md
+│   │   ├── 03-tso.md
+│   │   └── 04-ispf.md
+│   │
+│   ├── cobol/              # Module COBOL (12 chapitres)
 │   │   ├── 01-structure-programme.md
-│   │   ├── 02-ispf-commandes.md
 │   │   ├── ...
-│   │   └── 09-programmes-sous-programmes.md
+│   │   └── 12-fichier-impression.md
 │   │
 │   └── cics/               # Module CICS (3 chapitres)
 │       ├── 01-presentation-generale.md
@@ -21,15 +26,17 @@ poei-cobol/
 │       └── 03-sgbd-ims.md
 │
 ├── exercices/              # Exercices par module
-│   ├── cobol/              # Exercices COBOL
+│   ├── zos-tso/            # Exercices TSO/ISPF (14 exercices)
+│   │
+│   ├── cobol/              # Exercices COBOL (61 programmes)
 │   │   ├── chapitre-02/
 │   │   ├── ...
-│   │   └── chapitre-09/
+│   │   └── chapitre-12/
 │   │
 │   └── cics/               # Exercices CICS (à venir)
 │
 ├── projets/                # Projets complets
-│   └── fil-rouge/          # Projet fil rouge
+│   └── fil-rouge/          # Projet fil rouge (21 exercices)
 │
 ├── hercules/               # Configuration Hercules/z/OS
 ├── docs/                   # Documentation et mémos
@@ -38,6 +45,15 @@ poei-cobol/
 ```
 
 ## Modules de formation
+
+### Module Z/OS et TSO/ISPF
+
+| Chapitre | Sujet | Cours | Exercices |
+|----------|-------|-------|-----------|
+| I | Présentation générale de Z/OS | ✅ | - |
+| II | Fonctionnement de Z/OS | ✅ | - |
+| III | TSO (Time Sharing Option) | ✅ | ✅ |
+| IV | ISPF/PDF | ✅ | - |
 
 ### Module COBOL
 
@@ -49,9 +65,12 @@ poei-cobol/
 | IV | Opérations sur les données | ✅ | ✅ |
 | V | Traitement conditionnel | ✅ | ✅ |
 | VI | Gestion des Tables | ✅ | ✅ |
-| VII | Gestion des Fichiers | ✅ | ✅ |
-| VIII | Opérations E/S avancées (VSAM) | ✅ | ✅ |
+| VII | Gestion des Fichiers séquentiels | ✅ | ✅ |
+| VIII | Fichiers VSAM | ✅ | ✅ |
 | IX | Programmes et sous-programmes | ✅ | ✅ |
+| X | Traitement des Fichiers | ✅ | ✅ |
+| XI | Tri Interne (SORT/MERGE) | ✅ | ✅ |
+| XII | Fichiers d'impression et édition | ✅ | ✅ |
 
 ### Module CICS
 

@@ -16,7 +16,7 @@ Projet de mise en pratique COBOL/JCL - Gestion financiere (clients, comptes, pro
 | 07 | ex07-tri-avance | 1 JCL | Tri avance |
 | 08 | ex08-index-alternatif | 1 JCL | Index alternatif VSAM (AIX) |
 | 09 | ex09-index-alternatif-2 | 1 JCL | Index alternatif VSAM (AIX) suite |
-| 10 | ex10-manquant | - | **A COMPLETER** |
+| 10 | ex10-editer-index-alternatif | 2 CBL + 4 JCL | Edition index alternatif (AIX) |
 | 11 | ex11-merge | 1 JCL | Fusion de fichiers (MERGE) |
 | 12 | ex12-omit | 1 JCL | Exclusion d'enregistrements (OMIT) |
 | 13 | ex13-ajout | 1 CBL + 2 JCL | Ajout d'enregistrements |
@@ -33,6 +33,6 @@ Projet de mise en pratique COBOL/JCL - Gestion financiere (clients, comptes, pro
 Voir `doc/Projet de mise en pratique_Fil Rouge 1.docx`
 
 ## Statistiques
-- **21 exercices** (1 manquant)
-- **19 fichiers JCL**
-- **10 programmes COBOL**
+- **21 exercices** (tous complétés)
+- **43 fichiers JCL**
+- **14 programmes COBOL**

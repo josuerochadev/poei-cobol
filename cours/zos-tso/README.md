@@ -11,9 +11,9 @@ Ce module présente le système d'exploitation z/OS d'IBM et son environnement d
 | `01-presentation-zos.md` | I | Historique, architecture, terminologie IBM |
 | `02-fonctionnement-zos.md` | II | Mémoire virtuelle, DAT, tâches, travaux, données |
 | `03-tso.md` | III | TSO, LOGON/LOGOFF, commandes Data Management et Jobs |
-| `04-ispf.md` | IV | ISPF, panels, navigation, éditeur, utilitaires |
-| `05-jcl-base.md` | V | JCL, JOB, EXEC, DD, utilitaires |
-| `06-vsam.md` | VI | VSAM, KSDS, ESDS, RRDS, IDCAMS |
+| `04-ispf.md` | IV | ISPF/PDF, panels, View/Edit, Utilities, SDSF, éditeur |
+| `05-jcl-base.md` | V | JCL, JOB, EXEC, DD, utilitaires *(à venir)* |
+| `06-vsam.md` | VI | VSAM, KSDS, ESDS, RRDS, IDCAMS *(à venir)* |
 
 ## Objectifs pédagogiques
 
@@ -30,7 +30,7 @@ Ce module présente le système d'exploitation z/OS d'IBM et son environnement d
 - [x] Chapitre I - Présentation générale de Z/OS
 - [x] Chapitre II - Fonctionnement de Z/OS
 - [x] Chapitre III - TSO
-- [ ] Chapitre IV - ISPF
+- [x] Chapitre IV - ISPF/PDF
 - [ ] Chapitre V - JCL de base
 - [ ] Chapitre VI - VSAM
 
