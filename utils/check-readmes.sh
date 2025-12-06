@@ -53,14 +53,14 @@ echo -e "${BLUE}1. Module Z/OS TSO${NC}"
 echo "   Répertoire: cours/zos-tso/"
 ZOS_COURS_COUNT=$(count_files "$PROJECT_ROOT/cours/zos-tso" "*.md")
 ZOS_COURS_COUNT=$((ZOS_COURS_COUNT - 1)) # Exclure README.md
-if [ "$ZOS_COURS_COUNT" -eq 4 ]; then
+if [ "$ZOS_COURS_COUNT" -eq 5 ]; then
     print_status "OK" "Chapitres cours: $ZOS_COURS_COUNT fichiers"
 else
-    print_status "WARN" "Chapitres cours: $ZOS_COURS_COUNT fichiers (attendu: 4)"
+    print_status "WARN" "Chapitres cours: $ZOS_COURS_COUNT fichiers (attendu: 5)"
 fi
 
 # Vérifier les fichiers manquants
-for i in 01 02 03 04; do
+for i in 01 02 03 04 05; do
     if [ ! -f "$PROJECT_ROOT/cours/zos-tso/$i-"*.md ]; then
         print_status "ERROR" "Chapitre $i manquant"
     fi

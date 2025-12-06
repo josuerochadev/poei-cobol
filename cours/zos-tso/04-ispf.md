@@ -1188,4 +1188,4 @@ L'éditeur ISPF est l'outil central du développement mainframe.
 
 | Précédent | Suivant |
 |-----------|---------|
-| [Chapitre III - TSO](03-tso.md) | [Chapitre V - JCL](05-jcl.md) |
+| [Chapitre III - TSO](03-tso.md) | [Chapitre V - Architecture Z/OS](05-architecture-zos.md) |
