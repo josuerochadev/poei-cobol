@@ -9,7 +9,7 @@ Ce module couvre le **Job Control Language (JCL)**, le langage de controle des t
 | Fichier | Chapitre | Contenu |
 |---------|----------|---------|
 | `01-cartes-job-exec-dd.md` | I | Cartes JOB, EXEC, DD - Structure et parametres |
-| `02-fichiers-parametres.md` | II | Fichiers speciaux et parametres *(a venir)* |
+| `02-fichiers-parametres.md` | II | Concatenation, fichiers PS/PO, temporaires, references |
 | `03-procedures.md` | III | Procedures cataloguees et in-stream *(a venir)* |
 | `04-utilitaires.md` | IV | Utilitaires systeme (IEBGENER, IEBCOPY, IDCAMS...) *(a venir)* |
 | `05-travaux-pratiques.md` | V | Exercices pratiques JCL *(a venir)* |
@@ -28,7 +28,7 @@ A l'issue de ce module, vous serez capable de :
 ## Progression
 
 - [x] Chapitre I - Cartes JOB, EXEC, DD
-- [ ] Chapitre II - Fichiers speciaux et parametres
+- [x] Chapitre II - Fichiers speciaux et parametres
 - [ ] Chapitre III - Procedures
 - [ ] Chapitre IV - Utilitaires
 - [ ] Chapitre V - Travaux pratiques

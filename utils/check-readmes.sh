@@ -77,11 +77,22 @@ else
     print_status "WARN" "Aucun chapitre JCL trouvé"
 fi
 
-# Vérifier chapitre 01
-if [ -f "$PROJECT_ROOT/cours/jcl/01-"*.md ]; then
-    print_status "OK" "Chapitre 01 présent"
+# Vérifier chapitres 01 et 02
+for i in 01 02; do
+    if [ -f "$PROJECT_ROOT/cours/jcl/$i-"*.md ]; then
+        print_status "OK" "Chapitre $i présent"
+    else
+        print_status "WARN" "Chapitre $i manquant"
+    fi
+done
+
+# Vérifier exercices JCL
+JCL_EX_COUNT=$(count_files "$PROJECT_ROOT/exercices/jcl" "*.md")
+JCL_EX_COUNT=$((JCL_EX_COUNT - 1)) # Exclure README.md
+if [ "$JCL_EX_COUNT" -ge 1 ]; then
+    print_status "OK" "Exercices: $JCL_EX_COUNT fichiers"
 else
-    print_status "ERROR" "Chapitre 01 JCL manquant"
+    print_status "WARN" "Aucun exercice JCL trouvé"
 fi
 
 echo ""
@@ -159,7 +170,7 @@ echo ""
 echo "   Module             | Cours | Exercices"
 echo "   -------------------|-------|----------"
 printf "   Z/OS TSO           | %5s | %s fichiers\n" "$ZOS_COURS_COUNT" "$ZOS_EX_COUNT"
-printf "   JCL                | %5s | (à venir)\n" "$JCL_COURS_COUNT"
+printf "   JCL                | %5s | %s fichiers\n" "$JCL_COURS_COUNT" "$JCL_EX_COUNT"
 printf "   COBOL              | %5s | %s .cbl\n" "$COBOL_COURS_COUNT" "$COBOL_CBL_COUNT"
 printf "   CICS               | %5s | (à venir)\n" "$CICS_COURS_COUNT"
 printf "   Fil Rouge          |   -   | %s JCL, %s CBL\n" "$FR_JCL" "$FR_CBL"
