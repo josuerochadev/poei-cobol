@@ -25,6 +25,37 @@ Les exercices sont organisés par chapitre du cours.
 12. Message opérateur avec SEND
 13-14. Exercices complémentaires
 
+---
+
+### Chapitre 04 - ISPF/PDF
+
+| Fichier | Description |
+|---------|-------------|
+| `04-exercices-ispf.md` | 15 exercices sur ISPF/PDF |
+
+**Exercices couverts :**
+
+*Partie 1 - Gestion des membres de bibliothèque :*
+1. Lister le contenu d'une Library
+2. Créer un nouveau membre
+3. Afficher les caractéristiques d'une Library
+4. Créer une nouvelle Library
+5. Copier un membre
+6. Renommer un membre
+
+*Partie 2 - Navigation volumes et fichiers :*
+7. Afficher le contenu d'un volume (disque)
+8. Afficher les caractéristiques d'un fichier
+9. Afficher la VTOC d'un volume
+10. Différence entre COPY et MOVE
+
+*Partie 3 - Éditeur ISPF avancé :*
+11. Créer un membre avec l'éditeur
+12. Déplacer du texte APRÈS une position (MM + A)
+13. Déplacer du texte AVANT une position (MM + B)
+14. Exclusion de lignes et commandes F, L, S
+15. COLS, TABS, BNDS, MASK et PROFILE
+
 ## Prérequis
 
 - Accès à un environnement z/OS (ou émulateur)
