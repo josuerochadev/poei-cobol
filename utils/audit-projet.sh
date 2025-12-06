@@ -1,8 +1,13 @@
 #!/bin/bash
 #
-# check-readmes.sh - Vérifie la cohérence des READMEs avec le contenu réel
+# audit-projet.sh - Audit complet du projet poei-cobol
 #
-# Usage: ./utils/check-readmes.sh
+# Vérifie :
+# - Structure des modules (cours et exercices)
+# - Présence des fichiers attendus
+# - Liens de navigation entre chapitres
+#
+# Usage: ./utils/audit-projet.sh
 #
 
 # Couleurs
@@ -16,7 +21,7 @@ NC='\033[0m' # No Color
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}   Audit des READMEs - poei-cobol${NC}"
+echo -e "${BLUE}   Audit du projet poei-cobol${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
@@ -174,6 +179,71 @@ else
 fi
 
 echo ""
+echo -e "${BLUE}8. Vérification des liens de navigation${NC}"
+echo "   Analyse des sections ## Navigation"
+
+NAV_ERRORS=0
+NAV_OK=0
+
+# Fonction pour vérifier les liens dans un fichier
+check_nav_links() {
+    local file="$1"
+    local dir=$(dirname "$file")
+
+    # Extraire les liens markdown du fichier (format [texte](lien.md))
+    local links=$(grep -oE '\[.*?\]\([^)]+\.md\)' "$file" 2>/dev/null | grep -oE '\([^)]+\.md\)' | tr -d '()')
+
+    for link in $links; do
+        # Ignorer les liens avec "-" (pas de lien)
+        if [ "$link" = "-" ]; then
+            continue
+        fi
+
+        # Résoudre le chemin relatif
+        local target_path
+        if [[ "$link" == ../* ]]; then
+            target_path=$(cd "$dir" && cd "$(dirname "$link")" 2>/dev/null && pwd)/$(basename "$link")
+        else
+            target_path="$dir/$link"
+        fi
+
+        # Vérifier si le fichier existe
+        if [ ! -f "$target_path" ]; then
+            print_status "ERROR" "Lien cassé: $link dans $(basename "$file")"
+            ((NAV_ERRORS++))
+        else
+            ((NAV_OK++))
+        fi
+    done
+}
+
+# Vérifier tous les modules
+for module_dir in "$PROJECT_ROOT/cours/zos-tso" "$PROJECT_ROOT/cours/jcl" "$PROJECT_ROOT/cours/cobol" "$PROJECT_ROOT/cours/cics"; do
+    if [ -d "$module_dir" ]; then
+        module_name=$(basename "$module_dir")
+        nav_count=0
+        for mdfile in "$module_dir"/[0-9]*.md; do
+            if [ -f "$mdfile" ] && grep -q "## Navigation" "$mdfile" 2>/dev/null; then
+                ((nav_count++))
+                check_nav_links "$mdfile"
+            fi
+        done
+        if [ $nav_count -gt 0 ]; then
+            print_status "OK" "$module_name: $nav_count chapitres avec navigation"
+        else
+            print_status "WARN" "$module_name: aucune section navigation trouvée"
+        fi
+    fi
+done
+
+if [ $NAV_ERRORS -eq 0 ]; then
+    print_status "OK" "Tous les liens de navigation sont valides ($NAV_OK liens vérifiés)"
+else
+    print_status "ERROR" "$NAV_ERRORS lien(s) cassé(s) trouvé(s)"
+    ((ERRORS+=NAV_ERRORS))
+fi
+
+echo ""
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}   Résumé${NC}"
 echo -e "${BLUE}========================================${NC}"
@@ -190,7 +260,7 @@ printf "   Fil Rouge          |   -   | %s JCL, %s CBL\n" "$FR_JCL" "$FR_CBL"
 echo ""
 
 if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
-    echo -e "${GREEN}✅ Tous les READMEs sont à jour!${NC}"
+    echo -e "${GREEN}✅ Audit réussi - projet conforme!${NC}"
     exit 0
 elif [ $ERRORS -eq 0 ]; then
     echo -e "${YELLOW}⚠️  $WARNINGS avertissement(s) - vérifiez les détails ci-dessus${NC}"
