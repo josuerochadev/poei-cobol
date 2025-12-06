@@ -77,8 +77,8 @@ else
     print_status "WARN" "Aucun chapitre JCL trouvé"
 fi
 
-# Vérifier chapitres 01 et 02
-for i in 01 02; do
+# Vérifier chapitres 01, 02 et 03
+for i in 01 02 03; do
     if [ -f "$PROJECT_ROOT/cours/jcl/$i-"*.md ]; then
         print_status "OK" "Chapitre $i présent"
     else

@@ -20,7 +20,19 @@ Les exercices sont organises par chapitre du cours JCL.
 
 ---
 
-### Chapitre 03 - Procedures *(a venir)*
+### Chapitre 03 - Procedures
+
+| Fichier | Description |
+|---------|-------------|
+| `03-exercices-procedures.md` | 4 exercices sur les procedures JCL |
+
+**Exercices couverts :**
+1. Procedure in-stream pour chargement ESDS
+2. Deux procedures cataloguees successives
+3. Procedures imbriquees
+4. Parametrage symbolique multiple
+
+---
 
 ### Chapitre 04 - Utilitaires *(a venir)*
 
