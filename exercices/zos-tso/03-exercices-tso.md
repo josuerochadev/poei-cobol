@@ -1,290 +1,380 @@
-# Exercices TSO - Chapitre III
+# Exercices TSO/ISPF - Chapitre III
 
 ## Objectifs
 
-Ces exercices permettent de pratiquer les commandes TSO essentielles :
-- Connexion et gestion de session
-- Création et gestion de datasets
-- Commandes utilitaires (LISTCAT, LISTDS, RENAME)
-- Communication avec l'opérateur
+Ces exercices permettent de pratiquer la gestion des datasets via **ISPF** (interface privilégiée) sur un émulateur Hercules (TK4-/TK5).
+
+Les commandes TSO équivalentes sont mentionnées pour référence.
+
+---
+
+## Prérequis
+
+- Émulateur Hercules avec TK4- ou TK5
+- Session TSO/ISPF active
+- Userid : FTEST (ou votre userid)
+
+---
+
+## Navigation ISPF - Rappel
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    MENU PRINCIPAL ISPF                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   0  Settings      - Paramètres                                 │
+│   1  View          - Visualiser (lecture seule)                 │
+│   2  Edit          - Éditer                                     │
+│   3  Utilities     - Utilitaires  ◄── DATASETS                  │
+│   4  Foreground    - Compilation                                │
+│   5  Batch         - Soumission batch                           │
+│   6  Command       - Commandes TSO                              │
+│   ...                                                           │
+│                                                                  │
+│   Option 3 (Utilities) :                                        │
+│   ┌─────────────────────────────────────────────────────────┐   │
+│   │  1  Library    - Membres PDS                            │   │
+│   │  2  Data Set   - Opérations sur datasets                │   │
+│   │  3  Move/Copy  - Copier/Déplacer                        │   │
+│   │  4  Dslist     - Liste de datasets  ◄── LE PLUS UTILISÉ│   │
+│   │  ...                                                    │   │
+│   └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Raccourci** : Taper `=3.4` depuis n'importe quel écran pour aller directement à DSLIST.
 
 ---
 
 ## Exercice 1 : Ouverture de session
 
-**Objectif** : Se connecter à TSO
+**Objectif** : Se connecter à TSO/ISPF
 
-**Instructions** :
-1. Ouvrir une session en utilisant la commande LOGON
-2. Utiliser la transaction TSO pour s'identifier
-
-**Solution** :
-```
-LOGON userid
-```
-ou depuis l'écran de connexion TSO :
+**Via l'écran LOGON :**
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    TSO/E LOGON                                   │
 │                                                                  │
-│   Userid    ===> FTEST___                                       │
+│   Userid    ===> FTEST                                          │
 │   Password  ===> ________                                       │
 │   Procedure ===> IKJACCNT                                       │
-│   Command   ===> ISPF                                           │
+│   Command   ===> ISPF         ◄── Lance ISPF automatiquement    │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+Appuyer sur **Entrée** pour se connecter.
+
 ---
 
-## Exercice 2 : Création d'un PDS (Partitioned Data Set)
+## Exercice 2 : Création d'un PDS (bibliothèque)
 
-**Objectif** : Créer une bibliothèque avec ALLOCATE
+**Objectif** : Créer `FTEST.PROD.LIBTEST` (PO, LRECL=80, RECFM=F)
 
-**Spécifications** :
-- Nom : `FTEST.PROD.LIBTEST`
-- Taille : 2 Tracks
-- Organisation : PO (Partitioned)
-- LRECL : 80
-- Format : Fixe (F)
+### Méthode ISPF (Option 3.2)
 
-**Solution** :
+1. Aller à **Option 3.2** (taper `=3.2` ou naviguer via menus)
+
+2. Remplir l'écran :
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 DATA SET UTILITY                                 │
+│                                                                  │
+│   Option ===> A                    ◄── A = Allocate             │
+│                                                                  │
+│   Data Set Name ===> FTEST.PROD.LIBTEST                         │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+3. Appuyer **Entrée**, remplir les attributs :
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 ALLOCATE NEW DATA SET                            │
+│                                                                  │
+│   Data Set Name : FTEST.PROD.LIBTEST                            │
+│                                                                  │
+│   Management class  ===>                                        │
+│   Storage class     ===>                                        │
+│   Volume serial     ===> PUB001    (ou laisser vide si SMS)     │
+│   Device type       ===>                                        │
+│   Data class        ===>                                        │
+│   Space units       ===> TRACK     (TRACK, CYL, ou BLOCK)       │
+│   Primary quantity  ===> 2                                      │
+│   Secondary quantity===> 1                                      │
+│   Directory blocks  ===> 5         ◄── Obligatoire pour PDS     │
+│   Record format     ===> F                                      │
+│   Record length     ===> 80                                     │
+│   Block size        ===> 80                                     │
+│   Data set type     ===> PDS       (PDS, LIBRARY, ou vide)      │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+4. Appuyer **Entrée** pour créer.
+
+**Message attendu** : `DATA SET ALLOCATED`
+
+### Commande TSO équivalente (Option 6)
 ```
 ALLOC DA('FTEST.PROD.LIBTEST') NEW CATALOG +
       DSORG(PO) RECFM(F) LRECL(80) BLKSIZE(80) +
       SPACE(2,1) TRACKS DIR(5)
 ```
 
-**Explication** :
-- `DA('...')` : Nom du dataset (avec quotes si HLQ différent du userid)
-- `NEW CATALOG` : Création et catalogage
-- `DSORG(PO)` : Organisation Partitioned (bibliothèque)
-- `RECFM(F)` : Format fixe
-- `LRECL(80)` : Longueur enregistrement 80 octets
-- `SPACE(2,1) TRACKS` : 2 tracks primaires, 1 track secondaire
-- `DIR(5)` : 5 blocs directory (pour les membres)
-
 ---
 
 ## Exercice 3 : Création d'un dataset modèle
 
-**Objectif** : Créer un dataset qui servira de modèle
+**Objectif** : Créer `FTEST.DEV.MODEL` (PS, LRECL=80, RECFM=FB)
 
-**Spécifications** :
-- Nom : `FTEST.DEV.MODEL`
-- Organisation : PS (Physical Sequential)
-- LRECL : 80
-- Format : FB (Fixed Blocked)
+### Méthode ISPF (Option 3.2)
 
-**Solution** :
+1. **Option 3.2**, puis **A** (Allocate)
+
+2. Data Set Name : `FTEST.DEV.MODEL`
+
+3. Attributs :
 ```
-ALLOC DA('FTEST.DEV.MODEL') NEW CATALOG +
-      DSORG(PS) RECFM(F,B) LRECL(80) BLKSIZE(27920) +
-      SPACE(1,1) TRACKS
+┌─────────────────────────────────────────────────────────────────┐
+│   Space units       ===> TRACK                                  │
+│   Primary quantity  ===> 1                                      │
+│   Secondary quantity===> 1                                      │
+│   Directory blocks  ===>           ◄── Vide pour PS (séquentiel)│
+│   Record format     ===> FB        ◄── Fixed Blocked            │
+│   Record length     ===> 80                                     │
+│   Block size        ===> 27920     ◄── Optimal (349 x 80)       │
+│   Data set type     ===>           ◄── Vide pour PS             │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**Explication** :
-- `DSORG(PS)` : Organisation séquentielle
-- `RECFM(F,B)` : Format fixe bloqué
-- `BLKSIZE(27920)` : 349 enregistrements par bloc (27920/80)
+**Note** : Pas de Directory blocks = dataset séquentiel (PS)
 
 ---
 
 ## Exercice 4 : Création selon un modèle (LIKE)
 
-**Objectif** : Créer un dataset basé sur le modèle de l'exercice 3
+**Objectif** : Créer `FTEST.DEV.FILE` basé sur `FTEST.DEV.MODEL`
 
-**Spécifications** :
-- Nom : `FTEST.DEV.FILE`
-- Basé sur : `FTEST.DEV.MODEL`
+### Méthode ISPF (Option 3.2)
 
-**Solution** :
+1. **Option 3.2**, puis **A** (Allocate)
+
+2. Remplir :
 ```
-ALLOC DA('FTEST.DEV.FILE') NEW CATALOG +
-      LIKE('FTEST.DEV.MODEL')
+┌─────────────────────────────────────────────────────────────────┐
+│   Data Set Name ===> FTEST.DEV.FILE                             │
+│                                                                  │
+│   Based on Data Set ===> FTEST.DEV.MODEL    ◄── Le modèle       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**Explication** :
-- `LIKE('...')` : Copie les attributs (DSORG, RECFM, LRECL, BLKSIZE) du modèle
-- Seul le nom change, tous les autres attributs sont hérités
+3. Appuyer **Entrée** - les attributs sont pré-remplis depuis le modèle.
 
----
+4. Appuyer **Entrée** à nouveau pour confirmer.
 
-## Exercice 5 : Création de datasets supplémentaires
-
-**Objectif** : Créer deux datasets supplémentaires selon le même modèle
-
-**Spécifications** :
-- Dataset 1 : `FTEST.PROD.FILE`
-- Dataset 2 : `FTEST.EXPLOI.FILE`
-
-**Solution** :
+### Commande TSO équivalente
 ```
-ALLOC DA('FTEST.PROD.FILE') NEW CATALOG +
-      LIKE('FTEST.DEV.MODEL')
-
-ALLOC DA('FTEST.EXPLOI.FILE') NEW CATALOG +
-      LIKE('FTEST.DEV.MODEL')
+ALLOC DA('FTEST.DEV.FILE') NEW CATALOG LIKE('FTEST.DEV.MODEL')
 ```
 
 ---
 
-## Exercice 6 : Pas de spécification (voir exercice 5)
+## Exercice 5-6 : Création de datasets supplémentaires
+
+**Objectif** : Créer `FTEST.PROD.FILE` et `FTEST.EXPLOI.FILE`
+
+Répéter l'exercice 4 avec :
+- `FTEST.PROD.FILE` basé sur `FTEST.DEV.MODEL`
+- `FTEST.EXPLOI.FILE` basé sur `FTEST.DEV.MODEL`
 
 ---
 
-## Exercice 7 : Commande LISTCAT avec LEVEL
+## Exercice 7 : Lister le catalogue (DSLIST)
 
-**Objectif** : Lister les entrées du catalogue correspondant à un préfixe
+**Objectif** : Afficher tous les datasets FTEST.*
 
-**Solution** :
+### Méthode ISPF (Option 3.4) - RECOMMANDÉE
+
+1. Aller à **Option 3.4** (taper `=3.4`)
+
+2. Remplir :
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    DATA SET LIST UTILITY                         │
+│                                                                  │
+│   Dsname Level ===> FTEST                                       │
+│   Volume       ===>           (vide = catalogués seulement)     │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+3. Appuyer **Entrée**
+
+**Résultat** :
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ DSLIST - Data Sets Matching FTEST                    Row 1 of 5 │
+│ Command ===>                                                    │
+│                                                                  │
+│ Command     Name                                     Volume     │
+│ -------     ----                                     ------     │
+│             FTEST.DEV.FILE                           PUB001     │
+│             FTEST.DEV.MODEL                          PUB001     │
+│             FTEST.EXPLOI.FILE                        PUB001     │
+│             FTEST.PROD.FILE                          PUB001     │
+│             FTEST.PROD.LIBTEST                       PUB001     │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Commandes ligne disponibles** (taper devant le nom) :
+- `i` = Info (attributs)
+- `e` = Edit
+- `b` = Browse
+- `d` = Delete
+- `r` = Rename
+- `m` = Members (pour PDS)
+
+### Commande TSO équivalente
 ```
 LISTCAT LEVEL(FTEST)
 ```
 
-**Résultat attendu** :
-```
-NONVSAM ------- FTEST.PROD.LIBTEST
-NONVSAM ------- FTEST.DEV.MODEL
-NONVSAM ------- FTEST.DEV.FILE
-NONVSAM ------- FTEST.PROD.FILE
-NONVSAM ------- FTEST.EXPLOI.FILE
-```
-
-**Variantes** :
-```
-LISTCAT LEVEL(FTEST.PROD)
-```
-Affiche uniquement les datasets commençant par FTEST.PROD
-
-```
-LISTCAT LEVEL(FTEST) ALL
-```
-Affiche les détails complets de chaque entrée
-
 ---
 
-## Exercice 8 : Suppression du fichier LIBTEST
+## Exercice 8 : Suppression d'un dataset
 
-**Objectif** : Supprimer le dataset `FTEST.PROD.LIBTEST`
+**Objectif** : Supprimer `FTEST.PROD.LIBTEST`
 
-**Solution** :
+### Méthode ISPF (Option 3.4)
+
+1. Aller à **Option 3.4**, Dsname Level = `FTEST`
+
+2. Taper `d` devant `FTEST.PROD.LIBTEST` :
+```
+│ Command     Name                                                │
+│ d           FTEST.PROD.LIBTEST                       PUB001     │
+```
+
+3. Appuyer **Entrée**
+
+4. Confirmer la suppression (si demandé)
+
+**Message** : `DATA SET DELETED`
+
+### Alternative : Option 3.2
+1. Option 3.2, taper **D** (Delete)
+2. Data Set Name = `FTEST.PROD.LIBTEST`
+3. Entrée, confirmer
+
+### Commande TSO équivalente
 ```
 DELETE 'FTEST.PROD.LIBTEST'
 ```
 
-**Résultat attendu** :
-```
-ENTRY FTEST.PROD.LIBTEST DELETED
-```
+---
 
-**Vérification** :
-```
-LISTCAT LEVEL(FTEST.PROD)
-```
-Le dataset FTEST.PROD.LIBTEST ne doit plus apparaître.
+## Exercice 9 : Suppression de EXPLOI.FILE
+
+**Objectif** : Supprimer `FTEST.EXPLOI.FILE`
+
+Même méthode que l'exercice 8 :
+- Option 3.4, taper `d` devant le dataset
+- Ou Option 3.2 avec **D**
 
 ---
 
-## Exercice 9 : Suppression du fichier EXPLOI.FILE
+## Exercice 10 : Afficher les attributs d'un dataset
 
-**Objectif** : Supprimer le dataset `FTEST.EXPLOI.FILE`
+**Objectif** : Explorer les attributs de `FTEST.DEV.FILE`
 
-**Solution** :
+### Méthode ISPF (Option 3.4)
+
+1. Option 3.4, Dsname Level = `FTEST`
+
+2. Taper `i` (info) devant `FTEST.DEV.FILE` :
 ```
-DELETE 'FTEST.EXPLOI.FILE'
+│ Command     Name                                                │
+│ i           FTEST.DEV.FILE                           PUB001     │
 ```
 
-**Résultat attendu** :
-```
-ENTRY FTEST.EXPLOI.FILE DELETED
-```
+3. Appuyer **Entrée**
 
----
-
-## Exercice 10 : Commande LISTDS avec variations
-
-**Objectif** : Explorer les différentes options de LISTDS
-
-**Solutions** :
-
-### Option 1 : LISTDS simple
-```
-LISTDS 'FTEST.DEV.FILE'
-```
 **Résultat** :
 ```
-FTEST.DEV.FILE
---RECFM-FB--LRECL-80--BLKSIZE-27920
+┌─────────────────────────────────────────────────────────────────┐
+│                    DATA SET INFORMATION                          │
+│                                                                  │
+│  Data Set Name  : FTEST.DEV.FILE                                │
+│                                                                  │
+│  General Data:                          Current Allocation:     │
+│   Volume serial : PUB001                 Allocated tracks : 1   │
+│   Device type   : 3390                   Used tracks      : 0   │
+│   Organization  : PS                     Extents          : 1   │
+│   Record format : FB                                            │
+│   Record length : 80                    Creation date: 2025/001 │
+│   Block size    : 27920                                         │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Option 2 : LISTDS avec STATUS
-```
-LISTDS 'FTEST.DEV.FILE' STATUS
-```
-**Résultat** :
-```
-FTEST.DEV.FILE
---RECFM-FB--LRECL-80--BLKSIZE-27920
---VOLUMES--
-  VOL001
---DEVICE TYPES--
-  3390
-```
+### Alternative : Option 3.2
+1. Option 3.2, taper **I** (Info)
+2. Data Set Name = `FTEST.DEV.FILE`
 
-### Option 3 : LISTDS avec HISTORY
-```
-LISTDS 'FTEST.DEV.FILE' HISTORY
-```
-**Résultat** :
-```
-FTEST.DEV.FILE
---RECFM-FB--LRECL-80--BLKSIZE-27920
---CREATED 2025/001  EXPIRES 0000/000  LAST REFERENCE 2025/001
-```
-
-### Option 4 : LISTDS avec ALL
+### Commande TSO équivalente
 ```
 LISTDS 'FTEST.DEV.FILE' ALL
 ```
-Affiche toutes les informations combinées.
-
-### Option 5 : LISTDS sur un PDS avec MEMBERS
-```
-LISTDS 'SYS1.PROCLIB' MEMBERS
-```
-**Résultat** :
-```
-SYS1.PROCLIB
---RECFM-FB--LRECL-80--BLKSIZE-27920
---MEMBERS--
-  ASMACL
-  ASMACLEG
-  ASMACLG
-  ...
-```
 
 ---
 
-## Exercice 11 : Renommer un dataset créé avec ALLOC
+## Exercice 11 : Renommer un dataset
 
-**Objectif** : Renommer le dataset `FTEST.DEV.MODEL`
+**Objectif** : Renommer `FTEST.DEV.MODEL` en `FTEST.DEV.MODELE`
 
-**Solution** :
+### Méthode ISPF (Option 3.4)
+
+1. Option 3.4, Dsname Level = `FTEST`
+
+2. Taper `r` (rename) devant `FTEST.DEV.MODEL` :
+```
+│ Command     Name                                                │
+│ r           FTEST.DEV.MODEL                          PUB001     │
+```
+
+3. Appuyer **Entrée**
+
+4. Saisir le nouveau nom :
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    RENAME DATA SET                               │
+│                                                                  │
+│   Current Name: FTEST.DEV.MODEL                                 │
+│                                                                  │
+│   New Name ===> FTEST.DEV.MODELE                                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+5. Appuyer **Entrée**
+
+**Message** : `DATA SET RENAMED`
+
+### Alternative : Option 3.2
+1. Option 3.2, taper **R** (Rename)
+2. Old Name = `FTEST.DEV.MODEL`
+3. New Name = `FTEST.DEV.MODELE`
+
+### Commande TSO équivalente
 ```
 RENAME 'FTEST.DEV.MODEL' 'FTEST.DEV.MODELE'
 ```
-
-**Résultat attendu** :
-```
-IKJ56701I DSNAME CHANGED TO FTEST.DEV.MODELE
-```
-
-**Vérification** :
-```
-LISTCAT LEVEL(FTEST.DEV)
-```
-Doit afficher `FTEST.DEV.MODELE` au lieu de `FTEST.DEV.MODEL`
 
 ---
 
@@ -292,133 +382,118 @@ Doit afficher `FTEST.DEV.MODELE` au lieu de `FTEST.DEV.MODEL`
 
 **Objectif** : Envoyer un message à la console opérateur
 
-**Solution** :
+### Méthode ISPF (Option 6 ou préfixe TSO)
+
+Cette commande n'a pas d'équivalent menu ISPF, il faut utiliser TSO.
+
+**Option 1 : Via Option 6 (Command)**
+1. Aller à **Option 6**
+2. Taper la commande :
 ```
 SEND 'DEMARRAGE PRODUCTION PREVU A 22H00' OPERATOR
 ```
 
-**Résultat attendu** :
+**Option 2 : Préfixe TSO depuis n'importe quel écran**
+Sur la ligne de commande ISPF, taper :
 ```
-IKJ56701I MESSAGE SENT TO OPERATOR
-```
-
-Le message apparaît sur la console opérateur :
-```
-*01 FTEST    DEMARRAGE PRODUCTION PREVU A 22H00
+Command ===> TSO SEND 'DEMARRAGE PRODUCTION PREVU A 22H00' OPERATOR
 ```
 
-**Variante avec l'heure actuelle** :
-```
-SEND 'PRODUCTION DEMARREE - HEURE: 22:00:00' OPERATOR
-```
+**Message** : `MESSAGE SENT TO OPERATOR`
+
+Le message apparaît sur la console Hercules.
 
 ---
 
-## Exercice 13 : Renommer DEV.FILE en DEV.COMPTA
+## Exercice 13 : Renommer DEV.FILE
 
 **Objectif** : Renommer `FTEST.DEV.FILE` en `FTEST.DEV.COMPTA`
 
-**Solution** :
-```
-RENAME 'FTEST.DEV.FILE' 'FTEST.DEV.COMPTA'
-```
+### Méthode ISPF (Option 3.4)
 
-**Résultat attendu** :
-```
-IKJ56701I DSNAME CHANGED TO FTEST.DEV.COMPTA
-```
-
-**Vérification** :
-```
-LISTDS 'FTEST.DEV.COMPTA'
-```
+1. Option 3.4, taper `r` devant `FTEST.DEV.FILE`
+2. Nouveau nom : `FTEST.DEV.COMPTA`
+3. Entrée
 
 ---
 
-## Exercice 14 : Lister les caractéristiques de PROD.LIBTEST
+## Exercice 14 : Attributs de PROD.LIBTEST
 
-**Objectif** : Afficher les attributs du dataset `FTEST.PROD.LIBTEST`
+**Objectif** : Afficher les caractéristiques de `FTEST.PROD.LIBTEST`
 
-**Note** : Si vous avez effectué l'exercice 8, ce dataset a été supprimé.
-Recréez-le d'abord :
-```
-ALLOC DA('FTEST.PROD.LIBTEST') NEW CATALOG +
-      DSORG(PO) RECFM(F) LRECL(80) BLKSIZE(80) +
-      SPACE(2,1) TRACKS DIR(5)
-```
+**Note** : Ce dataset a été supprimé à l'exercice 8.
+Recréez-le d'abord via Option 3.2 (voir exercice 2).
 
-**Solution** :
-```
-LISTDS 'FTEST.PROD.LIBTEST' ALL
-```
+### Méthode ISPF
 
-**Résultat attendu** :
-```
-FTEST.PROD.LIBTEST
---RECFM-F--LRECL-80--BLKSIZE-80
---VOLUMES--
-  VOL001
---DEVICE TYPES--
-  3390
---CREATED 2025/001  EXPIRES 0000/000  LAST REFERENCE 2025/001
-```
+1. Option 3.4, Dsname Level = `FTEST.PROD`
+2. Taper `i` devant `FTEST.PROD.LIBTEST`
+3. Consulter les informations affichées
 
 ---
 
-## Récapitulatif des datasets créés
+## Récapitulatif des datasets
 
-| Dataset | Type | RECFM | LRECL | Statut final |
-|---------|------|-------|-------|--------------|
-| FTEST.PROD.LIBTEST | PO | F | 80 | Supprimé (Ex.8) puis recréé (Ex.14) |
-| FTEST.DEV.MODEL | PS | FB | 80 | Renommé en FTEST.DEV.MODELE (Ex.11) |
-| FTEST.DEV.FILE | PS | FB | 80 | Renommé en FTEST.DEV.COMPTA (Ex.13) |
-| FTEST.PROD.FILE | PS | FB | 80 | Existe |
-| FTEST.EXPLOI.FILE | PS | FB | 80 | Supprimé (Ex.9) |
+| Dataset | Type | RECFM | Statut final |
+|---------|------|-------|--------------|
+| FTEST.PROD.LIBTEST | PO | F | Supprimé (Ex.8), recréer pour Ex.14 |
+| FTEST.DEV.MODEL | PS | FB | Renommé → FTEST.DEV.MODELE |
+| FTEST.DEV.FILE | PS | FB | Renommé → FTEST.DEV.COMPTA |
+| FTEST.PROD.FILE | PS | FB | Existe |
+| FTEST.EXPLOI.FILE | PS | FB | Supprimé (Ex.9) |
+
+---
+
+## Aide-mémoire ISPF
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    RACCOURCIS ISPF                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  NAVIGATION                                                     │
+│  ──────────────────────────────────────────────────────────────  │
+│  =3.2         Aller directement à Data Set Utility              │
+│  =3.4         Aller directement à DSLIST (le plus utilisé)      │
+│  =6           Aller à Command (pour commandes TSO)              │
+│  =X           Quitter ISPF                                      │
+│  PF3          Retour / Sortie                                   │
+│                                                                  │
+│  OPTION 3.2 - DATA SET UTILITY                                  │
+│  ──────────────────────────────────────────────────────────────  │
+│  A            Allocate (créer)                                  │
+│  D            Delete (supprimer)                                │
+│  R            Rename (renommer)                                 │
+│  I            Info (attributs)                                  │
+│  C            Catalog                                           │
+│  U            Uncatalog                                         │
+│                                                                  │
+│  OPTION 3.4 - DSLIST (commandes ligne)                          │
+│  ──────────────────────────────────────────────────────────────  │
+│  i            Info (attributs)                                  │
+│  e            Edit                                              │
+│  b            Browse (lecture seule)                            │
+│  d            Delete                                            │
+│  r            Rename                                            │
+│  m            Members (liste membres PDS)                       │
+│  c            Copy                                              │
+│  z            Compress (PDS)                                    │
+│                                                                  │
+│  COMMANDES TSO (depuis ISPF)                                    │
+│  ──────────────────────────────────────────────────────────────  │
+│  TSO commande         Exécuter une commande TSO                 │
+│  TSO SEND 'msg' USER(uid)     Envoyer message                   │
+│  TSO LISTDS 'dsn' ALL         Attributs dataset                 │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## Nettoyage (optionnel)
 
 Pour supprimer tous les datasets créés :
-```
-DELETE 'FTEST.PROD.LIBTEST'
-DELETE 'FTEST.DEV.MODELE'
-DELETE 'FTEST.DEV.COMPTA'
-DELETE 'FTEST.PROD.FILE'
-```
 
----
-
-## Aide-mémoire des commandes utilisées
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    COMMANDES UTILISÉES                           │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  LOGON userid                                                   │
-│  Connexion à TSO                                                │
-│                                                                  │
-│  ALLOC DA('dsn') NEW CATALOG DSORG(xx) RECFM(xx) LRECL(xx)     │
-│  Création d'un dataset                                          │
-│                                                                  │
-│  ALLOC DA('dsn') NEW CATALOG LIKE('model')                     │
-│  Création selon un modèle                                       │
-│                                                                  │
-│  DELETE 'dsn'                                                   │
-│  Suppression d'un dataset                                       │
-│                                                                  │
-│  LISTCAT LEVEL(prefix)                                          │
-│  Liste les datasets d'un préfixe                               │
-│                                                                  │
-│  LISTDS 'dsn' [STATUS|MEMBERS|HISTORY|ALL]                     │
-│  Affiche les attributs d'un dataset                            │
-│                                                                  │
-│  RENAME 'old' 'new'                                             │
-│  Renomme un dataset                                             │
-│                                                                  │
-│  SEND 'message' OPERATOR                                        │
-│  Envoie un message à la console                                │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
+1. Option 3.4, Dsname Level = `FTEST`
+2. Taper `d` devant chaque dataset à supprimer
+3. Appuyer Entrée et confirmer
