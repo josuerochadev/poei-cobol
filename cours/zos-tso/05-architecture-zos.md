@@ -795,4 +795,4 @@ Les **ACS (Automatic Class Selection) Routines** déterminent automatiquement le
 
 | Précédent | Suivant |
 |-----------|---------|
-| [Chapitre IV - ISPF/PDF](04-ispf.md) | [Chapitre VI - JCL](06-jcl.md) |
+| [Chapitre IV - ISPF/PDF](04-ispf.md) | [Module JCL](../jcl/README.md) |

@@ -535,4 +535,4 @@ Règles :
 
 | Précédent | Suivant |
 |-----------|---------|
-| - | [Chapitre II - TSO et ISPF](02-tso-ispf.md) |
+| - | [Chapitre II - Fonctionnement Z/OS](02-fonctionnement-zos.md) |

@@ -915,4 +915,4 @@ Un **espace d'adressage** (Address Space) est l'environnement virtuel complet d'
 
 | Précédent | Suivant |
 |-----------|---------|
-| [Chapitre I - Présentation générale](01-presentation-zos.md) | [Chapitre III - TSO et ISPF](03-tso-ispf.md) |
+| [Chapitre I - Présentation générale](01-presentation-zos.md) | [Chapitre III - TSO](03-tso.md) |

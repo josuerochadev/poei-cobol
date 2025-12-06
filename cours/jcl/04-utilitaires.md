@@ -1276,7 +1276,7 @@ Creer un JCL qui :
 
 | Precedent | Suivant |
 |-----------|---------|
-| [Chapitre III - Procedures](03-procedures.md) | [Chapitre V - Travaux Pratiques](05-travaux-pratiques.md) |
+| [Chapitre III - Procedures](03-procedures.md) | [Travaux Pratiques](../../exercices/jcl/chapitre-05/README.md) |
 
 ---
 *Formation COBOL - Module JCL*
