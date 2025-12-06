@@ -67,7 +67,25 @@ for i in 01 02 03 04 05; do
 done
 
 echo ""
-echo -e "${BLUE}2. Module COBOL - Cours${NC}"
+echo -e "${BLUE}2. Module JCL${NC}"
+echo "   Répertoire: cours/jcl/"
+JCL_COURS_COUNT=$(count_files "$PROJECT_ROOT/cours/jcl" "*.md")
+JCL_COURS_COUNT=$((JCL_COURS_COUNT - 1)) # Exclure README.md
+if [ "$JCL_COURS_COUNT" -ge 1 ]; then
+    print_status "OK" "Chapitres cours: $JCL_COURS_COUNT fichiers"
+else
+    print_status "WARN" "Aucun chapitre JCL trouvé"
+fi
+
+# Vérifier chapitre 01
+if [ -f "$PROJECT_ROOT/cours/jcl/01-"*.md ]; then
+    print_status "OK" "Chapitre 01 présent"
+else
+    print_status "ERROR" "Chapitre 01 JCL manquant"
+fi
+
+echo ""
+echo -e "${BLUE}3. Module COBOL - Cours${NC}"
 echo "   Répertoire: cours/cobol/"
 COBOL_COURS_COUNT=$(count_files "$PROJECT_ROOT/cours/cobol" "*.md")
 COBOL_COURS_COUNT=$((COBOL_COURS_COUNT - 1)) # Exclure README.md
@@ -78,7 +96,7 @@ else
 fi
 
 echo ""
-echo -e "${BLUE}3. Module COBOL - Exercices${NC}"
+echo -e "${BLUE}4. Module COBOL - Exercices${NC}"
 echo "   Répertoire: exercices/cobol/"
 COBOL_EX_DIRS=$(find "$PROJECT_ROOT/exercices/cobol" -type d -name "chapitre-*" | wc -l | tr -d ' ')
 COBOL_CBL_COUNT=$(count_files "$PROJECT_ROOT/exercices/cobol" "*.cbl")
@@ -86,7 +104,7 @@ print_status "OK" "Chapitres exercices: $COBOL_EX_DIRS répertoires"
 print_status "OK" "Programmes COBOL: $COBOL_CBL_COUNT fichiers .cbl"
 
 echo ""
-echo -e "${BLUE}4. Module CICS - Cours${NC}"
+echo -e "${BLUE}5. Module CICS - Cours${NC}"
 echo "   Répertoire: cours/cics/"
 CICS_COURS_COUNT=$(count_files "$PROJECT_ROOT/cours/cics" "*.md")
 CICS_COURS_COUNT=$((CICS_COURS_COUNT - 1)) # Exclure README.md
@@ -97,7 +115,7 @@ else
 fi
 
 echo ""
-echo -e "${BLUE}5. Exercices Z/OS TSO${NC}"
+echo -e "${BLUE}6. Exercices Z/OS TSO${NC}"
 echo "   Répertoire: exercices/zos-tso/"
 ZOS_EX_COUNT=$(count_files "$PROJECT_ROOT/exercices/zos-tso" "*.md")
 ZOS_EX_COUNT=$((ZOS_EX_COUNT - 1)) # Exclure README.md
@@ -108,7 +126,7 @@ else
 fi
 
 echo ""
-echo -e "${BLUE}6. Projet Fil Rouge${NC}"
+echo -e "${BLUE}7. Projet Fil Rouge${NC}"
 echo "   Répertoire: projets/fil-rouge/"
 FR_DIRS=$(find "$PROJECT_ROOT/projets/fil-rouge" -type d -name "ex*" | wc -l | tr -d ' ')
 FR_JCL=$(count_files "$PROJECT_ROOT/projets/fil-rouge" "*.jcl")
@@ -140,7 +158,8 @@ echo ""
 # Tableau récapitulatif
 echo "   Module             | Cours | Exercices"
 echo "   -------------------|-------|----------"
-printf "   Z/OS TSO           | %5s | %s\n" "$ZOS_COURS_COUNT" "$ZOS_EX_COUNT fichiers"
+printf "   Z/OS TSO           | %5s | %s fichiers\n" "$ZOS_COURS_COUNT" "$ZOS_EX_COUNT"
+printf "   JCL                | %5s | (à venir)\n" "$JCL_COURS_COUNT"
 printf "   COBOL              | %5s | %s .cbl\n" "$COBOL_COURS_COUNT" "$COBOL_CBL_COUNT"
 printf "   CICS               | %5s | (à venir)\n" "$CICS_COURS_COUNT"
 printf "   Fil Rouge          |   -   | %s JCL, %s CBL\n" "$FR_JCL" "$FR_CBL"

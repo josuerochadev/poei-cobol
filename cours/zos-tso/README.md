@@ -13,8 +13,8 @@ Ce module présente le système d'exploitation z/OS d'IBM et son environnement d
 | `03-tso.md` | III | TSO, LOGON/LOGOFF, commandes Data Management et Jobs |
 | `04-ispf.md` | IV | ISPF/PDF, panels, View/Edit, Utilities, SDSF, éditeur |
 | `05-architecture-zos.md` | V | Architecture Z/OS : SYSPLEX, SMS, RACF |
-| `06-jcl.md` | VI | JCL, JOB, EXEC, DD, utilitaires *(à venir)* |
-| `07-vsam.md` | VII | VSAM, KSDS, ESDS, RRDS, IDCAMS *(à venir)* |
+
+> **Note** : Le JCL et VSAM font maintenant l'objet de modules dédiés séparés.
 
 ## Objectifs pédagogiques
 
@@ -23,8 +23,7 @@ Ce module présente le système d'exploitation z/OS d'IBM et son environnement d
 - Comprendre l'architecture et les composants de z/OS
 - Naviguer dans l'environnement TSO/ISPF
 - Créer et gérer des datasets (fichiers)
-- Écrire des JCL de base
-- Comprendre les organisations de fichiers VSAM
+- Comprendre les concepts de SYSPLEX, SMS et RACF
 
 ## Progression
 
@@ -33,8 +32,8 @@ Ce module présente le système d'exploitation z/OS d'IBM et son environnement d
 - [x] Chapitre III - TSO
 - [x] Chapitre IV - ISPF/PDF
 - [x] Chapitre V - Architecture Z/OS (SYSPLEX, SMS, RACF)
-- [ ] Chapitre VI - JCL
-- [ ] Chapitre VII - VSAM
+
+**Module terminé !** Passez au module JCL.
 
 ## Prérequis
 
@@ -49,8 +48,14 @@ Ce module présente le système d'exploitation z/OS d'IBM et son environnement d
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
 │   ┌─────────────┐                                       │
-│   │   Z/OS      │  ◄── VOUS ÊTES ICI                   │
+│   │   Z/OS      │  ◄── MODULE TERMINÉ                  │
 │   │  TSO/ISPF   │                                       │
+│   └──────┬──────┘                                       │
+│          │                                              │
+│          ▼                                              │
+│   ┌─────────────┐                                       │
+│   │    JCL      │  Job Control Language                │
+│   │             │                                       │
 │   └──────┬──────┘                                       │
 │          │                                              │
 │          ▼                                              │
