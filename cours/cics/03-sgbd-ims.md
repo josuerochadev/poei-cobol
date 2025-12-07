@@ -689,13 +689,6 @@ CICS accède à IMS DB via **DBCTL** (Database Control) :
 
 ---
 
-**Navigation**
-- [← Précédent : Organisation du système](02-organisation-systeme.md)
-- [Suivant : Architecture Multicouches →](04-architecture-multicouches.md)
-- [Retour au sommaire](README.md)
-
----
-
 ## Navigation
 
 | Précédent | Suivant |

@@ -996,13 +996,6 @@ La **couche des données** (aussi appelée **Data Access Layer** ou **DAL**) est
 
 ---
 
-**Navigation**
-- [← Précédent : Couche de Traitement](06-couche-traitement.md)
-- [Suivant : Travaux Pratiques →](08-travaux-pratiques.md)
-- [Retour au sommaire](README.md)
-
----
-
 ## Navigation
 
 | Précédent | Suivant |

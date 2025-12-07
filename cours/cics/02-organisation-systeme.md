@@ -990,13 +990,6 @@ La **COMMAREA** permet de passer des données entre transactions ou programmes :
 
 ---
 
-**Navigation**
-- [← Précédent : Présentation générale](01-presentation-generale.md)
-- [Suivant : SGBD IMS →](03-sgbd-ims.md)
-- [Retour au sommaire](README.md)
-
----
-
 ## Navigation
 
 | Précédent | Suivant |

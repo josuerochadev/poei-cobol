@@ -475,12 +475,6 @@ Une **région CICS** est une instance du moniteur transactionnel en cours d'exé
 
 ---
 
-**Navigation**
-- [Suivant : Organisation du système →](02-organisation-systeme.md)
-- [Retour au sommaire](README.md)
-
----
-
 ## Navigation
 
 | Précédent | Suivant |

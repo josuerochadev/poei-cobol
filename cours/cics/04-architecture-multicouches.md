@@ -752,13 +752,6 @@ Les **Channels/Containers** offrent une alternative moderne à la COMMAREA :
 
 ---
 
-**Navigation**
-- [← Précédent : SGBD IMS](03-sgbd-ims.md)
-- [Suivant : Couche de Présentation →](05-couche-presentation.md)
-- [Retour au sommaire](README.md)
-
----
-
 ## Navigation
 
 | Précédent | Suivant |
