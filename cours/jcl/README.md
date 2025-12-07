@@ -92,3 +92,58 @@ A l'issue de ce module, vous serez capable de :
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+## Aller plus loin
+
+### Documentation officielle IBM
+
+| Ressource | Description |
+|-----------|-------------|
+| [z/OS MVS JCL Reference](https://www.ibm.com/docs/en/zos/2.5.0?topic=mvs-zos-jcl-reference) | Manuel de référence JCL complet |
+| [z/OS MVS JCL User's Guide](https://www.ibm.com/docs/en/zos/2.5.0?topic=mvs-zos-jcl-users-guide) | Guide utilisateur JCL |
+| [z/OS Utilities Reference](https://www.ibm.com/docs/en/zos/2.5.0?topic=dfsms-zos-utilities) | Référence des utilitaires (IEBGENER, IEBCOPY, etc.) |
+| [DFSORT Application Programming Guide](https://www.ibm.com/docs/en/zos/2.5.0?topic=dfsort) | Guide complet DFSORT/ICETOOL |
+| [IDCAMS Reference](https://www.ibm.com/docs/en/zos/2.5.0?topic=dfsms-zos-idcams-access-method-services) | Commandes IDCAMS pour VSAM |
+
+### Cours en ligne
+
+| Plateforme | Cours | Niveau |
+|------------|-------|--------|
+| [Coursera - IBM](https://www.coursera.org/learn/introduction-to-jcl) | Introduction to z/OS JCL | Débutant |
+| [Udemy](https://www.udemy.com/course/jcl-tutorial-for-beginners/) | JCL Tutorial for Beginners | Débutant |
+| [Udemy](https://www.udemy.com/course/mainframe-the-complete-jcl-course/) | Mainframe: The Complete JCL Course | Tous niveaux |
+| [Interskill](https://interskill.com/) | Mainframe Specialist - JCL Foundations | Débutant |
+| [LinkedIn Learning](https://www.linkedin.com/learning/) | Mainframe JCL Essentials | Intermédiaire |
+
+### Tutoriels gratuits
+
+- [IBMMainframer.com - JCL Tutorial](https://www.ibmmainframer.com/jcl-tutorial/) - Tutoriel JCL complet avec exemples
+- [TutorialBrain - JCL](https://www.tutorialbrain.com/mainframe/jcl_tutorial/) - Guide détaillé JCL
+- [Mainframe Gurukul - JCL](https://www.mainframegurukul.com/tutorials/programming/jcl/jcl-tutorial.html) - Cours JCL avec exercices
+- [TechGuru99 - JCL](https://www.guru99.com/jcl-job-control-language-tutorial.html) - JCL Tutorial for Beginners
+
+### Outils et utilitaires
+
+| Outil | Description |
+|-------|-------------|
+| [JCL Checker](https://www.file-aid.com/) | Vérificateur de syntaxe JCL |
+| [DFSORT Tricks](https://www.dfsort.com/) | Astuces et exemples DFSORT/ICETOOL |
+| [CBTTape](http://www.cbttape.org/) | Collection d'utilitaires mainframe gratuits |
+
+### Références rapides
+
+- [JCL Quick Reference Card](https://www.ibm.com/docs/en/zos/2.5.0?topic=reference-quick) - Carte de référence rapide IBM
+- [SORT Tricks](https://www.dfsort.com/tricks/) - 100+ astuces DFSORT par Frank Yaeger (IBM)
+- [IDCAMS Commands Cheat Sheet](https://www.ibmmainframer.com/idcams-tutorial/) - Aide-mémoire IDCAMS
+
+### Communautés
+
+- [IBM Z Community](https://community.ibm.com/community/user/ibmz-and-linuxone) - Forum officiel IBM
+- [Planet Mainframe](https://planetmainframe.com/) - Blog et actualités mainframe
+- [Stack Overflow - JCL](https://stackoverflow.com/questions/tagged/jcl) - Questions/réponses JCL
+- [r/mainframe](https://www.reddit.com/r/mainframe/) - Subreddit dédié au mainframe
+
+### Environnement de pratique
+
+- [IBM Z Trial](https://www.ibm.com/z/trials) - Accès gratuit à un environnement z/OS réel
+- [Hercules Emulator + TK4-](http://wotho.ethz.ch/tk4-/) - MVS 3.8j avec JES2 pour pratiquer le JCL
