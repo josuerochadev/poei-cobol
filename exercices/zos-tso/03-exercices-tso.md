@@ -71,7 +71,7 @@ Appuyer sur **Entrée** pour se connecter.
 
 ## Exercice 2 : Création d'un PDS (bibliothèque)
 
-**Objectif** : Créer `FTEST.PROD.LIBTEST` (PO, LRECL=80, RECFM=F)
+**Objectif** : Créer `FTEST.PROD.LIBTEST` (PO, LRECL=80, RECFM=FB)
 
 ### Méthode ISPF (Option 3.2)
 
@@ -105,9 +105,9 @@ Appuyer sur **Entrée** pour se connecter.
 │   Primary quantity  ===> 2                                      │
 │   Secondary quantity===> 1                                      │
 │   Directory blocks  ===> 5         ◄── Obligatoire pour PDS     │
-│   Record format     ===> F                                      │
+│   Record format     ===> FB        ◄── Fixed Blocked            │
 │   Record length     ===> 80                                     │
-│   Block size        ===> 80                                     │
+│   Block size        ===> 800       ◄── Multiple de LRECL        │
 │   Data set type     ===> PDS       (PDS, LIBRARY, ou vide)      │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
@@ -120,7 +120,7 @@ Appuyer sur **Entrée** pour se connecter.
 ### Commande TSO équivalente (Option 6)
 ```
 ALLOC DA('FTEST.PROD.LIBTEST') NEW CATALOG +
-      DSORG(PO) RECFM(F) LRECL(80) BLKSIZE(80) +
+      DSORG(PO) RECFM(FB) LRECL(80) BLKSIZE(800) +
       SPACE(2,1) TRACKS DIR(5)
 ```
 
@@ -436,7 +436,7 @@ Recréez-le d'abord via Option 3.2 (voir exercice 2).
 
 | Dataset | Type | RECFM | Statut final |
 |---------|------|-------|--------------|
-| FTEST.PROD.LIBTEST | PO | F | Supprimé (Ex.8), recréer pour Ex.14 |
+| FTEST.PROD.LIBTEST | PO | FB | Supprimé (Ex.8), recréer pour Ex.14 |
 | FTEST.DEV.MODEL | PS | FB | Renommé → FTEST.DEV.MODELE |
 | FTEST.DEV.FILE | PS | FB | Renommé → FTEST.DEV.COMPTA |
 | FTEST.PROD.FILE | PS | FB | Existe |
