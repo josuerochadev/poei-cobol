@@ -95,8 +95,8 @@ poei-cobol/
 | IV | Opérations sur les données | ✅ | ✅ |
 | V | Traitement conditionnel | ✅ | ✅ |
 | VI | Gestion des Tables | ✅ | ✅ |
-| VII | Gestion des Fichiers séquentiels | ✅ | ✅ |
-| VIII | Fichiers VSAM | ✅ | ✅ |
+| VII | Gestion des Fichiers | ✅ | ✅ |
+| VIII | Opérations E/S sur les Fichiers | ✅ | ✅ |
 | IX | Programmes et sous-programmes | ✅ | ✅ |
 | X | Traitement des Fichiers | ✅ | ✅ |
 | XI | Tri Interne (SORT/MERGE) | ✅ | ✅ |
