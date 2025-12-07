@@ -21,9 +21,13 @@ PG*CH*
 *.bak
 *.tmp
 
-# Fichiers de données
+# Fichiers de données (minuscules et majuscules)
 *.dat
+*.DAT
+*.dat.*
+*.DAT.*
 *.idx
+*.IDX
 
 # Répertoires
 .vscode/
