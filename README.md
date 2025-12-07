@@ -27,10 +27,15 @@ poei-cobol/
 │   │   ├── ...
 │   │   └── 12-fichier-impression.md
 │   │
-│   └── cics/               # Module CICS (3 chapitres)
+│   └── cics/               # Module CICS (8 chapitres)
 │       ├── 01-presentation-generale.md
 │       ├── 02-organisation-systeme.md
-│       └── 03-sgbd-ims.md
+│       ├── 03-sgbd-ims.md
+│       ├── 04-architecture-multicouches.md
+│       ├── 05-couche-presentation.md
+│       ├── 06-couche-traitement.md
+│       ├── 07-couche-donnees.md
+│       └── 08-travaux-pratiques.md
 │
 ├── exercices/              # Exercices par module
 │   ├── zos-tso/            # Exercices TSO/ISPF
@@ -46,7 +51,8 @@ poei-cobol/
 │   │   ├── ...
 │   │   └── chapitre-12/
 │   │
-│   └── cics/               # Exercices CICS (à venir)
+│   └── cics/               # Exercices CICS (1 TP)
+│       └── tp-gestion-credits/  # TP complet architecture 3 tiers
 │
 ├── projets/                # Projets complets
 │   └── fil-rouge/          # Projet fil rouge (21 exercices)
@@ -103,6 +109,11 @@ poei-cobol/
 | I | Présentation générale | ✅ | - |
 | II | Organisation du système | ✅ | - |
 | III | SGBD IMS | ✅ | - |
+| IV | Architecture Multicouches | ✅ | - |
+| V | Couche de Présentation | ✅ | - |
+| VI | Couche de Traitement | ✅ | - |
+| VII | Couche des Données | ✅ | - |
+| VIII | Travaux Pratiques | ✅ | ✅ |
 
 ## Environnement
 
