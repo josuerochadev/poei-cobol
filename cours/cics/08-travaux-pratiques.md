@@ -906,12 +906,6 @@ exercices/cics/tp-gestion-credits/
 
 ---
 
-**Navigation**
-- [← Précédent : Couche des Données](07-couche-donnees.md)
-- [Retour au sommaire](README.md)
-
----
-
 ## Navigation
 
 | Précédent | Suivant |

@@ -1006,13 +1006,6 @@ MSGZONE  DFHMDF POS=(20,2),LENGTH=78,ATTRB=(ASKIP,BRT)
 
 ---
 
-**Navigation**
-- [← Précédent : Architecture Multicouches](04-architecture-multicouches.md)
-- [Suivant : Couche de Traitement →](06-couche-traitement.md)
-- [Retour au sommaire](README.md)
-
----
-
 ## Navigation
 
 | Précédent | Suivant |

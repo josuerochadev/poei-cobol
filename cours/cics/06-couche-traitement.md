@@ -1224,13 +1224,6 @@ La commande **DELETE** permet de supprimer un enregistrement :
 
 ---
 
-**Navigation**
-- [← Précédent : Couche de Présentation](05-couche-presentation.md)
-- [Suivant : Couche des Données →](07-couche-donnees.md)
-- [Retour au sommaire](README.md)
-
----
-
 ## Navigation
 
 | Précédent | Suivant |
