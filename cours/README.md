@@ -7,9 +7,9 @@ Ce dossier contient les supports de cours organisés par module.
 | Module | Description | Chapitres |
 |--------|-------------|-----------|
 | [Z/OS et TSO/ISPF](zos-tso/) | Système z/OS, TSO, ISPF | 5 chapitres |
-| [JCL](jcl/) | Job Control Language | 3 chapitres (+ 2 à venir) |
+| [JCL](jcl/) | Job Control Language | 4 chapitres + TP |
 | [COBOL](cobol/) | Langage COBOL et programmation mainframe | 12 chapitres |
-| [CICS](cics/) | Moniteur transactionnel et IMS | 3 chapitres |
+| [CICS](cics/) | Moniteur transactionnel CICS | 8 chapitres |
 
 ## Parcours recommandé
 
@@ -18,13 +18,13 @@ Ce dossier contient les supports de cours organisés par module.
    └── Chapitres I à V
 
 2. Module JCL (contrôle des travaux)
-   └── Chapitres I à V (en cours)
+   └── Chapitres I à IV + TP
 
 3. Module COBOL (programmation)
    └── Chapitres I à XII
 
 4. Module CICS (transactionnel)
-   └── Chapitres I à III
+   └── Chapitres I à VIII
 ```
 
 ## Prérequis par module

@@ -23,9 +23,10 @@ cobc -x -fdebugging-line programme.cbl -o programme
 
 ```
 cours/           # Course materials (markdown)
-├── zos-tso/     # Z/OS, TSO/ISPF fundamentals (Chapters I-VI)
+├── zos-tso/     # Z/OS, TSO/ISPF fundamentals (Chapters I-V)
+├── jcl/         # Job Control Language (Chapters I-IV + TP)
 ├── cobol/       # COBOL programming (Chapters I-XII)
-└── cics/        # CICS transactional (Chapters I-III)
+└── cics/        # CICS transactional (Chapters I-VIII)
 
 exercices/       # Practical exercises
 ├── cobol/       # COBOL exercises organized by chapter (chapitre-02 to chapitre-12)
