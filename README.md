@@ -17,9 +17,9 @@ poei-cobol/
 │   │   └── 05-architecture-zos.md
 │   │
 │   ├── jcl/                # Module JCL (4 chapitres)
-│   │   ├── 01-introduction-jcl.md
-│   │   ├── 02-fichiers-catalogues.md
-│   │   ├── 03-procedures-symboles.md
+│   │   ├── 01-cartes-job-exec-dd.md
+│   │   ├── 02-fichiers-parametres.md
+│   │   ├── 03-procedures.md
 │   │   └── 04-utilitaires.md
 │   │
 │   ├── cobol/              # Module COBOL (12 chapitres)
@@ -79,9 +79,9 @@ poei-cobol/
 
 | Chapitre | Sujet | Cours | Exercices |
 |----------|-------|-------|-----------|
-| I | Introduction au JCL | ✅ | - |
-| II | Fichiers et catalogues | ✅ | ✅ |
-| III | Procédures et symboles | ✅ | ✅ |
+| I | Cartes JOB, EXEC et DD | ✅ | - |
+| II | Fichiers spéciaux et paramètres | ✅ | ✅ |
+| III | Procédures JCL | ✅ | ✅ |
 | IV | Utilitaires (IEBGENER, IDCAMS, SORT...) | ✅ | ✅ |
 | V | Travaux pratiques (QCM + TPs) | - | ✅ |
 
