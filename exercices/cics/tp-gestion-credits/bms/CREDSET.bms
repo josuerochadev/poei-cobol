@@ -1,0 +1,152 @@
+***********************************************************************
+*  MAPSET : CREDSET - Écran gestion des crédits employés             *
+*  Transaction : CRED                                                 *
+***********************************************************************
+CREDSET  DFHMSD TYPE=&SYSPARM,                                         X
+               LANG=COBOL,                                             X
+               MODE=INOUT,                                             X
+               TIOAPFX=YES,                                            X
+               CTRL=FREEKB,                                            X
+               STORAGE=AUTO,                                           X
+               TERM=3270-2
+*
+***********************************************************************
+*  MAP : CREDMAP - Écran principal gestion crédits                   *
+***********************************************************************
+CREDMAP  DFHMDI SIZE=(24,80),                                          X
+               LINE=1,                                                 X
+               COLUMN=1
+*
+*─────────────────────── LIGNE DE TITRE ────────────────────────────
+         DFHMDF POS=(1,1),                                             X
+               LENGTH=60,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='═══════════════ GESTION DES CREDITS EMPLOYES ═X
+               ══════════════'
+*
+         DFHMDF POS=(1,70),                                            X
+               LENGTH=4,                                               X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='CRED'
+*
+*─────────────────────── ZONE DE SAISIE ────────────────────────────
+         DFHMDF POS=(3,2),                                             X
+               LENGTH=15,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='ID Employe   :'
+*
+IDEMPL   DFHMDF POS=(3,18),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(UNPROT,IC),                                      X
+               INITIAL='______'
+         DFHMDF POS=(3,25),                                            X
+               LENGTH=1,                                               X
+               ATTRB=ASKIP
+*
+*─────────────────────── INFORMATIONS EMPLOYE ──────────────────────
+         DFHMDF POS=(5,2),                                             X
+               LENGTH=60,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='──────────────── INFORMATIONS EMPLOYE ─────────X
+               ─────────'
+*
+         DFHMDF POS=(7,2),                                             X
+               LENGTH=15,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Nom          :'
+*
+NOM      DFHMDF POS=(7,18),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(9,2),                                             X
+               LENGTH=15,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Departement  :'
+*
+DEPT     DFHMDF POS=(9,18),                                            X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(9,35),                                            X
+               LENGTH=10,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Salaire  :'
+*
+SAL      DFHMDF POS=(9,46),                                            X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               PICOUT='ZZZ,ZZZ.99'
+*
+*─────────────────────── INFORMATIONS CREDIT ───────────────────────
+         DFHMDF POS=(11,2),                                            X
+               LENGTH=60,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='═══════════════ INFORMATIONS CREDIT ═══════════X
+               ═════════'
+*
+         DFHMDF POS=(13,2),                                            X
+               LENGTH=15,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Libelle      :'
+*
+LIBCRED  DFHMDF POS=(13,18),                                           X
+               LENGTH=20,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(15,2),                                            X
+               LENGTH=15,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Montant total:'
+*
+MTTOTAL  DFHMDF POS=(15,18),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               PICOUT='ZZZ,ZZZ.99'
+*
+         DFHMDF POS=(15,35),                                           X
+               LENGTH=10,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Echeance :'
+*
+MTECH    DFHMDF POS=(15,46),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               PICOUT='ZZ,ZZZ.99'
+*
+         DFHMDF POS=(17,2),                                            X
+               LENGTH=15,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Reste a payer:'
+*
+RESTE    DFHMDF POS=(17,18),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               PICOUT='ZZZ,ZZZ.99'
+*
+*─────────────────────── ZONE MESSAGE ──────────────────────────────
+         DFHMDF POS=(20,2),                                            X
+               LENGTH=76,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='────────────────────────────────────────────────X
+               ────────────────────────────'
+*
+MSG      DFHMDF POS=(21,2),                                            X
+               LENGTH=76,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+*─────────────────────── LIGNE DE COMMANDES ────────────────────────
+         DFHMDF POS=(23,2),                                            X
+               LENGTH=76,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='────────────────────────────────────────────────X
+               ────────────────────────────'
+*
+         DFHMDF POS=(24,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='PF3=Quitter   PF5=Payer echeance   ENTER=RecherX
+               cher'
+*
+         DFHMSD TYPE=FINAL
+         END

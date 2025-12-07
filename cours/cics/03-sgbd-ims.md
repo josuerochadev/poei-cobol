@@ -691,6 +691,7 @@ CICS accède à IMS DB via **DBCTL** (Database Control) :
 
 **Navigation**
 - [← Précédent : Organisation du système](02-organisation-systeme.md)
+- [Suivant : Architecture Multicouches →](04-architecture-multicouches.md)
 - [Retour au sommaire](README.md)
 
 ---
@@ -699,7 +700,7 @@ CICS accède à IMS DB via **DBCTL** (Database Control) :
 
 | Précédent | Suivant |
 |-----------|---------|
-| [Chapitre II - Organisation Système](02-organisation-systeme.md) | - |
+| [Chapitre II - Organisation Système](02-organisation-systeme.md) | [Chapitre IV - Architecture Multicouches](04-architecture-multicouches.md) |
 
 ---
 *Formation COBOL - Module CICS*
