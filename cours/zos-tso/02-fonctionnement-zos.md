@@ -29,7 +29,7 @@ Le système z/OS utilise deux types de stockage distincts :
 │   │  • Accès très rapide (nanosecondes)                    │   │
 │   │  • Volatile (perdue à l'arrêt)                         │   │
 │   │  • Coûteuse                                            │   │
-│   │  • Capacité : jusqu'à 40 To (z16)                      │   │
+│   │  • Capacité : jusqu'à 48 To (z16)                      │   │
 │   │                                                         │   │
 │   └─────────────────────────────────────────────────────────┘   │
 │                                                                  │

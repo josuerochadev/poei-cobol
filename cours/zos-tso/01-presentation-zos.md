@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Ce chapitre présente l'environnement dans lequel sera utilisé le système de gestion de fichiers VSAM. Le système d'exploitation IBM Z/OS utilise l'outil VSAM pour tous les fichiers stockés sur disque.
+Ce chapitre présente le système d'exploitation **z/OS** et l'environnement mainframe IBM. Nous aborderons l'historique des mainframes, leur positionnement dans l'architecture cloud hybride moderne, leurs points forts (disponibilité, sécurité, performance), ainsi que la terminologie spécifique à cet environnement.
 
 ---
 
@@ -173,7 +173,7 @@ IBM Z n'est plus un système isolé mais le **cœur d'une architecture cloud hyb
 | **Disponibilité** | 99,999% | 99,9% (typique) |
 | **Transactions/sec** | Millions | Milliers |
 | **Sécurité** | EAL5+ (certifié) | Variable |
-| **Virtualisation** | Native depuis 1960 | Ajoutée (VMware, etc.) |
+| **Virtualisation** | Native depuis 1972 (VM/370) | Ajoutée (VMware, etc.) |
 | **Coût/transaction** | Très faible | Plus élevé à grande échelle |
 | **Empreinte carbone** | Optimisée | Plus importante |
 
@@ -182,20 +182,20 @@ IBM Z n'est plus un système isolé mais le **cœur d'une architecture cloud hyb
 #### 1. Performance et scalabilité
 
 ```
-                    CAPACITÉ DE TRAITEMENT
+                    CAPACITÉ DE TRAITEMENT (en milliers de MIPS)
     ┌────────────────────────────────────────────────┐
     │                                                │
-    │  ████████████████████████████  19 MIPS (z16)  │
-    │  ████████████████████████      17 MIPS (z15)  │
-    │  ████████████████              13 MIPS (z14)  │
-    │  ██████████████                12 MIPS (z13)  │
+    │  ████████████████████████████  ~190K (z16)    │
+    │  ████████████████████████      ~170K (z15)    │
+    │  ████████████████              ~130K (z14)    │
+    │  ██████████████                ~120K (z13)    │
     │                                                │
     │  MIPS = Millions d'Instructions Par Seconde   │
     └────────────────────────────────────────────────┘
 ```
 
 - **Jusqu'à 200 processeurs** par système
-- **40 To de mémoire** maximum
+- **48 To de mémoire** maximum (z16)
 - **Millions de transactions** par seconde
 
 #### 2. Haute disponibilité

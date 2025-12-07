@@ -6,6 +6,7 @@
 # - Structure des modules (cours et exercices)
 # - Présence des fichiers attendus
 # - Liens de navigation entre chapitres
+# - Cohérence du README principal
 #
 # Usage: ./utils/audit-projet.sh
 #
@@ -241,6 +242,108 @@ if [ $NAV_ERRORS -eq 0 ]; then
 else
     print_status "ERROR" "$NAV_ERRORS lien(s) cassé(s) trouvé(s)"
     ((ERRORS+=NAV_ERRORS))
+fi
+
+echo ""
+echo -e "${BLUE}9. Vérification du README principal${NC}"
+echo "   Fichier: README.md"
+
+README_FILE="$PROJECT_ROOT/README.md"
+if [ -f "$README_FILE" ]; then
+    README_ERRORS=0
+
+    # Vérifier le nombre de chapitres Z/OS TSO dans la structure
+    README_ZOS=$(grep -oE "zos-tso/.*\(([0-9]+) chapitres\)" "$README_FILE" | grep -oE "[0-9]+" | head -1)
+    if [ -n "$README_ZOS" ]; then
+        if [ "$README_ZOS" -eq "$ZOS_COURS_COUNT" ]; then
+            print_status "OK" "Z/OS TSO: $README_ZOS chapitres (correct)"
+        else
+            print_status "ERROR" "Z/OS TSO: README indique $README_ZOS chapitres, réel: $ZOS_COURS_COUNT"
+            ((README_ERRORS++))
+        fi
+    fi
+
+    # Vérifier le nombre de chapitres JCL dans la structure
+    README_JCL=$(grep -oE "jcl/.*\(([0-9]+) chapitres\)" "$README_FILE" | grep -oE "[0-9]+" | head -1)
+    if [ -n "$README_JCL" ]; then
+        if [ "$README_JCL" -eq "$JCL_COURS_COUNT" ]; then
+            print_status "OK" "JCL: $README_JCL chapitres (correct)"
+        else
+            print_status "ERROR" "JCL: README indique $README_JCL chapitres, réel: $JCL_COURS_COUNT"
+            ((README_ERRORS++))
+        fi
+    else
+        print_status "WARN" "JCL: non mentionné dans la structure du README"
+    fi
+
+    # Vérifier le nombre de chapitres COBOL dans la structure
+    README_COBOL=$(grep -oE "cobol/.*\(([0-9]+) chapitres\)" "$README_FILE" | grep -oE "[0-9]+" | head -1)
+    if [ -n "$README_COBOL" ]; then
+        if [ "$README_COBOL" -eq "$COBOL_COURS_COUNT" ]; then
+            print_status "OK" "COBOL: $README_COBOL chapitres (correct)"
+        else
+            print_status "ERROR" "COBOL: README indique $README_COBOL chapitres, réel: $COBOL_COURS_COUNT"
+            ((README_ERRORS++))
+        fi
+    fi
+
+    # Vérifier le nombre de chapitres CICS dans la structure
+    README_CICS=$(grep -oE "cics/.*\(([0-9]+) chapitres\)" "$README_FILE" | grep -oE "[0-9]+" | head -1)
+    if [ -n "$README_CICS" ]; then
+        if [ "$README_CICS" -eq "$CICS_COURS_COUNT" ]; then
+            print_status "OK" "CICS: $README_CICS chapitres (correct)"
+        else
+            print_status "ERROR" "CICS: README indique $README_CICS chapitres, réel: $CICS_COURS_COUNT"
+            ((README_ERRORS++))
+        fi
+    fi
+
+    # Vérifier les tableaux de modules (compter les lignes avec ✅ dans chaque section)
+    # Module Z/OS TSO
+    ZOS_TABLE_LINES=$(sed -n '/### Module Z\/OS/,/### Module/p' "$README_FILE" | grep -c "| ✅")
+    if [ "$ZOS_TABLE_LINES" -eq "$ZOS_COURS_COUNT" ]; then
+        print_status "OK" "Tableau Z/OS TSO: $ZOS_TABLE_LINES lignes (correct)"
+    else
+        print_status "ERROR" "Tableau Z/OS TSO: $ZOS_TABLE_LINES lignes, attendu: $ZOS_COURS_COUNT"
+        ((README_ERRORS++))
+    fi
+
+    # Module JCL (4 chapitres cours + 1 ligne TP sans cours)
+    JCL_TABLE_LINES=$(sed -n '/### Module JCL/,/### Module/p' "$README_FILE" | grep -c "|")
+    JCL_TABLE_LINES=$((JCL_TABLE_LINES - 2)) # Retirer header et separator
+    if [ "$JCL_TABLE_LINES" -ge "$JCL_COURS_COUNT" ]; then
+        print_status "OK" "Tableau JCL: $JCL_TABLE_LINES lignes (correct)"
+    else
+        print_status "ERROR" "Tableau JCL: $JCL_TABLE_LINES lignes, attendu: >= $JCL_COURS_COUNT"
+        ((README_ERRORS++))
+    fi
+
+    # Module COBOL
+    COBOL_TABLE_LINES=$(sed -n '/### Module COBOL/,/### Module/p' "$README_FILE" | grep -c "| ✅")
+    if [ "$COBOL_TABLE_LINES" -eq "$COBOL_COURS_COUNT" ]; then
+        print_status "OK" "Tableau COBOL: $COBOL_TABLE_LINES lignes (correct)"
+    else
+        print_status "ERROR" "Tableau COBOL: $COBOL_TABLE_LINES lignes, attendu: $COBOL_COURS_COUNT"
+        ((README_ERRORS++))
+    fi
+
+    # Module CICS
+    CICS_TABLE_LINES=$(sed -n '/### Module CICS/,/## Environnement/p' "$README_FILE" | grep -c "| ✅")
+    if [ "$CICS_TABLE_LINES" -eq "$CICS_COURS_COUNT" ]; then
+        print_status "OK" "Tableau CICS: $CICS_TABLE_LINES lignes (correct)"
+    else
+        print_status "ERROR" "Tableau CICS: $CICS_TABLE_LINES lignes, attendu: $CICS_COURS_COUNT"
+        ((README_ERRORS++))
+    fi
+
+    if [ $README_ERRORS -eq 0 ]; then
+        print_status "OK" "README principal cohérent avec le projet"
+    else
+        ((ERRORS+=README_ERRORS))
+    fi
+else
+    print_status "ERROR" "README.md non trouvé à la racine"
+    ((ERRORS++))
 fi
 
 echo ""

@@ -9,11 +9,18 @@ Ce repository documente ma progression et regroupe les exercices, TP et projets 
 ```
 poei-cobol/
 ├── cours/                  # Cours par module
-│   ├── zos-tso/            # Module Z/OS et TSO/ISPF (4 chapitres)
+│   ├── zos-tso/            # Module Z/OS et TSO/ISPF (5 chapitres)
 │   │   ├── 01-presentation-zos.md
 │   │   ├── 02-fonctionnement-zos.md
 │   │   ├── 03-tso.md
-│   │   └── 04-ispf.md
+│   │   ├── 04-ispf.md
+│   │   └── 05-architecture-zos.md
+│   │
+│   ├── jcl/                # Module JCL (4 chapitres)
+│   │   ├── 01-introduction-jcl.md
+│   │   ├── 02-fichiers-catalogues.md
+│   │   ├── 03-procedures-symboles.md
+│   │   └── 04-utilitaires.md
 │   │
 │   ├── cobol/              # Module COBOL (12 chapitres)
 │   │   ├── 01-structure-programme.md
@@ -26,7 +33,13 @@ poei-cobol/
 │       └── 03-sgbd-ims.md
 │
 ├── exercices/              # Exercices par module
-│   ├── zos-tso/            # Exercices TSO/ISPF (14 exercices)
+│   ├── zos-tso/            # Exercices TSO/ISPF
+│   │
+│   ├── jcl/                # Exercices JCL (24 fichiers .jcl)
+│   │   ├── chapitre-02/
+│   │   ├── chapitre-03/
+│   │   ├── chapitre-04/
+│   │   └── chapitre-05/    # Travaux pratiques + QCM
 │   │
 │   ├── cobol/              # Exercices COBOL (61 programmes)
 │   │   ├── chapitre-02/
@@ -54,6 +67,17 @@ poei-cobol/
 | II | Fonctionnement de Z/OS | ✅ | - |
 | III | TSO (Time Sharing Option) | ✅ | ✅ |
 | IV | ISPF/PDF | ✅ | - |
+| V | Architecture Z/OS | ✅ | - |
+
+### Module JCL
+
+| Chapitre | Sujet | Cours | Exercices |
+|----------|-------|-------|-----------|
+| I | Introduction au JCL | ✅ | - |
+| II | Fichiers et catalogues | ✅ | ✅ |
+| III | Procédures et symboles | ✅ | ✅ |
+| IV | Utilitaires (IEBGENER, IDCAMS, SORT...) | ✅ | ✅ |
+| V | Travaux pratiques (QCM + TPs) | - | ✅ |
 
 ### Module COBOL
 
