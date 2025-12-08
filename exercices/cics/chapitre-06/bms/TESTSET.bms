@@ -1,0 +1,108 @@
+***********************************************************************
+*  MAPSET : TESTSET - Ecran lecture employe (TP Chapitre VI)          *
+*  Transaction : TEST                                                  *
+***********************************************************************
+TESTSET  DFHMSD TYPE=&SYSPARM,                                         X
+               LANG=COBOL,                                             X
+               MODE=INOUT,                                             X
+               TIOAPFX=YES,                                            X
+               CTRL=FREEKB,                                            X
+               STORAGE=AUTO,                                           X
+               TERM=3270-2
+*
+***********************************************************************
+*  MAP : MAPTEST - Ecran recherche employe par code                   *
+***********************************************************************
+MAPTEST  DFHMDI SIZE=(24,80),                                          X
+               LINE=1,                                                 X
+               COLUMN=1
+*
+*----------------------- LIGNE DE TITRE ------------------------------
+         DFHMDF POS=(1,1),                                             X
+               LENGTH=50,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='======== RECHERCHE EMPLOYE (TP CHAPITRE VI) ==X
+               ======'
+*
+         DFHMDF POS=(1,70),                                            X
+               LENGTH=4,                                               X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='TEST'
+*
+*----------------------- ZONE DE SAISIE CLE --------------------------
+         DFHMDF POS=(4,2),                                             X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Code Employe     :'
+*
+CODEEMP  DFHMDF POS=(4,23),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(UNPROT,IC),                                      X
+               INITIAL='______'
+         DFHMDF POS=(4,30),                                            X
+               LENGTH=1,                                               X
+               ATTRB=ASKIP
+*
+*----------------------- DONNEES EMPLOYE -----------------------------
+         DFHMDF POS=(7,2),                                             X
+               LENGTH=50,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='------------ DONNEES EMPLOYE ----------------X
+               ----'
+*
+         DFHMDF POS=(9,2),                                             X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Nom              :'
+*
+NOMEMP   DFHMDF POS=(9,23),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(11,2),                                            X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Departement      :'
+*
+DEPTEMP  DFHMDF POS=(11,23),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(13,2),                                            X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Salaire          :'
+*
+SALEMP   DFHMDF POS=(13,23),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               PICOUT='ZZZ,ZZZ.99'
+*
+         DFHMDF POS=(15,2),                                            X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Statut Credit    :'
+*
+STATEMP  DFHMDF POS=(15,23),                                           X
+               LENGTH=15,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+*----------------------- ZONE MESSAGE --------------------------------
+         DFHMDF POS=(19,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='----------------------------------------------X
+               ------------------------'
+*
+MSG      DFHMDF POS=(20,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+*----------------------- LIGNE DE COMMANDES --------------------------
+         DFHMDF POS=(23,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='PF3=Quitter                 ENTER=Rechercher'
+*
+         DFHMSD TYPE=FINAL
+         END

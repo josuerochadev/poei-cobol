@@ -9,7 +9,7 @@ Ce dossier contient les exercices pratiques organisés par module.
 | [Z/OS et TSO](zos-tso/) | Exercices TSO, commandes système | 14 exercices |
 | [JCL](jcl/) | Exercices JCL (chapitres 02 à 05) | 24 exercices |
 | [COBOL](cobol/) | Exercices COBOL (chapitres 02 à 12) | 61 programmes |
-| [CICS](cics/) | TP Gestion des Crédits (architecture 3 tiers) | 1 TP complet |
+| [CICS](cics/) | TP Commande READ + TP Gestion des Crédits | 2 TPs |
 
 ## Organisation
 
