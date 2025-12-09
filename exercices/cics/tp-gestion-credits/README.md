@@ -76,7 +76,7 @@ EMP004 PRET PERSO           0005000.00 00250.00 0000250.00
 EMP006 PRET ETUDES          0008000.00 00200.00 0006800.00
 ```
 
-## Architecture (version simplifiée)
+## Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -112,7 +112,7 @@ EMP006 PRET ETUDES          0008000.00 00200.00 0006800.00
 ```
 tp-gestion-credits/
 ├── cobol/
-│   └── PROGCRED.cbl      # Programme principal (version simple)
+│   └── PROGCRED.cbl      # Programme principal
 ├── copybooks/
 │   ├── EMPLOYE.cpy       # Structure employé (52 octets)
 │   └── CREDEMP.cpy       # Structure crédit (40 octets)
@@ -124,53 +124,7 @@ tp-gestion-credits/
 │   ├── LOADDATA.jcl      # Chargement données test
 │   └── COMPCRED.jcl      # Compilation programme PROGCRED
 └── README.md
-
-(Version avancée avec BMS - voir section "Exercices complémentaires")
-├── bms/CREDSET.bms
-├── cobol/CREDPRES.cbl, CREDTRT.cbl, CREDDAO.cbl
 ```
-
-| Dossier | Fichier | Description |
-|---------|---------|-------------|
-| `cobol/` | **PROGCRED.cbl** | **Programme principal (version simple)** |
-| `copybooks/` | EMPLOYE.cpy | Structure enregistrement employé |
-| `copybooks/` | CREDEMP.cpy | Structure enregistrement crédit |
-| `jcl/` | DEFVSAM.jcl | Définition des fichiers VSAM |
-| `jcl/` | LOADDATA.jcl | Chargement des données de test |
-| `jcl/` | COMPCRED.jcl | Compilation du programme CICS |
-| `data/` | EMPLOYE.dat | Données employés (6 enreg.) |
-| `data/` | CREDEMP.dat | Données crédits (4 enreg.) |
-
----
-
-## JCL de compilation
-
-### Compilation du programme PROGCRED (COMPCRED.jcl)
-
-```jcl
-//COMPCRED JOB 'COMPILE PROGCRED',
-//          CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),
-//          NOTIFY=&SYSUID
-//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,FTEST.CICS.SOURCE,
-//          FTEST.CICS.LKED,FTEST.CICS.LOAD)
-//COMPIL   EXEC PROC=DFHYITVL,
-//          INDEX='DFH510.CICS',
-//          PROGLIB='FTEST.CICS.LOAD',
-//          AD370HLQ='IGY420',
-//          DSCTLIB='FTEST.CICS.LKED',
-//          LE370HLQ='CEE'
-//TRN.SYSIN DD DSN=FTEST.CICS.SOURCE(PROGCRED),DISP=SHR
-//LKED.SYSIN DD *
-     INCLUDE SYSLIB(DFHELII)
-     NAME PROGCRED(R)
-/*
-```
-
-**Paramètres clés** :
-- `DFHYITVL` : Procédure intégrée (Translate + Compile + Link)
-- `PROGLIB` : Bibliothèque de sortie pour le programme
-- `AD370HLQ` : High-Level Qualifier du compilateur COBOL
-- `DFHELII` : Module d'interface CICS-COBOL
 
 ---
 
@@ -204,86 +158,44 @@ CEDA INSTALL GROUP(CREDGRP)
 CRED
 ```
 
-### Étape 5 : Tests
-
-| Scénario | Action | Résultat attendu |
-|----------|--------|------------------|
-| 1 | Saisir `EMP001` + ENTER | Affichage employé + crédit auto |
-| 2 | Saisir `EMP002` + ENTER | Affichage employé sans crédit |
-| 3 | Saisir `EMP999` + ENTER | Message "Employé non trouvé" |
-| 4 | Sur EMP001, appuyer PF5 | Reste diminue de 450.00 |
-| 5 | Sur EMP004, appuyer PF5 | Crédit soldé, état passe à 'N' |
-
 ---
 
-## Déroulement de l'application
+## Déroulement du programme
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  FLUX DE TRAITEMENT - APPLICATION GESTION DES CREDITS                   │
+│  FLUX DE TRAITEMENT - PROGCRED                                          │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│  ÉTAPE 1 : Lecture de l'ID-EMPL                                         │
-│  ─────────────────────────────────                                      │
-│  L'utilisateur saisit un ID employé (EMP001-EMP006)                     │
-│  → Programme CREDPRES reçoit la saisie via RECEIVE MAP                  │
-│                                                                          │
-│  ÉTAPE 2 : Vérification état crédit                                     │
-│  ────────────────────────────────────                                   │
-│  → Programme CREDTRT vérifie EMP-ETAT-CRED                              │
-│  → Si 'Y' : l'employé a un crédit actif                                │
-│  → Si 'N' : pas de crédit en cours                                     │
-│                                                                          │
-│  ÉTAPE 3 : Lecture informations crédit                                  │
-│  ──────────────────────────────────────                                 │
-│  Si EMP-ETAT-CRED = 'Y' :                                               │
-│  → Programme CREDDAO lit le fichier CRE-EMP                            │
-│  → Retourne : libellé, montant total, échéance, reste                   │
-│                                                                          │
-│  ÉTAPE 4 : Paiement échéance (PF5)                                      │
-│  ─────────────────────────────────                                      │
-│  1. READ UPDATE sur CRE-EMP (verrouillage)                              │
-│  2. RESTE-CREDIT = RESTE-CREDIT - MONTANT-ECHEANCE                     │
-│  3. REWRITE CRE-EMP                                                     │
-│  4. Si RESTE-CREDIT = 0 :                                               │
-│     - READ UPDATE sur EMPLOYE                                           │
-│     - ETAT-CRED-EMPL = 'N'                                             │
-│     - REWRITE EMPLOYE                                                   │
+│  0000-PRINCIPAL                                                          │
+│  │                                                                       │
+│  ├─► 1000-LIRE-EMPLOYE                                                  │
+│  │   • READ FILE('EMPLOYE') INTO(WS-EMPLOYE)                            │
+│  │   • Gestion NOTFND si employé inexistant                             │
+│  │                                                                       │
+│  ├─► 2000-AFFICHER-EMPLOYE                                              │
+│  │   • SEND TEXT : ID, Nom, Dept, Salaire, État crédit                  │
+│  │                                                                       │
+│  ├─► 3000-LIRE-CREDIT (si EMP-ETAT-CRED = 'Y')                         │
+│  │   • READ FILE('CREDEMP') INTO(WS-CREDIT)                             │
+│  │                                                                       │
+│  ├─► 4000-AFFICHER-CREDIT                                               │
+│  │   • SEND TEXT : Libellé, Montant, Échéance, Reste                    │
+│  │                                                                       │
+│  ├─► 5000-PAYER-ECHEANCE                                                │
+│  │   • READ FILE('CREDEMP') UPDATE                                      │
+│  │   • SUBTRACT CRD-MONTANT-ECH FROM CRD-RESTE                          │
+│  │   • REWRITE FILE('CREDEMP')                                          │
+│  │   │                                                                   │
+│  │   └─► 6000-SOLDER-CREDIT (si CRD-RESTE = 0)                         │
+│  │       • READ FILE('EMPLOYE') UPDATE                                  │
+│  │       • SET EMP-SANS-CREDIT TO TRUE                                  │
+│  │       • REWRITE FILE('EMPLOYE')                                      │
+│  │                                                                       │
+│  └─► 9000-FIN-PROGRAMME                                                 │
+│      • EXEC CICS RETURN                                                 │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
-```
-
-### Séquence d'appels entre programmes
-
-```
-                    ┌─────────────┐
-                    │   Terminal  │
-                    └──────┬──────┘
-                           │ Transaction CRED
-                           ▼
-                    ┌─────────────┐
-                    │  CREDPRES   │  Couche Présentation
-                    │ (BMS/Ecran) │
-                    └──────┬──────┘
-                           │ LINK
-                           ▼
-                    ┌─────────────┐
-                    │  CREDTRT    │  Couche Traitement
-                    │ (Métier)    │
-                    └──────┬──────┘
-                           │ LINK
-                           ▼
-                    ┌─────────────┐
-                    │  CREDDAO    │  Couche Données
-                    │ (VSAM)      │
-                    └──────┬──────┘
-                           │
-              ┌────────────┴────────────┐
-              ▼                         ▼
-        ┌──────────┐              ┌──────────┐
-        │ EMPLOYE  │              │ CRE-EMP  │
-        │  (VSAM)  │              │  (VSAM)  │
-        └──────────┘              └──────────┘
 ```
 
 ---
@@ -292,35 +204,35 @@ CRED
 
 ### Niveau 1 - Modifications simples
 
-1. Ajouter l'affichage du nombre d'échéances restantes
-2. Afficher un message différent si moins de 3 échéances restantes
-3. Ajouter la touche PF1 pour afficher une aide
+1. Modifier `WS-ID-EMPL` pour tester différents employés (EMP001 à EMP006)
+2. Ajouter l'affichage du nombre d'échéances restantes
+3. Afficher un message différent si moins de 3 échéances restantes
 
 ### Niveau 2 - Nouvelles fonctionnalités
 
-1. Ajouter la création d'un nouveau crédit (PF4)
+1. Ajouter un `RECEIVE` pour saisir l'ID employé au clavier
 2. Permettre le paiement de plusieurs échéances (saisie nombre)
 3. Historiser les paiements dans un fichier TD
 
 ### Niveau 3 - Architecture avancée
 
 1. Remplacer l'accès VSAM par DB2
-2. Ajouter une validation de mot de passe
-3. Implémenter un journal d'audit
+2. Séparer en architecture 3-tiers (Présentation/Traitement/Données)
+3. Ajouter des écrans BMS pour une meilleure interface
+
+---
 
 ## Résultats attendus
 
 Après réalisation complète du TP, vous saurez :
 
-- Concevoir une application CICS multicouches
-- Définir et utiliser des fichiers VSAM
-- Créer des écrans BMS
-- Implémenter les commandes READ, REWRITE
-- Gérer le mode pseudo-conversationnel
-- Appliquer les bonnes pratiques de séparation des responsabilités
+- Utiliser les commandes READ et REWRITE avec verrouillage (UPDATE)
+- Gérer les codes retour CICS (RESP/RESP2)
+- Implémenter une logique métier avec mise à jour de plusieurs fichiers
+- Utiliser SEND TEXT pour l'affichage simple
 
 ---
 
 **Navigation**
 - [← Retour aux exercices CICS](../README.md)
-- [Cours : Travaux Pratiques](../../../cours/cics/08-travaux-pratiques.md)
+- [Cours : Couche Traitement](../../../cours/cics/06-couche-traitement.md)

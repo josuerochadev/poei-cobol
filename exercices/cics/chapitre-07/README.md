@@ -11,22 +11,19 @@ Ce TP met en pratique le parcours séquentiel de fichiers VSAM et la gestion des
 - Comprendre SYNCPOINT et ROLLBACK
 - Gérer les points de sauvegarde (SYNCPOINT)
 
-## Fichiers
+## Fichiers fournis
 
 ```
 chapitre-07/
-├── bms/
-│   └── BROWSSET.bms      # Mapset pour affichage liste
-├── cobol/
-│   ├── PROGBRWS.cbl      # Exercice 1 : Browse simple
-│   ├── PROGPAGE.cbl      # Exercice 2 : Affichage paginé
-│   └── PROGVIR.cbl       # Exercice 3 : Virement avec SYNCPOINT
-├── copybooks/
-│   └── MAPBROWS.cpy      # Zone symbolique
-├── jcl/
-│   └── DEFVSAM.jcl       # Définition fichiers VSAM
-└── README.md
+└── README.md             # Instructions et exercices
 ```
+
+**Exercices à réaliser** :
+- `PROGBRWS.cbl` : Browse simple (Exercice 1)
+- `PROGPAGE.cbl` : Affichage paginé (Exercice 2)
+- `PROGVIR.cbl` : Virement avec SYNCPOINT (Exercice 3)
+
+> **Note** : Ce chapitre est théorique. Les programmes sont à développer en s'inspirant du code fourni dans les exemples ci-dessous.
 
 ## Structure de données
 
@@ -121,13 +118,13 @@ Parcourir un fichier VSAM du début à la fin et afficher tous les enregistremen
 | 20 | DFHRESP(ENDFILE) | Fin de fichier atteinte |
 | 13 | DFHRESP(NOTFND) | Clé de départ non trouvée |
 
-### Programme fourni
+### Programme à développer
 
-Le programme `PROGBRWS.cbl` :
-1. Ouvre un browse avec STARTBR (clé LOW-VALUES)
-2. Lit tous les enregistrements avec READNEXT
-3. Affiche chaque enregistrement sur le terminal
-4. Ferme avec ENDBR
+Le programme `PROGBRWS.cbl` doit :
+1. Ouvrir un browse avec STARTBR (clé LOW-VALUES)
+2. Lire tous les enregistrements avec READNEXT
+3. Afficher chaque enregistrement avec SEND TEXT
+4. Fermer avec ENDBR
 
 ### Test
 
@@ -211,13 +208,13 @@ Implémenter un affichage paginé avec navigation PF7 (page précédente) et PF8
            END-EXEC.
 ```
 
-### Programme fourni
+### Programme à développer
 
-Le programme `PROGPAGE.cbl` :
+Le programme `PROGPAGE.cbl` doit :
 1. Premier affichage : 10 premiers enregistrements
-2. PF8 : Affiche les 10 suivants
-3. PF7 : Affiche les 10 précédents
-4. PF3 : Quitte le programme
+2. PF8 : Afficher les 10 suivants
+3. PF7 : Afficher les 10 précédents
+4. PF3 : Quitter le programme
 
 ### Test
 
@@ -320,13 +317,13 @@ Implémenter un virement entre deux comptes avec gestion transactionnelle.
 | 0 | DFHRESP(NORMAL) | SYNCPOINT réussi |
 | 82 | DFHRESP(ROLLEDBACK) | Rollback automatique |
 
-### Programme fourni
+### Programme à développer
 
-Le programme `PROGVIR.cbl` :
-1. Demande compte source, compte destination, montant
-2. Vérifie que le compte source a un solde suffisant
-3. Débite le compte source
-4. Crédite le compte destination
+Le programme `PROGVIR.cbl` doit :
+1. Demander compte source, compte destination, montant
+2. Vérifier que le compte source a un solde suffisant
+3. Débiter le compte source
+4. Créditer le compte destination
 5. Si succès : SYNCPOINT
 6. Si erreur : SYNCPOINT ROLLBACK
 

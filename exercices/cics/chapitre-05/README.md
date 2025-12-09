@@ -11,20 +11,21 @@ Ce TP met en pratique la création d'écrans BMS et l'utilisation des outils de 
 - Installer une application avec les commandes CEDA
 - Comprendre le cycle SEND MAP / RECEIVE MAP
 
-## Fichiers
+## Fichiers fournis
 
 ```
 chapitre-05/
 ├── bms/
-│   ├── MAPTEST.bms       # Mapset simple (exercice intro)
-│   └── WELCOMES.bms      # Mapset d'accueil complet
-├── cobol/
-│   └── PROGWELC.cbl      # Programme affichage MAP
+│   └── MAPTEST.bms       # Exemple de Mapset simple
 ├── jcl/
 │   ├── ASSBLMAP.jcl      # Assemblage MAP BMS
 │   └── COMPPGR.jcl       # Compilation programme CICS
 └── README.md
 ```
+
+**Fichiers à créer (exercices)** :
+- `bms/WELCOMES.bms` : Mapset d'accueil complet (Exercice 1)
+- `cobol/PROGWELC.cbl` : Programme COBOL avec SEND/RECEIVE MAP (Exercice 2)
 
 ---
 

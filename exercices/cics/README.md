@@ -9,35 +9,36 @@ Ce dossier contient les exercices pratiques pour le module CICS, organisés par 
 ```
 cics/
 ├── chapitre-05/           # TP Couche Présentation (BMS, CEDF, CEDA)
-│   ├── README.md
-│   └── ...
+│   ├── bms/MAPTEST.bms    # Exemple de MAP simple
+│   ├── jcl/               # JCL d'assemblage et compilation
+│   └── README.md
 │
 ├── chapitre-06/           # TP Couche Traitement (READ, WRITE, REWRITE, DELETE)
-│   ├── bms/               # TESTSET.bms
+│   ├── bms/TESTSET.bms    # Mapset pour les exercices
 │   ├── cobol/             # PROGREAD, PROGWRIT, PROGREWT, PROGDELT
 │   ├── copybooks/         # MAPTEST.cpy
+│   ├── jcl/               # Définition et chargement VSAM
 │   └── README.md
 │
 ├── chapitre-07/           # TP Couche Données (Browse, Transactions)
-│   ├── README.md
-│   └── ...
+│   └── README.md          # Exercices théoriques à développer
 │
-└── tp-gestion-credits/    # TP complet : Architecture multicouches
+└── tp-gestion-credits/    # TP complet : Programme CICS simplifié
+    ├── cobol/PROGCRED.cbl # Programme principal (SEND TEXT, pas de BMS)
     ├── copybooks/         # Structures de données
-    ├── jcl/               # Définition et chargement VSAM
     ├── data/              # Données de test
-    ├── bms/               # Écran BMS
-    └── cobol/             # Programmes (3 couches)
+    ├── jcl/               # Définition VSAM et compilation
+    └── README.md
 ```
 
 ## Travaux Pratiques disponibles
 
-| TP | Titre | Description | Chapitres cours |
-|----|-------|-------------|-----------------|
-| [chapitre-05](chapitre-05/) | Couche Présentation | BMS, CEDF, installation CEDA | 05 |
-| [chapitre-06](chapitre-06/) | Couche Traitement | READ, WRITE, REWRITE, DELETE | 06 |
-| [chapitre-07](chapitre-07/) | Couche Données | Browse VSAM (STARTBR, READNEXT), SYNCPOINT | 07 |
-| [tp-gestion-credits](tp-gestion-credits/) | Gestion des Crédits | Application CICS multicouches complète | 05-07 |
+| TP | Titre | Description | Niveau |
+|----|-------|-------------|--------|
+| [chapitre-05](chapitre-05/) | Couche Présentation | BMS, CEDF, CEDA | Débutant |
+| [chapitre-06](chapitre-06/) | Couche Traitement | READ, WRITE, REWRITE, DELETE | Intermédiaire |
+| [chapitre-07](chapitre-07/) | Couche Données | Browse VSAM, SYNCPOINT (théorique) | Avancé |
+| [tp-gestion-credits](tp-gestion-credits/) | Gestion des Crédits | Application complète (version simplifiée) | Intermédiaire |
 
 ---
 
@@ -102,9 +103,9 @@ Ce TP met en pratique les 4 commandes CICS de manipulation de fichiers VSAM.
 
 - Maîtriser READ, WRITE, REWRITE, DELETE
 - Gérer les codes retour (RESP/RESP2)
-- Intégrer présentation (BMS) et accès données (VSAM)
+- Comprendre la séquence READ UPDATE → REWRITE
 
-### Exercices
+### Programmes fournis
 
 | Programme | Transaction | Commande | Description |
 |-----------|-------------|----------|-------------|
@@ -119,15 +120,15 @@ Ce TP met en pratique les 4 commandes CICS de manipulation de fichiers VSAM.
 
 ## TP Chapitre 07 - Couche Données
 
-Ce TP met en pratique le parcours de fichiers VSAM et la gestion des transactions.
+Ce TP présente le parcours de fichiers VSAM et la gestion des transactions.
 
 ### Objectifs
 
 - Maîtriser STARTBR, READNEXT, READPREV, ENDBR
 - Comprendre SYNCPOINT et ROLLBACK
-- Implémenter un parcours séquentiel avec affichage paginé
+- Implémenter un parcours séquentiel
 
-### Exercices
+### Exercices (à développer)
 
 1. **Exercice 1** : Parcours complet d'un fichier VSAM
 2. **Exercice 2** : Affichage paginé (10 enregistrements par page)
@@ -139,7 +140,7 @@ Ce TP met en pratique le parcours de fichiers VSAM et la gestion des transaction
 
 ## TP Complet - Gestion des Crédits
 
-Application CICS complète utilisant l'architecture multicouches (3 tiers).
+Application CICS simplifiée démontrant l'utilisation de READ/REWRITE avec SEND TEXT.
 
 ### Fonctionnalités
 
@@ -148,31 +149,28 @@ Application CICS complète utilisant l'architecture multicouches (3 tiers).
 - Paiement d'une échéance
 - Solde automatique du crédit
 
-### Architecture
+### Architecture simplifiée
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    ARCHITECTURE 3-TIERS                          │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │  CREDPRES.cbl (Présentation)                            │   │
-│  │  • Écran BMS CREDSET/CREDMAP                           │   │
-│  │  • Gestion touches PF                                   │   │
-│  └─────────────────────────────┬───────────────────────────┘   │
-│                                │ LINK                           │
-│  ┌─────────────────────────────▼───────────────────────────┐   │
-│  │  CREDTRT.cbl (Traitement)                               │   │
-│  │  • Logique métier                                       │   │
-│  │  • Calculs et validations                              │   │
-│  └─────────────────────────────┬───────────────────────────┘   │
-│                                │ LINK                           │
-│  ┌─────────────────────────────▼───────────────────────────┐   │
-│  │  CREDDAO.cbl (Données)                                  │   │
-│  │  • READ/REWRITE VSAM                                   │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                      TRANSACTION CRED                         │
+├──────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  PROGCRED.cbl                                           │ │
+│  │  • Affichage via SEND TEXT (pas de BMS)                │ │
+│  │  • Lecture/Mise à jour VSAM directe                    │ │
+│  │  • Logique métier intégrée                             │ │
+│  └─────────────────────┬───────────────────────────────────┘ │
+│                        │                                      │
+│              ┌─────────┴─────────┐                           │
+│              ▼                   ▼                            │
+│        ┌──────────┐        ┌──────────┐                      │
+│        │ EMPLOYE  │        │ CRE-EMP  │                      │
+│        │  (VSAM)  │        │  (VSAM)  │                      │
+│        └──────────┘        └──────────┘                      │
+│                                                               │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 → [Voir les détails](tp-gestion-credits/)
@@ -183,7 +181,7 @@ Application CICS complète utilisant l'architecture multicouches (3 tiers).
 
 - Avoir complété les exercices du module COBOL
 - Avoir lu les chapitres 01 à 07 du cours CICS
-- Comprendre l'architecture multicouches
+- Comprendre les commandes CICS de base
 
 ## Navigation
 
