@@ -57,6 +57,7 @@
        01  WS-MONTANT-EDIT         PIC ZZZ,ZZ9.99.
        01  WS-RESTE-EDIT           PIC ZZZ,ZZ9.99.
        01  WS-ECH-EDIT             PIC ZZ,ZZ9.99.
+       01  WS-RESP-EDIT            PIC -9(8).
 
        PROCEDURE DIVISION.
 
@@ -107,9 +108,10 @@
                        INTO WS-MESSAGE
                    PERFORM 9100-AFFICHER-MESSAGE
                WHEN OTHER
+                   MOVE WS-RESP TO WS-RESP-EDIT
                    STRING 'ERREUR VSAM lecture EMPLOYE, RESP='
                           DELIMITED BY SIZE
-                          WS-RESP DELIMITED BY SIZE
+                          WS-RESP-EDIT DELIMITED BY SIZE
                        INTO WS-MESSAGE
                    PERFORM 9100-AFFICHER-MESSAGE
            END-EVALUATE.
