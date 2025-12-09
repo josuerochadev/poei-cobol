@@ -101,15 +101,15 @@
                WHEN DFHRESP(NORMAL)
                    CONTINUE
                WHEN DFHRESP(NOTFND)
-                   STRING 'ERREUR: Employe ' DELIMITED SIZE
-                          WS-ID-EMPL DELIMITED SIZE
-                          ' non trouve' DELIMITED SIZE
+                   STRING 'ERREUR: Employe ' DELIMITED BY SIZE
+                          WS-ID-EMPL DELIMITED BY SIZE
+                          ' non trouve' DELIMITED BY SIZE
                        INTO WS-MESSAGE
                    PERFORM 9100-AFFICHER-MESSAGE
                WHEN OTHER
                    STRING 'ERREUR VSAM lecture EMPLOYE, RESP='
-                          DELIMITED SIZE
-                          WS-RESP DELIMITED SIZE
+                          DELIMITED BY SIZE
+                          WS-RESP DELIMITED BY SIZE
                        INTO WS-MESSAGE
                    PERFORM 9100-AFFICHER-MESSAGE
            END-EVALUATE.
@@ -122,30 +122,30 @@
            MOVE '--- INFORMATIONS EMPLOYE ---' TO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
-           STRING 'ID      : ' DELIMITED SIZE
-                  EMP-ID DELIMITED SIZE
+           STRING 'ID      : ' DELIMITED BY SIZE
+                  EMP-ID DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
-           STRING 'Nom     : ' DELIMITED SIZE
-                  EMP-NAME DELIMITED SIZE
+           STRING 'Nom     : ' DELIMITED BY SIZE
+                  EMP-NAME DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
-           STRING 'Dept    : ' DELIMITED SIZE
-                  EMP-DEPT DELIMITED SIZE
+           STRING 'Dept    : ' DELIMITED BY SIZE
+                  EMP-DEPT DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
            MOVE EMP-SALAIRE TO WS-SALAIRE-EDIT
-           STRING 'Salaire : ' DELIMITED SIZE
-                  WS-SALAIRE-EDIT DELIMITED SIZE
+           STRING 'Salaire : ' DELIMITED BY SIZE
+                  WS-SALAIRE-EDIT DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
-           STRING 'Credit  : ' DELIMITED SIZE
-                  EMP-ETAT-CRED DELIMITED SIZE
-                  ' (Y=Oui, N=Non)' DELIMITED SIZE
+           STRING 'Credit  : ' DELIMITED BY SIZE
+                  EMP-ETAT-CRED DELIMITED BY SIZE
+                  ' (Y=Oui, N=Non)' DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE.
 
@@ -164,8 +164,8 @@
 
            IF WS-RESP NOT = DFHRESP(NORMAL)
                STRING 'ERREUR: Credit non trouve pour '
-                      DELIMITED SIZE
-                      WS-ID-EMPL DELIMITED SIZE
+                      DELIMITED BY SIZE
+                      WS-ID-EMPL DELIMITED BY SIZE
                    INTO WS-MESSAGE
                PERFORM 9100-AFFICHER-MESSAGE
            END-IF.
@@ -181,26 +181,26 @@
            MOVE '--- INFORMATIONS CREDIT ---' TO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
-           STRING 'Libelle : ' DELIMITED SIZE
-                  CRD-LIBELLE DELIMITED SIZE
+           STRING 'Libelle : ' DELIMITED BY SIZE
+                  CRD-LIBELLE DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
            MOVE CRD-MONTANT-TOTAL TO WS-MONTANT-EDIT
-           STRING 'Montant total : ' DELIMITED SIZE
-                  WS-MONTANT-EDIT DELIMITED SIZE
+           STRING 'Montant total : ' DELIMITED BY SIZE
+                  WS-MONTANT-EDIT DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
            MOVE CRD-MONTANT-ECH TO WS-ECH-EDIT
-           STRING 'Echeance      : ' DELIMITED SIZE
-                  WS-ECH-EDIT DELIMITED SIZE
+           STRING 'Echeance      : ' DELIMITED BY SIZE
+                  WS-ECH-EDIT DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
            MOVE CRD-RESTE TO WS-RESTE-EDIT
-           STRING 'Reste a payer : ' DELIMITED SIZE
-                  WS-RESTE-EDIT DELIMITED SIZE
+           STRING 'Reste a payer : ' DELIMITED BY SIZE
+                  WS-RESTE-EDIT DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE.
 
@@ -255,8 +255,8 @@
 
            MOVE CRD-RESTE TO WS-RESTE-EDIT
            STRING 'Echeance payee ! Nouveau reste : '
-                  DELIMITED SIZE
-                  WS-RESTE-EDIT DELIMITED SIZE
+                  DELIMITED BY SIZE
+                  WS-RESTE-EDIT DELIMITED BY SIZE
                INTO WS-MESSAGE
            PERFORM 9100-AFFICHER-MESSAGE
 
