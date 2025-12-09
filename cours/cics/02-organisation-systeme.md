@@ -226,19 +226,23 @@ Gère la création et l'affichage des écrans formatés.
 | SEND MAP | Envoi d'un écran formaté |
 | RECEIVE MAP | Réception des données saisies |
 
-### Tables système CICS
+### Tables système CICS (Control Tables)
 
-CICS utilise des **tables de définition** pour connaître les ressources disponibles :
+Le noyau de CICS est composé de **programmes de contrôle** fournis par IBM et de **tables de contrôle** définies par l'utilisateur. Ces tables doivent être mises à jour par l'équipe d'administration avec les informations d'application.
 
 | Table | Nom complet | Contenu |
 |-------|-------------|---------|
-| **PCT** | Program Control Table | Transactions et programmes associés |
-| **PPT** | Processing Program Table | Programmes disponibles |
-| **FCT** | File Control Table | Fichiers VSAM accessibles |
-| **TCT** | Terminal Control Table | Terminaux autorisés |
-| **DCT** | Destination Control Table | Queues TD définies |
-| **TST** | Temporary Storage Table | Configuration TS |
-| **SIT** | System Initialization Table | Paramètres de démarrage |
+| **PCT** | Program Control Table | TRANSID (4 car.) et noms de programmes associés |
+| **PPT** | Processing Program Table | Noms programmes/mapsets, compteur utilisation, adresse mémoire |
+| **FCT** | File Control Table | Noms fichiers, type, longueur enregistrement |
+| **TCT** | Terminal Control Table | ID terminaux connectés à la région CICS |
+| **DCT** | Destination Control Table | Files d'attente de données transitoires |
+| **TST** | Temporary Storage Table | Files d'attente TS récupérables après crash |
+| **SNT** | Sign-On Table | ID utilisateur et mots de passe |
+| **RCT** | Region Control Table | PLANs DB2 associés aux transactions |
+| **PLT** | Program List Table | Programmes démarrés auto au start/stop CICS |
+| **JCT** | Journal Control Table | Configuration des journaux système |
+| **SIT** | System Initialization Table | Paramètres de démarrage de la région |
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -257,6 +261,52 @@ CICS utilise des **tables de définition** pour connaître les ressources dispon
 ```
 
 ## II-2 Déroulement d'une Transaction
+
+### Qu'est-ce qu'une transaction ?
+
+Une **transaction CICS** est un identifiant unique de **1 à 4 caractères** utilisé pour démarrer l'exécution d'une tâche particulière. Les noms de transaction doivent être uniques dans la table PCT.
+
+**Caractéristiques :**
+- Mapping un-à-un ou un-à-plusieurs avec les programmes
+- Une même transaction peut être déclenchée depuis différents terminaux simultanément
+- **Une seule transaction active par terminal** à un instant donné
+
+### Cinq méthodes de lancement d'une transaction
+
+Il existe **cinq manières** de lancer des transactions CICS :
+
+| # | Méthode | Description |
+|---|---------|-------------|
+| **1** | **Saisie au terminal** | L'utilisateur tape le TRANSID + ENTER (méthode la plus courante) |
+| **2** | **Pseudo-conversation** | TRANSID associé via `RETURN TRANSID('xxxx')` |
+| **3** | **Commande START** | Lancement programmé via `EXEC CICS START TRANSID(...)` |
+| **4** | **ATI (Automatic Task Initiation)** | Déclenchement automatique quand une queue TD intra-partition atteint son niveau de trigger (paramètre dans DCT) |
+| **5** | **Touche AID 3270** | Une touche PF peut être définie dans PCT pour initier une transaction |
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              MÉTHODES DE LANCEMENT D'UNE TRANSACTION            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. TERMINAL + ENTER                                            │
+│     ┌─────────┐                                                 │
+│     │ MENU    │ ──► Transaction MENU lancée                     │
+│     └─────────┘                                                 │
+│                                                                  │
+│  2. PSEUDO-CONVERSATION                                         │
+│     EXEC CICS RETURN TRANSID('MENU') COMMAREA(...) END-EXEC    │
+│                                                                  │
+│  3. COMMANDE START                                              │
+│     EXEC CICS START TRANSID('BATC') INTERVAL(003000) END-EXEC  │
+│                                                                  │
+│  4. ATI - Déclenchement automatique                             │
+│     Queue TD atteint trigger level → Transaction lancée         │
+│                                                                  │
+│  5. TOUCHE PF                                                   │
+│     PF12 configurée dans PCT → Lance transaction HELP          │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ### Cycle de vie complet
 
@@ -377,6 +427,44 @@ CICS utilise le mode **pseudo-conversationnel** pour optimiser les ressources :
        └──────────────┘
 ```
 
+### Cycle de vie détaillé (12 étapes)
+
+Le cycle complet d'une transaction implique les interactions entre tous les programmes de contrôle CICS :
+
+| Étape | Action |
+|-------|--------|
+| **1** | L'opérateur saisit un TRANSID (1-4 car.) et appuie sur ENTER |
+| **2** | **TCP** vérifie les terminaux, reçoit le message, demande à **SCP** de créer une **TIOA** (Terminal I/O Area), place le message dans la TIOA, passe le contrôle à **KCP** |
+| **3** | **KCP** valide le TRANSID et la sécurité, demande à **SCP** de créer une zone de contrôle des tâches, calcule la priorité (terminal TCT + opérateur SNT + transaction PCT), ajoute à la file d'attente, passe à **PCP** |
+| **4** | **PCP** localise le programme (via PPT), le charge si nécessaire, transfère le contrôle au programme d'application |
+| **5** | Le programme d'application demande à **TCP** de placer le message dans sa WORKING-STORAGE, demande à **FCP** de récupérer les enregistrements fichiers |
+| **6** | **FCP** demande une zone de travail à **SCP**, informe **KCP** que la tâche peut attendre les E/S |
+| **7** | **KCP** dispatche la tâche suivante dans la file, redistribue l'ancienne tâche quand les E/S sont terminées, transfère à **FCP** |
+| **8** | **FCP** rend le contrôle au programme d'application |
+| **9** | Le programme traite les données, demande à **TCP** d'envoyer un message, retourne le contrôle à **PCP** |
+| **10** | **PCP** demande à **KCP** de terminer la tâche |
+| **11** | **KCP** demande à **SCP** de libérer tout le stockage (sauf TIOA) |
+| **12** | **TCP** envoie la sortie au terminal, demande à **SCP** de libérer la TIOA |
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    TIOA - Terminal I/O Area                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  La TIOA est une zone mémoire créée par SCP pour TCP :          │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Terminal ◄──► TIOA ◄──► Programme d'application         │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  • Stocke les données entrantes du terminal                     │
+│  • Stocke les données sortantes vers le terminal                │
+│  • Créée au début de la transaction                             │
+│  • Libérée à la fin (après envoi au terminal)                   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ## II-3 Bloc EIB (Execute Interface Block)
 
 ### Présentation
@@ -449,19 +537,51 @@ L'EIB est défini dans le copybook **DFHEIBLK** :
 
 ### Champs principaux de l'EIB
 
-| Champ | Type | Description | Exemple |
-|-------|------|-------------|---------|
-| **EIBTIME** | COMP-3 | Heure au format 0HHMMSS | 0143052 = 14:30:52 |
-| **EIBDATE** | COMP-3 | Date au format 0CYYDDD | 0124339 = 339ème jour de 2024 |
-| **EIBTRNID** | X(4) | Code de la transaction | "MENU" |
-| **EIBTASKN** | COMP-3 | Numéro unique de la tâche | 0012345 |
-| **EIBTRMID** | X(4) | Identifiant du terminal | "T001" |
-| **EIBCPOSN** | COMP | Position du curseur (0-1919) | 480 |
-| **EIBCALEN** | COMP | Longueur de la COMMAREA | 100 |
-| **EIBAID** | X(1) | Touche AID appuyée | X'7D' (ENTER) |
-| **EIBRESP** | COMP | Code retour de la dernière commande | 0 (NORMAL) |
-| **EIBRESP2** | COMP | Code retour secondaire | 0 |
-| **EIBDS** | X(8) | Nom du dernier fichier accédé | "CLIENTS " |
+**Champs fréquemment utilisés :**
+
+| Champ | Clause PIC | Description |
+|-------|------------|-------------|
+| **EIBAID** | X(1) | Touche PF (AID) appuyée sur le clavier |
+| **EIBCALEN** | S9(4) COMP | Longueur de la COMMAREA (0 = premier passage) |
+| **EIBDATE** | S9(7) COMP-3 | Date de démarrage de la tâche (mis à jour par ASKTIME) |
+| **EIBRCODE** | X(6) | Code de réponse CICS de la dernière commande |
+| **EIBTASK** | S9(7) COMP-3 | Numéro de tâche affecté par CICS |
+| **EIBTIME** | S9(7) COMP-3 | Heure de démarrage (mis à jour par ASKTIME) |
+| **EIBTRMID** | X(4) | Identifiant du terminal associé à la tâche |
+| **EIBTRNID** | X(4) | Identificateur de transaction de la tâche |
+| **EIBRESP** | S9(8) COMP | Nombre correspondant à la condition RESP |
+| **EIBRESP2** | S9(8) COMP | Informations détaillées sur la condition RESP |
+| **EIBCPOSN** | S9(4) COMP | Position du curseur (0-1919) |
+
+**Champs supplémentaires :**
+
+| Champ | Clause PIC | Description |
+|-------|------------|-------------|
+| **EIBDS** | X(8) | Nom du dernier fichier référencé |
+| **EIBFN** | X(2) | Code identifiant la dernière commande CICS |
+| **EIBCOMPL** | X(1) | Données complètes reçues (X'FF') |
+| **EIBCONF** | X(1) | Requête CONFIRM reçue (conversation APPC) |
+| **EIBFREE** | X(1) | Programme doit libérer la fonction (X'FF') |
+| **EIBNODAT** | X(1) | Aucune donnée envoyée par l'application distante |
+| **EIBREQID** | X(8) | Identificateur de demande (Interval Control) |
+| **EIBRECV** | X(1) | Programme doit continuer à recevoir (X'FF') |
+| **EIBRSRCE** | X(8) | Identifiant de la ressource en cours d'accès |
+| **EIBSYNC** | X(1) | Programme doit prendre un syncpoint (APPC) |
+| **EIBSIG** | X(1) | SIGNAL reçu (X'FF') |
+| **EIBSYNRB** | X(1) | Programme doit émettre SYNCPOINT ROLLBACK |
+| **EIBERR** | X(1) | Erreur reçue sur conversation APPC (X'FF') |
+| **EIBERRCD** | X(4) | Code d'erreur quand EIBERR est défini |
+
+**Exemples de valeurs :**
+
+| Champ | Exemple | Signification |
+|-------|---------|---------------|
+| EIBTIME | 0143052 | 14:30:52 |
+| EIBDATE | 0124339 | 339ème jour de 2024 |
+| EIBTRNID | "MENU" | Transaction MENU |
+| EIBTRMID | "T001" | Terminal T001 |
+| EIBCPOSN | 480 | Curseur en position 480 |
+| EIBAID | X'7D' | Touche ENTER appuyée |
 
 ### Codes EIBAID (touches AID)
 
@@ -579,6 +699,57 @@ Les touches AID (Attention IDentifier) sont stockées dans EIBAID :
                PERFORM TRAITER-SAISIE
            END-IF.
 ```
+
+### Visualisation de l'EIB avec CECI
+
+La transaction **CECI** (CICS Execute Command Interpreter) permet de visualiser les champs EIB en temps réel :
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│          VISUALISATION EIB AVEC LA TRANSACTION CECI             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. Ouvrir une session CICS                                     │
+│                                                                  │
+│  2. Taper CECI puis ENTER                                       │
+│     ┌─────────────────────────────────────────────────────────┐│
+│     │ CECI                                                     ││
+│     └─────────────────────────────────────────────────────────┘│
+│                                                                  │
+│  3. L'écran CECI affiche les commandes disponibles              │
+│                                                                  │
+│  4. Appuyer sur PF4 (ou Shift+F4) pour voir l'EIB              │
+│     ┌─────────────────────────────────────────────────────────┐│
+│     │  EXEC INTERFACE BLOCK                                    ││
+│     │  EIBTIME   = +0204728                                   ││
+│     │  EIBDATE   = +0123174                                   ││
+│     │  EIBTRNID  = 'CECI'                                     ││
+│     │  EIBTASKN  = +0000188                                   ││
+│     │  EIBTRMID  = '1783'                                     ││
+│     │  EIBCPOSN  = +00000                                     ││
+│     │  EIBCALEN  = +00000                                     ││
+│     │  EIBAID    = X'7D'                                      ││
+│     │  ...                                                     ││
+│     └─────────────────────────────────────────────────────────┘│
+│                                                                  │
+│  5. Appuyer sur PF8 (ou Shift+F8) pour voir la suite           │
+│                                                                  │
+│  Utilisation :                                                  │
+│  • Un programme peut lire tous les champs EIB par leur nom     │
+│  • Ne JAMAIS modifier les champs EIB directement               │
+│  • Seules les commandes EXEC CICS peuvent modifier l'EIB       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Transactions utiles pour le débogage EIB :**
+
+| Transaction | Description |
+|-------------|-------------|
+| **CECI** | Interpréteur de commandes - visualise l'EIB |
+| **CEDF** | Mode debug interactif - affiche l'EIB à chaque commande |
+| **CEBR** | Browse des queues TS |
+| **CEMT** | Master Terminal - gestion des ressources |
 
 ## II-4 Notion de commandes CICS
 
@@ -956,33 +1127,34 @@ La **COMMAREA** permet de passer des données entre transactions ou programmes :
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  II-1 COMPOSANTS                                                         │
-│       • TCP : Terminaux             • FC  : Fichiers                    │
-│       • PCP : Programmes            • SC  : Mémoire                     │
-│       • KCP : Tâches                • IC  : Temps                       │
-│       • TS  : Stockage temporaire   • TD  : Files d'attente            │
-│       • BMS : Écrans formatés                                           │
-│       • Tables : PCT, PPT, FCT, TCT, DCT                               │
+│       • Control Programs : TCP, KCP, PCP, FCP, SCP                      │
+│       • Control Tables : PCT, PPT, FCT, TCT, DCT, TST, SNT, RCT,       │
+│         PLT, JCT, SIT                                                   │
+│       • Autres : TS, TD, BMS, IC                                        │
 │                                                                          │
 │  II-2 DÉROULEMENT TRANSACTION                                           │
-│       • Transaction → PCT → PPT → Chargement → Exécution → Retour      │
+│       • Transaction = TRANSID 1-4 caractères unique                     │
+│       • 5 méthodes de lancement :                                       │
+│         Terminal+ENTER, Pseudo-conversation, START, ATI, Touche PF     │
+│       • Cycle 12 étapes avec TIOA, TCP, KCP, PCP, FCP, SCP             │
 │       • Mode pseudo-conversationnel (optimisation ressources)           │
 │       • États : CRÉÉE → PRÊTE → RUNNING ↔ WAITING → TERMINÉE           │
 │                                                                          │
 │  II-3 BLOC EIB                                                          │
-│       • Zone de communication automatique                               │
-│       • Champs clés :                                                   │
-│         - EIBTRNID : Code transaction    - EIBAID  : Touche AID        │
-│         - EIBTRMID : ID terminal         - EIBRESP : Code retour       │
-│         - EIBCALEN : Longueur COMMAREA   - EIBTIME : Heure             │
-│       • DFHAID : Copybook des touches (DFHENTER, DFHPF1-12...)        │
+│       • Zone de communication automatique (DFHEIBLK)                    │
+│       • Champs clés : EIBTRNID, EIBTRMID, EIBCALEN, EIBAID, EIBRESP   │
+│       • Champs temps : EIBTIME, EIBDATE (mis à jour par ASKTIME)       │
+│       • Visualisation : Transaction CECI (PF4 pour voir EIB)           │
+│       • Debug : CEDF pour exécution pas-à-pas                          │
+│       • DFHAID : Copybook des touches (DFHENTER, DFHPF1-24...)        │
 │                                                                          │
 │  II-4 COMMANDES CICS                                                    │
-│       • Syntaxe : EXEC CICS ... END-EXEC                               │
+│       • Syntaxe : EXEC CICS fonction option1 option2... END-EXEC       │
 │       • Programme : RETURN, LINK, XCTL, ABEND                          │
 │       • Terminal  : SEND, RECEIVE, SEND MAP, RECEIVE MAP               │
 │       • Fichiers  : READ, WRITE, REWRITE, DELETE, STARTBR/ENDBR       │
 │       • Stockage  : WRITEQ TS/TD, READQ TS/TD, DELETEQ TS/TD          │
-│       • Gestion erreurs : RESP, RESP2, DFHRESP(xxx)                    │
+│       • Codes réponse : EIBRESP/EIBRCODE après chaque commande         │
 │       • COMMAREA  : Passage de données inter-transactions              │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘

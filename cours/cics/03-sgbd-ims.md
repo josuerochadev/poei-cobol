@@ -119,6 +119,30 @@ Le modèle **relationnel** organise les données en tables liées par des clés 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+#### Notion de cardinalité
+
+La **cardinalité** définit le nombre d'occurrences d'une entité pouvant être associées à une autre :
+
+| Notation | Signification | Exemple |
+|----------|---------------|---------|
+| **(0, 1)** | Optionnel, une seule occurrence | Un salarié peut avoir 0 ou 1 carte d'accès |
+| **(1, 1)** | Obligatoire, une seule occurrence | Un salarié a exactement 1 numéro d'employé |
+| **(0, n)** | Optionnel, plusieurs possibles | Un client peut avoir 0 ou plusieurs commandes |
+| **(1, n)** | Obligatoire, plusieurs possibles | Une commande a au moins 1 ligne de commande |
+
+**Exemple de relation (1,1) :**
+```
+TABLE SALARIE                    TABLE CARTE_ACCES
+┌──────────┬──────────┐          ┌──────────┬──────────┐
+│ SAL_ID   │ NOM      │          │ CARTE_ID │ SAL_ID   │
+├──────────┼──────────┤          ├──────────┼──────────┤
+│ 001      │ DUPONT   │◄────────►│ C001     │ 001      │
+│ 002      │ MARTIN   │◄────────►│ C002     │ 002      │
+└──────────┴──────────┘          └──────────┴──────────┘
+
+Un salarié a une seule carte d'accès et une carte est rattachée à un seul salarié.
+```
+
 **Avantages :**
 - Flexibilité maximale
 - Langage SQL standard
@@ -128,7 +152,7 @@ Le modèle **relationnel** organise les données en tables liées par des clés 
 **Inconvénients :**
 - Performance moindre pour certains accès massifs
 - Optimisation nécessaire pour gros volumes
-- Overhead du moteur SQL
+- Overhead du moteur SQL (normalisation peut impacter les performances)
 
 ### Comparaison des trois modèles
 
@@ -436,6 +460,43 @@ Le PCB retourne le statut de chaque opération :
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+#### Insuffisances spécifiques des SGBD hiérarchiques (vs Relationnel)
+
+Les **jointures** dans un SGBD hiérarchique (comme IMS) ont des limitations majeures par rapport aux SGBD relationnels :
+
+| Limitation | Description | Impact |
+|------------|-------------|--------|
+| **Navigation explicite** | Il faut naviguer manuellement à travers les segments pour obtenir les données enfants | Code plus complexe, plus de lignes |
+| **Modèle hiérarchique** | Relations fixes (parent-enfant uniquement), pas de relations flexibles entre segments | Pas de jointures ad-hoc possibles |
+| **Performance variable** | Naviguer à travers plusieurs niveaux peut être lent si la hiérarchie est profonde | Temps de réponse variable |
+| **Requêtes limitées** | Pas de langage déclaratif comme SQL pour exprimer des requêtes complexes | Moins de flexibilité d'interrogation |
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│            COMPARAISON : ACCÈS HIÉRARCHIQUE vs RELATIONNEL              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  HIÉRARCHIQUE (IMS)              │  RELATIONNEL (DB2/SQL)               │
+│  ─────────────────────           │  ──────────────────────              │
+│                                   │                                      │
+│  • Navigation segment par        │  • Jointures déclaratives            │
+│    segment                        │                                      │
+│                                   │                                      │
+│  • Chemin d'accès prédéfini      │  • Optimiseur choisit le             │
+│    par le développeur             │    meilleur chemin                   │
+│                                   │                                      │
+│  • Plusieurs appels DL/I         │  • Une seule requête SQL             │
+│    nécessaires                    │                                      │
+│                                   │                                      │
+│  • Performant si structure       │  • Flexible mais overhead            │
+│    bien adaptée                   │    de l'optimiseur                   │
+│                                   │                                      │
+│  • Modification de structure     │  • Ajout de colonnes/tables          │
+│    = réorganisation majeure       │    relativement simple               │
+│                                   │                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
 ### f) Applications de IMS
 
 IMS reste utilisé dans des secteurs critiques :
@@ -475,6 +536,90 @@ IMS reste utilisé dans des secteurs critiques :
 ```
 
 ### g) Caractéristiques techniques
+
+#### Exemple pratique : Base hiérarchique REGION/COMPTE/MVT
+
+Le PDF du cours illustre le modèle hiérarchique avec cet exemple bancaire :
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    EXEMPLE : HIÉRARCHIE BANCAIRE                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│                            ┌──────────┐                                 │
+│                            │  REGION  │  ◄── Segment RACINE             │
+│                            └────┬─────┘                                 │
+│              ┌──────────────────┼──────────────────┐                    │
+│              │                  │                  │                    │
+│              ▼                  ▼                  ▼                    │
+│        ┌──────────┐       ┌──────────┐       ┌──────────┐              │
+│        │ COMPTE 1 │       │ COMPTE 2 │       │ COMPTE 3 │              │
+│        └────┬─────┘       └────┬─────┘       └────┬─────┘              │
+│        ┌────┴────┐        ┌────┴────┐        ┌────┴────┐               │
+│        ▼         ▼        ▼         ▼        ▼         ▼               │
+│     ┌─────┐  ┌─────┐   ┌─────┐  ┌─────┐   ┌─────┐  ┌─────┐            │
+│     │MVT 1│  │MVT 2│   │MVT 3│  │MVT 4│   │MVT 5│  │MVT 6│            │
+│     └─────┘  └─────┘   └─────┘  └─────┘   └─────┘  └─────┘            │
+│                                                                          │
+│  Chaque MVT est rattaché à un unique COMPTE                             │
+│  Chaque COMPTE est rattaché à une unique REGION                         │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Structure des segments :**
+
+```
+REGION  : ID-REGION    ZONE-REGION    DEPOT-REGION    ENGAGEMENT-REGION
+          (clé)
+
+COMPTE  : ID-COMPTE    NOM-COMPTE     SOLDE-COMPTE    ID-REGION    SOLDE-MOYEN
+          (clé)                                        (FK parent)
+
+MVT     : ID-MVT       DATE-MVT       ID-COMPTE       SENS-MVT     MONTANT-MVT
+          (clé)                        (FK parent)
+```
+
+**Navigation hiérarchique pour lire tous les MVT d'une REGION :**
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  ALGORITHME DE PARCOURS HIÉRARCHIQUE                                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  1. Indiquer ID-REGION à traiter : 'REGION1'                           │
+│                                                                          │
+│  2. Récupérer le 1er COMPTE de la REGION1                              │
+│                                                                          │
+│  3. Pour chaque COMPTE de la REGION1 :                                 │
+│     │                                                                    │
+│     └─► Récupérer le nème MVT du nème COMPTE                           │
+│                                                                          │
+│  4. Parcourir les MVT des COMPTE de la REGION1                         │
+│     jusqu'à la fin de tous les MVT                                      │
+│                                                                          │
+│  ⚠️ Navigation explicite obligatoire : on descend niveau par niveau    │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Équivalent SQL (SGBD Relationnel) :**
+
+```sql
+-- En SQL, une seule requête avec jointures suffit :
+
+SELECT R.ID-REGION, R.ZONE-REGION,
+       C.ID-COMPTE, C.NOM-COMPTE,
+       M.ID-MVT, M.DATE-MVT, M.MONTANT-MVT
+FROM REGION R
+JOIN COMPTE C ON R.ID-REGION = C.ID-REGION
+JOIN MVT M ON C.ID-COMPTE = M.ID-COMPTE
+WHERE R.ID-REGION = 'REGION1'
+ORDER BY C.ID-COMPTE, M.DATE-MVT;
+
+-- Cette requête fait une jointure entre REGION, COMPTE et MVT
+-- pour obtenir tous les mouvements d'une région en une seule opération
+```
 
 #### Méthodes d'accès
 
@@ -645,7 +790,7 @@ CICS accède à IMS DB via **DBCTL** (Database Control) :
 │  ─────────────────────────                                              │
 │  • Hiérarchique : Arbre, parent-enfant, IMS                            │
 │  • Réseau      : Graphe, relations M:N, IDMS                           │
-│  • Relationnel : Tables, SQL, DB2/Oracle                               │
+│  • Relationnel : Tables, SQL, DB2/Oracle, cardinalité (0,1)/(1,n)     │
 │                                                                          │
 │  III-1 CARACTÉRISTIQUES IMS                                             │
 │  ─────────────────────────                                              │
@@ -674,12 +819,16 @@ CICS accède à IMS DB via **DBCTL** (Database Control) :
 │     • Rigidité structurelle                                             │
 │     • Pas de requêtes ad-hoc                                            │
 │     • Compétences spécifiques                                           │
+│     • Insuffisances vs relationnel : navigation explicite,             │
+│       pas de jointures flexibles                                        │
 │                                                                          │
 │  f) APPLICATIONS                                                         │
 │     • Banque, Assurance, Santé, Industrie                              │
 │     • Nomenclatures, hiérarchies complexes                             │
 │                                                                          │
 │  g) CARACTÉRISTIQUES TECHNIQUES                                         │
+│     • Exemple REGION/COMPTE/MVT (hiérarchie bancaire)                  │
+│     • Comparaison SQL vs navigation DL/I                               │
 │     • HSAM, HISAM, HDAM, HIDAM                                         │
 │     • Full Function, Fast Path, HALDB                                  │
 │     • Intégration CICS via DBCTL                                       │

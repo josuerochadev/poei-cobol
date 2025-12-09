@@ -84,6 +84,47 @@ Chaque transaction CICS respecte les propriétés **ACID** :
 | **I**solation | Invisible aux autres | Transaction en cours non visible |
 | **D**urabilité | Modifications permanentes | Données sauvegardées même si panne |
 
+### LUW - Logical Unit of Work
+
+La **LUW** (Logical Unit of Work / Unité Logique de Travail) est un concept fondamental de CICS :
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    LUW - UNITÉ LOGIQUE DE TRAVAIL               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Définition :                                                    │
+│  Une LUW est une séquence d'opérations qui doivent être         │
+│  exécutées comme un TOUT INDIVISIBLE                            │
+│                                                                  │
+│  Principe : TOUT OU RIEN                                        │
+│  ─────────────────────────                                      │
+│  • Si TOUTES les opérations réussissent → COMMIT (validation)   │
+│  • Si UNE opération échoue → ROLLBACK (annulation totale)       │
+│                                                                  │
+│  Exemple - Virement bancaire :                                  │
+│  ┌─────────────────────────────────────────────────────┐        │
+│  │  1. Lire compte source                              │        │
+│  │  2. Vérifier solde suffisant                        │        │
+│  │  3. Débiter compte source                           │        │
+│  │  4. Créditer compte destination                     │        │
+│  │  5. Enregistrer l'opération                         │        │
+│  │                                                      │        │
+│  │  Si étape 4 échoue → Annuler étape 3               │        │
+│  │  = Intégrité des données garantie                  │        │
+│  └─────────────────────────────────────────────────────┘        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Points de synchronisation (Syncpoint) :**
+
+| Commande | Action |
+|----------|--------|
+| `EXEC CICS SYNCPOINT` | Valide toutes les modifications (COMMIT) |
+| `EXEC CICS SYNCPOINT ROLLBACK` | Annule toutes les modifications depuis le dernier syncpoint |
+| `EXEC CICS RETURN` | Syncpoint implicite en fin de transaction |
+
 ## I-3 CICS sous z/OS
 
 ### Position dans l'architecture z/OS
@@ -248,7 +289,43 @@ Une **région CICS** est une instance du moniteur transactionnel en cours d'exé
 
 ## I-6 Traitement BATCH vs ONLINE
 
-### Comparaison
+### Architecture de communication
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│             ARCHITECTURE DE COMMUNICATION CICS                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────┐      ┌──────────┐      ┌──────────┐              │
+│  │ Terminal │      │ Terminal │      │ Terminal │              │
+│  │   3270   │      │   3270   │      │   3270   │              │
+│  └────┬─────┘      └────┬─────┘      └────┬─────┘              │
+│       │                 │                 │                     │
+│       └─────────────────┼─────────────────┘                     │
+│                         │                                        │
+│                    ┌────▼────┐                                  │
+│                    │  VTAM   │  ◄── Virtual Telecommunications  │
+│                    │         │      Access Method               │
+│                    └────┬────┘                                  │
+│                         │                                        │
+│                    ┌────▼────┐                                  │
+│                    │  CICS   │  ◄── Moniteur Transactionnel     │
+│                    │   TS    │                                  │
+│                    └────┬────┘                                  │
+│                         │                                        │
+│           ┌─────────────┼─────────────┐                         │
+│           │             │             │                         │
+│      ┌────▼────┐   ┌────▼────┐   ┌────▼────┐                   │
+│      │  VSAM   │   │   DB2   │   │   IMS   │                   │
+│      │ (DASD)  │   │  (SQL)  │   │  (DL/I) │                   │
+│      └─────────┘   └─────────┘   └─────────┘                   │
+│                                                                  │
+│  DASD = Direct Access Storage Device (disques)                  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Comparaison schématique
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
@@ -283,6 +360,18 @@ Une **région CICS** est une instance du moniteur transactionnel en cours d'exé
 | **Exemple** | Édition des relevés mensuels | Consultation de solde |
 | **Horaire** | Nuit / Week-end | 24h/24 |
 
+### Comparaison des approches de programmation
+
+| Aspect | Programme BATCH | Programme CICS |
+|--------|-----------------|----------------|
+| **Démarrage** | JCL EXEC PGM= | Transaction (4 car.) |
+| **Entrées/Sorties** | SELECT ... ASSIGN | EXEC CICS READ/WRITE |
+| **Affichage** | DISPLAY, fichiers | EXEC CICS SEND MAP |
+| **Saisie** | ACCEPT, fichiers | EXEC CICS RECEIVE MAP |
+| **Arrêt** | STOP RUN | EXEC CICS RETURN |
+| **Gestion erreurs** | FILE STATUS | RESP / HANDLE CONDITION |
+| **Accès DB2** | EXEC SQL ... END-EXEC | EXEC SQL ... END-EXEC |
+
 ### Exemples concrets
 
 **BATCH :**
@@ -291,6 +380,8 @@ Une **région CICS** est une instance du moniteur transactionnel en cours d'exé
 • Génération des relevés bancaires
 • Mise à jour massive des tarifs
 • Archivage des anciennes transactions
+• Rapports de fin de journée
+• Purge des données obsolètes
 ```
 
 **ONLINE (CICS) :**
@@ -299,11 +390,77 @@ Une **région CICS** est une instance du moniteur transactionnel en cours d'exé
 • Virement entre deux comptes
 • Retrait au distributeur
 • Réservation d'un billet d'avion
+• Mise à jour d'une fiche client
+• Passage d'une commande
 ```
 
 ## I-7 Gestion des terminaux / données / tâches
 
 ### Gestion des terminaux
+
+#### Le moniteur CRT (Cathode Ray Tube)
+
+Le terminal 3270 est un écran "passif" (dumb terminal) de **24 lignes × 80 colonnes** :
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 MONITEUR CRT - TERMINAL 3270                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Caractéristiques :                                             │
+│  • 24 lignes × 80 colonnes = 1920 positions adressables         │
+│  • Chaque position = 1 caractère affichable                     │
+│  • Terminal PASSIF (pas de traitement local)                    │
+│  • CICS envoie/reçoit des flux de données (data stream)         │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │ Ligne 1  ▌MENU PRINCIPAL                              Col 80││
+│  │ Ligne 2                                                      ││
+│  │ ...                                                          ││
+│  │ Ligne 24 PF3=Quitter  PF12=Aide                             ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                  │
+│  Total : 24 × 80 = 1920 caractères adressables                  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Touches AID et Non-AID
+
+**Touches AID** (Attention IDentifier) - Déclenchent une transmission vers CICS :
+
+| Touche | Code | Description |
+|--------|------|-------------|
+| **ENTER** | DFHENTER | Validation standard |
+| **PF1-PF24** | DFHPF1-24 | Touches de fonction programmables |
+| **PA1-PA3** | DFHPA1-3 | Program Attention (pas de données) |
+| **CLEAR** | DFHCLEAR | Effacement écran |
+
+**Touches Non-AID** - Saisie locale (CICS ne voit rien tant qu'une AID n'est pas pressée) :
+
+| Type | Exemples |
+|------|----------|
+| Caractères | A-Z, 0-9, symboles |
+| Navigation | TAB, flèches, Home, End |
+| Edition | Insert, Delete, Backspace |
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              FLUX DE COMMUNICATION TERMINAL-CICS                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Utilisateur tape "MARTIN"    → Stocké localement (buffer)      │
+│  Utilisateur tape [TAB]       → Curseur se déplace              │
+│  Utilisateur tape "12345"     → Stocké localement               │
+│  Utilisateur tape [ENTER]     → TRANSMISSION vers CICS !        │
+│                                     │                            │
+│                                     ▼                            │
+│                          CICS reçoit : "MARTIN" + "12345"       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Architecture BMS
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -446,6 +603,7 @@ Une **région CICS** est une instance du moniteur transactionnel en cours d'exé
 │  I-2 DÉFINITION                                                  │
 │      • Moniteur transactionnel (TP Monitor)                     │
 │      • Transactions ACID identifiées par 4 caractères           │
+│      • LUW (Logical Unit of Work) - Tout ou rien               │
 │                                                                  │
 │  I-3 CICS SOUS z/OS                                             │
 │      • Région CICS = instance en exécution                      │
@@ -466,12 +624,79 @@ Une **région CICS** est une instance du moniteur transactionnel en cours d'exé
 │      • Online : temps réel, petites transactions, interactif   │
 │                                                                  │
 │  I-7 GESTION TERMINAUX/DONNÉES/TÂCHES                          │
-│      • Terminaux : BMS, écrans 3270                            │
+│      • Terminaux : CRT 1920 car., BMS, AID/Non-AID keys        │
 │      • Données : VSAM, DB2, IMS, TS, TD                        │
 │      • Tâches : multitâche, priorités, états                   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Exercices
+
+### Questions de compréhension
+
+1. **Qu'est-ce que CICS ?**
+   - Quelle est la signification de l'acronyme CICS ?
+   - Quel est le rôle principal de CICS dans un environnement z/OS ?
+
+2. **Propriétés ACID**
+   - Expliquez chacune des propriétés ACID avec un exemple concret.
+   - Pourquoi ces propriétés sont-elles essentielles pour un système transactionnel ?
+
+3. **LUW (Logical Unit of Work)**
+   - Qu'est-ce qu'une LUW ?
+   - Donnez un exemple de situation où le ROLLBACK est nécessaire.
+
+4. **Terminal 3270**
+   - Combien de positions adressables possède un écran 3270 standard ?
+   - Quelle est la différence entre une touche AID et une touche Non-AID ?
+
+5. **BATCH vs ONLINE**
+   - Citez 3 différences majeures entre le traitement BATCH et ONLINE.
+   - Dans quel cas utiliseriez-vous chaque type de traitement ?
+
+6. **Gestion des ressources**
+   - Quels sont les trois types de ressources gérées par CICS ?
+   - Qu'est-ce que BMS et à quoi sert-il ?
+
+### Exercices pratiques
+
+**Exercice 1 : Identifier le type de traitement**
+
+Pour chaque situation, indiquez s'il s'agit d'un traitement BATCH ou ONLINE :
+
+| Situation | Type |
+|-----------|------|
+| Calcul des intérêts bancaires mensuels | ? |
+| Consultation du solde d'un compte | ? |
+| Génération des fiches de paie | ? |
+| Réservation d'un vol | ? |
+| Mise à jour des cours boursiers en temps réel | ? |
+| Archivage des logs de l'année précédente | ? |
+
+**Exercice 2 : Touches AID**
+
+Associez chaque touche à son code CICS :
+
+| Touche | Code CICS |
+|--------|-----------|
+| ENTER | ? |
+| PF3 | ? |
+| PA1 | ? |
+| CLEAR | ? |
+
+**Exercice 3 : Propriétés ACID**
+
+Un système de réservation de billets d'avion doit :
+1. Vérifier la disponibilité du siège
+2. Débiter le compte du client
+3. Réserver le siège
+4. Envoyer un email de confirmation
+
+- Quelles propriétés ACID garantissent que le client ne sera pas débité si la réservation échoue ?
+- Que se passe-t-il si l'email de confirmation échoue après le débit ?
 
 ---
 

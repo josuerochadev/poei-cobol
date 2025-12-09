@@ -1,0 +1,23 @@
+***********************************************************************
+*  MAPSET : MAPTEST - Ecran de bienvenue CICS                         *
+*  Usage  : Exercice d'introduction BMS                               *
+***********************************************************************
+MAPTEST  DFHMSD TYPE=MAP,                                              X
+               MODE=INOUT,                                             X
+               LANG=COBOL,                                             X
+               STORAGE=AUTO,                                           X
+               TIOAPFX=YES
+MAP1     DFHMDI SIZE=(24,80),                                          X
+               LINE=01,                                                X
+               COLUMN=01,                                              X
+               CTRL=(PRINT,FREEKB)
+         DFHMDF POS=(9,23),                                            X
+               ATTRB=(ASKIP,NORM),                                     X
+               LENGTH=38,                                              X
+               INITIAL='WELCOME TO THE MAGICAL WORLD IN CICS'
+         DFHMDF POS=(12,27),                                           X
+               ATTRB=(ASKIP,NORM),                                     X
+               LENGTH=26,                                              X
+               INITIAL='MAY THE FORCE BE WITH YOU'
+MAPTEST  DFHMSD TYPE=FINAL
+         END

@@ -910,6 +910,91 @@ La **couche des données** (aussi appelée **Data Access Layer** ou **DAL**) est
            EXIT.
 ```
 
+## VII-5 Schéma récapitulatif de l'architecture CICS-VSAM
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    ARCHITECTURE CICS-VSAM                                │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │              COUCHE PRÉSENTATION (Front-End)                       │  │
+│  │  ┌─────────┐   ┌─────────┐   ┌─────────────────────────────────┐  │  │
+│  │  │   MAP   │   │ MAPSET  │   │  Transaction CICS (TR01)        │  │  │
+│  │  │ (Écran) │   │         │   │  Interface utilisateur          │  │  │
+│  │  └─────────┘   └─────────┘   └─────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+│                              │                                          │
+│                      COMMAREA / TSI                                     │
+│                              │                                          │
+│                              ▼                                          │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │              COUCHE TRAITEMENT (Back-End)                          │  │
+│  │  ┌─────────────────────────────────────────────────────────────┐  │  │
+│  │  │           Programme COBOL-CICS                               │  │  │
+│  │  │                                                              │  │  │
+│  │  │  ┌──────────┐ ┌──────────┐ ┌─────────┐ ┌─────────────────┐  │  │  │
+│  │  │  │   READ   │ │  WRITE   │ │ REWRITE │ │     DELETE      │  │  │  │
+│  │  │  │          │ │          │ │         │ │                 │  │  │  │
+│  │  │  │ Lecture  │ │ Écriture │ │  Mise   │ │   Suppression   │  │  │  │
+│  │  │  │          │ │          │ │ à jour  │ │                 │  │  │  │
+│  │  │  └──────────┘ └──────────┘ └─────────┘ └─────────────────┘  │  │  │
+│  │  └─────────────────────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+│                              │                                          │
+│                      COMMAREA / TSI                                     │
+│                              │                                          │
+│                              ▼                                          │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │              COUCHE DONNÉES (Data Layer)                           │  │
+│  │  ┌─────────────────────────────────────────────────────────────┐  │  │
+│  │  │                    FICHIERS VSAM                             │  │  │
+│  │  │                                                              │  │  │
+│  │  │  ┌─────────┐  ┌─────────┐  ┌─────────────────────────────┐  │  │  │
+│  │  │  │  KSDS   │  │  ESDS   │  │           RRDS              │  │  │  │
+│  │  │  │ (Clé)   │  │ (Séq.)  │  │        (Relatif)            │  │  │  │
+│  │  │  └─────────┘  └─────────┘  └─────────────────────────────┘  │  │  │
+│  │  │                                                              │  │  │
+│  │  │       Intégrité │ Cohérence │ Sécurité │ Durabilité         │  │  │
+│  │  └─────────────────────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+## VII-6 Tableau récapitulatif des commandes CICS
+
+| Commande | Syntaxe minimale | Description |
+|----------|------------------|-------------|
+| **READ** | `EXEC CICS READ FILE('name') INTO(data) RIDFLD(key) END-EXEC` | Lecture d'un enregistrement |
+| **WRITE** | `EXEC CICS WRITE FILE('name') FROM(data) RIDFLD(key) END-EXEC` | Écriture d'un nouvel enregistrement |
+| **REWRITE** | `EXEC CICS REWRITE FILE('name') FROM(data) END-EXEC` | Mise à jour (après READ UPDATE) |
+| **DELETE** | `EXEC CICS DELETE FILE('name') END-EXEC` | Suppression (après READ UPDATE) |
+| **STARTBR** | `EXEC CICS STARTBR FILE('name') RIDFLD(key) END-EXEC` | Début de parcours séquentiel |
+| **READNEXT** | `EXEC CICS READNEXT FILE('name') INTO(data) RIDFLD(key) END-EXEC` | Lecture suivante |
+| **READPREV** | `EXEC CICS READPREV FILE('name') INTO(data) RIDFLD(key) END-EXEC` | Lecture précédente |
+| **ENDBR** | `EXEC CICS ENDBR FILE('name') END-EXEC` | Fin de parcours |
+| **UNLOCK** | `EXEC CICS UNLOCK FILE('name') END-EXEC` | Libérer verrou sans modification |
+| **SYNCPOINT** | `EXEC CICS SYNCPOINT END-EXEC` | Valider les modifications |
+| **SYNCPOINT ROLLBACK** | `EXEC CICS SYNCPOINT ROLLBACK END-EXEC` | Annuler les modifications |
+
+### Codes de retour (RESP) principaux
+
+| Code DFHRESP | Valeur | Signification |
+|--------------|--------|---------------|
+| `NORMAL` | 0 | Opération réussie |
+| `NOTFND` | 13 | Enregistrement non trouvé |
+| `DUPREC` | 14 | Clé en double |
+| `INVREQ` | 16 | Requête invalide |
+| `NOSPACE` | 18 | Plus d'espace |
+| `NOTOPEN` | 19 | Fichier non ouvert |
+| `DISABLED` | 22 | Fichier désactivé |
+| `IOERR` | 17 | Erreur d'entrée/sortie |
+| `ENDFILE` | 20 | Fin de fichier (browse) |
+| `FILENOTFOUND` | 12 | Fichier non trouvé |
+
+---
+
 ## Conclusion
 
 ```

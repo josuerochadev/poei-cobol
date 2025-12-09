@@ -606,7 +606,104 @@ La compilation du MAPSET génère un **copybook COBOL** :
            END-EXEC.
 ```
 
-## V-4 Mise en place d'une Transaction (TRNM)
+## V-4 CEDF - CICS Execution Diagnostic Facility
+
+### Présentation
+
+**CEDF** (CICS Execution Diagnostic Facility) est l'outil de débogage interactif de CICS. Il fournit deux transactions :
+
+| Transaction | Description |
+|-------------|-------------|
+| **CEDF** | Pour tester les programmes associés aux transactions utilisateur initiées depuis un terminal |
+| **CEDX** | Pour tester les programmes associés aux transactions non-terminales |
+
+### Syntaxe CEDF
+
+```
+CEDF {termId|sysID} [,ON|,OFF]
+```
+
+| Paramètre | Description |
+|-----------|-------------|
+| `termid` | Identifiant à 4 caractères du terminal (utiliser `CEMT INQ TERMINAL` pour le trouver) |
+| `sysId` | Identifiant à 4 caractères de la région distante |
+| `ON` | Démarrer la session EDF (valeur par défaut) |
+| `OFF` | Terminer la session EDF |
+
+### Valeurs de STATUS dans CEDF
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    STATUTS CEDF                                          │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  STATUS                        │  DESCRIPTION                           │
+│  ─────────────────────────────│────────────────────────────────────────│
+│  PROGRAM INITIATION            │  Démarrage du programme                │
+│  ABOUT TO EXECUTE COMMAND      │  Avant l'exécution d'une commande     │
+│  COMMAND EXECUTE COMPLETE      │  Commande exécutée                     │
+│  PROGRAM TERMINATION           │  Fin du programme                      │
+│  TASK TERMINATION              │  Fin de la tâche                       │
+│  AN ABEND HAS OCCURRED         │  Une erreur s'est produite            │
+│  ABNORMAL TASK TERMINATION     │  Fin anormale de la tâche             │
+│  EXECUTION INTERFACE BLOCK     │  Affichage du bloc EIB                │
+│  DISPLAY ON CONDITION          │  Affichage sur condition              │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Touches de fonction PF dans CEDF
+
+| Touche | Fonction |
+|--------|----------|
+| **PF1** | Affiche l'aide |
+| **PF2** | Bascule entre affichage alphanumérique et hexadécimal |
+| **PF3** | Fin de session EDF |
+| **PF4** | Affiche les champs EIB / Supprime tous les affichages EDF |
+| **PF5** | Affiche le storage du programme actuel |
+| **PF6** | Passage de l'affichage CEDF à l'affichage de l'application |
+| **PF7/PF8** | Scroll arrière/avant dans le stockage de travail |
+| **PF9** | Définir les conditions d'interruption (breakpoints) |
+| **PF10** | Scroll arrière en plein écran |
+| **PF11** | Scroll avant dans une commande ou affichage EIB |
+| **PF12** | Terminer la tâche utilisateur (avec confirmation) |
+
+### Utilisation de CEDF
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    PROCESSUS DE DÉBOGAGE CEDF                            │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  1. Activer le mode debug :                                             │
+│     ┌──────────────────────────────────────────────────────────────┐   │
+│     │  CEDF                                                         │   │
+│     └──────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  2. Lancer la transaction à tester :                                    │
+│     ┌──────────────────────────────────────────────────────────────┐   │
+│     │  TR01                                                         │   │
+│     └──────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  3. CEDF s'arrête à chaque commande EXEC CICS :                        │
+│     • BEFORE : avant exécution (modifier paramètres possible)          │
+│     • AFTER  : après exécution (voir résultats, RESP)                  │
+│                                                                          │
+│  4. Utiliser PF9 pour définir des conditions d'arrêt :                 │
+│     • Arrêt sur RESP non nul                                           │
+│     • Arrêt sur commande spécifique (READ, WRITE...)                   │
+│                                                                          │
+│  5. Utiliser PF4 pour visualiser l'EIB :                               │
+│     • EIBAID   : touche appuyée                                        │
+│     • EIBRESP  : code retour                                           │
+│     • EIBTRNID : transaction en cours                                  │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## V-5 Mise en place d'une Transaction (TRNM)
 
 ### Définition de la transaction dans CICS
 
@@ -660,6 +757,51 @@ Pour qu'une transaction fonctionne, elle doit être définie dans les **tables C
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
+
+### Installation interactive avec CEDA
+
+Les définitions ci-dessus peuvent être créées interactivement via la transaction **CEDA** :
+
+#### Séquence d'installation
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    ÉTAPES INSTALLATION CEDA                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  1. DÉFINIR puis INSTALLER la MAP :                                     │
+│     CEDA DEF MAP(MAPTEST) GROUP(GRPTEST)                               │
+│     CEDA INS MAP(MAPTEST) GROUP(GRPTEST)                               │
+│                                                                          │
+│  2. DÉFINIR puis INSTALLER le PROGRAMME :                               │
+│     CEDA DEF PROG(PROGTEST) GROUP(GRPTEST) LANGUAGE(COBOL)             │
+│     CEDA INS PROG(PROGTEST) GROUP(GRPTEST)                             │
+│                                                                          │
+│  3. DÉFINIR puis INSTALLER la TRANSACTION :                             │
+│     CEDA DEF TRANS(TR01) GROUP(GRPTEST) PROGRAM(PROGTEST)              │
+│     CEDA INS TRANS(TR01) GROUP(GRPTEST)                                │
+│                                                                          │
+│  4. VISUALISER le groupe :                                              │
+│     CEDA DISPLAY GROUP(GRPTEST)                                        │
+│                                                                          │
+│  5. (Optionnel) Ajouter à une liste de démarrage :                     │
+│     CEDA ADD GROUP(GRPTEST) LIST(STARTLST)                             │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Commandes CEDA principales
+
+| Commande | Description |
+|----------|-------------|
+| `CEDA DEF xxx` | Définir un objet dans le CSD |
+| `CEDA INS xxx` | Installer un objet en mémoire |
+| `CEDA DISPLAY GROUP(xxx)` | Afficher le contenu d'un groupe |
+| `CEDA VIEW xxx` | Visualiser les attributs d'un objet |
+| `CEDA ALTER xxx` | Modifier un objet existant |
+| `CEDA DELETE xxx` | Supprimer une définition |
+
+> **Note** : La commande `CEDA ADD GROUP(...) LIST(...)` est généralement réservée aux administrateurs CICS en production.
 
 ### Exemple pratique : Transaction TRNM (Menu principal)
 

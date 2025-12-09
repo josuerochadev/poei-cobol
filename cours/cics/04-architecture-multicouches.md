@@ -1,106 +1,140 @@
-# Chapitre IV - Architecture Multicouches et Transactions TSI
+# Chapitre IV - Architecture Multicouches
+
+## Table des matières
+
+1. [IV-1 Présentation générale](#iv-1-présentation-générale)
+2. [IV-2 Structure de l'architecture multicouches](#iv-2-structure-de-larchitecture-multicouches)
+3. [IV-3 Les trois couches en détail](#iv-3-les-trois-couches-en-détail)
+4. [IV-4 TSI - Transaction Scripting Interface](#iv-4-tsi---transaction-scripting-interface)
+5. [IV-5 Exemple de programme COBOL avec TSI](#iv-5-exemple-de-programme-cobol-avec-tsi)
+6. [IV-6 Avantages de l'architecture multicouches](#iv-6-avantages-de-larchitecture-multicouches)
+7. [IV-7 Exemple pratique : Application CICS-VSAM](#iv-7-exemple-pratique--application-cics-vsam)
+
+---
 
 ## IV-1 Présentation générale
 
 ### Préambule
 
-Avec l'évolution des systèmes d'information, les applications mainframe ont dû s'adapter aux exigences modernes :
+L'**Architecture Multicouche** est une approche essentielle dans le développement d'applications. Elle permet de **séparer les différentes préoccupations du système** entre les couches qui composent une application.
 
-- **Séparation des responsabilités** : chaque composant a un rôle bien défini
-- **Maintenabilité** : modifications localisées sans impact global
-- **Réutilisabilité** : composants utilisables par plusieurs applications
-- **Scalabilité** : capacité à absorber la charge
+Par cette structure séparée, apparaît la notion des **transactions TSI** (Transaction Scripting Interface) qui permettent l'échange des données entre les couches Frontale et Back-end.
 
-L'**architecture multicouches** répond à ces besoins en organisant l'application en couches distinctes et indépendantes.
-
-### Contexte historique
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    ÉVOLUTION DES ARCHITECTURES                           │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  1960-1980 : MONOLITHIQUE                                               │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  Terminal ──► Programme unique (IHM + Logique + Accès données) │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  1980-2000 : CLIENT-SERVEUR (2 tiers)                                   │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  Client (IHM + Logique) ◄──────────► Serveur (Base de données) │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  2000+ : MULTICOUCHES (3 tiers et plus)                                 │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  Présentation ◄──► Traitement (Logique) ◄──► Données           │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+> **Transactions TSI** : permettent de garantir l'intégrité des données lors des échanges entre les différentes couches de l'application. Elles assurent que toutes les opérations nécessaires sont exécutées de manière **atomique, cohérente, isolée et durable (ACID)**.
 
 ### Définition
 
-L'**architecture multicouches** (ou architecture N-tiers) est un modèle de conception logicielle qui sépare l'application en **couches distinctes**, chacune ayant une responsabilité spécifique.
+Une **Architecture Multicouche** (ou **n-tiers**) sépare les différentes fonctions d'une application en plusieurs couches. Chaque couche est responsable d'une partie spécifique du traitement.
 
-Dans le contexte CICS, on parle généralement d'une architecture **3 tiers** :
-
-| Couche | Nom | Responsabilité |
-|--------|-----|----------------|
-| **1** | Présentation | Interface utilisateur (écrans BMS) |
-| **2** | Traitement | Logique métier (règles de gestion) |
-| **3** | Données | Accès aux données (VSAM, DB2, IMS) |
+Dans un environnement mainframe utilisant **CICS** (Customer Information Control System) et **VSAM** (Virtual Storage Access Method), une architecture multicouche inclut :
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                   ARCHITECTURE 3 TIERS CICS                              │
+│                    ARCHITECTURE 3 TIERS CICS                            │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│       ┌───────────────────┐                                             │
-│       │   UTILISATEUR     │                                             │
-│       │   Terminal 3270   │                                             │
-│       └─────────┬─────────┘                                             │
-│                 │                                                        │
-│                 ▼                                                        │
-│  ┌─────────────────────────────────┐                                    │
-│  │      COUCHE PRÉSENTATION        │  Programme COBOL "Front-End"      │
-│  │         (Programme P)           │  - Affichage écrans BMS           │
-│  │                                 │  - Saisie utilisateur             │
-│  │  SEND MAP / RECEIVE MAP         │  - Validation de format           │
-│  └───────────────┬─────────────────┘                                    │
-│                  │ COMMAREA / TSI                                       │
-│                  ▼                                                       │
-│  ┌─────────────────────────────────┐                                    │
-│  │      COUCHE TRAITEMENT          │  Programme COBOL "Back-End"       │
-│  │         (Programme T)           │  - Règles de gestion              │
-│  │                                 │  - Calculs métier                 │
-│  │  Logique métier pure            │  - Validation fonctionnelle       │
-│  └───────────────┬─────────────────┘                                    │
-│                  │ EXEC CICS READ/WRITE                                 │
-│                  ▼                                                       │
-│  ┌─────────────────────────────────┐                                    │
-│  │       COUCHE DONNÉES            │  Programme COBOL "Data Access"    │
-│  │         (Programme D)           │  - Lecture/Écriture VSAM          │
-│  │                                 │  - Requêtes SQL DB2               │
-│  │  VSAM / DB2 / IMS               │  - Accès IMS                      │
-│  └─────────────────────────────────┘                                    │
-│                                                                          │
+│                                                                         │
+│   ┌─────────────────────┐                                               │
+│   │    PRÉSENTATION     │  ◄── Front-end (Interface utilisateur)       │
+│   │     (Front-End)     │                                               │
+│   └──────────┬──────────┘                                               │
+│              │                                                          │
+│              ▼                                                          │
+│   ┌─────────────────────┐                                               │
+│   │     TRAITEMENT      │  ◄── CICS / TSI (Logique métier)             │
+│   │     (CICS/TSI)      │                                               │
+│   └──────────┬──────────┘                                               │
+│              │                                                          │
+│              ▼                                                          │
+│   ┌─────────────────────┐                                               │
+│   │      DONNÉES        │  ◄── VSAM / DB2 (Stockage)                   │
+│   │       (VSAM)        │                                               │
+│   └─────────────────────┘                                               │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+**TSI** peut être utilisé pour orchestrer les transactions entre ces différentes couches, en automatisant la gestion des flux de données et des transactions.
+
+> **L'Architecture 3 tiers** est idéale pour les applications nécessitant une séparation claire entre l'interface utilisateur, la logique métier et les données. Elle est largement utilisée dans les applications web, les systèmes d'entreprise et les projets nécessitant une évolutivité.
+
+---
+
 ## IV-2 Structure de l'architecture multicouches
 
-### Les trois couches en détail
+### Schéma général avec TSI
 
-#### Couche de Présentation (Front-End)
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        ARCHITECTURE MULTICOUCHE                         │
+├────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                    COUCHE DE PRÉSENTATION                         │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────────────┐  │  │
+│  │  │ Terminal    │  │ Application │  │ Applications distribuées │  │  │
+│  │  │ 3270        │  │ Web (HTTP)  │  │ (API REST/SOAP)          │  │  │
+│  │  └──────┬──────┘  └──────┬──────┘  └────────────┬─────────────┘  │  │
+│  └─────────┼────────────────┼─────────────────────┼─────────────────┘  │
+│            │                │                     │                     │
+│            └────────────────┼─────────────────────┘                     │
+│                             │                                           │
+│                             ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                    COUCHE DE TRAITEMENT                           │  │
+│  │                                                                    │  │
+│  │    ┌─────────────────────────────────────────────────────────┐    │  │
+│  │    │                         CICS                             │    │  │
+│  │    │  • Gestion des transactions                              │    │  │
+│  │    │  • Gestion des erreurs                                   │    │  │
+│  │    │  • Environnement hautement fiable                        │    │  │
+│  │    └─────────────────────────────────────────────────────────┘    │  │
+│  │                              │                                     │  │
+│  │    ┌─────────────────────────┴───────────────────────────────┐    │  │
+│  │    │                         TSI                              │    │  │
+│  │    │  • Transaction Scripting Interface                       │    │  │
+│  │    │  • Tests automatisés                                     │    │  │
+│  │    │  • Simulation de charges                                 │    │  │
+│  │    │  • Pilotage programmatique de sessions 3270              │    │  │
+│  │    └─────────────────────────────────────────────────────────┘    │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                             │                                           │
+│                             ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                    COUCHE DE DONNÉES                              │  │
+│  │                                                                    │  │
+│  │    ┌─────────────────┐           ┌─────────────────┐              │  │
+│  │    │     VSAM        │           │      DB2        │              │  │
+│  │    │  • KSDS         │           │  • Tables       │              │  │
+│  │    │  • ESDS         │           │  • SQL          │              │  │
+│  │    │  • RRDS         │           │                 │              │  │
+│  │    └─────────────────┘           └─────────────────┘              │  │
+│  │                                                                    │  │
+│  │    Commandes CICS: READ, WRITE, REWRITE, DELETE                   │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                                                                         │
+└────────────────────────────────────────────────────────────────────────┘
+```
 
-La couche de présentation gère l'**interface homme-machine** :
+---
+
+## IV-3 Les trois couches en détail
+
+### Couche de Présentation (Front-End)
+
+C'est l'interface utilisateur avec laquelle les utilisateurs interagissent.
+
+| Caractéristique | Description |
+|-----------------|-------------|
+| **Rôle** | Point d'entrée pour les demandes de traitement de données |
+| **Fonction** | Interaction avec l'utilisateur final et gestion de l'affichage |
+| **Technologies** | Terminal 3270, Applications Web, Applications distribuées via API |
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    COUCHE DE PRÉSENTATION                                │
+│                    COUCHE DE PRÉSENTATION                               │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  RESPONSABILITÉS :                                                       │
+│                                                                         │
+│  RESPONSABILITÉS :                                                      │
 │  ┌─────────────────────────────────────────────────────────────────┐   │
 │  │  • Affichage des écrans (SEND MAP)                              │   │
 │  │  • Réception des saisies (RECEIVE MAP)                          │   │
@@ -109,646 +143,679 @@ La couche de présentation gère l'**interface homme-machine** :
 │  │  • Navigation entre écrans                                       │   │
 │  │  • Messages d'erreur utilisateur                                 │   │
 │  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  NE DOIT PAS CONTENIR :                                                 │
+│                                                                         │
+│  MODES DE COMMUNICATION AVEC CICS :                                    │
 │  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  ✗ Règles de gestion métier                                     │   │
-│  │  ✗ Accès direct aux fichiers/bases de données                   │   │
-│  │  ✗ Calculs complexes                                            │   │
+│  │  • Appels API                                                    │   │
+│  │  • Web services SOAP/REST                                        │   │
+│  │  • Queues de messages MQ                                         │   │
 │  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Exemple de programme de présentation :**
+### Couche de Traitement (CICS et TSI)
 
-```cobol
-      ******************************************************************
-      * Programme : CLNTP00 - Couche Présentation Gestion Clients
-      * Rôle      : Interface utilisateur uniquement
-      ******************************************************************
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. CLNTP00.
+Cette couche regroupe la **logique métier** et les **règles de traitement**.
 
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-           COPY DFHAID.
-       01 WS-COMMAREA.
-          05 CA-ACTION            PIC X(1).
-          05 CA-NUM-CLIENT        PIC 9(8).
-          05 CA-DONNEES-CLIENT    PIC X(200).
-          05 CA-CODE-RETOUR       PIC 9(2).
-          05 CA-MESSAGE           PIC X(78).
-
-       PROCEDURE DIVISION.
-       0000-PRINCIPAL.
-      * Gestion des touches - PRESENTATION UNIQUEMENT
-           EVALUATE EIBAID
-               WHEN DFHENTER
-                   PERFORM 1000-APPELER-TRAITEMENT
-               WHEN DFHPF3
-                   PERFORM 9000-QUITTER
-               WHEN OTHER
-                   MOVE 'TOUCHE NON AUTORISEE' TO CA-MESSAGE
-           END-EVALUATE
-           PERFORM 2000-AFFICHER-ECRAN
-           PERFORM 9999-RETOUR-CICS.
-
-       1000-APPELER-TRAITEMENT.
-      * Appel de la couche de traitement via LINK
-           EXEC CICS
-               LINK PROGRAM('CLNTT00')
-                    COMMAREA(WS-COMMAREA)
-           END-EXEC.
-
-       2000-AFFICHER-ECRAN.
-      * Affichage BMS - PRESENTATION UNIQUEMENT
-           EXEC CICS
-               SEND MAP('CLNTMAP')
-                    MAPSET('CLNTSET')
-                    FROM(CLNTMAPO)
-                    ERASE
-           END-EXEC.
-```
-
-#### Couche de Traitement (Back-End / Business Logic)
-
-La couche de traitement contient la **logique métier** :
+#### CICS
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    COUCHE DE TRAITEMENT                                  │
+│                           CICS                                          │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  RESPONSABILITÉS :                                                       │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  • Règles de gestion métier                                     │   │
-│  │  • Validation fonctionnelle (client existe, solde suffisant)   │   │
-│  │  • Calculs métier (intérêts, taxes, remises)                   │   │
-│  │  • Orchestration des appels à la couche données                 │   │
-│  │  • Gestion des transactions (SYNCPOINT, ROLLBACK)               │   │
-│  │  • Journalisation fonctionnelle                                 │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  NE DOIT PAS CONTENIR :                                                 │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  ✗ Commandes BMS (SEND MAP, RECEIVE MAP)                        │   │
-│  │  ✗ Gestion des écrans et touches                                │   │
-│  │  ✗ Requêtes SQL ou accès fichiers directs                       │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
+│                                                                         │
+│  • Reçoit les demandes du Front-End                                    │
+│  • Gère l'exécution des transactions                                   │
+│  • Prend en charge les appels transactionnels                          │
+│  • Gestion des erreurs dans un environnement hautement fiable          │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Exemple de programme de traitement :**
+#### TSI (Transaction Scripting Interface)
+
+Interface IBM utilisée pour automatiser, piloter ou tester des transactions CICS dans un environnement z/OS.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    FONCTIONNALITÉS TSI                                  │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ✅ Tests automatisés de transactions CICS                             │
+│  ✅ Simulation de charges                                               │
+│  ✅ Pilotage programmatique de sessions 3270                           │
+│  ✅ Tests d'intégration batch ↔ CICS                                   │
+│                                                                         │
+│  MOTEURS D'EXÉCUTION TSI :                                             │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │  • IBM TEST CONTROL FACILITY (TCF)                               │   │
+│  │  • IBM Application Test Facility (ATF)                           │   │
+│  │  • IBM CICS Transaction Gateway (CTG) Scripting                  │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Couche de Données (VSAM ou Base de Données)
+
+Responsable du **stockage total des informations**.
+
+| Technologie | Utilisation |
+|-------------|-------------|
+| **VSAM** | Fichiers et enregistrements dans un environnement mainframe |
+| **DB2** | Base de données relationnelle |
+
+**Commandes CICS pour interagir avec VSAM :**
+
+| Commande | Fonction |
+|----------|----------|
+| `READ` | Lecture d'enregistrements |
+| `WRITE` | Écriture d'enregistrements |
+| `REWRITE` | Mise à jour d'enregistrements |
+| `DELETE` | Suppression d'enregistrements |
+
+---
+
+## IV-4 TSI - Transaction Scripting Interface
+
+### Modules TSI
+
+| Module | Fonction |
+|--------|----------|
+| `TSIINIT` | Allocation Terminal + connexion |
+| `TSIFINI` | Déconnexion + Libération |
+| `TSISEND` | Envoi du Texte / touches |
+| `TSIRECEIVE` | Lecture écran |
+| `TSI VERIFY` | Assertions de Test |
+
+### Commandes TSI
+
+| Étape | Fonction |
+|-------|----------|
+| `ALLOCATE` | Réservation de Terminal |
+| `CONNECT` | Connexion à CICS |
+| `LOGON` | Simulation du logon |
+| `SEND/RECEIVE` | Pilotage écran 3270 |
+| `VERIFY` | Assertions de test |
+| `PFKEY` | Navigation |
+| `LOGOFF` | Fin transaction |
+| `FREE` | Libération terminal |
+
+### Résumé des commandes EXEC TSI
+
+| Commande | Rôle |
+|----------|------|
+| `ALLOC` | Réserver un terminal TSI |
+| `CONNECT` | Se connecter à CICS |
+| `SEND` | Envoyer texte, PFKEY ou champ |
+| `RECEIVE` | Lire l'écran |
+| `VERIFY` | Vérifier des textes / champs |
+| `DISCONNECT` | Se déconnecter |
+| `FREE` | Libérer les ressources TSI |
+
+### Flux de communication TSI
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    FLUX TSI - SESSION 3270                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Programme COBOL                          CICS Region                  │
+│   (avec EXEC TSI)                                                       │
+│        │                                                                │
+│        │  1. EXEC TSI ALLOC                                            │
+│        │     ──────────────────►  Réserve un terminal virtuel          │
+│        │                                                                │
+│        │  2. EXEC TSI CONNECT                                          │
+│        │     ──────────────────►  Connexion à CICS                     │
+│        │                                                                │
+│        │  3. EXEC TSI SEND (LOGON)                                     │
+│        │     ──────────────────►  Simulation LOGON                     │
+│        │                                                                │
+│        │  4. EXEC TSI RECEIVE                                          │
+│        │     ◄──────────────────  Lecture écran                        │
+│        │                                                                │
+│        │  5. EXEC TSI VERIFY                                           │
+│        │     Vérifie le contenu de l'écran                             │
+│        │                                                                │
+│        │  6. EXEC TSI SEND (TRANSACTION)                               │
+│        │     ──────────────────►  Lance une transaction                │
+│        │                                                                │
+│        │  7. EXEC TSI RECEIVE                                          │
+│        │     ◄──────────────────  Récupère les résultats               │
+│        │                                                                │
+│        │  8. EXEC TSI DISCONNECT                                       │
+│        │     ──────────────────►  Déconnexion                          │
+│        │                                                                │
+│        │  9. EXEC TSI FREE                                             │
+│        │     ──────────────────►  Libère les ressources                │
+│        ▼                                                                │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## IV-5 Exemple de programme COBOL avec TSI
+
+### Structure du programme
+
+Le programme effectue les étapes suivantes :
+1. Initialise TSI (ALLOC + CONNECT)
+2. Effectue un LOGON
+3. Appelle la transaction INQY
+4. Vérifie les résultats
+5. Fait un LOGOFF
+6. Déconnecte et libère le terminal
+
+### Code COBOL complet
+
+#### Déclaration TSI
 
 ```cobol
-      ******************************************************************
-      * Programme : CLNTT00 - Couche Traitement Gestion Clients
-      * Rôle      : Logique métier uniquement (pas d'écrans)
-      ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. CLNTT00.
-
+       PROGRAM-ID. TSI-TEST-INQY.
+       ENVIRONMENT DIVISION.
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01 WS-CLIENT-DATA.
-          05 WS-NUM-CLIENT       PIC 9(8).
-          05 WS-NOM              PIC X(30).
-          05 WS-SOLDE            PIC S9(9)V99 COMP-3.
+       01 WS-TERMID        PIC X(4) VALUE SPACES.
+       01 WS-APPLID        PIC X(8) VALUE 'CICSTEST'.
+       01 WS-USER          PIC X(8) VALUE 'TESTUSR'.
+       01 WS-PASS          PIC X(8) VALUE 'PASS123'.
+       01 WS-RETURN-CODE   PIC S9(4) COMP.
+       01 WS-TEXT          PIC X(80).
+       COPY DFH0TSI.       *> COPY les macros EXEC TSI
+```
 
-       LINKAGE SECTION.
-       01 DFHCOMMAREA            PIC X(300).
+#### Initialisation TSI
 
+```cobol
        PROCEDURE DIVISION.
-       0000-PRINCIPAL.
-           MOVE DFHCOMMAREA TO WS-COMMAREA
+       MAIN-PARA.
+           DISPLAY '--- INITIALISATION TSI ---'.
 
-      * LOGIQUE METIER - pas d'écran ici !
-           EVALUATE CA-ACTION
-               WHEN 'C'
-                   PERFORM 1000-CONSULTER-CLIENT
-               WHEN 'M'
-                   PERFORM 2000-MODIFIER-CLIENT
-               WHEN 'S'
-                   PERFORM 3000-CALCULER-SOLDE
-           END-EVALUATE
+           EXEC TSI ALLOC
+               APPLID  (WS-APPLID)
+               USERID  (WS-USER)
+               PASSWORD(WS-PASS)
+               TERMID  (WS-TERMID)
+           END-EXEC.
 
-           MOVE WS-COMMAREA TO DFHCOMMAREA
-           EXEC CICS RETURN END-EXEC.
-
-       1000-CONSULTER-CLIENT.
-      * Appel de la couche données
-           EXEC CICS
-               LINK PROGRAM('CLNTD00')
-                    COMMAREA(WS-COMMAREA)
-           END-EXEC
-      * Vérification des règles métier
-           IF CA-CODE-RETOUR = 0
-               IF WS-SOLDE < 0
-                   MOVE 'ATTENTION: COMPTE DEBITEUR' TO CA-MESSAGE
-               END-IF
+           MOVE RETURN-CODE TO WS-RETURN-CODE.
+           IF WS-RETURN-CODE NOT = 0
+               DISPLAY 'ERREUR ALLOC TSI RC=' WS-RETURN-CODE
+               STOP RUN
            END-IF.
 
-       3000-CALCULER-SOLDE.
-      * Calcul métier : intérêts
-           COMPUTE WS-SOLDE = WS-SOLDE * 1.05.
+           DISPLAY 'TSI ALLOC OK - TERMID = ' WS-TERMID.
+
+           EXEC TSI CONNECT
+               TERMID(WS-TERMID)
+           END-EXEC.
+
+           MOVE RETURN-CODE TO WS-RETURN-CODE.
+           IF WS-RETURN-CODE NOT = 0
+               DISPLAY 'ERREUR CONNECT TSI RC=' WS-RETURN-CODE
+               STOP RUN
+           END-IF.
+
+           DISPLAY 'TSI CONNECT OK'.
 ```
 
-#### Couche de Données (Data Access Layer)
-
-La couche de données gère l'**accès aux ressources** :
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    COUCHE DE DONNÉES                                     │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  RESPONSABILITÉS :                                                       │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  • Lecture/écriture fichiers VSAM                               │   │
-│  │  • Requêtes SQL DB2                                             │   │
-│  │  • Accès bases IMS                                              │   │
-│  │  • Gestion des erreurs techniques (NOTFND, DUPREC...)          │   │
-│  │  • Transformation données fichier ↔ structure programme        │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  NE DOIT PAS CONTENIR :                                                 │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  ✗ Règles de gestion métier                                     │   │
-│  │  ✗ Affichage ou saisie                                          │   │
-│  │  ✗ Décisions fonctionnelles                                     │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  SOURCES DE DONNÉES :                                                   │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
-│  │   VSAM   │  │   DB2    │  │   IMS    │  │    MQ    │              │
-│  │   KSDS   │  │   SQL    │  │   DL/I   │  │  Series  │              │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘              │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-**Exemple de programme d'accès aux données :**
+#### LOGON CICS
 
 ```cobol
-      ******************************************************************
-      * Programme : CLNTD00 - Couche Données Gestion Clients
-      * Rôle      : Accès VSAM uniquement (pas de logique métier)
-      ******************************************************************
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. CLNTD00.
+           MOVE 'LOGON TESTUSR PASS123' TO WS-TEXT.
 
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-       01 WS-CLIENT-REC.
-          05 CLI-NUM             PIC 9(8).
-          05 CLI-NOM             PIC X(30).
-          05 CLI-ADRESSE         PIC X(50).
-          05 CLI-SOLDE           PIC S9(9)V99 COMP-3.
+           EXEC TSI SEND
+               TEXT (WS-TEXT)
+               ENTER
+               TERMID (WS-TERMID)
+           END-EXEC.
 
-       01 WS-RESP                PIC S9(8) COMP.
+           EXEC TSI RECEIVE
+               TERMID(WS-TERMID)
+           END-EXEC.
 
-       LINKAGE SECTION.
-       01 DFHCOMMAREA            PIC X(300).
+           EXEC TSI VERIFY
+               TEXT CONTAINS 'LOGON COMPLETED'
+               TERMID(WS-TERMID)
+           END-EXEC.
 
-       PROCEDURE DIVISION.
-       0000-PRINCIPAL.
-           MOVE DFHCOMMAREA TO WS-COMMAREA
+           IF RETURN-CODE NOT = 0
+               DISPLAY 'ECHEC LOGON'
+               STOP RUN
+           END-IF.
 
-      * ACCES DONNEES - uniquement lecture/écriture
-           EVALUATE CA-ACTION
-               WHEN 'R'
-                   PERFORM 1000-LIRE-CLIENT
-               WHEN 'W'
-                   PERFORM 2000-ECRIRE-CLIENT
-               WHEN 'U'
-                   PERFORM 3000-MAJ-CLIENT
-               WHEN 'D'
-                   PERFORM 4000-SUPPRIMER-CLIENT
-           END-EVALUATE
-
-           MOVE WS-COMMAREA TO DFHCOMMAREA
-           EXEC CICS RETURN END-EXEC.
-
-       1000-LIRE-CLIENT.
-      * Accès VSAM pur - pas de règle métier
-           EXEC CICS
-               READ FILE('CLIENTS')
-                    INTO(WS-CLIENT-REC)
-                    RIDFLD(CA-NUM-CLIENT)
-                    RESP(WS-RESP)
-           END-EXEC
-
-           EVALUATE WS-RESP
-               WHEN DFHRESP(NORMAL)
-                   MOVE 0 TO CA-CODE-RETOUR
-                   MOVE WS-CLIENT-REC TO CA-DONNEES-CLIENT
-               WHEN DFHRESP(NOTFND)
-                   MOVE 13 TO CA-CODE-RETOUR
-               WHEN OTHER
-                   MOVE 99 TO CA-CODE-RETOUR
-           END-EVALUATE.
+           DISPLAY 'LOGON OK'.
 ```
 
-### Flux de communication entre couches
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│              FLUX DE COMMUNICATION MULTICOUCHES                          │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│   UTILISATEUR                                                           │
-│       │                                                                  │
-│       │ (1) Saisie numéro client + ENTER                                │
-│       ▼                                                                  │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  PRÉSENTATION (CLNTP00)                                          │   │
-│  │  ─────────────────────────                                       │   │
-│  │  (2) RECEIVE MAP → Récupère saisie                              │   │
-│  │  (3) Validation format (numérique ?)                            │   │
-│  │  (4) Prépare COMMAREA avec action='C' + num_client              │   │
-│  │  (5) LINK PROGRAM('CLNTT00') ─────────────────────┐             │   │
-│  │                                                    │             │   │
-│  │  (12) Reçoit COMMAREA avec données ou erreur      │             │   │
-│  │  (13) SEND MAP → Affiche résultat                 │             │   │
-│  └───────────────────────────────────────────────────│─────────────┘   │
-│                                                       │                  │
-│                                                       ▼                  │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  TRAITEMENT (CLNTT00)                                            │   │
-│  │  ─────────────────────                                           │   │
-│  │  (6) Reçoit COMMAREA                                            │   │
-│  │  (7) Valide règles métier (client VIP ? actif ?)                │   │
-│  │  (8) LINK PROGRAM('CLNTD00') ─────────────────────┐             │   │
-│  │                                                    │             │   │
-│  │  (10) Reçoit données                              │             │   │
-│  │  (11) Applique logique (calculs, enrichissement)  │             │   │
-│  │       RETURN vers CLNTP00                         │             │   │
-│  └───────────────────────────────────────────────────│─────────────┘   │
-│                                                       │                  │
-│                                                       ▼                  │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  DONNÉES (CLNTD00)                                               │   │
-│  │  ─────────────────                                               │   │
-│  │  (9) READ FILE('CLIENTS') → Lecture VSAM                        │   │
-│  │      RETURN vers CLNTT00                                        │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-## IV-3 Transactions TSI (Terminal Services Interface)
-
-### Présentation des transactions TSI
-
-Les **transactions TSI** (Terminal Services Interface) sont des transactions CICS spécialisées pour gérer les **échanges entre les couches** dans une architecture multicouches.
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    TRANSACTIONS TSI                                      │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  PRINCIPE :                                                              │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  Transaction TSI = Interface standardisée entre couches         │   │
-│  │                                                                  │   │
-│  │  ┌──────────┐    TSI    ┌──────────┐    TSI    ┌──────────┐   │   │
-│  │  │  Front   │◄─────────►│  Middle  │◄─────────►│  Back    │   │   │
-│  │  │  (Écran) │           │ (Logique)│           │ (Données)│   │   │
-│  │  └──────────┘           └──────────┘           └──────────┘   │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  CARACTÉRISTIQUES :                                                      │
-│  • Interface normalisée et documentée                                   │
-│  • Échanges via COMMAREA ou Channels/Containers                         │
-│  • Découplage entre les couches                                         │
-│  • Traçabilité des échanges                                             │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-### Structure d'une COMMAREA TSI
-
-Pour les échanges TSI, on définit une **COMMAREA normalisée** :
+#### Appel Transaction INQY
 
 ```cobol
-      ******************************************************************
-      * Copybook : TSICOPY - Structure COMMAREA pour échanges TSI
-      ******************************************************************
-       01 TSI-COMMAREA.
-      *─── EN-TÊTE TSI (zone technique) ────────────────────────────────
-          05 TSI-HEADER.
-             10 TSI-VERSION        PIC X(2).
-                88 TSI-V01         VALUE '01'.
-             10 TSI-SERVICE        PIC X(8).
-             10 TSI-ACTION         PIC X(4).
-                88 TSI-READ        VALUE 'READ'.
-                88 TSI-WRIT        VALUE 'WRIT'.
-                88 TSI-UPDT        VALUE 'UPDT'.
-                88 TSI-DELT        VALUE 'DELT'.
-                88 TSI-LIST        VALUE 'LIST'.
-             10 TSI-CODE-RETOUR    PIC 9(4).
-                88 TSI-OK          VALUE 0.
-                88 TSI-NOT-FOUND   VALUE 0013.
-                88 TSI-DUPLICATE   VALUE 0014.
-                88 TSI-ERROR       VALUE 9999.
-             10 TSI-MESSAGE        PIC X(78).
-             10 TSI-TIMESTAMP      PIC X(26).
-             10 TSI-USER-ID        PIC X(8).
+           MOVE 'INQY' TO WS-TEXT.
 
-      *─── ZONE DONNÉES (contenu métier) ───────────────────────────────
-          05 TSI-DATA.
-             10 TSI-CLE            PIC X(20).
-             10 TSI-DONNEES        PIC X(500).
-             10 TSI-NB-ENREG       PIC 9(5).
+           EXEC TSI SEND
+               TEXT(WS-TEXT)
+               ENTER
+               TERMID(WS-TERMID)
+           END-EXEC.
+
+           EXEC TSI RECEIVE
+               TERMID(WS-TERMID)
+           END-EXEC.
+
+           EXEC TSI VERIFY
+               TEXT CONTAINS 'INQUIRY MENU'
+               TERMID(WS-TERMID)
+           END-EXEC.
+
+           IF RETURN-CODE NOT = 0
+               DISPLAY 'MENU INQY INCORRECT'
+               STOP RUN
+           END-IF.
+
+           DISPLAY 'MENU INQY OK'.
 ```
 
-### Mécanismes d'appel TSI
-
-#### Via LINK (synchrone)
+#### Envoi du numéro de compte et vérification
 
 ```cobol
-      * Appel synchrone - le programme attend la réponse
-           MOVE 'CLNTSRV' TO TSI-SERVICE
-           SET TSI-READ TO TRUE
-           MOVE WS-NUM-CLIENT TO TSI-CLE
+           EXEC TSI SEND
+               FIELD('ACCOUNT-NO')
+               VALUE '000123456789'
+               ENTER
+               TERMID(WS-TERMID)
+           END-EXEC.
 
-           EXEC CICS
-               LINK PROGRAM('TSIHANDL')
-                    COMMAREA(TSI-COMMAREA)
-                    LENGTH(LENGTH OF TSI-COMMAREA)
-           END-EXEC
+           EXEC TSI RECEIVE
+               TERMID(WS-TERMID)
+           END-EXEC.
 
-      * Analyse du retour
-           IF TSI-OK
-               MOVE TSI-DONNEES TO WS-CLIENT-DATA
+           EXEC TSI VERIFY
+               FIELD('ACCOUNT-NAME')
+               VALUE 'DUPONT JEAN'
+               TERMID(WS-TERMID)
+           END-EXEC.
+
+           EXEC TSI VERIFY
+               FIELD('BALANCE')
+               VALUE '00001234.56'
+               TERMID(WS-TERMID)
+           END-EXEC.
+
+           IF RETURN-CODE = 0
+               DISPLAY 'COMPTE VERIFIE AVEC SUCCES'
            ELSE
-               MOVE TSI-MESSAGE TO WS-ERREUR
+               DISPLAY 'ECHEC VERIFICATION COMPTE'
+               STOP RUN
            END-IF.
 ```
 
-#### Via START (asynchrone)
+#### LOGOFF
 
 ```cobol
-      * Démarrage asynchrone d'une transaction TSI
-           MOVE 'CLNTSRV' TO TSI-SERVICE
-           SET TSI-LIST TO TRUE
+           MOVE 'LOGOFF' TO WS-TEXT.
 
-           EXEC CICS
-               START TRANSID('TSIB')
-                     FROM(TSI-COMMAREA)
-                     LENGTH(LENGTH OF TSI-COMMAREA)
-           END-EXEC
+           EXEC TSI SEND
+               TEXT(WS-TEXT)
+               ENTER
+               TERMID(WS-TERMID)
+           END-EXEC.
 
-      * Le programme continue sans attendre
-      * Les résultats seront récupérés plus tard via TS Queue
+           EXEC TSI RECEIVE
+               TERMID(WS-TERMID)
+           END-EXEC.
+
+           EXEC TSI VERIFY
+               TEXT CONTAINS 'LOGOFF SUCCESSFUL'
+               TERMID(WS-TERMID)
+           END-EXEC.
+
+           DISPLAY 'LOGOFF OK'.
 ```
 
-#### Via Channels et Containers (CICS TS 3.1+)
-
-Les **Channels/Containers** offrent une alternative moderne à la COMMAREA :
+#### Finalisation
 
 ```cobol
-      * Création d'un channel pour l'échange
-           EXEC CICS
-               PUT CONTAINER('CLIENT-REQ')
-                   CHANNEL('CLNT-CHANNEL')
-                   FROM(WS-REQUEST-DATA)
-                   FLENGTH(LENGTH OF WS-REQUEST-DATA)
-           END-EXEC
+           EXEC TSI DISCONNECT
+               TERMID(WS-TERMID)
+           END-EXEC.
 
-      * Appel du service avec le channel
-           EXEC CICS
-               LINK PROGRAM('CLNTSRV')
-                    CHANNEL('CLNT-CHANNEL')
-           END-EXEC
+           EXEC TSI FREE
+               TERMID(WS-TERMID)
+           END-EXEC.
 
-      * Récupération de la réponse
-           EXEC CICS
-               GET CONTAINER('CLIENT-RESP')
-                   CHANNEL('CLNT-CHANNEL')
-                   INTO(WS-RESPONSE-DATA)
-                   FLENGTH(WS-RESP-LEN)
-           END-EXEC
+           DISPLAY 'TSI TERMINAL LIBERE'.
+           GOBACK.
 ```
 
-**Avantages des Channels/Containers :**
+### JCL de Pré-compilation
 
-| Caractéristique | COMMAREA | Channels/Containers |
-|-----------------|----------|---------------------|
-| Taille max | 32 KB | 500 MB+ |
-| Structure | Fixe | Flexible (plusieurs containers) |
-| Types | Caractères uniquement | BIT, CHAR, etc. |
-| Nommage | Non applicable | Containers nommés |
+```jcl
+//TSITESTC JOB (ACCT),'COMPIL TSI',CLASS=A,MSGCLASS=X,NOTIFY=&SYSUID
+//* ------------------------------------------------------------------
+//* PRECOMPIL TSI + COMPILATION COBOL
+//* ------------------------------------------------------------------
+//PRECOMP  EXEC DFHECP1C,
+//         INFILE=YOUR.SOURCE(TSI-TEST-INQY),
+//         OUTFILE=&&COBOL,
+//         LIB=YOUR.COPYLIB
+//* ------------------------------------------------------------------
+//COBOL    EXEC IGYWCL,
+//         INFILE=&&COBOL,
+//         OUTFILE=&&OBJ
+//* ------------------------------------------------------------------
+//LKED     EXEC HEWL,PARM='LIST,MAP,XREF'
+//SYSLIN   DD DISP=SHR,DSN=&&OBJ
+//         DD DISP=SHR,DSN=CEE.SCEELKED       /* RUNTIME COBOL  */
+//         DD DISP=SHR,DSN=CICSTS56.CICS.SDFHLOAD /* Interface TSI */
+//         DD DISP=SHR,DSN=SYS1.CSSLIB        /* TSO/TSI libraries */
+//SYSLMOD  DD DISP=SHR,DSN=YOUR.LOAD(TSITEST)
+//SYSPRINT DD SYSOUT=*
+//SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+```
 
-### Exemple complet d'architecture TSI
+**Notes importantes :**
+- `DFHECP1C` = précompilateur CICS
+- `CICSTS56.CICS.SDFHLOAD` = contient les commandes EXEC TSI
+- Le load final est placé dans `YOUR.LOAD(TSITEST)`
+
+### JCL d'Exécution
+
+```jcl
+//TSITESTX JOB (ACCT),'EXEC TSI',CLASS=A,MSGCLASS=X,NOTIFY=&SYSUID
+//* ------------------------------------------------------------------
+//* EXECUTION DU PROGRAMME COBOL UTILISANT TSI
+//* ------------------------------------------------------------------
+//RUN      EXEC PGM=TSITEST,REGION=0M
+//STEPLIB  DD DISP=SHR,DSN=YOUR.LOAD
+//         DD DISP=SHR,DSN=CICSTS56.CICS.SDFHLOAD  /* TSI   */
+//         DD DISP=SHR,DSN=CEE.SCEERUN             /* COBOL */
+//         DD DISP=SHR,DSN=SYS1.CSSLIB             /* TSI/ATF */
+//*
+//TSILOG   DD SYSOUT=*     /* Journal TSI          */
+//TSITRACE DD SYSOUT=*     /* Trace écrans 3270    */
+//TSIDUMP  DD SYSOUT=*     /* Dump TSI si RC ≠ 0   */
+//TSISCRN  DD SYSOUT=*     /* Écrans capturés      */
+//*
+//SYSOUT   DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SYSUDUMP DD SYSOUT=*
+//SYSIN    DD DUMMY
+```
+
+**DD Statements TSI :**
+
+| DD | Rôle |
+|----|------|
+| `TSILOG` | Log des commandes EXEC TSI |
+| `TSITRACE` | Trace de communication terminal |
+| `TSIDUMP` | Dump complet en cas d'erreur |
+| `TSISCRN` | Dump des écrans 3270 |
+| `STEPLIB` | Charge les modules TSI, CICS et COBOL |
+
+---
+
+## IV-6 Avantages de l'architecture multicouches
+
+### Dissociation des besoins
+
+Chaque couche dans une architecture multicouche a une fonctionnalité spécifique et bien définie.
+
+### Modularité et réutilisabilité
+
+- Les différentes couches peuvent être développées indépendamment
+- Permet de réutiliser des composants ou des services
+- La couche de logique métier peut être utilisée par plusieurs interfaces Front-End
+
+### Scalabilité horizontale et verticale
+
+- Chaque couche peut être mise à l'échelle indépendamment
+- Les couches métier et données peuvent être déployées sur plusieurs serveurs
+- Support du Load Balancing et de la redondance
+
+### Facilité de maintenance
+
+**Indépendance des couches :**
+- Déploiement de mises à jour sans perturber les autres parties du système
+
+**Testabilité :**
+- Les différentes couches peuvent être testées indépendamment
+- Facilite les tests unitaires et les tests d'intégration
+
+### Flexibilité et indépendance technologique
+
+**Changement technologique :**
+Chaque couche peut utiliser des technologies différentes :
+- Couche de Présentation : Application web
+- Couche Métier : Services CICS ou Java
+- Couche de Données : VSAM ou DB2
+
+**Interopérabilité :**
+- Facilité d'intégration avec des systèmes externes (ERP, etc.)
+- Communication via web services ou API
+
+### Sécurité améliorée
+
+**Contrôle des accès et sécurisation des couches :**
+- Mécanismes de sécurité spécifiques pour chaque couche
+- Authentification différente selon les couches
+
+**Isolation des données sensibles :**
+- Données protégées au niveau de la couche de Données
+- Accès restreints et audit trails
+
+### Facilité d'intégration et de gestion des services
+
+**Web services et API :**
+- Exposition de la logique métier via web services ou APIs RESTful
+- Intégration facilitée avec systèmes internes ou externes
+
+**Gestion des transactions :**
+- Mécanismes transactionnels robustes dans CICS
+- Cohérence des données dans les scénarios distribués
+
+### Développement parallèle et efficacité accrue
+
+- Les équipes peuvent travailler sur différentes couches en parallèle
+- Accélération du développement global de l'application
+
+### Support pour des architectures distribuées
+
+**Déploiement sur plusieurs serveurs :**
+- Couche de présentation sur serveur Web
+- Couches métier et données sur serveurs principaux ou cloud hybride
+
+**Communication asynchrone :**
+- Messages MQ ou queues
+- Meilleure résilience et gestion des erreurs
+
+### Résumé des avantages
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│              ARCHITECTURE TSI COMPLÈTE                                   │
+│           AVANTAGES DE L'ARCHITECTURE MULTICOUCHE                       │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  TRANSACTION : CLNT (Gestion des clients)                               │
-│                                                                          │
-│  ┌─────────────┐                                                        │
-│  │  Terminal   │                                                        │
-│  │    3270     │                                                        │
-│  └──────┬──────┘                                                        │
-│         │                                                                │
-│         ▼                                                                │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  TRANS: CLNT                                                     │   │
-│  │  PROG:  CLNTPRES                                                 │   │
-│  │  RÔLE:  Présentation                                             │   │
-│  │                                                                  │   │
-│  │  • RECEIVE MAP                                                   │   │
-│  │  • Validation format                                             │   │
-│  │  • LINK → CLNTTSI (via TSI)                                     │   │
-│  │  • SEND MAP                                                      │   │
-│  └──────────────────────────┬──────────────────────────────────────┘   │
-│                              │                                          │
-│                    TSI-COMMAREA                                         │
-│                              │                                          │
-│                              ▼                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  PROG:  CLNTTSI                                                  │   │
-│  │  RÔLE:  Router TSI                                               │   │
-│  │                                                                  │   │
-│  │  • Analyse TSI-SERVICE                                          │   │
-│  │  • Dispatch vers le bon service                                  │   │
-│  │  • Journalisation des appels                                     │   │
-│  └───────────┬─────────────────────────────────┬───────────────────┘   │
-│              │                                  │                        │
-│              ▼                                  ▼                        │
-│  ┌─────────────────────────┐      ┌─────────────────────────┐          │
-│  │  PROG: CLNTTRT          │      │  PROG: CPTTRT           │          │
-│  │  Service: CLNTSRV       │      │  Service: CPTSRV        │          │
-│  │                         │      │                         │          │
-│  │  Traitement Clients     │      │  Traitement Comptes     │          │
-│  │  • Règles métier        │      │  • Règles métier        │          │
-│  │  • LINK → CLNTDAT       │      │  • LINK → CPTDAT        │          │
-│  └───────────┬─────────────┘      └───────────┬─────────────┘          │
-│              │                                 │                         │
-│              ▼                                 ▼                         │
-│  ┌─────────────────────────┐      ┌─────────────────────────┐          │
-│  │  PROG: CLNTDAT          │      │  PROG: CPTDAT           │          │
-│  │                         │      │                         │          │
-│  │  Accès VSAM CLIENTS     │      │  Accès DB2 COMPTES      │          │
-│  │  • READ/WRITE/DELETE    │      │  • SELECT/INSERT/UPDATE │          │
-│  └─────────────────────────┘      └─────────────────────────┘          │
-│                                                                          │
+│                                                                         │
+│  ✅ Simplifier le développement et améliorer la maintenance             │
+│                                                                         │
+│  ✅ Optimiser la scalabilité (capacité d'évolution)                     │
+│                                                                         │
+│  ✅ Faciliter l'intégration avec d'autres systèmes                      │
+│     tout en assurant la sécurité et la modularité                       │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## IV-4 Avantages de l'architecture multicouches
+---
 
-### Tableau comparatif
+## IV-7 Exemple pratique : Application CICS-VSAM
 
-| Critère | Architecture Monolithique | Architecture Multicouches |
-|---------|---------------------------|---------------------------|
-| **Maintenabilité** | Difficile - modifications impactent tout | Facile - modifications localisées |
-| **Tests** | Tests unitaires complexes | Tests par couche isolée |
-| **Réutilisation** | Faible | Élevée (services partagés) |
-| **Équipe** | Tout le monde sur tout | Spécialisation possible |
-| **Performance** | Parfois meilleure (moins d'appels) | Overhead des appels inter-couches |
-| **Évolutivité** | Limitée | Haute (remplacement de couche) |
-| **Documentation** | Souvent absente | Interfaces documentées |
+### Contexte
 
-### Avantages détaillés
+Application de gestion de la situation financière des employés (vérification des crédits avant mise à jour du salaire).
+
+### Flux de traitement
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    AVANTAGES DE L'ARCHITECTURE MULTICOUCHES              │
+│                     FLUX DE TRAITEMENT                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  1. SÉPARATION DES PRÉOCCUPATIONS                                       │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  • Chaque développeur se concentre sur sa couche                │   │
-│  │  • Moins de risque d'effets de bord                             │   │
-│  │  • Code plus lisible et maintenable                              │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  2. RÉUTILISABILITÉ                                                      │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  • La couche données peut servir plusieurs transactions         │   │
-│  │  • Nouveaux écrans sans toucher à la logique                    │   │
-│  │  • Services partagés entre applications                          │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  3. TESTABILITÉ                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  • Tests unitaires de chaque couche                              │   │
-│  │  • Mocking des couches dépendantes                               │   │
-│  │  • Tests de non-régression facilités                             │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  4. ÉVOLUTIVITÉ TECHNOLOGIQUE                                           │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  • Remplacement de VSAM par DB2 : seule couche données change   │   │
-│  │  • Nouvel écran web : nouvelle couche présentation              │   │
-│  │  • Migration progressive possible                                │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  5. SCALABILITÉ                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │  • Répartition de charge par couche                              │   │
-│  │  • Instances multiples d'un service                              │   │
-│  │  • Optimisation ciblée                                           │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
+│                                                                         │
+│  1. Transaction pour récupérer les données existantes                   │
+│     dans VSAM (Situation Crédit EMPL)                                   │
+│                          │                                              │
+│                          ▼                                              │
+│  2. Valider des règles métier                                           │
+│     (Calculer et déduire la somme des Crédits)                          │
+│                          │                                              │
+│                          ▼                                              │
+│  3. Mettre à jour VSAM                                                  │
+│     (Data Set EMPLOYE et CREDIT-EMPLOYE)                                │
+│                          │                                              │
+│                          ▼                                              │
+│  4. Retour des résultats au Front-End                                   │
+│     (Afficher le résultat selon l'interface User)                       │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Exemple concret : évolution d'interface
+### Structures de données VSAM
+
+#### Data Set EMPLOYE
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `ID-EMPL` | X(4) numérique | Identifiant employé (clé) |
+| `NAME-EMPL` | X(15) | Nom de l'employé |
+| `DEPT-EMPL` | X(15) | Département |
+| `SALAIRE-EMPL` | 9(5)V9(2) | Salaire |
+| `ETAT-CRED-EMPL` | X | État crédit ('O' ou 'N') |
+
+#### Data Set CRE-EMP (CREDIT-EMPLOYE)
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `ID-EMPL` | X(4) numérique | Identifiant employé (clé) |
+| `LIB-CREDIT-EMPL` | X(20) | Libellé du crédit |
+| `MONTANT-CREDIT` | 9(5)V9(2) | Montant total du crédit |
+| `TOTAL MONTANT-ECHEANCE` | 9(5)V9(2) | Montant de l'échéance |
+| `RESTE-CREDIT` | 9(5)V9(2) | Reste à payer |
+
+### Schéma de l'application
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│         EXEMPLE : AJOUT D'UNE INTERFACE WEB                              │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  AVANT (Terminal 3270 uniquement)                                       │
-│  ─────────────────────────────────                                      │
-│                                                                          │
-│  ┌──────────┐      ┌──────────┐      ┌──────────┐                      │
-│  │ Terminal │ ───► │ Trait.   │ ───► │ Données  │                      │
-│  │   3270   │      │ (COBOL)  │      │ (VSAM)   │                      │
-│  └──────────┘      └──────────┘      └──────────┘                      │
-│                                                                          │
-│  APRÈS (Terminal 3270 + Interface Web)                                  │
-│  ──────────────────────────────────────                                 │
-│                                                                          │
-│  ┌──────────┐                                                           │
-│  │ Terminal │──────────┐                                                │
-│  │   3270   │          │                                                │
-│  └──────────┘          │                                                │
-│                        ▼                                                │
-│                   ┌──────────┐      ┌──────────┐                       │
-│                   │ Trait.   │ ───► │ Données  │                       │
-│                   │ (COBOL)  │      │ (VSAM)   │                       │
-│                   └──────────┘      └──────────┘                       │
-│                        ▲                                                │
-│  ┌──────────┐          │                                                │
-│  │  Web     │──────────┘                                                │
-│  │ (CICS WS)│  NOUVELLE couche présentation                            │
-│  └──────────┘  Traitement et Données INCHANGÉS !                       │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────┐
+│                    APPLICATION CICS - VSAM                            │
+├───────────────────────────────────────────────────────────────────────┤
+│                                                                        │
+│  ┌──────────────────┐                                                  │
+│  │   COUCHE DE      │  • Terminal 3270                                 │
+│  │   PRÉSENTATION   │  • Application Web via API RESTful               │
+│  │   (Front-End)    │                                                  │
+│  └────────┬─────────┘                                                  │
+│           │                                                            │
+│           │ API                                                        │
+│           ▼                                                            │
+│  ┌──────────────────┐                                                  │
+│  │   COUCHE MÉTIER  │  • CICS : Gestion des transactions RH            │
+│  │   (Logique       │  • TSI : Orchestration des actions complexes     │
+│  │    métier)       │    ou séquences de transactions                  │
+│  └────────┬─────────┘                                                  │
+│           │                                                            │
+│           │ CICS Commands                                              │
+│           ▼                                                            │
+│  ┌──────────────────┐                                                  │
+│  │   COUCHE DE      │                                                  │
+│  │   DONNÉES        │                                                  │
+│  │   (Backend)      │                                                  │
+│  │                  │                                                  │
+│  │  ┌────────────┐  ┌────────────┐                                     │
+│  │  │  EMPLOYE   │  │  CRE-EMP   │                                     │
+│  │  │   (VSAM)   │  │   (VSAM)   │                                     │
+│  │  │            │  │            │                                     │
+│  │  │ ID-EMPL    │  │ ID-EMPL    │                                     │
+│  │  │ NAME-EMPL  │  │ LIB-CREDIT │                                     │
+│  │  │ DEPT-EMPL  │  │ MONTANT    │                                     │
+│  │  │ SALAIRE    │  │ ECHEANCE   │                                     │
+│  │  │ ETAT-CRED  │  │ RESTE      │                                     │
+│  │  └────────────┘  └────────────┘                                     │
+│  │                                                                     │
+│  │  Commandes: READ, WRITE, REWRITE, DELETE                            │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                        │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
-### Inconvénients à considérer
-
-| Inconvénient | Impact | Mitigation |
-|--------------|--------|------------|
-| **Complexité initiale** | Plus de programmes à créer | Templates et générateurs |
-| **Overhead d'appels** | Latence supplémentaire | Regrouper les appels |
-| **Courbe d'apprentissage** | Formation nécessaire | Documentation claire |
-| **Debugging** | Trace sur plusieurs programmes | Journalisation centralisée |
+---
 
 ## Résumé du chapitre
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    CHAPITRE IV - RÉSUMÉ                                  │
+│                    CHAPITRE IV - RÉSUMÉ                                 │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  IV-1 PRÉSENTATION GÉNÉRALE                                             │
-│       • Évolution : Monolithique → Client-Serveur → Multicouches       │
+│                                                                         │
+│  IV-1 PRÉSENTATION GÉNÉRALE                                            │
+│       • Architecture n-tiers : séparation des préoccupations           │
 │       • Architecture 3 tiers : Présentation / Traitement / Données     │
-│       • Séparation des responsabilités                                  │
-│                                                                          │
-│  IV-2 STRUCTURE DE L'ARCHITECTURE                                       │
-│       • Couche Présentation :                                           │
-│         - Écrans BMS, SEND/RECEIVE MAP                                 │
-│         - Validation de format, gestion des touches                    │
-│       • Couche Traitement :                                             │
-│         - Logique métier, règles de gestion                            │
-│         - Calculs, validations fonctionnelles                          │
-│       • Couche Données :                                                │
-│         - Accès VSAM, DB2, IMS                                         │
-│         - CRUD (Create, Read, Update, Delete)                          │
-│                                                                          │
-│  IV-3 TRANSACTIONS TSI                                                   │
-│       • Interface standardisée entre couches                            │
-│       • COMMAREA normalisée avec en-tête et données                    │
-│       • Mécanismes : LINK (sync), START (async), Channels              │
-│       • Routage vers les services appropriés                           │
-│                                                                          │
-│  IV-4 AVANTAGES                                                          │
-│       • Maintenabilité : modifications localisées                       │
-│       • Réutilisabilité : services partagés                            │
-│       • Testabilité : tests unitaires par couche                       │
-│       • Évolutivité : remplacement de couche facilité                  │
-│       • Scalabilité : optimisation ciblée                              │
-│                                                                          │
-│  BONNES PRATIQUES                                                        │
-│       • Définir des interfaces claires (COMMAREA/Channels)             │
-│       • Documenter les services disponibles                             │
-│       • Pas de logique métier dans la présentation                     │
-│       • Pas d'accès données dans le traitement                         │
-│                                                                          │
+│       • Transactions TSI pour orchestration                            │
+│                                                                         │
+│  IV-2 STRUCTURE DE L'ARCHITECTURE                                      │
+│       • Couche Présentation : Terminal 3270, Web, API                  │
+│       • Couche Traitement : CICS + TSI                                 │
+│       • Couche Données : VSAM, DB2                                     │
+│                                                                         │
+│  IV-3 LES TROIS COUCHES                                                │
+│       • Présentation : interface utilisateur                           │
+│       • Traitement : logique métier, CICS, TSI                         │
+│       • Données : READ, WRITE, REWRITE, DELETE                         │
+│                                                                         │
+│  IV-4 TSI - TRANSACTION SCRIPTING INTERFACE                            │
+│       • Modules : TSIINIT, TSIFINI, TSISEND, TSIRECEIVE, VERIFY        │
+│       • Commandes EXEC TSI : ALLOC, CONNECT, SEND, RECEIVE,            │
+│         VERIFY, DISCONNECT, FREE                                        │
+│       • Tests automatisés et simulation de charges                     │
+│                                                                         │
+│  IV-5 EXEMPLE PROGRAMME TSI                                            │
+│       • Initialisation (ALLOC, CONNECT)                                │
+│       • LOGON, exécution transaction, VERIFY                           │
+│       • Finalisation (DISCONNECT, FREE)                                │
+│       • JCL précompilation et exécution                                │
+│                                                                         │
+│  IV-6 AVANTAGES                                                        │
+│       • Modularité et réutilisabilité                                  │
+│       • Scalabilité horizontale et verticale                           │
+│       • Facilité de maintenance et testabilité                         │
+│       • Flexibilité technologique                                      │
+│       • Sécurité améliorée                                             │
+│       • Support architectures distribuées                              │
+│                                                                         │
+│  IV-7 EXEMPLE PRATIQUE                                                 │
+│       • Application gestion employés avec VSAM                         │
+│       • Data Sets EMPLOYE et CRE-EMP                                   │
+│       • Flux de traitement complet                                     │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Glossaire
+
+| Terme | Définition |
+|-------|------------|
+| **CICS** | Customer Information Control System - Système de gestion de transactions IBM |
+| **VSAM** | Virtual Storage Access Method - Méthode d'accès aux fichiers IBM |
+| **TSI** | Transaction Scripting Interface - Interface de script pour transactions CICS |
+| **ACID** | Atomicité, Cohérence, Isolation, Durabilité - Propriétés des transactions |
+| **n-tiers** | Architecture à plusieurs couches |
+| **3270** | Terminal IBM pour interaction avec mainframe |
+| **DB2** | Système de gestion de base de données relationnelle IBM |
+| **JCL** | Job Control Language - Langage de contrôle des jobs sur mainframe |
+| **COBOL** | Common Business-Oriented Language - Langage de programmation mainframe |
 
 ---
 
