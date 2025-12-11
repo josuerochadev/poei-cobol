@@ -109,7 +109,9 @@
                RESP(WS-RESP)
            END-EXEC
 
-           IF WS-RESP = DFHRESP(NORMAL)
+      *    EOC (End Of Chain) est normal pour RECEIVE terminal
+           IF WS-RESP = DFHRESP(NORMAL) OR
+              WS-RESP = DFHRESP(EOC)
       *        Extraire l'ID (apres 'CRED ')
                IF WS-INPUT-LEN > 5
                    MOVE WS-INPUT-DATA(6:6) TO WS-ID-EMPL
