@@ -112,9 +112,12 @@
       *    EOC (End Of Chain) est normal pour RECEIVE terminal
            IF WS-RESP = DFHRESP(NORMAL) OR
               WS-RESP = DFHRESP(EOC)
-      *        Extraire l'ID (apres 'CRED ')
-               IF WS-INPUT-LEN > 5
-                   MOVE WS-INPUT-DATA(6:6) TO WS-ID-EMPL
+      *        Extraire l'ID : 'CRED EMP001' -> position 6 = espace
+      *        L'ID commence en position 6 (apres 'CRED ')
+      *        Chercher le premier caractere non-espace apres CRED
+               IF WS-INPUT-LEN > 4
+                   MOVE FUNCTION TRIM(WS-INPUT-DATA(5:))
+                       TO WS-ID-EMPL
                END-IF
            END-IF.
 
@@ -358,6 +361,10 @@
       * 9000-FIN-PROGRAMME : Retour CICS
       ******************************************************************
        9000-FIN-PROGRAMME.
+
+      *--- Envoyer la page accumulee avant de terminer ---
+           EXEC CICS SEND PAGE
+           END-EXEC
 
            EXEC CICS RETURN
            END-EXEC.
