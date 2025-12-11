@@ -3,16 +3,18 @@
       * Transaction : CRED
       * Fonction  : Gestion des credits employes (version simplifiee)
       *
+      * Usage : CRED EMP001  (saisir ID apres la transaction)
+      *
       * Description :
-      * 1. Lire ID-EMPL (saisi au niveau programme)
+      * 1. Recevoir ID-EMPL saisi par l'utilisateur
       * 2. Verifier si l'employe a un credit (ETAT-CRED-EMPL = 'Y')
       * 3. Lire les informations credit dans CRE-EMP
       * 4. Payer une echeance et mettre a jour RESTE-CREDIT
       *    Si RESTE-CREDIT = 0, positionner ETAT-CRED-EMPL a 'N'
       *
       * Fichiers VSAM :
-      * - EMPLOYE : Informations employes (KSDS, cle 6 car)
-      * - CREDEMP : Informations credits (KSDS, cle 6 car)
+      * - EMPLOYE : Informations employes (KSDS, cle 6 car, 80 oct)
+      * - CREDEMP : Informations credits (KSDS, cle 6 car, 40 oct)
       *
       * Auteur    : Formation CICS
       * Date      : 2024
@@ -27,30 +29,32 @@
        01  WS-RESP                 PIC S9(8) COMP VALUE 0.
        01  WS-RESP2                PIC S9(8) COMP VALUE 0.
 
-      *--- Cle de recherche ---
-       01  WS-ID-EMPL              PIC X(6) VALUE 'EMP001'.
+      *--- Zone de saisie ---
+       01  WS-INPUT-DATA           PIC X(80) VALUE SPACES.
+       01  WS-INPUT-LEN            PIC S9(4) COMP VALUE 80.
+       01  WS-ID-EMPL              PIC X(6) VALUE SPACES.
 
-      *--- Structure EMPLOYE (52 octets) ---
+      *--- Structure EMPLOYE (80 octets) - Format DISPLAY ---
        01  WS-EMPLOYE.
            05  EMP-ID              PIC X(6).
            05  EMP-NAME            PIC X(30).
            05  EMP-DEPT            PIC X(10).
-           05  EMP-SALAIRE         PIC 9(7)V99 COMP-3.
+           05  EMP-SALAIRE         PIC 9(7)V99.
            05  EMP-ETAT-CRED       PIC X(1).
                88  EMP-A-CREDIT    VALUE 'Y'.
                88  EMP-SANS-CREDIT VALUE 'N'.
+           05  EMP-FILLER          PIC X(24).
 
-      *--- Structure CREDIT (40 octets) ---
+      *--- Structure CREDIT (40 octets) - Format DISPLAY ---
        01  WS-CREDIT.
            05  CRD-ID-EMPL         PIC X(6).
            05  CRD-LIBELLE         PIC X(20).
-           05  CRD-MONTANT-TOTAL   PIC 9(7)V99 COMP-3.
-           05  CRD-MONTANT-ECH     PIC 9(5)V99 COMP-3.
-           05  CRD-RESTE           PIC 9(7)V99 COMP-3.
+           05  CRD-MONTANT-TOTAL   PIC 9(7)V99.
+           05  CRD-MONTANT-ECH     PIC 9(5)V99.
+           05  CRD-RESTE           PIC 9(7)V99.
 
       *--- Zone message pour affichage ---
        01  WS-MESSAGE              PIC X(79) VALUE SPACES.
-       01  WS-LIGNE                PIC X(79) VALUE SPACES.
 
       *--- Variables de travail pour affichage ---
        01  WS-SALAIRE-EDIT         PIC ZZZ,ZZ9.99.
@@ -65,6 +69,15 @@
       * 0000-PRINCIPAL : Point d'entree du programme
       ******************************************************************
        0000-PRINCIPAL.
+
+           PERFORM 0100-RECEVOIR-ID
+
+           IF WS-ID-EMPL = SPACES
+               MOVE 'Usage: CRED EMP001 (saisir ID employe)'
+                   TO WS-MESSAGE
+               PERFORM 9100-AFFICHER-MESSAGE
+               PERFORM 9000-FIN-PROGRAMME
+           END-IF
 
            PERFORM 1000-LIRE-EMPLOYE
 
@@ -84,6 +97,24 @@
            END-IF
 
            PERFORM 9000-FIN-PROGRAMME.
+
+      ******************************************************************
+      * 0100-RECEVOIR-ID : Reception de l'ID employe saisi
+      ******************************************************************
+       0100-RECEVOIR-ID.
+
+           EXEC CICS RECEIVE
+               INTO(WS-INPUT-DATA)
+               LENGTH(WS-INPUT-LEN)
+               RESP(WS-RESP)
+           END-EXEC
+
+           IF WS-RESP = DFHRESP(NORMAL)
+      *        Extraire l'ID (apres 'CRED ')
+               IF WS-INPUT-LEN > 5
+                   MOVE WS-INPUT-DATA(6:6) TO WS-ID-EMPL
+               END-IF
+           END-IF.
 
       ******************************************************************
       * 1000-LIRE-EMPLOYE : Lecture fichier EMPLOYE par cle
