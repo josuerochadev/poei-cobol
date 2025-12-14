@@ -9,7 +9,7 @@ Ce dossier contient les exercices pratiques organisés par module.
 | [Z/OS et TSO](zos-tso/) | Exercices TSO, commandes système | 14 exercices |
 | [JCL](jcl/) | Exercices JCL (chapitres 02 à 05) | 24 exercices |
 | [COBOL](cobol/) | Exercices COBOL (chapitres 02 à 12) | 61 programmes |
-| [CICS](cics/) | TP Commande READ + TP Gestion des Crédits | 2 TPs |
+| [CICS](cics/) | QCM + TP pratiques + TP Gestion des Credits | 93 exercices |
 | [DB2/SQL](db2/) | QCM + TP SQL + DDL/DML | 144 exercices |
 
 ## Organisation
@@ -41,7 +41,10 @@ exercices/
 │   └── chapitre-12/    # Impression, édition
 │
 ├── cics/
-│   └── tp-gestion-credits/   # TP complet architecture 3 tiers
+│   ├── theorie/              # QCM (82 questions)
+│   ├── pratique/             # Exercices BMS, COBOL, JCL (10 exercices)
+│   ├── tp-gestion-credits/   # TP complet (transaction CRED)
+│   └── fil-rouge/            # Projet fil rouge (a venir)
 │
 └── db2/                      # Exercices DB2/SQL
     ├── theorie/              # QCM (71 questions)

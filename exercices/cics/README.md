@@ -1,186 +1,107 @@
 # Exercices CICS
 
-## Présentation
-
-Ce dossier contient les exercices pratiques pour le module CICS, organisés par chapitre.
+Ce module contient les exercices et travaux pratiques pour CICS.
 
 ## Structure
 
 ```
 cics/
-├── chapitre-05/           # TP Couche Présentation (BMS, CEDF, CEDA)
-│   ├── bms/MAPTEST.bms    # Exemple de MAP simple
-│   ├── jcl/               # JCL d'assemblage et compilation
-│   └── README.md
+├── README.md                  # Ce fichier
 │
-├── chapitre-06/           # TP Couche Traitement (READ, WRITE, REWRITE, DELETE)
-│   ├── bms/TESTSET.bms    # Mapset pour les exercices
-│   ├── cobol/             # PROGREAD, PROGWRIT, PROGREWT, PROGDELT
-│   ├── copybooks/         # MAPTEST.cpy
-│   ├── jcl/               # Définition et chargement VSAM
-│   └── README.md
+├── theorie/                   # QCM et questions conceptuelles
+│   ├── qcm-01-presentation.md
+│   ├── qcm-02-organisation.md
+│   ├── qcm-03-architecture.md
+│   ├── qcm-04-presentation.md
+│   ├── qcm-05-traitement.md
+│   └── qcm-06-donnees.md
 │
-├── chapitre-07/           # TP Couche Données (Browse, Transactions)
-│   └── README.md          # Exercices théoriques à développer
+├── pratique/                  # Exercices pratiques
+│   ├── bms/                   # Ecrans BMS
+│   ├── cobol/                 # Programmes COBOL-CICS
+│   ├── copybooks/             # Copybooks
+│   └── jcl/                   # Jobs JCL
 │
-└── tp-gestion-credits/    # TP complet : Programme CICS simplifié
-    ├── cobol/PROGCRED.cbl # Programme principal (SEND TEXT, pas de BMS)
-    ├── copybooks/         # Structures de données
-    ├── data/              # Données de test
-    ├── jcl/               # Définition VSAM et compilation
-    └── README.md
+├── tp-gestion-credits/        # TP complet (Transaction CRED)
+│   ├── cobol/
+│   ├── copybooks/
+│   ├── data/
+│   └── jcl/
+│
+└── fil-rouge/                 # Projet fil rouge (a venir)
 ```
 
-## Travaux Pratiques disponibles
+## Contenu detaille
 
-| TP | Titre | Description | Niveau |
-|----|-------|-------------|--------|
-| [chapitre-05](chapitre-05/) | Couche Présentation | BMS, CEDF, CEDA | Débutant |
-| [chapitre-06](chapitre-06/) | Couche Traitement | READ, WRITE, REWRITE, DELETE | Intermédiaire |
-| [chapitre-07](chapitre-07/) | Couche Données | Browse VSAM, SYNCPOINT (théorique) | Avancé |
-| [tp-gestion-credits](tp-gestion-credits/) | Gestion des Crédits | Application complète (version simplifiée) | Intermédiaire |
+### Theorie (82 questions)
 
----
+| QCM | Chapitre | Questions |
+|-----|----------|-----------|
+| [QCM 01](theorie/qcm-01-presentation.md) | Presentation generale | 10 |
+| [QCM 02](theorie/qcm-02-organisation.md) | Organisation systeme | 12 |
+| [QCM 03](theorie/qcm-03-architecture.md) | Architecture multicouches | 15 |
+| [QCM 04](theorie/qcm-04-presentation.md) | Couche Presentation (BMS) | 15 |
+| [QCM 05](theorie/qcm-05-traitement.md) | Couche Traitement | 15 |
+| [QCM 06](theorie/qcm-06-donnees.md) | Couche Donnees | 15 |
 
-## Exercices de compréhension (Chapitres 1-4)
+### Pratique (10 exercices)
 
-### Chapitre I - Présentation générale
+| Theme | Exercices | Description |
+|-------|-----------|-------------|
+| BMS | 2 | MAPTEST, TESTSET (ecrans) |
+| COBOL | 4 | PROGREAD, PROGWRIT, PROGREWT, PROGDELT |
+| JCL | 4 | Assemblage MAP, Compilation, VSAM |
 
-1. **Question** : Quelle est la différence entre le traitement BATCH et ONLINE ?
-2. **Question** : Qu'est-ce qu'une LUW (Logical Unit of Work) ?
-3. **Question** : Expliquez le concept de pseudo-conversation.
-4. **Question** : Combien de caractères contient un écran 3270 standard (24x80) ?
+Voir [pratique/README.md](pratique/README.md) pour les details.
 
-### Chapitre II - Organisation du système
+### TP Gestion Credits (1 TP)
 
-1. **Question** : Citez les 5 Control Programs principaux de CICS et leur rôle.
-2. **Question** : Quelle table CICS contient la définition des transactions ?
-3. **Question** : Qu'est-ce que la TIOA et quel est son rôle ?
-4. **Question** : Décrivez les 5 méthodes de lancement d'une transaction.
-5. **Question** : Quels champs de l'EIB permettent d'identifier la transaction et le terminal ?
+Application CICS simplifiee demonstrant l'utilisation de READ/REWRITE avec SEND TEXT.
 
-### Chapitre III - SGBD IMS
+| Composant | Description |
+|-----------|-------------|
+| Transaction | CRED |
+| Programme | PROGCRED.cbl |
+| Fichiers VSAM | EMPLOYE, CRE-EMP |
 
-1. **Question** : Quelle est la différence entre un SGBD hiérarchique et relationnel ?
-2. **Question** : Dans IMS, qu'est-ce qu'un segment ?
-3. **Question** : Citez 2 avantages et 2 inconvénients du modèle hiérarchique.
-4. **Question** : Qu'est-ce que l'IMS Transaction Manager (IMS TM) ?
+Voir [tp-gestion-credits/README.md](tp-gestion-credits/README.md) pour les details.
 
-### Chapitre IV - Programmation CICS
-
-1. **Question** : Quelle est la syntaxe générale d'une commande CICS ?
-2. **Question** : À quoi servent les options RESP et RESP2 ?
-3. **Question** : Que se passe-t-il si on ne gère pas les codes retour ?
-4. **Question** : Quelle est la constante COBOL pour un code retour normal ?
-
----
-
-## TP Chapitre 05 - Couche Présentation
-
-Ce TP met en pratique la création d'écrans BMS et l'utilisation des outils CEDF et CEDA.
-
-### Objectifs
-
-- Créer un MAPSET BMS simple
-- Utiliser CEDF pour déboguer un programme
-- Installer une application avec CEDA
-
-### Exercices
-
-1. **Exercice 1** : Créer une MAP d'accueil avec message "BIENVENUE"
-2. **Exercice 2** : Utiliser CEDF pour tracer l'exécution d'une transaction
-3. **Exercice 3** : Installer un programme et une transaction avec CEDA
-
-→ [Voir les détails](chapitre-05/)
-
----
-
-## TP Chapitre 06 - Couche Traitement
-
-Ce TP met en pratique les 4 commandes CICS de manipulation de fichiers VSAM.
-
-### Objectifs
-
-- Maîtriser READ, WRITE, REWRITE, DELETE
-- Gérer les codes retour (RESP/RESP2)
-- Comprendre la séquence READ UPDATE → REWRITE
-
-### Programmes fournis
-
-| Programme | Transaction | Commande | Description |
-|-----------|-------------|----------|-------------|
-| PROGREAD | READ | READ | Lecture par clé |
-| PROGWRIT | WRIT | WRITE | Création d'enregistrement |
-| PROGREWT | REWT | REWRITE | Mise à jour |
-| PROGDELT | DELT | DELETE | Suppression |
-
-→ [Voir les détails](chapitre-06/)
-
----
-
-## TP Chapitre 07 - Couche Données
-
-Ce TP présente le parcours de fichiers VSAM et la gestion des transactions.
-
-### Objectifs
-
-- Maîtriser STARTBR, READNEXT, READPREV, ENDBR
-- Comprendre SYNCPOINT et ROLLBACK
-- Implémenter un parcours séquentiel
-
-### Exercices (à développer)
-
-1. **Exercice 1** : Parcours complet d'un fichier VSAM
-2. **Exercice 2** : Affichage paginé (10 enregistrements par page)
-3. **Exercice 3** : Transaction avec SYNCPOINT (virement entre comptes)
-
-→ [Voir les détails](chapitre-07/)
-
----
-
-## TP Complet - Gestion des Crédits
-
-Application CICS simplifiée démontrant l'utilisation de READ/REWRITE avec SEND TEXT.
-
-### Fonctionnalités
-
-- Consultation d'un employé
-- Affichage des détails de son crédit
-- Paiement d'une échéance
-- Solde automatique du crédit
-
-### Architecture simplifiée
+## Progression recommandee
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                      TRANSACTION CRED                         │
-├──────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌─────────────────────────────────────────────────────────┐ │
-│  │  PROGCRED.cbl                                           │ │
-│  │  • Affichage via SEND TEXT (pas de BMS)                │ │
-│  │  • Lecture/Mise à jour VSAM directe                    │ │
-│  │  • Logique métier intégrée                             │ │
-│  └─────────────────────┬───────────────────────────────────┘ │
-│                        │                                      │
-│              ┌─────────┴─────────┐                           │
-│              ▼                   ▼                            │
-│        ┌──────────┐        ┌──────────┐                      │
-│        │ EMPLOYE  │        │ CRE-EMP  │                      │
-│        │  (VSAM)  │        │  (VSAM)  │                      │
-│        └──────────┘        └──────────┘                      │
-│                                                               │
-└──────────────────────────────────────────────────────────────┘
+1. THEORIE
+   QCM 01 → QCM 02 → QCM 03 → QCM 04 → QCM 05 → QCM 06
+   (Valider la comprehension des concepts)
+
+2. PRATIQUE BMS
+   MAPTEST → Comprendre les ecrans CICS
+   (Maitriser SEND MAP / RECEIVE MAP)
+
+3. PRATIQUE VSAM
+   PROGREAD → PROGWRIT → PROGREWT → PROGDELT
+   (Maitriser les commandes fichier)
+
+4. TP GESTION CREDITS
+   Application complete avec SEND TEXT
+   (Integration de tous les concepts)
+
+5. FIL ROUGE
+   Application complete (a venir)
 ```
 
-→ [Voir les détails](tp-gestion-credits/)
+## Outils CICS utiles
 
----
+| Transaction | Description |
+|-------------|-------------|
+| CEDF | Debugger interactif |
+| CEDA | Definition de ressources |
+| CEMT | Administration |
+| CEBR | Browse des TS Queues |
 
-## Prérequis
+## Prerequis
 
-- Avoir complété les exercices du module COBOL
-- Avoir lu les chapitres 01 à 07 du cours CICS
+- Avoir complete les exercices du module COBOL
+- Avoir lu les chapitres 01 a 07 du cours CICS
 - Comprendre les commandes CICS de base
 
 ## Navigation
@@ -188,5 +109,12 @@ Application CICS simplifiée démontrant l'utilisation de READ/REWRITE avec SEND
 - [Cours CICS](../../cours/cics/)
 - [Chapitre VIII - Travaux Pratiques](../../cours/cics/08-travaux-pratiques.md)
 
+## Total
+
+- **82 questions** theoriques (QCM)
+- **10 exercices** pratiques
+- **1 TP** complet (CRED)
+- **93 exercices** au total
+
 ---
-*Formation COBOL - Module CICS*
+*Formation CICS - M2i Formation*
