@@ -1,115 +1,105 @@
-# Exercices DB2/SQL - Interrogation d'une base de donnees
+# Exercices DB2/SQL
 
-Ce dossier contient les travaux pratiques SQL pour interroger une base de donnees relationnelle.
+Ce module contient les exercices et travaux pratiques pour DB2/SQL.
 
-## Contexte
-
-L'entreprise **Humania Services** souhaite mettre en place une base de donnees pour gerer :
-- Les employes
-- Les departements
-- La grille des salaires selon le grade
-
-## Structure de la base de donnees
+## Structure
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    SCHEMA DE LA BASE                             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  DEPT                    EMPLOYEE                SAL_GRILLE     │
-│  ┌──────────────┐        ┌──────────────┐        ┌───────────┐  │
-│  │ DEPT_NUM (PK)│◄───────│ DEPT_NUM (FK)│        │ GRADE (PK)│  │
-│  │ DEPT_NOM     │        │ EMP_NUM (PK) │        │ MIN_SAL   │  │
-│  │ LOC          │        │ EMP_NOM      │        │ MAX_SAL   │  │
-│  └──────────────┘        │ POSTE        │        └───────────┘  │
-│                          │ DIR (FK auto)│                       │
-│                          │ DATE_EMB     │                       │
-│                          │ SAL          │                       │
-│                          │ COMM         │                       │
-│                          └──────────────┘                       │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+db2/
+├── README.md              # Ce fichier
+│
+├── theorie/               # QCM et questions conceptuelles
+│   ├── qcm-01-fondamentaux.md
+│   ├── qcm-02-architecture.md
+│   ├── qcm-03-modelisation.md
+│   ├── qcm-04-modele-relationnel.md
+│   └── qcm-05-sql.md
+│
+├── tp/                    # Travaux Pratiques (formatrice)
+│   ├── 00-schema/         # Scripts de creation des tables
+│   ├── activite-01-select/
+│   ├── activite-02-selection-tri/
+│   ├── activite-04-jointures/
+│   ├── activite-05-operateurs-ensemblistes/
+│   ├── activite-06-fonctions-groupe/
+│   └── activite-07-sous-requetes/
+│
+├── pratique/              # Exercices complementaires
+│   ├── exercices-ddl.sql  # CREATE, ALTER, DROP
+│   └── exercices-dml.sql  # INSERT, UPDATE, DELETE
+│
+└── fil-rouge/             # Projet fil rouge (a venir)
 ```
 
-## Fichiers disponibles
+## Contenu detaille
 
-| Fichier | Description | Exercices |
-|---------|-------------|-----------|
-| [00-creation-tables.sql](00-creation-tables.sql) | Scripts DDL et INSERT | - |
-| [Activite 1](activite-01-select-elementaire.md) | SELECT elementaire | 6 questions |
-| [Activite 2](activite-02-selection-tri.md) | Selection et tri (WHERE, ORDER BY) | 12 questions |
-| [Activite 4](activite-04-jointures.md) | Jointures (JOIN, LEFT JOIN, Self-join) | 11 questions |
-| [Activite 5](activite-05-operateurs-ensemblistes.md) | Operateurs ensemblistes (UNION, INTERSECT, EXCEPT) | 5 questions |
-| [Activite 6](activite-06-fonctions-groupe.md) | Fonctions de groupe (COUNT, SUM, AVG, GROUP BY, HAVING) | 7 questions |
-| [Activite 7](activite-07-sous-requetes.md) | Sous-requetes (IN, ANY, ALL, EXISTS, correlees) | 15 questions |
+### Theorie (71 questions)
 
-**Total : 56 exercices corriges**
+| QCM | Chapitre | Questions |
+|-----|----------|-----------|
+| [QCM 01](theorie/qcm-01-fondamentaux.md) | Fondamentaux BD | 15 |
+| [QCM 02](theorie/qcm-02-architecture.md) | Architecture DB2 | 12 |
+| [QCM 03](theorie/qcm-03-modelisation.md) | Modelisation | 12 |
+| [QCM 04](theorie/qcm-04-modele-relationnel.md) | Modele relationnel | 12 |
+| [QCM 05](theorie/qcm-05-sql.md) | Langage SQL | 20 |
 
-## Donnees de test
+### Travaux Pratiques (56 exercices SQL)
 
-### Table DEPT (4 lignes)
+| Activite | Theme | Questions |
+|----------|-------|-----------|
+| [Activite 1](tp/activite-01-select/) | SELECT elementaire | 6 |
+| [Activite 2](tp/activite-02-selection-tri/) | WHERE, ORDER BY | 12 |
+| [Activite 4](tp/activite-04-jointures/) | Jointures | 11 |
+| [Activite 5](tp/activite-05-operateurs-ensemblistes/) | UNION, INTERSECT, EXCEPT | 5 |
+| [Activite 6](tp/activite-06-fonctions-groupe/) | GROUP BY, HAVING | 7 |
+| [Activite 7](tp/activite-07-sous-requetes/) | Sous-requetes | 15 |
 
-| DEPT_NUM | DEPT_NOM | LOC |
-|----------|----------|-----|
-| 10 | COMPTABILITE | MARSEILLE |
-| 20 | RECHERCHE | STRASBOURG |
-| 30 | VENTES | LYON |
-| 40 | EXPLOITATION | PARIS |
+### Pratique (20 exercices complementaires)
 
-### Table EMPLOYEE (14 lignes)
+| Fichier | Theme | Exercices |
+|---------|-------|-----------|
+| [exercices-ddl.sql](pratique/exercices-ddl.sql) | DDL (CREATE, ALTER, DROP) | 7 |
+| [exercices-dml.sql](pratique/exercices-dml.sql) | DML (INSERT, UPDATE, DELETE) | 10 |
+| Transactions | COMMIT, ROLLBACK | 3 |
 
-| EMP_NUM | EMP_NOM | POSTE | DIR | SAL | DEPT_NUM |
-|---------|---------|-------|-----|-----|----------|
-| 7369 | ARTHUR | AGENT | 7902 | 800.00 | 20 |
-| 7499 | PAUL | VENDEUR | 7698 | 1600.00 | 30 |
-| 7521 | JEAN | VENDEUR | 7698 | 1250.00 | 30 |
-| ... | ... | ... | ... | ... | ... |
-| 7839 | HENRI | PDG | NULL | 5000.00 | 10 |
+## Progression recommandee
 
-### Table SAL_GRILLE (5 lignes)
+```
+1. THEORIE
+   QCM 01 → QCM 02 → QCM 03 → QCM 04 → QCM 05
+   (Valider la comprehension des concepts)
 
-| GRADE | MIN_SAL | MAX_SAL |
-|-------|---------|---------|
-| 1 | 700.00 | 1200.00 |
-| 2 | 1201.00 | 1400.00 |
-| 3 | 1401.00 | 2000.00 |
-| 4 | 2001.00 | 3000.00 |
-| 5 | 3001.00 | 9999.00 |
+2. PRATIQUE DDL/DML
+   exercices-ddl.sql → exercices-dml.sql
+   (Pratiquer CREATE, INSERT, UPDATE, DELETE)
 
-## Utilisation sur z/OS
+3. TRAVAUX PRATIQUES
+   Activite 1 → 2 → 4 → 5 → 6 → 7
+   (Maitriser SELECT et ses fonctionnalites)
 
-### Configuration SPUFI
+4. FIL ROUGE
+   Application complete (a venir)
+```
 
-1. Creer les datasets :
-   - `userid.DB2.ISPUFI` (input) : FB, LRECL=80, BLKSIZE=3120
-   - `userid.DB2.OSPUFI` (output) : VB, LRECL=4092, BLKSIZE=4096
+## Base de donnees de test
 
-2. Acceder a SPUFI : `=M.DB2` puis option 1
+Les TP utilisent les tables EMPLOYEE, DEPT et SAL_GRILLE.
+Scripts disponibles dans [tp/00-schema/](tp/00-schema/).
 
-3. Configurer :
-   ```
-   1 DATA SET NAME ... ===> 'userid.DB2.ISPUFI'
-   4 DATA SET NAME ... ===> 'userid.DB2.OSPUFI'
-   6 EDIT INPUT  ... ===> YES
-   7 EXECUTE     ... ===> YES
-   8 AUTOCOMMIT  ... ===> YES
-   9 BROWSE OUTPUT .. ===> YES
-   ```
+### Tables
 
-## Competences couvertes
+| Table | Description | Lignes |
+|-------|-------------|--------|
+| DEPT | Departements | 4 |
+| EMPLOYEE | Employes | 14 |
+| SAL_GRILLE | Grille des salaires | 5 |
 
-- SELECT, FROM, WHERE
-- Operateurs : =, <>, <, >, BETWEEN, IN, LIKE, IS NULL
-- Alias de colonnes et de tables
-- Concatenation (||)
-- ORDER BY (ASC, DESC)
-- DISTINCT
-- INNER JOIN, LEFT OUTER JOIN, RIGHT OUTER JOIN
-- Auto-jointure (self-join)
-- UNION, INTERSECT, EXCEPT
-- COUNT, SUM, AVG, MIN, MAX
-- GROUP BY, HAVING
-- Sous-requetes
+## Total
+
+- **71 questions** theoriques (QCM)
+- **56 exercices** SQL (TP)
+- **20 exercices** complementaires (DDL/DML)
+- **147 exercices** au total
 
 ---
 *Formation DB2/SQL - M2i Formation*
