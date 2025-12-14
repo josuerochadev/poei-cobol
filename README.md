@@ -27,15 +27,27 @@ poei-cobol/
 │   │   ├── ...
 │   │   └── 12-fichier-impression.md
 │   │
-│   └── cics/               # Module CICS (8 chapitres)
-│       ├── 01-presentation-generale.md
-│       ├── 02-organisation-systeme.md
-│       ├── 03-sgbd-ims.md
-│       ├── 04-architecture-multicouches.md
-│       ├── 05-couche-presentation.md
-│       ├── 06-couche-traitement.md
-│       ├── 07-couche-donnees.md
-│       └── 08-travaux-pratiques.md
+│   ├── cics/               # Module CICS (8 chapitres)
+│   │   ├── 01-presentation-generale.md
+│   │   ├── 02-organisation-systeme.md
+│   │   ├── 03-sgbd-ims.md
+│   │   ├── 04-architecture-multicouches.md
+│   │   ├── 05-couche-presentation.md
+│   │   ├── 06-couche-traitement.md
+│   │   ├── 07-couche-donnees.md
+│   │   └── 08-travaux-pratiques.md
+│   │
+│   └── db2/                # Module DB2/SQL (10 chapitres)
+│       ├── 01-fondamentaux-bd.md
+│       ├── 02-architecture-db2.md
+│       ├── 03-modelisation.md
+│       ├── 04-modele-relationnel.md
+│       ├── 05-types-db2i.md
+│       ├── 06-sql-ddl.md
+│       ├── 07-sql-dml.md
+│       ├── 08-sql-select.md
+│       ├── 09-sql-avance.md
+│       └── 10-embedded-sql.md
 │
 ├── exercices/              # Exercices par module
 │   ├── zos-tso/            # Exercices TSO/ISPF
@@ -114,6 +126,21 @@ poei-cobol/
 | VI | Couche de Traitement | ✅ | - |
 | VII | Couche des Données | ✅ | - |
 | VIII | Travaux Pratiques | ✅ | ✅ |
+
+### Module DB2/SQL
+
+| Chapitre | Sujet | Cours | Exercices |
+|----------|-------|-------|-----------|
+| I | Fondamentaux des bases de données | ✅ | - |
+| II | Architecture DB2 | ✅ | - |
+| III | Modélisation des données | ✅ | - |
+| IV | Modèle relationnel | ✅ | - |
+| V | Types de données et DB2I | ✅ | - |
+| VI | SQL DDL (CREATE, ALTER, DROP) | ✅ | - |
+| VII | SQL DML (INSERT, UPDATE, DELETE) | ✅ | - |
+| VIII | SQL SELECT et Jointures | ✅ | - |
+| IX | Agrégations et Sous-requêtes | ✅ | - |
+| X | Embedded SQL COBOL | ✅ | - |
 
 ## Environnement
 
