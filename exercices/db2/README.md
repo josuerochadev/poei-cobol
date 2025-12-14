@@ -54,13 +54,12 @@ db2/
 | [Activite 6](tp/activite-06-fonctions-groupe/) | GROUP BY, HAVING | 7 |
 | [Activite 7](tp/activite-07-sous-requetes/) | Sous-requetes | 15 |
 
-### Pratique (20 exercices complementaires)
+### Pratique (17 exercices complementaires)
 
 | Fichier | Theme | Exercices |
 |---------|-------|-----------|
 | [exercices-ddl.sql](pratique/exercices-ddl.sql) | DDL (CREATE, ALTER, DROP) | 7 |
-| [exercices-dml.sql](pratique/exercices-dml.sql) | DML (INSERT, UPDATE, DELETE) | 10 |
-| Transactions | COMMIT, ROLLBACK | 3 |
+| [exercices-dml.sql](pratique/exercices-dml.sql) | DML + Transactions | 10 |
 
 ## Progression recommandee
 
@@ -98,8 +97,8 @@ Scripts disponibles dans [tp/00-schema/](tp/00-schema/).
 
 - **71 questions** theoriques (QCM)
 - **56 exercices** SQL (TP)
-- **20 exercices** complementaires (DDL/DML)
-- **147 exercices** au total
+- **17 exercices** complementaires (DDL/DML)
+- **144 exercices** au total
 
 ---
 *Formation DB2/SQL - M2i Formation*

@@ -10,7 +10,7 @@ Ce dossier contient les exercices pratiques organisés par module.
 | [JCL](jcl/) | Exercices JCL (chapitres 02 à 05) | 24 exercices |
 | [COBOL](cobol/) | Exercices COBOL (chapitres 02 à 12) | 61 programmes |
 | [CICS](cics/) | TP Commande READ + TP Gestion des Crédits | 2 TPs |
-| [DB2/SQL](db2/) | QCM + TP SQL + DDL/DML | 147 exercices |
+| [DB2/SQL](db2/) | QCM + TP SQL + DDL/DML | 144 exercices |
 
 ## Organisation
 
@@ -46,7 +46,7 @@ exercices/
 └── db2/                      # Exercices DB2/SQL
     ├── theorie/              # QCM (71 questions)
     ├── tp/                   # TP SQL (56 exercices)
-    ├── pratique/             # DDL/DML (20 exercices)
+    ├── pratique/             # DDL/DML (17 exercices)
     └── fil-rouge/            # Projet fil rouge (a venir)
 ```
 
