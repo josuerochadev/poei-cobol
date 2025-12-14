@@ -10,6 +10,7 @@ Ce dossier contient les exercices pratiques organisés par module.
 | [JCL](jcl/) | Exercices JCL (chapitres 02 à 05) | 24 exercices |
 | [COBOL](cobol/) | Exercices COBOL (chapitres 02 à 12) | 61 programmes |
 | [CICS](cics/) | TP Commande READ + TP Gestion des Crédits | 2 TPs |
+| [DB2/SQL](db2/) | TP SQL (SELECT, JOIN, GROUP BY) | 41 exercices |
 
 ## Organisation
 
@@ -39,8 +40,16 @@ exercices/
 │   ├── chapitre-11/    # Tri interne (SORT/MERGE)
 │   └── chapitre-12/    # Impression, édition
 │
-└── cics/
-    └── tp-gestion-credits/   # TP complet architecture 3 tiers
+├── cics/
+│   └── tp-gestion-credits/   # TP complet architecture 3 tiers
+│
+└── db2/                      # Exercices DB2/SQL
+    ├── 00-creation-tables.sql    # Scripts DDL et INSERT
+    ├── activite-01-select-elementaire.md
+    ├── activite-02-selection-tri.md
+    ├── activite-04-jointures.md
+    ├── activite-05-operateurs-ensemblistes.md
+    └── activite-06-fonctions-groupe.md
 ```
 
 ## Compilation
