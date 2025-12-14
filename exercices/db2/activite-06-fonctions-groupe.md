@@ -277,7 +277,7 @@ VENTES        LYON           6                   1567.00
 
 | Precedent | Suivant |
 |-----------|---------|
-| [Activite 5 - Operateurs ensemblistes](activite-05-operateurs-ensemblistes.md) | [README](README.md) |
+| [Activite 5 - Operateurs ensemblistes](activite-05-operateurs-ensemblistes.md) | [Activite 7 - Sous-requetes](activite-07-sous-requetes.md) |
 
 ---
 *Formation DB2/SQL - M2i Formation*

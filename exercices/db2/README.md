@@ -41,8 +41,9 @@ L'entreprise **Humania Services** souhaite mettre en place une base de donnees p
 | [Activite 4](activite-04-jointures.md) | Jointures (JOIN, LEFT JOIN, Self-join) | 11 questions |
 | [Activite 5](activite-05-operateurs-ensemblistes.md) | Operateurs ensemblistes (UNION, INTERSECT, EXCEPT) | 5 questions |
 | [Activite 6](activite-06-fonctions-groupe.md) | Fonctions de groupe (COUNT, SUM, AVG, GROUP BY, HAVING) | 7 questions |
+| [Activite 7](activite-07-sous-requetes.md) | Sous-requetes (IN, ANY, ALL, EXISTS, correlees) | 15 questions |
 
-**Total : 41 exercices corriges**
+**Total : 56 exercices corriges**
 
 ## Donnees de test
 

@@ -10,7 +10,7 @@ Ce dossier contient les exercices pratiques organisés par module.
 | [JCL](jcl/) | Exercices JCL (chapitres 02 à 05) | 24 exercices |
 | [COBOL](cobol/) | Exercices COBOL (chapitres 02 à 12) | 61 programmes |
 | [CICS](cics/) | TP Commande READ + TP Gestion des Crédits | 2 TPs |
-| [DB2/SQL](db2/) | TP SQL (SELECT, JOIN, GROUP BY) | 41 exercices |
+| [DB2/SQL](db2/) | TP SQL (SELECT, JOIN, GROUP BY, Sous-requetes) | 56 exercices |
 
 ## Organisation
 
@@ -49,7 +49,8 @@ exercices/
     ├── activite-02-selection-tri.md
     ├── activite-04-jointures.md
     ├── activite-05-operateurs-ensemblistes.md
-    └── activite-06-fonctions-groupe.md
+    ├── activite-06-fonctions-groupe.md
+    └── activite-07-sous-requetes.md
 ```
 
 ## Compilation
