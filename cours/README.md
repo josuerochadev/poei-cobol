@@ -10,6 +10,7 @@ Ce dossier contient les supports de cours organisés par module.
 | [JCL](jcl/) | Job Control Language | 4 chapitres + TP |
 | [COBOL](cobol/) | Langage COBOL et programmation mainframe | 12 chapitres |
 | [CICS](cics/) | Moniteur transactionnel CICS | 8 chapitres |
+| [DB2/SQL](db2/) | Bases de données relationnelles et SQL | 10 chapitres |
 
 ## Parcours recommandé
 
@@ -25,6 +26,9 @@ Ce dossier contient les supports de cours organisés par module.
 
 4. Module CICS (transactionnel)
    └── Chapitres I à VIII
+
+5. Module DB2/SQL (bases de données)
+   └── Chapitres I à X
 ```
 
 ## Prérequis par module
@@ -45,3 +49,8 @@ Ce dossier contient les supports de cours organisés par module.
 ### CICS
 - Maîtrise du module COBOL
 - Connaissance de l'environnement z/OS
+
+### DB2/SQL
+- Maîtrise du module COBOL
+- Connaissance de l'environnement z/OS (ISPF, JCL)
+- Module CICS recommandé pour l'Embedded SQL
