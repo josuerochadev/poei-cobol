@@ -51,15 +51,15 @@ fil-rouge/
 
 | Exo | Description                          | Statut |
 |-----|--------------------------------------|--------|
-| 1   | Afficher region Marseille            | TODO   |
-| 2   | Inserer nouveau client               | TODO   |
-| 3   | Afficher clients Marseille           | TODO   |
-| 4   | Mise a jour client                   | TODO   |
-| 5   | Liste tries avec ruptures            | TODO   |
-| 6   | Statistiques DB/CR                   | TODO   |
-| 7   | Totaux par region (niveau 88)        | TODO   |
-| 8   | Creation table MOUVEMENT             | TODO   |
-| 9   | Total mouvements client              | TODO   |
-| 10  | Releve de compte                     | TODO   |
-| 11  | Mouvements 2024                      | TODO   |
-| 12  | Releve compte specifique             | TODO   |
+| 1   | Afficher region Marseille            | OK     |
+| 2   | Inserer nouveau client               | OK     |
+| 3   | Afficher clients Marseille           | OK     |
+| 4   | Mise a jour client                   | OK     |
+| 5   | Liste tries avec ruptures            | OK     |
+| 6   | Statistiques DB/CR                   | OK     |
+| 7   | Totaux par region (niveau 88)        | OK     |
+| 8   | Creation table MOUVEMENT             | OK     |
+| 9   | Total mouvements client              | OK     |
+| 10  | Releve de compte                     | OK     |
+| 11  | Mouvements 2024                      | OK     |
+| 12  | Releve compte specifique             | OK     |
