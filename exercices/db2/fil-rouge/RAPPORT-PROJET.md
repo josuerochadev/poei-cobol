@@ -1264,22 +1264,43 @@ J'ai utilise la fonction YEAR(DATE_MVT) dans le WHERE pour filtrer uniquement l'
 
 ---
 
-## Exercice 12 : Releve compte specifique (012)
+## Exercice 12 : Mouvements 2024 d'un client specifique
 
 ### Enonce
-Refaire l'exercice 10 en precisant le numero de compte d'un client determine (ex: 012). Recuperer le numero via donnee In-Stream.
+Refaire l'exercice 11 en precisant le numero de compte d'un client determine. Recuperer le numero via donnee In-Stream.
 
 ### Mon travail
 
-Ce programme reprend la logique du releve (Ex10) mais le numero de compte est lu dynamiquement via ACCEPT au lieu d'etre code en dur. Le JCL passe le numero '012' via SYSIN.
+Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client specifique. Le numero de compte est lu dynamiquement via ACCEPT. Le curseur filtre sur `NUM_COMPTE` ET `YEAR(DATE_MVT) = 2024`.
 
-**Avantage** : Le meme programme peut generer le releve de n'importe quel client en changeant simplement la donnee In-Stream.
+**Difference avec Ex11** : Ex11 affiche tous les clients avec un JOIN, Ex12 filtre sur un seul client passe en SYSIN.
 
 ### Resolution
 
 **Programme : RLV012.cbl**
 
 ```cobol
+       WORKING-STORAGE SECTION.
+      * Variable d'entree (ACCEPT depuis SYSIN In-Stream)
+       01 WS-NUM-COMPTE     PIC X(03).
+      * Variables host pour DB2
+       01 WS-NOM-CLIENT     PIC X(10).
+       01 WS-DATE-MVT       PIC X(10).
+       01 WS-LIB-MOUV       PIC X(15).
+       01 WS-MONTANT-MVT    PIC S9(6)V99 COMP-3.
+       01 WS-SENS           PIC X(02).
+       01 WS-NATURE         PIC X(03).
+
+      * Curseur pour mouvements 2024 d'un client specifique
+           EXEC SQL
+               DECLARE C-MVT2024-CLI CURSOR FOR
+               SELECT DATE_MVT, LIB_MOUV, MONTANT_MVT, SENS, NATURE
+               FROM MOUVEMENT
+               WHERE NUM_COMPTE = :WS-NUM-COMPTE
+                 AND YEAR(DATE_MVT) = 2024
+               ORDER BY DATE_MVT
+           END-EXEC.
+
        PROCEDURE DIVISION.
        1000-LIRE-NUM-COMPTE.
            ACCEPT WS-NUM-COMPTE
@@ -1289,13 +1310,15 @@ Ce programme reprend la logique du releve (Ex10) mais le numero de compte est lu
 **JCL avec donnee In-Stream :**
 ```jcl
 //SYSIN DD *
-012
+001
 /*
 ```
 
+**Technique utilisee** : CURSOR avec double filtre (NUM_COMPTE + YEAR) + ACCEPT pour parametre dynamique
+
 ### Captures d'ecran suggerees
 - [ ] JCL avec SYSIN In-Stream
-- [ ] Releve du client 012 (LEROY SOPHIE)
+- [ ] Mouvements 2024 du client specifique
 
 ---
 
@@ -1315,7 +1338,7 @@ Ce programme reprend la logique du releve (Ex10) mais le numero de compte est lu
 | TOTMVT | Total mouvements |
 | RELEVE | Releve de compte |
 | MVT2024 | Mouvements 2024 |
-| RLV012 | Releve specifique |
+| RLV012 | Mouvements 2024 client |
 
 ## Liste des vues creees
 
