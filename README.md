@@ -63,8 +63,14 @@ poei-cobol/
 │   │   ├── ...
 │   │   └── chapitre-12/
 │   │
-│   └── cics/               # Exercices CICS (1 TP)
-│       └── tp-gestion-credits/  # TP complet architecture 3 tiers
+│   ├── cics/               # Exercices CICS (1 TP)
+│   │   └── tp-gestion-credits/  # TP complet architecture 3 tiers
+│   │
+│   └── db2/                # Exercices DB2/SQL
+│       ├── theorie/        # QCM (71 questions)
+│       ├── tp/             # Travaux pratiques (56 exercices)
+│       ├── pratique/       # Exercices DDL/DML (17 exercices)
+│       └── fil-rouge/      # Mini-projet COBOL-DB2 (25 exercices)
 │
 ├── projets/                # Projets complets
 │   └── fil-rouge/          # Projet fil rouge (21 exercices)
@@ -131,16 +137,19 @@ poei-cobol/
 
 | Chapitre | Sujet | Cours | Exercices |
 |----------|-------|-------|-----------|
-| I | Fondamentaux des bases de données | ✅ | - |
-| II | Architecture DB2 | ✅ | - |
-| III | Modélisation des données | ✅ | - |
-| IV | Modèle relationnel | ✅ | - |
-| V | Types de données et DB2I | ✅ | - |
-| VI | SQL DDL (CREATE, ALTER, DROP) | ✅ | - |
-| VII | SQL DML (INSERT, UPDATE, DELETE) | ✅ | - |
-| VIII | SQL SELECT et Jointures | ✅ | - |
-| IX | Agrégations et Sous-requêtes | ✅ | - |
-| X | Embedded SQL COBOL | ✅ | - |
+| I | Fondamentaux des bases de données | ✅ | ✅ QCM |
+| II | Architecture DB2 | ✅ | ✅ QCM |
+| III | Modélisation des données | ✅ | ✅ QCM |
+| IV | Modèle relationnel | ✅ | ✅ QCM |
+| V | Types de données et DB2I | ✅ | ✅ QCM |
+| VI | SQL DDL (CREATE, ALTER, DROP) | ✅ | ✅ TP |
+| VII | SQL DML (INSERT, UPDATE, DELETE) | ✅ | ✅ TP |
+| VIII | SQL SELECT et Jointures | ✅ | ✅ TP |
+| IX | Agrégations et Sous-requêtes | ✅ | ✅ TP |
+| X | Embedded SQL COBOL | ✅ | ✅ Fil-rouge |
+
+**Fil-rouge DB2** : Mini-projet COBOL-DB2 (25 exercices) - Suivi clientèle secteur financier
+→ [Voir le rapport](exercices/db2/fil-rouge/RAPPORT-PROJET.pdf)
 
 ## Environnement
 

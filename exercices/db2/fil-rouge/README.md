@@ -1,6 +1,8 @@
 # Fil Rouge - DB2/SQL
 
-Mini-Projet COBOL-DB2 : Suivi Clientele Secteur Financier
+Mini-Projet COBOL-DB2 : Suivi Clientèle Secteur Financier
+
+**Rapport complet** : [RAPPORT-PROJET.pdf](RAPPORT-PROJET.pdf) | [Version Markdown](RAPPORT-PROJET.md)
 
 ## Structure
 
@@ -62,4 +64,22 @@ fil-rouge/
 | 9   | Total mouvements client              | OK     |
 | 10  | Releve de compte                     | OK     |
 | 11  | Mouvements 2024                      | OK     |
-| 12  | Releve compte specifique             | OK     |
+| 12  | Relevé compte spécifique             | OK     |
+
+## Bilan
+
+- **25 exercices** réalisés (3 + 10 + 12)
+- **11 programmes COBOL-DB2**
+- **14 scripts SQL**
+- **10 vues** créées
+- **2 index** créés
+
+### Technologies utilisées
+
+- z/OS, ISPF, SPUFI
+- DB2 (SQL DDL/DML)
+- COBOL avec Embedded SQL
+- Curseurs, SQLCODE, COMMIT/ROLLBACK
+
+---
+*Formation POEI Mainframe COBOL - M2i Formation, Strasbourg - Décembre 2025*

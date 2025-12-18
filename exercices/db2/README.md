@@ -24,11 +24,14 @@ db2/
 │   ├── activite-06-fonctions-groupe/
 │   └── activite-07-sous-requetes/
 │
-├── pratique/              # Exercices complementaires
+├── pratique/              # Exercices complémentaires
 │   ├── exercices-ddl.sql  # CREATE, ALTER, DROP
 │   └── exercices-dml.sql  # INSERT, UPDATE, DELETE
 │
-└── fil-rouge/             # Projet fil rouge (a venir)
+└── fil-rouge/             # Mini-projet COBOL-DB2 (terminé)
+    ├── RAPPORT-PROJET.md  # Rapport complet
+    ├── RAPPORT-PROJET.pdf # Version PDF
+    └── images-pt*/        # Captures d'écran
 ```
 
 ## Contenu detaille
@@ -61,23 +64,24 @@ db2/
 | [exercices-ddl.sql](pratique/exercices-ddl.sql) | DDL (CREATE, ALTER, DROP) | 7 |
 | [exercices-dml.sql](pratique/exercices-dml.sql) | DML + Transactions | 10 |
 
-## Progression recommandee
+## Progression recommandée
 
 ```
-1. THEORIE
+1. THÉORIE
    QCM 01 → QCM 02 → QCM 03 → QCM 04 → QCM 05
-   (Valider la comprehension des concepts)
+   (Valider la compréhension des concepts)
 
 2. PRATIQUE DDL/DML
    exercices-ddl.sql → exercices-dml.sql
    (Pratiquer CREATE, INSERT, UPDATE, DELETE)
 
 3. TRAVAUX PRATIQUES
-   Activite 1 → 2 → 4 → 5 → 6 → 7
-   (Maitriser SELECT et ses fonctionnalites)
+   Activité 1 → 2 → 4 → 5 → 6 → 7
+   (Maîtriser SELECT et ses fonctionnalités)
 
-4. FIL ROUGE
-   Application complete (a venir)
+4. FIL ROUGE ✅
+   Mini-projet COBOL-DB2 complet (25 exercices)
+   → Voir [fil-rouge/RAPPORT-PROJET.pdf](fil-rouge/RAPPORT-PROJET.pdf)
 ```
 
 ## Base de donnees de test
@@ -95,10 +99,11 @@ Scripts disponibles dans [tp/00-schema/](tp/00-schema/).
 
 ## Total
 
-- **71 questions** theoriques (QCM)
+- **71 questions** théoriques (QCM)
 - **56 exercices** SQL (TP)
-- **17 exercices** complementaires (DDL/DML)
-- **144 exercices** au total
+- **17 exercices** complémentaires (DDL/DML)
+- **25 exercices** fil-rouge COBOL-DB2
+- **169 exercices** au total
 
 ---
-*Formation DB2/SQL - M2i Formation*
+*Formation DB2/SQL - M2i Formation, Strasbourg*
