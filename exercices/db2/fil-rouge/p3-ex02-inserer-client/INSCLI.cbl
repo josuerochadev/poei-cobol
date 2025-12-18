@@ -23,6 +23,9 @@
        01 WS-SOLDE          PIC S9(8)V99 COMP-3.
        01 WS-POS            PIC X(02).
 
+      * Variable pour saisie du solde
+       01 WS-SOLDE-IN       PIC X(10).
+
       * SQLCA pour gestion erreurs DB2
            EXEC SQL
                INCLUDE SQLCA
@@ -30,25 +33,32 @@
 
        PROCEDURE DIVISION.
        0000-PRINCIPAL.
-           PERFORM 1000-INIT-DONNEES
+           PERFORM 1000-LIRE-DONNEES
            PERFORM 2000-INSERT-CLIENT
            PERFORM 9000-FIN
            STOP RUN.
 
-       1000-INIT-DONNEES.
-      * Exemple de nouveau client
-           MOVE '021'               TO WS-NUM-COMPTE
-           MOVE '01'                TO WS-CODE-REGION
-           MOVE '25'                TO WS-CODE-NATCPT
-           MOVE 'DUPONT'            TO WS-NOM-CLIENT
-           MOVE 'MARC'              TO WS-PREN-CLIENT
-           MOVE '1995-06-15'        TO WS-DATE-NAIS
-           MOVE 'M'                 TO WS-SEXE
-           MOVE '10'                TO WS-CODE-PROF
-           MOVE 'C'                 TO WS-SIT-FAM
-           MOVE '25 RUE NEUVE'      TO WS-ADRESSE
-           MOVE 1800.00             TO WS-SOLDE
-           MOVE 'CR'                TO WS-POS.
+       1000-LIRE-DONNEES.
+      * Lecture des donnees depuis SYSIN (JCL In-Stream)
+           ACCEPT WS-NUM-COMPTE
+           ACCEPT WS-CODE-REGION
+           ACCEPT WS-CODE-NATCPT
+           ACCEPT WS-NOM-CLIENT
+           ACCEPT WS-PREN-CLIENT
+           ACCEPT WS-DATE-NAIS
+           ACCEPT WS-SEXE
+           ACCEPT WS-CODE-PROF
+           ACCEPT WS-SIT-FAM
+           ACCEPT WS-ADRESSE
+           ACCEPT WS-SOLDE-IN
+           ACCEPT WS-POS
+
+      * Conversion du solde (texte -> numerique)
+           COMPUTE WS-SOLDE = FUNCTION NUMVAL(WS-SOLDE-IN)
+
+           DISPLAY 'DONNEES LUES DEPUIS SYSIN'
+           DISPLAY 'NUM COMPTE : ' WS-NUM-COMPTE
+           DISPLAY 'NOM        : ' WS-NOM-CLIENT.
 
        2000-INSERT-CLIENT.
            EXEC SQL

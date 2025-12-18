@@ -718,48 +718,66 @@ Ecrire un programme COBOL-DB2 permettant d'inserer un nouveau client dans la tab
 
 ### Mon travail
 
-J'ai utilise INSERT INTO avec des variables host pour inserer le client 021. J'ai ajoute la gestion transactionnelle avec COMMIT en cas de succes et ROLLBACK en cas d'erreur.
+J'ai utilise INSERT INTO avec des variables host. Les donnees du client sont lues depuis SYSIN via des ACCEPT (une ligne par champ). J'ai ajoute la gestion transactionnelle avec COMMIT en cas de succes et ROLLBACK en cas d'erreur.
 
-**Bonne pratique** : Toujours tester SQLCODE apres un INSERT pour valider ou annuler la transaction.
+**JCL requis** : Les donnees du client sont passees via SYSIN (12 lignes) :
+```jcl
+//SYSIN DD *
+021
+01
+25
+DUPONT
+MARC
+1995-06-15
+M
+10
+C
+25 RUE NEUVE
+1800.00
+CR
+/*
+```
 
 ### Resolution
 
 **Programme : INSCLI.cbl**
 
 ```cobol
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. INSCLI.
+       1000-LIRE-DONNEES.
+      * Lecture des donnees depuis SYSIN (JCL In-Stream)
+           ACCEPT WS-NUM-COMPTE
+           ACCEPT WS-CODE-REGION
+           ACCEPT WS-CODE-NATCPT
+           ACCEPT WS-NOM-CLIENT
+           ACCEPT WS-PREN-CLIENT
+           ACCEPT WS-DATE-NAIS
+           ACCEPT WS-SEXE
+           ACCEPT WS-CODE-PROF
+           ACCEPT WS-SIT-FAM
+           ACCEPT WS-ADRESSE
+           ACCEPT WS-SOLDE-IN
+           ACCEPT WS-POS
 
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-       01 WS-NUM-COMPTE     PIC X(03).
-       01 WS-CODE-REGION    PIC X(02).
-       -- ... autres variables host ...
-           EXEC SQL INCLUDE SQLCA END-EXEC.
+      * Conversion du solde (texte -> numerique)
+           COMPUTE WS-SOLDE = FUNCTION NUMVAL(WS-SOLDE-IN).
 
-       PROCEDURE DIVISION.
-       0000-PRINCIPAL.
-           MOVE '021' TO WS-NUM-COMPTE
-           MOVE '01'  TO WS-CODE-REGION
-           -- ... initialisation des autres champs ...
-
+       2000-INSERT-CLIENT.
            EXEC SQL
-               INSERT INTO CLIENT
-               (NUM_COMPTE, CODE_REGION, ...)
+               INSERT INTO CLIENT (...)
                VALUES (:WS-NUM-COMPTE, :WS-CODE-REGION, ...)
            END-EXEC
 
            IF SQLCODE = 0
-               DISPLAY 'CLIENT INSERE AVEC SUCCES'
                EXEC SQL COMMIT END-EXEC
            ELSE
-               DISPLAY 'ERREUR INSERTION - SQLCODE : ' SQLCODE
                EXEC SQL ROLLBACK END-EXEC
-           END-IF
-           STOP RUN.
+           END-IF.
 ```
 
-**Technique utilisee** : INSERT INTO avec variables host + COMMIT/ROLLBACK
+**Techniques utilisees** :
+- ACCEPT pour lire les donnees depuis SYSIN
+- FUNCTION NUMVAL pour convertir le solde texte en numerique
+- COMMIT/ROLLBACK pour la gestion transactionnelle
 
 ### Captures d'ecran suggerees
 - [ ] Execution du programme (message de succes)
