@@ -542,22 +542,25 @@ Afficher, pour chaque region :
 
 J'ai utilise la technique CASE WHEN dans les fonctions d'agregation pour calculer des sous-totaux conditionnels en une seule requete. Cela evite de faire plusieurs requetes separees.
 
-**Technique cle** : `SUM(CASE WHEN POS = 'DB' THEN 1 ELSE 0 END)` compte le nombre de debiteurs par region.
+**Version simplifiee** : Sans jointure, directement sur CLIENT avec GROUP BY CODE_REGION. Les alias entre guillemets permettent des noms descriptifs avec espaces.
 
 ### Resolution
 
 ```sql
-SELECT R.CODE_REGION,
-       R.NOM_REGION,
-       COUNT(*) AS NB_TOTAL,
-       SUM(CASE WHEN C.POS = 'DB' THEN 1 ELSE 0 END) AS NB_DEBITEURS,
-       SUM(CASE WHEN C.POS = 'CR' THEN 1 ELSE 0 END) AS NB_CREDITEURS,
-       SUM(CASE WHEN C.POS = 'DB' THEN C.SOLDE ELSE 0 END) AS SOLDE_DEBITEUR,
-       SUM(CASE WHEN C.POS = 'CR' THEN C.SOLDE ELSE 0 END) AS SOLDE_CREDITEUR
-FROM CLIENT C
-INNER JOIN REGION R ON C.CODE_REGION = R.CODE_REGION
-GROUP BY R.CODE_REGION, R.NOM_REGION
-ORDER BY R.CODE_REGION;
+SELECT
+  CODE_REGION,
+  COUNT(*)
+     AS "NB CLIENTS",
+  SUM(CASE WHEN POS = 'DB' THEN 1 ELSE 0 END)
+     AS "NB DEBITEURS",
+  SUM(CASE WHEN POS = 'CR' THEN 1 ELSE 0 END)
+     AS "NB CREDITEURS",
+  SUM(CASE WHEN POS = 'DB' THEN SOLDE ELSE 0 END)
+     AS "SOLDE TOTAL DEBITEURS",
+  SUM(CASE WHEN POS = 'CR' THEN SOLDE ELSE 0 END)
+     AS "SOLDE TOTAL CREDITEURS"
+FROM CLIENT
+GROUP BY CODE_REGION;
 ```
 
 ### Captures d'ecran suggerees
