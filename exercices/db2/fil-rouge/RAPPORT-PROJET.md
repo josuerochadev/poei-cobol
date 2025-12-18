@@ -2,9 +2,9 @@
 
 **Theme** : Developpement d'un mini-projet COBOL-DB2 sous z/OS pour le suivi clientele dans le secteur financier.
 
-**Candidat** : FORM1112
-**Date** : Decembre 2025
-**Formation** : POEI Developpeur Mainframe COBOL - M2i Formation
+**Candidat** : Josué ROCHA (FORM1112)
+**Date** : 16-18 Decembre 2024
+**Formation** : POEI Developpeur Mainframe COBOL - M2i Formation, Strasbourg
 
 ---
 
@@ -19,7 +19,8 @@ Ce projet a ete realise dans le cadre de la formation POEI Developpeur Mainframe
 - **Base de donnees** : DB2
 - **Outil SQL** : SPUFI
 - **Libraries utilisees** :
-  - `FORM1112.FINANCE.SOURCE` : Programmes COBOL et scripts SQL
+  - `FORM1112.FINANCE.SOURCE` : Programmes COBOL
+  - `FORM1112.FINANCE.SCRIPT` : Requetes SQL (SPUFI)
   - `FORM1112.FINANCE.RESULT` : Fichiers de sortie SPUFI
 
 ### Demarche suivie
@@ -34,9 +35,11 @@ Ce projet a ete realise dans le cadre de la formation POEI Developpeur Mainframe
 
 | Probleme | Solution |
 |----------|----------|
-| `POSITION` mot reserve COBOL | Renomme en `POS` |
+| `POSITION` mot reserve COBOL | Renomme la colonne en `POS` |
 | Erreur B37 (espace SPUFI) | Augmentation des tracks du fichier output |
-| _[Ajouter vos propres difficultes]_ | _[Vos solutions]_ |
+| MOVE SPACES vers champ numerique edite | Utilisation de INITIALIZE |
+| ABEND 4038 (SYSIN vide) | Validation du numero compte apres ACCEPT |
+| Alias SQL "C" mot reserve | Simplification de la requete sans alias |
 
 ### Competences mises en oeuvre
 
@@ -1402,4 +1405,20 @@ Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client s
 
 ---
 
-*Rapport genere pour la formation POEI Mainframe COBOL - M2i Formation - Decembre 2025*
+# Conclusion
+
+Ce projet m'a permis de mettre en pratique l'ensemble des competences acquises durant la formation POEI Mainframe COBOL. A travers les trois parties du projet, j'ai pu :
+
+- **Maitriser SQL/DB2** : Creation de tables avec contraintes (PK, FK, CHECK), insertion de donnees, requetes complexes avec jointures, sous-requetes, fonctions d'agregation et vues.
+
+- **Developper en COBOL-DB2** : Integration du SQL embarque dans les programmes COBOL, utilisation des curseurs pour le traitement multi-lignes, gestion des erreurs via SQLCODE, et techniques avancees (ruptures de controle, niveau 88, ACCEPT/SYSIN).
+
+- **Travailler dans l'environnement z/OS** : Navigation ISPF, utilisation de SPUFI pour les requetes interactives, compilation et execution de programmes via JCL.
+
+Le projet couvre un cas concret de gestion clientele dans le secteur financier, avec 12 programmes COBOL et plus de 10 requetes SQL. Les principales difficultes rencontrees (mots reserves, gestion des erreurs, formats de donnees) m'ont permis de developper une approche methodique de resolution de problemes.
+
+Cette experience constitue une base solide pour aborder des projets mainframe en entreprise.
+
+---
+
+*Rapport realise par Josué ROCHA - Formation POEI Mainframe COBOL - M2i Formation, Strasbourg - Decembre 2024*
