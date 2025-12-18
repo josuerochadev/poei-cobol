@@ -1,52 +1,52 @@
 # Rapport de Projet - Mini-Projet DB2/COBOL
 
-**Theme** : Developpement d'un mini-projet COBOL-DB2 sous z/OS pour le suivi clientele dans le secteur financier.
+**Thème** : Développement d'un mini-projet COBOL-DB2 sous z/OS pour le suivi clientèle dans le secteur financier.
 
 **Candidat** : Josué ROCHA (FORM1112)
-**Date** : 16-18 Decembre 2025
-**Formation** : POEI Developpeur Mainframe COBOL - M2i Formation, Strasbourg
+**Date** : 16-18 Décembre 2025
+**Formation** : POEI Développeur Mainframe COBOL - M2i Formation, Strasbourg
 
 ---
 
 ## Introduction
 
-Ce projet a ete realise dans le cadre de la formation POEI Developpeur Mainframe COBOL. L'objectif etait de mettre en pratique les competences acquises en SQL/DB2 et en programmation COBOL avec acces aux bases de donnees.
+Ce projet a été réalisé dans le cadre de la formation POEI Développeur Mainframe COBOL. L'objectif était de mettre en pratique les compétences acquises en SQL/DB2 et en programmation COBOL avec accès aux bases de données.
 
 ### Environnement de travail
 
-- **Systeme** : z/OS sous emulateur Hercules (TK4-)
+- **Système** : z/OS sous emulateur Hercules (TK4-)
 - **Interface** : ISPF / TSO
-- **Base de donnees** : DB2
+- **Base de données** : DB2
 - **Outil SQL** : SPUFI
-- **Libraries utilisees** :
+- **Libraries utilisées** :
   - `FORM1112.FINANCE.SOURCE` : Programmes COBOL
-  - `FORM1112.FINANCE.SCRIPT` : Requetes SQL (SPUFI)
+  - `FORM1112.FINANCE.SCRIPT` : Requêtes SQL (SPUFI)
   - `FORM1112.FINANCE.RESULT` : Fichiers de sortie SPUFI
 
-### Demarche suivie
+### Démarche suivie
 
-1. **Analyse du sujet** : Etude des specifications et du schema de donnees
-2. **Creation des tables** : Definition des structures avec contraintes PK/FK
-3. **Chargement des donnees** : Insertion de 20 clients et des referentiels
-4. **Requetes SQL** : Vues, index, jointures, agregations
-5. **Programmes COBOL-DB2** : Developpement avec Embedded SQL
+1. **Analyse du sujet** : Étude des spécifications et du schéma de données
+2. **Création des tables** : Définition des structures avec contraintes PK/FK
+3. **Chargement des données** : Insertion de 20 clients et des référentiels
+4. **Requêtes SQL** : Vues, index, jointures, agrégations
+5. **Programmes COBOL-DB2** : Développement avec Embedded SQL
 
-### Difficultes rencontrees et solutions
+### Difficultés rencontrées et solutions
 
-| Probleme | Solution |
+| Problème | Solution |
 |----------|----------|
-| `POSITION` mot reserve COBOL | Renomme la colonne en `POS` |
+| `POSITION` mot réservé COBOL | Renommé la colonne en `POS` |
 | Erreur B37 (espace SPUFI) | Augmentation des tracks du fichier output |
 | MOVE SPACES vers champ numerique edite | Utilisation de INITIALIZE |
-| ABEND 4038 (SYSIN vide) | Validation du numero compte apres ACCEPT |
-| Alias SQL "C" mot reserve | Simplification de la requete sans alias |
+| ABEND 4038 (SYSIN vide) | Validation du numéro compte apres ACCEPT |
+| Alias SQL "C" mot réservé | Simplification de la requête sans alias |
 
-### Competences mises en oeuvre
+### Compétences mises en œuvre
 
-- Conception de base de donnees relationnelle (PK, FK, contraintes CHECK)
-- Requetes SQL : SELECT, INSERT, UPDATE, CREATE VIEW, CREATE INDEX
+- Conception de base de données relationnelle (PK, FK, contraintes CHECK)
+- Requêtes SQL : SELECT, INSERT, UPDATE, CREATE VIEW, CREATE INDEX
 - Fonctions SQL : SUM, AVG, COUNT, CASE WHEN, COALESCE
-- Jointures : INNER JOIN, sous-requetes correlees
+- Jointures : INNER JOIN, sous-requêtes corrélées
 - COBOL-DB2 : SELECT INTO, CURSOR, variables host, SQLCODE
 - Techniques COBOL : niveau 88, ruptures de controle, ACCEPT
 
@@ -54,45 +54,45 @@ Ce projet a ete realise dans le cadre de la formation POEI Developpeur Mainframe
 
 ## Sommaire
 
-1. [Partie 1 : Creation et chargement des donnees](#partie-1--creation-et-chargement-des-donnees)
+1. [Partie 1 : Création et chargement des données](#partie-1--creation-et-chargement-des-données)
 2. [Partie 2 : Exploitation et manipulation SQL](#partie-2--exploitation-et-manipulation-sql)
 3. [Partie 3 : Programmation COBOL-DB2](#partie-3--programmation-cobol-db2)
 
 ---
 
-# Partie 1 : Creation et chargement des donnees
+# Partie 1 : Création et chargement des données
 
-## Exercice 1 : Creation des tables
+## Exercice 1 : Création des tables
 
-### Enonce
+### Énoncé
 
-Executer les instructions CREATE TABLE de chacune des tables. Chaque table doit comporter sa clé primaire, et les cles etrangeres doivent etre correctement reliees (FK).
+Exécuter les instructions CREATE TABLE de chacune des tables. Chaque table doit comporter sa clé primaire, et les clés étrangères doivent etre correctement reliees (FK).
 
 ### Mon travail
 
-J'ai commence par creer les 3 tables referentielles (REGION, NATCOMPT, PROFESSI) car elles n'ont pas de dependances. Ensuite, j'ai cree la table CLIENT qui possede des cles etrangeres vers ces 3 tables.
+J'ai commencé par créér les 3 tables référentielles (REGION, NATCOMPT, PROFESSI) car elles n'ont pas de dépendances. Ensuite, j'ai créé la table CLIENT qui possede des clés étrangères vers ces 3 tables.
 
 **Points importants :**
-- L'ordre de creation est crucial : les tables referencees doivent exister avant la table qui les reference
-- J'ai renomme la colonne `POSITION` en `POS` car POSITION est un mot reserve en COBOL
+- L'ordre de creation est crucial : les tables référencées doivent exister avant la table qui les reference
+- J'ai renommé la colonne `POSITION` en `POS` car POSITION est un mot réservé en COBOL
 - La contrainte CHECK sur POS garantit que seules les valeurs 'DB' et 'CR' sont acceptees
 
-### Resolution
+### Résolution
 
 ```sql
--- Table REGION (referentiel des regions)
+-- Table REGION (référentiel des régions)
 CREATE TABLE REGION (
     CODE_REGION CHAR(2) NOT NULL PRIMARY KEY,
     NOM_REGION  VARCHAR(15)
 );
 
--- Table NATCOMPT (referentiel des natures de compte)
+-- Table NATCOMPT (référentiel des natures de compte)
 CREATE TABLE NATCOMPT (
     CODE_NATCPT CHAR(2) NOT NULL PRIMARY KEY,
     LIB_NATCPT  VARCHAR(30)
 );
 
--- Table PROFESSI (referentiel des professions)
+-- Table PROFESSI (référentiel des professions)
 CREATE TABLE PROFESSI (
     CODE_PROF CHAR(2) NOT NULL PRIMARY KEY,
     LIB_PROF  VARCHAR(20)
@@ -116,9 +116,9 @@ CREATE TABLE CLIENT (
 );
 ```
 
-> **Note** : `POS` remplace `POSITION` (mot reserve COBOL)
+> **Note** : `POS` remplace `POSITION` (mot réservé COBOL)
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt1ex01-1](images-pt1/pt1ex01%201.PNG)
 ![pt1ex01-2](images-pt1/pt1ex01%202.PNG)
@@ -130,26 +130,26 @@ CREATE TABLE CLIENT (
 
 ## Exercice 2 : Alimentation des tables
 
-### Enonce
+### Énoncé
 
-Inserer les donnees de base avec des commandes INSERT INTO. Le nombre de clients doit etre au minimum de 20 avec des repartitions equilibrees.
+Insérer les données de base avec des commandes INSERT INTO. Le nombre de clients doit etre au minimum de 20 avec des répartitions équilibrées.
 
 ### Mon travail
 
-J'ai d'abord insere les donnees dans les tables referentielles, puis les 20 clients. J'ai veille a respecter une repartition equilibree des donnees :
+J'ai d'abord inséré les données dans les tables référentielles, puis les 20 clients. J'ai veillé a respecter une répartition équilibrée des données :
 - 5 clients par region (Paris, Marseille, Lyon, Lille)
 - 10 hommes et 10 femmes
-- Environ 40% debiteurs (8) et 60% crediteurs (12)
+- Environ 40% débiteurs (8) et 60% créditeurs (12)
 - Toutes les professions et types de comptes representes
 
-J'ai utilise la fonction DATE() de DB2 pour formater les dates de naissance.
+J'ai utilisé la fonction DATE() de DB2 pour formater les dates de naissance.
 
-### Resolution
+### Résolution
 
-**Tables referentielles :**
+**Tables référentielles :**
 
 ```sql
--- REGION (4 regions)
+-- REGION (4 régions)
 INSERT INTO REGION VALUES ('01', 'PARIS');
 INSERT INTO REGION VALUES ('02', 'MARSEILLE');
 INSERT INTO REGION VALUES ('03', 'LYON');
@@ -181,16 +181,16 @@ INSERT INTO CLIENT VALUES ('003','03','30','BERNARD','CLAUDE',DATE('1979-03-21')
 INSERT INTO CLIENT VALUES ('020','04','40','GUYOT','PAULINE',DATE('1990-07-13'),'F','05','C','20 RUE DE LILLE',1100.00,'CR');
 ```
 
-**Repartition des donnees :**
+**Répartition des données :**
 
-| Critere | Repartition |
+| Critère | Répartition |
 |---------|-------------|
 | Regions | 5 clients par region |
 | Sexe | 10 M / 10 F |
 | Position | 8 DB / 12 CR |
-| Professions | Toutes representees |
+| Professions | Toutes représentées |
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt1ex02-1](images-pt1/pt1ex02%201.PNG)
 ![pt1ex02-2](images-pt1/pt1ex02%202.PNG)
@@ -202,21 +202,21 @@ INSERT INTO CLIENT VALUES ('020','04','40','GUYOT','PAULINE',DATE('1990-07-13'),
 
 ---
 
-## Exercice 3 : Verification de coherence
+## Exercice 3 : Vérification de cohérence
 
-### Enonce
+### Énoncé
 
-Effectuer des requetes pour valider le chargement.
+Effectuer des requêtes pour valider le chargement.
 
 ### Mon travail
 
-J'ai execute des SELECT simples sur chaque table pour verifier que toutes les donnees ont ete correctement inserees. J'ai verifie :
-- 4 regions dans REGION
+J'ai exécuté des SELECT simples sur chaque table pour vérifier que toutes les données ont ete correctement insérées. J'ai vérifié :
+- 4 régions dans REGION
 - 5 natures de compte dans NATCOMPT
 - 6 professions dans PROFESSI
 - 20 clients dans CLIENT avec les bonnes references (FK valides)
 
-### Resolution
+### Résolution
 
 ```sql
 SELECT * FROM REGION;
@@ -225,7 +225,7 @@ SELECT * FROM PROFESSI;
 SELECT * FROM CLIENT;
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt1ex03-1](images-pt1/pt1ex03%201.PNG)
 ![pt1ex03-2](images-pt1/pt1ex03%202.PNG)
@@ -239,25 +239,25 @@ SELECT * FROM CLIENT;
 
 ## Exercice 1 : Extraction des clients par profession
 
-### Enonce
+### Énoncé
 
-Extraire la liste des clients exercant les professions COMPTABLE, FONCTIONNAIRE et MEDECIN. Creer des vues permanentes pour chacune de ces categories.
+Extraire la liste des clients exercant les professions COMPTABLE, FONCTIONNAIRE et MEDECIN. Créer des vues permanentes pour chacune de ces catégories.
 
 ### Mon travail
 
-J'ai d'abord realise des SELECT simples pour verifier les donnees, puis j'ai cree 3 vues permanentes. J'ai utilise des jointures INNER JOIN avec la table PROFESSI pour inclure le libelle de la profession dans chaque vue.
+J'ai d'abord réalisé des SELECT simples pour vérifier les données, puis j'ai créé 3 vues permanentes. J'ai utilisé des jointures INNER JOIN avec la table PROFESSI pour inclure le libellé de la profession dans chaque vue.
 
 **Choix technique** : Filtrer par LIB_PROF plutot que CODE_PROF rend le code plus lisible et maintenable.
 
-### Resolution
+### Résolution
 
 ```sql
--- Requetes de selection
+-- Requêtes de sélection
 SELECT * FROM CLIENT WHERE CODE_PROF = '15';  -- COMPTABLE
 SELECT * FROM CLIENT WHERE CODE_PROF = '25';  -- FONCTIONNAIRE
 SELECT * FROM CLIENT WHERE CODE_PROF = '05';  -- MEDECIN
 
--- Vues avec jointure (libelle profession)
+-- Vues avec jointure (libellé profession)
 CREATE VIEW V_CLIENT_COMPTABLE AS
 SELECT C.NUM_COMPTE, C.NOM_CLIENT, C.PREN_CLIENT,
        P.CODE_PROF, P.LIB_PROF
@@ -279,13 +279,13 @@ FROM CLIENT C
 INNER JOIN PROFESSI P ON C.CODE_PROF = P.CODE_PROF
 WHERE P.LIB_PROF = 'MEDECIN';
 
--- Verification
+-- Vérification
 SELECT * FROM V_CLIENT_COMPTABLE;
 SELECT * FROM V_CLIENT_FONCTION;
 SELECT * FROM V_CLIENT_MEDECIN;
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex01-1](images-pt1/pt2ex01%201.PNG)
 ![pt2ex01-2](images-pt1/pt2ex01%202.PNG)
@@ -296,22 +296,22 @@ SELECT * FROM V_CLIENT_MEDECIN;
 
 ---
 
-## Exercice 2 : Repartition selon la position du compte (DB/CR)
+## Exercice 2 : Répartition selon la position du compte (DB/CR)
 
-### Enonce
+### Énoncé
 
-Realiser deux requetes SQL permettant d'isoler les clients debiteurs (DB) et les clients crediteurs (CR). Materialiser ces selections sous forme de vues.
+Réaliser deux requêtes SQL permettant d'isoler les clients débiteurs (DB) et les clients créditeurs (CR). Matérialiser ces sélections sous forme de vues.
 
 ### Mon travail
 
-J'ai cree deux vues distinctes pour separer les clients selon leur position. Ces vues seront utiles pour les programmes COBOL-DB2 qui traiteront separement les debiteurs et crediteurs.
+J'ai créé deux vues distinctes pour séparer les clients selon leur position. Ces vues seront utiles pour les programmes COBOL-DB2 qui traiteront séparément les débiteurs et créditeurs.
 
-**Observation** : Sur les 20 clients, 8 sont debiteurs (solde negatif) et 12 sont crediteurs (solde positif).
+**Observation** : Sur les 20 clients, 8 sont débiteurs (solde négatif) et 12 sont créditeurs (solde positif).
 
-### Resolution
+### Résolution
 
 ```sql
--- Requetes de selection
+-- Requêtes de sélection
 SELECT * FROM CLIENT WHERE POS = 'DB';
 SELECT * FROM CLIENT WHERE POS = 'CR';
 
@@ -328,12 +328,12 @@ SELECT C.NUM_COMPTE, C.NOM_CLIENT, C.PREN_CLIENT,
 FROM CLIENT C
 WHERE C.POS = 'CR';
 
--- Verification
+-- Vérification
 SELECT * FROM V_CLIENT_DEBITEUR;
 SELECT * FROM V_CLIENT_CREDITEUR;
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex02-1](images-pt1/pt2ex02%201.PNG)
 ![pt2ex02-2](images-pt1/pt2ex02%202.PNG)
@@ -345,22 +345,22 @@ SELECT * FROM V_CLIENT_CREDITEUR;
 
 ---
 
-## Exercice 3 : Repartition des clients par region
+## Exercice 3 : Répartition des clients par region
 
-### Enonce
+### Énoncé
 
-Mettre en place une repartition des clients par region. Chaque region doit faire l'objet d'une extraction distincte.
+Mettre en place une répartition des clients par region. Chaque region doit faire l'objet d'une extraction distincte.
 
 ### Mon travail
 
-J'ai cree 4 vues, une par region (Paris, Marseille, Lyon, Lille). Chaque vue inclut une jointure avec REGION pour afficher le nom de la region.
+J'ai créé 4 vues, une par region (Paris, Marseille, Lyon, Lille). Chaque vue inclut une jointure avec REGION pour affichér le nom de la region.
 
-**Verification** : Chaque region contient exactement 5 clients comme prevu dans la repartition initiale.
+**Vérification** : Chaque region contient exactement 5 clients comme prévu dans la répartition initiale.
 
-### Resolution
+### Résolution
 
 ```sql
--- Requetes par region
+-- Requêtes par region
 SELECT * FROM CLIENT WHERE CODE_REGION = '01';  -- PARIS
 SELECT * FROM CLIENT WHERE CODE_REGION = '02';  -- MARSEILLE
 SELECT * FROM CLIENT WHERE CODE_REGION = '03';  -- LYON
@@ -395,11 +395,11 @@ FROM CLIENT C
 INNER JOIN REGION R ON C.CODE_REGION = R.CODE_REGION
 WHERE R.NOM_REGION = 'LILLE';
 
--- Verification
+-- Vérification
 SELECT * FROM V_CLIENT_MARSEILLE;
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex03-1](images-pt1/pt2ex03%201.PNG)
 ![pt2ex03-2](images-pt1/pt2ex03%202.PNG)
@@ -416,25 +416,25 @@ SELECT * FROM V_CLIENT_MARSEILLE;
 
 ## Exercice 4 : Index secondaire sur la region
 
-### Enonce
-Creer un index secondaire sur la colonne CODE_REGION pour optimiser les recherches par region.
+### Énoncé
+Créer un index secondaire sur la colonne CODE_REGION pour optimiser les recherches par region.
 
 ### Mon travail
 
-J'ai cree un index sur CODE_REGION pour accelerer les requetes de recherche par region. Cet index est particulierement utile car plusieurs de nos vues et requetes filtrent par region.
+J'ai créé un index sur CODE_REGION pour accélérer les requêtes de recherche par region. Cet index est particulierement utile car plusieurs de nos vues et requêtes filtrent par region.
 
-**Impact** : Les SELECT avec WHERE CODE_REGION = ... beneficient desormais d'un acces indexe au lieu d'un scan complet de la table.
+**Impact** : Les SELECT avec WHERE CODE_REGION = ... bénéficient desormais d'un accès indexé au lieu d'un scan complet de la table.
 
-### Resolution
+### Résolution
 
 ```sql
 CREATE INDEX IDX_CLIENT_REGION ON CLIENT(CODE_REGION);
 
--- Verification
+-- Vérification
 SELECT * FROM CLIENT WHERE CODE_REGION = '01';
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex04-1](images-pt1/pt2ex04%201.PNG)
 ![pt2ex04-2](images-pt1/pt2ex04%202.PNG)
@@ -443,46 +443,46 @@ SELECT * FROM CLIENT WHERE CODE_REGION = '01';
 
 ## Exercice 5 : Index secondaire sur la profession
 
-### Enonce
-Creer un index secondaire sur la colonne CODE_PROF afin de faciliter les traitements regroupes par profession.
+### Énoncé
+Créer un index secondaire sur la colonne CODE_PROF afin de faciliter les traitements regroupés par profession.
 
 ### Mon travail
 
-De meme que pour la region, j'ai cree un index sur CODE_PROF. Les vues V_CLIENT_COMPTABLE, V_CLIENT_FONCTION et V_CLIENT_MEDECIN beneficieront de cet index.
+De même que pour la region, j'ai créé un index sur CODE_PROF. Les vues V_CLIENT_COMPTABLE, V_CLIENT_FONCTION et V_CLIENT_MEDECIN bénéficieront de cet index.
 
-**Remarque** : Les deux index (region et profession) peuvent etre utilises simultanement par l'optimiseur DB2 pour les requetes combinant ces deux criteres.
+**Remarque** : Les deux index (region et profession) peuvent etre utilisés simultanément par l'optimiseur DB2 pour les requêtes combinant ces deux critères.
 
-### Resolution
+### Résolution
 
 ```sql
 CREATE INDEX IDX_CLIENT_PROF ON CLIENT(CODE_PROF);
 
--- Verification
+-- Vérification
 SELECT * FROM CLIENT WHERE CODE_PROF = '15';
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex05-1](images-pt1/pt2ex05%201.PNG)
 ![pt2ex05-2](images-pt1/pt2ex05%202.PNG)
 
 ---
 
-## Exercice 6 : Edition des clients tries par region et profession
+## Exercice 6 : Édition des clients triés par region et profession
 
-### Enonce
-Concevoir une requete SQL permettant d'afficher les clients dans l'ordre suivant :
+### Énoncé
+Concevoir une requête SQL permettant d'affichér les clients dans l'ordre suivant :
 1. Par region (CODE_REGION)
 2. Puis par profession (CODE_PROF)
-3. Puis par numero de compte (NUM_COMPTE)
+3. Puis par numéro de compte (NUM_COMPTE)
 
 ### Mon travail
 
-J'ai ecrit une requete avec double jointure (REGION et PROFESSI) pour afficher les libelles plutot que les codes. Le tri multi-niveaux ORDER BY permet de regrouper visuellement les donnees.
+J'ai écrit une requête avec double jointure (REGION et PROFESSI) pour affichér les libellés plutot que les codes. Le tri multi-niveaux ORDER BY permet de regrouper visuellement les données.
 
-**Utilite** : Cette requete servira de base pour le programme COBOL-DB2 avec ruptures (P3-Ex05).
+**Utilité** : Cette requête servira de base pour le programme COBOL-DB2 avec ruptures (P3-Ex05).
 
-### Resolution
+### Résolution
 
 ```sql
 SELECT C.NUM_COMPTE, C.NOM_CLIENT, C.PREN_CLIENT,
@@ -495,7 +495,7 @@ INNER JOIN PROFESSI P ON C.CODE_PROF = P.CODE_PROF
 ORDER BY C.CODE_REGION, C.CODE_PROF, C.NUM_COMPTE;
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex06-1](images-pt1/pt2ex06%201.PNG)
 ![pt2ex06-2](images-pt1/pt2ex06%202.PNG)
@@ -505,16 +505,16 @@ ORDER BY C.CODE_REGION, C.CODE_PROF, C.NUM_COMPTE;
 
 ## Exercice 7 : Fusion de deux populations de clients
 
-### Enonce
-Realiser une requete SQL permettant de fusionner les listes de clients COMPTABLES et FONCTIONNAIRES dans un meme resultat.
+### Énoncé
+Réaliser une requête SQL permettant de fusionner les listes de clients COMPTABLES et FONCTIONNAIRES dans un même résultat.
 
 ### Mon travail
 
-J'ai utilise l'operateur UNION pour fusionner deux SELECT independants. Chaque SELECT filtre sur une profession differente et inclut la jointure avec PROFESSI pour le libelle.
+J'ai utilisé l'opérateur UNION pour fusionner deux SELECT independants. Chaque SELECT filtre sur une profession differente et inclut la jointure avec PROFESSI pour le libellé.
 
-**Note technique** : UNION elimine automatiquement les doublons (si un client etait dans les deux categories). Pour conserver les doublons, on utiliserait UNION ALL.
+**Note technique** : UNION élimine automatiquement les doublons (si un client était dans les deux catégories). Pour conserver les doublons, on utilisérait UNION ALL.
 
-### Resolution
+### Résolution
 
 ```sql
 SELECT C.NUM_COMPTE, C.NOM_CLIENT, C.PREN_CLIENT,
@@ -532,7 +532,7 @@ INNER JOIN PROFESSI P ON C.CODE_PROF = P.CODE_PROF
 WHERE P.LIB_PROF = 'FONCTIONNAIRE';
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex07-1](images-pt1/pt2ex07%201.PNG)
 ![pt2ex07-2](images-pt1/pt2ex07%202.PNG)
@@ -540,18 +540,18 @@ WHERE P.LIB_PROF = 'FONCTIONNAIRE';
 
 ---
 
-## Exercice 8 : Vue CLIENT reduit
+## Exercice 8 : Vue CLIENT réduit
 
-### Enonce
-Creer une vue simplifiee de la table CLIENT contenant uniquement : numero de compte, code region, nature de compte, nom/prenom, activite professionnelle, situation familiale, solde, position.
+### Énoncé
+Créer une vue simplifiée de la table CLIENT contenant uniquement : numéro de compte, code region, nature de compte, nom/prenom, activité professionnelle, situation familiale, solde, position.
 
 ### Mon travail
 
-J'ai cree une vue qui exclut les colonnes DATE_NAIS, SEXE et ADRESSE. Cette vue allege les requetes qui n'ont pas besoin de ces informations personnelles.
+J'ai créé une vue qui exclut les colonnes DATE_NAIS, SEXE et ADRESSE. Cette vue allège les requêtes qui n'ont pas besoin de ces informations personnelles.
 
-**Avantage** : La vue peut aussi servir a limiter l'acces aux donnees sensibles (date de naissance, adresse) pour certains utilisateurs.
+**Avantage** : La vue peut aussi servir a limiter l'accès aux données sensibles (date de naissance, adresse) pour certains utilisateurs.
 
-### Resolution
+### Résolution
 
 ```sql
 CREATE VIEW V_CLIENT_REDUIT AS
@@ -566,11 +566,11 @@ SELECT NUM_COMPTE,
        POS
 FROM CLIENT;
 
--- Verification
+-- Vérification
 SELECT * FROM V_CLIENT_REDUIT;
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex08-1](images-pt1/pt2ex08%201.PNG)
 ![pt2ex08-2](images-pt1/pt2ex08%202.PNG)
@@ -579,23 +579,23 @@ SELECT * FROM V_CLIENT_REDUIT;
 
 ---
 
-## Exercice 9 : Analyse multi-criteres avec agregations conditionnelles
+## Exercice 9 : Analyse multi-critères avec agrégations conditionnelles
 
-### Enonce
+### Énoncé
 Afficher, pour chaque region :
 - Nombre total de clients
-- Nombre de clients debiteurs
-- Nombre de clients crediteurs
-- Solde total debiteur
-- Solde total crediteur
+- Nombre de clients débiteurs
+- Nombre de clients créditeurs
+- Solde total débiteur
+- Solde total créditeur
 
 ### Mon travail
 
-J'ai utilise la technique CASE WHEN dans les fonctions d'agregation pour calculer des sous-totaux conditionnels en une seule requete. Cela evite de faire plusieurs requetes separees.
+J'ai utilisé la technique CASE WHEN dans les fonctions d'agrégation pour calculer des sous-totaux conditionnels en une seule requête. Cela évite de faire plusieurs requêtes séparées.
 
-**Version simplifiee** : Sans jointure, directement sur CLIENT avec GROUP BY CODE_REGION. Les alias entre guillemets permettent des noms descriptifs avec espaces.
+**Version simplifiée** : Sans jointure, directement sur CLIENT avec GROUP BY CODE_REGION. Les alias entre guillemets permettent des noms descriptifs avec espaces.
 
-### Resolution
+### Résolution
 
 ```sql
 SELECT
@@ -614,7 +614,7 @@ FROM CLIENT
 GROUP BY CODE_REGION;
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex09-1](images-pt1/pt2ex09%201.PNG)
 ![pt2ex09-2](images-pt1/pt2ex09%202.PNG)
@@ -622,18 +622,18 @@ GROUP BY CODE_REGION;
 
 ---
 
-## Exercice 10 : Clients anormalement debiteurs par profession
+## Exercice 10 : Clients anormalement débiteurs par profession
 
-### Enonce
-Lister les clients debiteurs dont le solde est superieur a la moyenne des soldes debiteurs de leur profession.
+### Énoncé
+Lister les clients débiteurs dont le solde est supérieur a la moyenne des soldes débiteurs de leur profession.
 
 ### Mon travail
 
-Cet exercice m'a demande une sous-requete correlee. La sous-requete calcule la moyenne des soldes debiteurs pour chaque profession, et la requete principale compare chaque client a cette moyenne.
+Cet exercice m'a demandé une sous-requête corrélée. La sous-requête calcule la moyenne des soldes débiteurs pour chaque profession, et la requête principale compare chaque client a cette moyenne.
 
-**Subtilite** : Les soldes debiteurs etant negatifs, un client "plus debiteur" a un solde inferieur (ex: -450 < -200). D'ou l'utilisation de `<` au lieu de `>`.
+**Subtilité** : Les soldes débiteurs étant négatifs, un client "plus débiteur" a un solde inférieur (ex: -450 < -200). D'ou l'utilisation de `<` au lieu de `>`.
 
-### Resolution
+### Résolution
 
 ```sql
 SELECT C.NUM_COMPTE, C.NOM_CLIENT, C.PREN_CLIENT,
@@ -649,9 +649,9 @@ WHERE C.POS = 'DB'
 ORDER BY C.CODE_PROF, C.SOLDE;
 ```
 
-> **Note** : La comparaison utilise `<` car les soldes debiteurs sont negatifs. Un solde de -450 est "plus debiteur" qu'un solde de -200.
+> **Note** : La comparaison utilisé `<` car les soldes débiteurs sont négatifs. Un solde de -450 est "plus débiteur" qu'un solde de -200.
 
-### Captures d'ecran
+### Captures d'écran
 
 ![pt2ex10-1](images-pt1/pt2ex10%201.PNG)
 ![pt2ex10-2](images-pt1/pt2ex10%202.PNG)
@@ -662,21 +662,21 @@ ORDER BY C.CODE_PROF, C.SOLDE;
 
 ## Exercice 1 : Afficher la region Marseille
 
-### Enonce
-Ecrire un programme COBOL-DB2 permettant d'afficher la region Marseille (02).
+### Énoncé
+Écrire un programme COBOL-DB2 permettant d'affichér la region Marseille (02).
 
 ### Mon travail
 
-Premier programme COBOL-DB2 : j'ai utilise SELECT INTO pour lire une seule ligne. La variable SQLCODE me permet de verifier si la requete a reussi (0) ou echoue.
+Premier programme COBOL-DB2 : j'ai utilisé SELECT INTO pour lire une seule ligne. La variable SQLCODE me permet de vérifier si la requête a réussi (0) ou échoué.
 
-**Utilisation de DCLGEN** : Au lieu de declarer manuellement les variables host, j'utilise `EXEC SQL INCLUDE REGION END-EXEC` pour inclure les variables generees par l'utilitaire DCLGEN de DB2.
+**Utilisation de DCLGEN** : Au lieu de déclarer manuellement les variables host, j'utilisé `EXEC SQL INCLUDE REGION END-EXEC` pour inclure les variables générées par l'utilitaire DCLGEN de DB2.
 
 **Avantages DCLGEN** :
-- Variables host generees automatiquement depuis la structure de la table
+- Variables host générées automatiquement depuis la structure de la table
 - Correspondance exacte avec les types de colonnes DB2
-- Maintenabilite : si la table change, on regenere le DCLGEN
+- Maintenabilite : si la table change, on régénère le DCLGEN
 
-### Resolution
+### Résolution
 
 **Programme : AFFREG.cbl**
 
@@ -704,11 +704,11 @@ Premier programme COBOL-DB2 : j'ai utilise SELECT INTO pour lire une seule ligne
            END-IF.
 ```
 
-**Techniques utilisees** :
+**Techniques utilisées** :
 - SELECT INTO (lecture d'une seule ligne)
-- DCLGEN (variables host generees par DB2)
+- DCLGEN (variables host générées par DB2)
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex01 - 1](images-pt3-1/pt3ex01%201.PNG)
 ![P3 Ex01 - 2](images-pt3-1/pt3ex01%202.PNG)
@@ -717,16 +717,16 @@ Premier programme COBOL-DB2 : j'ai utilise SELECT INTO pour lire une seule ligne
 
 ---
 
-## Exercice 2 : Inserer un nouveau client
+## Exercice 2 : Insérer un nouveau client
 
-### Enonce
-Ecrire un programme COBOL-DB2 permettant d'inserer un nouveau client dans la table CLIENT.
+### Énoncé
+Écrire un programme COBOL-DB2 permettant d'insérér un nouveau client dans la table CLIENT.
 
 ### Mon travail
 
-J'ai utilise INSERT INTO avec des variables host. Les donnees du client sont lues depuis SYSIN via des ACCEPT (une ligne par champ). J'ai ajoute la gestion transactionnelle avec COMMIT en cas de succes et ROLLBACK en cas d'erreur.
+J'ai utilisé INSERT INTO avec des variables host. Les données du client sont lues depuis SYSIN via des ACCEPT (une ligne par champ). J'ai ajouté la gestion transactionnelle avec COMMIT en cas de succès et ROLLBACK en cas d'erreur.
 
-**JCL requis** : Les donnees du client sont passees via SYSIN (12 lignes) :
+**JCL requis** : Les données du client sont passées via SYSIN (12 lignes) :
 ```jcl
 //SYSIN DD *
 021
@@ -744,13 +744,13 @@ CR
 /*
 ```
 
-### Resolution
+### Résolution
 
 **Programme : INSCLI.cbl**
 
 ```cobol
        1000-LIRE-DONNEES.
-      * Lecture des donnees depuis SYSIN (JCL In-Stream)
+      * Lecture des données depuis SYSIN (JCL In-Stream)
            ACCEPT WS-NUM-COMPTE
            ACCEPT WS-CODE-REGION
            ACCEPT WS-CODE-NATCPT
@@ -780,12 +780,12 @@ CR
            END-IF.
 ```
 
-**Techniques utilisees** :
-- ACCEPT pour lire les donnees depuis SYSIN
+**Techniques utilisées** :
+- ACCEPT pour lire les données depuis SYSIN
 - FUNCTION NUMVAL pour convertir le solde texte en numerique
 - COMMIT/ROLLBACK pour la gestion transactionnelle
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex02 - 1](images-pt3-1/pt3ex02%201.PNG)
 ![P3 Ex02 - 2](images-pt3-1/pt3ex02%202.PNG)
@@ -801,16 +801,16 @@ CR
 
 ## Exercice 3 : Afficher tous les clients de Marseille
 
-### Enonce
-Ecrire un programme COBOL-DB2 permettant d'afficher tous les clients de la region Marseille (02).
+### Énoncé
+Écrire un programme COBOL-DB2 permettant d'affichér tous les clients de la region Marseille (02).
 
 ### Mon travail
 
-Pour lire plusieurs lignes, j'ai utilise un CURSOR. Le cycle complet est : DECLARE (definition), OPEN (ouverture), FETCH en boucle (lecture), CLOSE (fermeture).
+Pour lire plusieurs lignes, j'ai utilisé un CURSOR. Le cycle complet est : DECLARE (définition), OPEN (ouverture), FETCH en boucle (lecture), CLOSE (fermeture).
 
 **Gestion fin de fichier** : SQLCODE = 100 indique qu'il n'y a plus de lignes a lire.
 
-### Resolution
+### Résolution
 
 **Programme : AFFCLI.cbl**
 
@@ -849,9 +849,9 @@ Pour lire plusieurs lignes, j'ai utilise un CURSOR. Le cycle complet est : DECLA
            STOP RUN.
 ```
 
-**Technique utilisee** : CURSOR (DECLARE, OPEN, FETCH, CLOSE) pour lecture multiple
+**Technique utilisée** : CURSOR (DECLARE, OPEN, FETCH, CLOSE) pour lecture multiple
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex03 - 1](images-pt3-1/pt3ex03%201.PNG)
 ![P3 Ex03 - 2](images-pt3-1/pt3ex03%202.PNG)
@@ -863,18 +863,18 @@ Pour lire plusieurs lignes, j'ai utilise un CURSOR. Le cycle complet est : DECLA
 
 ---
 
-## Exercice 4 : Mise a jour d'un client
+## Exercice 4 : Mise à jour d'un client
 
-### Enonce
-Ecrire un programme COBOL-DB2 qui permet de mettre a jour l'adresse, le solde et la position d'un client existant.
+### Énoncé
+Écrire un programme COBOL-DB2 qui permet de mettre à jour l'adresse, le solde et la position d'un client existant.
 
 ### Mon travail
 
-J'ai utilise UPDATE avec une clause WHERE pour cibler un client specifique (005). Comme pour l'INSERT, j'applique COMMIT apres verification du SQLCODE.
+J'ai utilisé UPDATE avec une clause WHERE pour cibler un client spécifique (005). Comme pour l'INSERT, j'applique COMMIT apres verification du SQLCODE.
 
-**Test** : J'ai verifie avec un SELECT avant et apres la mise a jour pour confirmer les changements.
+**Test** : J'ai vérifié avec un SELECT avant et apres la mise à jour pour confirmer les changements.
 
-### Resolution
+### Résolution
 
 **Programme : MAJCLI.cbl**
 
@@ -890,7 +890,7 @@ J'ai utilise UPDATE avec une clause WHERE pour cibler un client specifique (005)
 
        PROCEDURE DIVISION.
        1000-LIRE-DONNEES.
-      * Lecture des donnees depuis SYSIN (JCL In-Stream)
+      * Lecture des données depuis SYSIN (JCL In-Stream)
            ACCEPT WS-NUM-COMPTE
            ACCEPT WS-ADRESSE
            ACCEPT WS-SOLDE-IN
@@ -923,9 +923,9 @@ CR
 /*
 ```
 
-**Technique utilisee** : UPDATE avec clause WHERE + COMMIT + ACCEPT pour donnees dynamiques
+**Technique utilisée** : UPDATE avec clause WHERE + COMMIT + ACCEPT pour données dynamiques
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex04 - 1](images-pt3-1/pt3ex04%201.PNG)
 ![P3 Ex04 - 2](images-pt3-1/pt3ex04%202.PNG)
@@ -940,16 +940,16 @@ CR
 
 ## Exercice 5 : Liste avec ruptures
 
-### Enonce
-Ecrire un programme COBOL-DB2 qui affiche la liste des clients tries par region puis par profession. Pour chaque changement, afficher un titre de rupture.
+### Énoncé
+Écrire un programme COBOL-DB2 qui affiché la liste des clients triés par region puis par profession. Pour chaque changement, affichér un titre de rupture.
 
 ### Mon travail
 
-J'ai implemente les ruptures de controle en conservant les valeurs precedentes de CODE_REGION et CODE_PROF. A chaque FETCH, je compare les nouvelles valeurs avec les precedentes pour detecter les changements.
+J'ai implémenté les ruptures de controle en conservant les valeurs précédentes de CODE_REGION et CODE_PROF. A chaque FETCH, je compare les nouvelles valeurs avec les précédentes pour détecter les changements.
 
-**Logique** : Si la region change, j'affiche le titre region ET je reinitialise la rupture profession (car on change de groupe).
+**Logique** : Si la region change, j'affiché le titre region ET je reinitialise la rupture profession (car on change de groupe).
 
-### Resolution
+### Résolution
 
 **Programme : LSTRUPT.cbl**
 
@@ -972,9 +972,9 @@ J'ai implemente les ruptures de controle en conservant les valeurs precedentes d
            END-IF.
 ```
 
-**Technique utilisee** : Variables de rupture pour detecter les changements de groupe
+**Technique utilisée** : Variables de rupture pour détecter les changements de groupe
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex05 - 1](images-pt3-2/pt3ex05%201.PNG)
 ![P3 Ex05 - 2](images-pt3-2/pt3ex05%202.PNG)
@@ -991,16 +991,16 @@ J'ai implemente les ruptures de controle en conservant les valeurs precedentes d
 
 ## Exercice 6 : Statistiques DB/CR
 
-### Enonce
-Ecrire un programme COBOL-DB2 permettant de calculer le montant general et la moyenne des comptes debiteurs et crediteurs.
+### Énoncé
+Écrire un programme COBOL-DB2 permettant de calculer le montant général et la moyenne des comptes débiteurs et créditeurs.
 
 ### Mon travail
 
-J'ai fait deux SELECT INTO avec les fonctions SUM, AVG et COUNT : un pour les debiteurs (POS = 'DB') et un pour les crediteurs (POS = 'CR').
+J'ai fait deux SELECT INTO avec les fonctions SUM, AVG et COUNT : un pour les débiteurs (POS = 'DB') et un pour les créditeurs (POS = 'CR').
 
-**Affichage** : Les variables d'edition (PIC ZZZ,ZZ9.99) permettent de formater les montants avec separateurs et decimales.
+**Affichage** : Les variables d'édition (PIC ZZZ,ZZ9.99) permettent de formater les montants avec separateurs et décimales.
 
-### Resolution
+### Résolution
 
 **Programme : STATCLI.cbl**
 
@@ -1027,9 +1027,9 @@ J'ai fait deux SELECT INTO avec les fonctions SUM, AVG et COUNT : un pour les de
            DISPLAY 'MOYENNE : ' WS-MOYENNE-CR.
 ```
 
-**Technique utilisee** : Fonctions d'agregation SQL (SUM, AVG, COUNT)
+**Technique utilisée** : Fonctions d'agrégation SQL (SUM, AVG, COUNT)
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex06 - 1](images-pt3-2/pt3ex06%201.PNG)
 ![P3 Ex06 - 2](images-pt3-2/pt3ex06%202.PNG)
@@ -1042,16 +1042,16 @@ J'ai fait deux SELECT INTO avec les fonctions SUM, AVG et COUNT : un pour les de
 
 ## Exercice 7 : Totaux par region avec niveau 88
 
-### Enonce
-Ecrire un programme COBOL-DB2 qui calcule, pour chaque region, la valeur totale des comptes debiteurs et crediteurs. Utiliser une variable conditionnelle (niveau 88).
+### Énoncé
+Écrire un programme COBOL-DB2 qui calcule, pour chaque region, la valeur totale des comptes débiteurs et créditeurs. Utiliser une variable conditionnelle (niveau 88).
 
 ### Mon travail
 
-J'ai declare des niveaux 88 pour representer les 4 regions (REGION-PARIS, REGION-MARSEILLE, etc.). Une boucle PERFORM VARYING parcourt les regions et SET permet d'activer chaque condition.
+J'ai déclaré des niveaux 88 pour représenter les 4 régions (REGION-PARIS, REGION-MARSEILLE, etc.). Une boucle PERFORM VARYING parcourt les régions et SET permet d'activer chaque condition.
 
 **Avantage du niveau 88** : Le code est plus lisible avec IF REGION-PARIS qu'avec IF WS-CODE-REGION = '01'.
 
-### Resolution
+### Résolution
 
 **Programme : TOTREG.cbl**
 
@@ -1075,9 +1075,9 @@ J'ai declare des niveaux 88 pour representer les 4 regions (REGION-PARIS, REGION
            END-PERFORM.
 ```
 
-**Technique utilisee** : Niveau 88 pour representer les codes regions + boucle PERFORM VARYING
+**Technique utilisée** : Niveau 88 pour représenter les codes régions + boucle PERFORM VARYING
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex07 - 1](images-pt3-2/pt3ex07%201.PNG)
 ![P3 Ex07 - 2](images-pt3-2/pt3ex07%202.PNG)
@@ -1089,18 +1089,18 @@ J'ai declare des niveaux 88 pour representer les 4 regions (REGION-PARIS, REGION
 
 ---
 
-## Exercice 8 : Creation table MOUVEMENT
+## Exercice 8 : Création table MOUVEMENT
 
-### Enonce
-Creer une table DB2 permettant de gerer les mouvements des clients avec : numero de compte, libelle, montant, sens (DB/CR), nature (CHQ/VER/VIR), date.
+### Énoncé
+Créer une table DB2 permettant de gérer les mouvements des clients avec : numéro de compte, libellé, montant, sens (DB/CR), nature (CHQ/VER/VIR), date.
 
 ### Mon travail
 
-J'ai cree la table MOUVEMENT avec une cle etrangere vers CLIENT(NUM_COMPTE). Deux contraintes CHECK valident les valeurs de SENS (DB/CR) et NATURE (CHQ/VER/VIR).
+J'ai créé la table MOUVEMENT avec une clé étrangère vers CLIENT(NUM_COMPTE). Deux contraintes CHECK valident les valeurs de SENS (DB/CR) et NATURE (CHQ/VER/VIR).
 
-**Donnees de test** : J'ai insere plusieurs mouvements pour differents clients afin de tester les programmes suivants (releve, total, etc.).
+**Données de test** : J'ai inséré plusieurs mouvements pour différents clients afin de tester les programmes suivants (relevé, total, etc.).
 
-### Resolution
+### Résolution
 
 ```sql
 CREATE TABLE MOUVEMENT (
@@ -1114,13 +1114,13 @@ CREATE TABLE MOUVEMENT (
     CHECK(NATURE IN ('CHQ','VER','VIR'))
 );
 
--- Donnees de test
+-- Données de test
 INSERT INTO MOUVEMENT VALUES ('001','VIREMENT SAL',1500.00,'CR','VIR',DATE('2024-01-15'));
 INSERT INTO MOUVEMENT VALUES ('001','CHEQUE 001',200.00,'DB','CHQ',DATE('2024-01-20'));
 -- ... autres mouvements de test ...
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex08 - 1](images-pt3-1/pt3ex08%201.PNG)
 ![P3 Ex08 - 2](images-pt3-1/pt3ex08%202.PNG)
@@ -1135,16 +1135,16 @@ INSERT INTO MOUVEMENT VALUES ('001','CHEQUE 001',200.00,'DB','CHQ',DATE('2024-01
 
 ## Exercice 9 : Total mouvements d'un client
 
-### Enonce
-Ecrire un programme COBOL-DB2 permettant de calculer le montant total des mouvements d'un client et le nombre total de mouvements. Recevoir le numero via ACCEPT.
+### Énoncé
+Écrire un programme COBOL-DB2 permettant de calculer le montant total des mouvements d'un client et le nombre total de mouvements. Recevoir le numéro via ACCEPT.
 
 ### Mon travail
 
-J'ai utilise ACCEPT pour lire le numero de compte depuis SYSIN. La requete SELECT utilise SUM et COUNT avec COALESCE pour eviter les valeurs NULL si le client n'a pas de mouvements.
+J'ai utilisé ACCEPT pour lire le numéro de compte depuis SYSIN. La requête SELECT utilisé SUM et COUNT avec COALESCE pour éviter les valeurs NULL si le client n'a pas de mouvements.
 
-**Parametrage JCL** : Le numero de compte est passe via donnee In-Stream (//SYSIN DD *).
+**Paramétrage JCL** : Le numéro de compte est passé via donnee In-Stream (//SYSIN DD *).
 
-### Resolution
+### Résolution
 
 **Programme : TOTMVT.cbl**
 
@@ -1168,11 +1168,11 @@ J'ai utilise ACCEPT pour lire le numero de compte depuis SYSIN. La requete SELEC
            END-EXEC.
 ```
 
-**Technique utilisee** : ACCEPT pour saisie + SUM/COUNT + COALESCE pour gerer les NULL
+**Technique utilisée** : ACCEPT pour saisie + SUM/COUNT + COALESCE pour gérer les NULL
 
-**Validation importante** : Le programme verifie que le numero de compte n'est pas vide avant d'executer les requetes SQL. Cela evite l'erreur ABEND 4038 si le SYSIN est mal configure.
+**Validation importante** : Le programme vérifié que le numéro de compte n'est pas vide avant d'exécutér les requêtes SQL. Cela évite l'erreur ABEND 4038 si le SYSIN est mal configure.
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex09 - 1](images-pt3-1/pt3ex09%201.PNG)
 ![P3 Ex09 - 2](images-pt3-1/pt3ex09%202.PNG)
@@ -1186,25 +1186,25 @@ J'ai utilise ACCEPT pour lire le numero de compte depuis SYSIN. La requete SELEC
 
 ---
 
-## Exercice 10 : Releve de compte
+## Exercice 10 : Relevé de compte
 
-### Enonce
-Ecrire un programme COBOL-DB2 permettant d'editer un releve de compte des mouvements d'un client avec colonnes Credit/Debit separees.
+### Énoncé
+Écrire un programme COBOL-DB2 permettant d'éditer un relevé de compte des mouvements d'un client avec colonnes Credit/Debit séparées.
 
 ### Mon travail
 
-J'ai cree un releve bancaire avec en-tete client et liste des mouvements. Chaque mouvement s'affiche soit dans la colonne Credit (si SENS = 'CR') soit dans la colonne Debit.
+J'ai créé un relevé bancaire avec en-tête client et liste des mouvements. Chaque mouvement s'affiché soit dans la colonne Credit (si SENS = 'CR') soit dans la colonne Debit.
 
-**Presentation** : L'en-tete affiche le nom du client et son numero de compte, suivi des colonnes Date/Libelle/Credit/Debit.
+**Presentation** : L'en-tête affiché le nom du client et son numéro de compte, suivi des colonnes Date/Libelle/Credit/Debit.
 
-**JCL requis** : Le numero de compte est lu via ACCEPT, donc le JCL doit inclure :
+**JCL requis** : Le numéro de compte est lu via ACCEPT, donc le JCL doit inclure :
 ```jcl
 //SYSIN DD *
 001
 /*
 ```
 
-### Resolution
+### Résolution
 
 **Programme : RELEVE.cbl**
 
@@ -1239,7 +1239,7 @@ Date operation  Libelle         Credit    Debit
 ================================================
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex10 - 1](images-pt3-1/pt3ex10%201.PNG)
 ![P3 Ex10 - 2](images-pt3-1/pt3ex10%202.PNG)
@@ -1255,18 +1255,18 @@ Date operation  Libelle         Credit    Debit
 
 ---
 
-## Exercice 11 : Mouvements de l'annee 2024
+## Exercice 11 : Mouvements de l'année 2024
 
-### Enonce
-Ecrire un programme COBOL-DB2 permettant d'afficher les mouvements de l'annee 2024 de tous les clients.
+### Énoncé
+Écrire un programme COBOL-DB2 permettant d'affichér les mouvements de l'année 2024 de tous les clients.
 
 ### Mon travail
 
-J'ai utilise la fonction YEAR(DATE_MVT) dans le WHERE pour filtrer uniquement l'annee 2024. Une jointure avec CLIENT permet d'afficher le nom du client a cote de chaque mouvement.
+J'ai utilisé la fonction YEAR(DATE_MVT) dans le WHERE pour filtrer uniquement l'année 2024. Une jointure avec CLIENT permet d'affichér le nom du client à côté de chaque mouvement.
 
-**Compteur** : Le programme compte et affiche le nombre total de mouvements 2024 a la fin.
+**Compteur** : Le programme compte et affiché le nombre total de mouvements 2024 a la fin.
 
-### Resolution
+### Résolution
 
 **Programme : MVT2024.cbl**
 
@@ -1283,9 +1283,9 @@ J'ai utilise la fonction YEAR(DATE_MVT) dans le WHERE pour filtrer uniquement l'
            END-EXEC.
 ```
 
-**Technique utilisee** : Fonction YEAR() pour filtrer par annee + jointure CLIENT
+**Technique utilisée** : Fonction YEAR() pour filtrer par année + jointure CLIENT
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex11 - 1](images-pt3-2/pt3ex11%201.PNG)
 ![P3 Ex11 - 2](images-pt3-2/pt3ex11%202.PNG)
@@ -1297,24 +1297,24 @@ J'ai utilise la fonction YEAR(DATE_MVT) dans le WHERE pour filtrer uniquement l'
 
 ---
 
-## Exercice 12 : Mouvements 2024 d'un client specifique
+## Exercice 12 : Mouvements 2024 d'un client spécifique
 
-### Enonce
-Refaire l'exercice 11 en precisant le numero de compte d'un client determine. Recuperer le numero via donnee In-Stream.
+### Énoncé
+Refaire l'exercice 11 en précisant le numéro de compte d'un client déterminé. Récupérer le numéro via donnee In-Stream.
 
 ### Mon travail
 
-Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client specifique. Le numero de compte est lu dynamiquement via ACCEPT. Le curseur filtre sur `NUM_COMPTE` ET `YEAR(DATE_MVT) = 2024`.
+Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client spécifique. Le numéro de compte est lu dynamiquement via ACCEPT. Le curseur filtre sur `NUM_COMPTE` ET `YEAR(DATE_MVT) = 2024`.
 
-**Difference avec Ex11** : Ex11 affiche tous les clients avec un JOIN, Ex12 filtre sur un seul client passe en SYSIN.
+**Différence avec Ex11** : Ex11 affiché tous les clients avec un JOIN, Ex12 filtre sur un seul client passé en SYSIN.
 
-### Resolution
+### Résolution
 
 **Programme : RLV012.cbl**
 
 ```cobol
        WORKING-STORAGE SECTION.
-      * Variable d'entree (ACCEPT depuis SYSIN In-Stream)
+      * Variable d'entrée (ACCEPT depuis SYSIN In-Stream)
        01 WS-NUM-COMPTE     PIC X(03).
       * Variables host pour DB2
        01 WS-NOM-CLIENT     PIC X(10).
@@ -1324,7 +1324,7 @@ Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client s
        01 WS-SENS           PIC X(02).
        01 WS-NATURE         PIC X(03).
 
-      * Curseur pour mouvements 2024 d'un client specifique
+      * Curseur pour mouvements 2024 d'un client spécifique
            EXEC SQL
                DECLARE C-MVT2024-CLI CURSOR FOR
                SELECT DATE_MVT, LIB_MOUV, MONTANT_MVT, SENS, NATURE
@@ -1347,9 +1347,9 @@ Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client s
 /*
 ```
 
-**Technique utilisee** : CURSOR avec double filtre (NUM_COMPTE + YEAR) + ACCEPT pour parametre dynamique
+**Technique utilisée** : CURSOR avec double filtre (NUM_COMPTE + YEAR) + ACCEPT pour paramètre dynamique
 
-### Captures d'ecran
+### Captures d'écran
 
 ![P3 Ex12 - 1](images-pt3-2/pt3ex12%201.PNG)
 ![P3 Ex12 - 2](images-pt3-2/pt3ex12%202.PNG)
@@ -1370,14 +1370,14 @@ Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client s
 | Programme | Description |
 |-----------|-------------|
 | AFFREG | Afficher region |
-| INSCLI | Inserer client |
+| INSCLI | Insérer client |
 | AFFCLI | Afficher clients region |
-| MAJCLI | Mise a jour client |
+| MAJCLI | Mise à jour client |
 | LSTRUPT | Liste avec ruptures |
 | STATCLI | Statistiques DB/CR |
 | TOTREG | Totaux par region |
 | TOTMVT | Total mouvements |
-| RELEVE | Releve de compte |
+| RELEVE | Relevé de compte |
 | MVT2024 | Mouvements 2024 |
 | RLV012 | Mouvements 2024 client |
 
@@ -1385,37 +1385,37 @@ Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client s
 
 | Script | Partie | Description |
 |--------|--------|-------------|
-| PT1EX01 | P1 | Creation des tables (REGION, NATCPT, PROF, CLIENT) |
+| PT1EX01 | P1 | Création des tables (REGION, NATCPT, PROF, CLIENT) |
 | PT1EX02 | P1 | Alimentation des tables de reference |
 | PT1EX03 | P1 | Insertion des 20 clients |
 | PT2EX01 | P2 | Extraction clients par profession |
-| PT2EX02 | P2 | Repartition DB/CR |
-| PT2EX03 | P2 | Repartition par region |
+| PT2EX02 | P2 | Répartition DB/CR |
+| PT2EX03 | P2 | Répartition par region |
 | PT2EX04 | P2 | Index sur CODE_REGION |
 | PT2EX05 | P2 | Index sur CODE_PROF |
-| PT2EX06 | P2 | Edition tries region/profession |
+| PT2EX06 | P2 | Édition triés region/profession |
 | PT2EX07 | P2 | Fusion populations (UNION) |
 | PT2EX08 | P2 | Vue CLIENT_REDUIT |
-| PT2EX09 | P2 | Analyse multi-criteres |
-| PT2EX10 | P2 | Clients anormalement debiteurs |
-| PT3EX08 | P3 | Creation table MOUVEMENT |
+| PT2EX09 | P2 | Analyse multi-critères |
+| PT2EX10 | P2 | Clients anormalement débiteurs |
+| PT3EX08 | P3 | Création table MOUVEMENT |
 
-## Liste des vues creees
+## Liste des vues créées
 
 | Vue | Description |
 |-----|-------------|
 | V_CLIENT_COMPTABLE | Clients comptables |
 | V_CLIENT_FONCTION | Clients fonctionnaires |
 | V_CLIENT_MEDECIN | Clients medecins |
-| V_CLIENT_DEBITEUR | Clients debiteurs |
-| V_CLIENT_CREDITEUR | Clients crediteurs |
+| V_CLIENT_DEBITEUR | Clients débiteurs |
+| V_CLIENT_CREDITEUR | Clients créditeurs |
 | V_CLIENT_PARIS | Clients region Paris |
 | V_CLIENT_MARSEILLE | Clients region Marseille |
 | V_CLIENT_LYON | Clients region Lyon |
 | V_CLIENT_LILLE | Clients region Lille |
-| V_CLIENT_REDUIT | Vue simplifiee CLIENT |
+| V_CLIENT_REDUIT | Vue simplifiée CLIENT |
 
-## Liste des index crees
+## Liste des index créés
 
 | Index | Colonne |
 |-------|---------|
@@ -1426,18 +1426,18 @@ Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client s
 
 # Conclusion
 
-Ce projet m'a permis de mettre en pratique l'ensemble des competences acquises durant la formation POEI Mainframe COBOL. A travers les trois parties du projet, j'ai pu :
+Ce projet m'a permis de mettre en pratique l'ensemble des compétences acquises durant la formation POEI Mainframe COBOL. A travers les trois parties du projet, j'ai pu :
 
-- **Maitriser SQL/DB2** : Creation de tables avec contraintes (PK, FK, CHECK), insertion de donnees, requetes complexes avec jointures, sous-requetes, fonctions d'agregation et vues.
+- **Maîtriser SQL/DB2** : Création de tables avec contraintes (PK, FK, CHECK), insertion de données, requêtes complexes avec jointures, sous-requêtes, fonctions d'agrégation et vues.
 
-- **Developper en COBOL-DB2** : Integration du SQL embarque dans les programmes COBOL, utilisation des curseurs pour le traitement multi-lignes, gestion des erreurs via SQLCODE, et techniques avancees (ruptures de controle, niveau 88, ACCEPT/SYSIN).
+- **Développer en COBOL-DB2** : Intégration du SQL embarqué dans les programmes COBOL, utilisation des curseurs pour le traitement multi-lignes, gestion des erreurs via SQLCODE, et techniques avancées (ruptures de controle, niveau 88, ACCEPT/SYSIN).
 
-- **Travailler dans l'environnement z/OS** : Navigation ISPF, utilisation de SPUFI pour les requetes interactives, compilation et execution de programmes via JCL.
+- **Travailler dans l'environnement z/OS** : Navigation ISPF, utilisation de SPUFI pour les requêtes interactives, compilation et execution de programmes via JCL.
 
-Le projet couvre un cas concret de gestion clientele dans le secteur financier, avec 12 programmes COBOL et plus de 10 requetes SQL. Les principales difficultes rencontrees (mots reserves, gestion des erreurs, formats de donnees) m'ont permis de developper une approche methodique de resolution de problemes.
+Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec 12 programmes COBOL et plus de 10 requêtes SQL. Les principales difficultés rencontrées (mots réservés, gestion des erreurs, formats de données) m'ont permis de développer une approche méthodique de resolution de problèmes.
 
 Cette experience constitue une base solide pour aborder des projets mainframe en entreprise.
 
 ---
 
-*Rapport realise par Josué ROCHA - Formation POEI Mainframe COBOL - M2i Formation, Strasbourg - Decembre 2025*
+*Rapport réalisé par Josué ROCHA - Formation POEI Mainframe COBOL - M2i Formation, Strasbourg - Décembre 2025*
