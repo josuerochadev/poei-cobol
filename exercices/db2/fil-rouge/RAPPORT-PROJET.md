@@ -1381,6 +1381,25 @@ Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client s
 | MVT2024 | Mouvements 2024 |
 | RLV012 | Mouvements 2024 client |
 
+## Liste des scripts SQL
+
+| Script | Partie | Description |
+|--------|--------|-------------|
+| PT1EX01 | P1 | Creation des tables (REGION, NATCPT, PROF, CLIENT) |
+| PT1EX02 | P1 | Alimentation des tables de reference |
+| PT1EX03 | P1 | Insertion des 20 clients |
+| PT2EX01 | P2 | Extraction clients par profession |
+| PT2EX02 | P2 | Repartition DB/CR |
+| PT2EX03 | P2 | Repartition par region |
+| PT2EX04 | P2 | Index sur CODE_REGION |
+| PT2EX05 | P2 | Index sur CODE_PROF |
+| PT2EX06 | P2 | Edition tries region/profession |
+| PT2EX07 | P2 | Fusion populations (UNION) |
+| PT2EX08 | P2 | Vue CLIENT_REDUIT |
+| PT2EX09 | P2 | Analyse multi-criteres |
+| PT2EX10 | P2 | Clients anormalement debiteurs |
+| PT3EX08 | P3 | Creation table MOUVEMENT |
+
 ## Liste des vues creees
 
 | Vue | Description |
