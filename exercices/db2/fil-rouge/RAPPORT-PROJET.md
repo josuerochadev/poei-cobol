@@ -1091,10 +1091,9 @@ J'ai cree un releve bancaire avec en-tete client et liste des mouvements. Chaque
 **Programme : RELEVE.cbl**
 
 ```cobol
-       PROCEDURE DIVISION.
        5100-AFFICHER-LIGNE.
-           MOVE SPACES TO WS-CREDIT-ED
-           MOVE SPACES TO WS-DEBIT-ED
+           INITIALIZE WS-CREDIT-ED
+           INITIALIZE WS-DEBIT-ED
 
            IF WS-SENS = 'CR'
                MOVE WS-MONTANT-MVT TO WS-CREDIT-ED
@@ -1107,6 +1106,8 @@ J'ai cree un releve bancaire avec en-tete client et liste des mouvements. Chaque
                    WS-CREDIT-ED ' '
                    WS-DEBIT-ED.
 ```
+
+> **Note** : Utiliser `INITIALIZE` au lieu de `MOVE SPACES` pour les champs numeriques edites (PIC ZZZ,ZZ9.99). MOVE SPACES cause l'erreur IGYPA3005-S.
 
 **Sortie attendue :**
 ```
