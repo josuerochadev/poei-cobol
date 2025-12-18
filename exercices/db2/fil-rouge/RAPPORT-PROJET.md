@@ -3,7 +3,7 @@
 **Theme** : Developpement d'un mini-projet COBOL-DB2 sous z/OS pour le suivi clientele dans le secteur financier.
 
 **Candidat** : Josué ROCHA (FORM1112)
-**Date** : 16-18 Decembre 2024
+**Date** : 16-18 Decembre 2025
 **Formation** : POEI Developpeur Mainframe COBOL - M2i Formation, Strasbourg
 
 ---
@@ -1440,4 +1440,4 @@ Cette experience constitue une base solide pour aborder des projets mainframe en
 
 ---
 
-*Rapport realise par Josué ROCHA - Formation POEI Mainframe COBOL - M2i Formation, Strasbourg - Decembre 2024*
+*Rapport realise par Josué ROCHA - Formation POEI Mainframe COBOL - M2i Formation, Strasbourg - Decembre 2025*
