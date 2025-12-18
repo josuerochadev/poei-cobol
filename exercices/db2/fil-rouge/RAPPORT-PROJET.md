@@ -1086,6 +1086,13 @@ J'ai cree un releve bancaire avec en-tete client et liste des mouvements. Chaque
 
 **Presentation** : L'en-tete affiche le nom du client et son numero de compte, suivi des colonnes Date/Libelle/Credit/Debit.
 
+**JCL requis** : Le numero de compte est lu via ACCEPT, donc le JCL doit inclure :
+```jcl
+//SYSIN DD *
+001
+/*
+```
+
 ### Resolution
 
 **Programme : RELEVE.cbl**
