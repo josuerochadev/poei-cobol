@@ -37,7 +37,13 @@
 
        1000-LIRE-NUM-COMPTE.
            ACCEPT WS-NUM-COMPTE
-           DISPLAY 'NUMERO COMPTE SAISI : ' WS-NUM-COMPTE.
+           DISPLAY 'NUMERO COMPTE SAISI : [' WS-NUM-COMPTE ']'
+
+           IF WS-NUM-COMPTE = SPACES
+               DISPLAY 'ERREUR : NUMERO COMPTE VIDE'
+               DISPLAY 'VERIFIER SYSIN DANS LE JCL'
+               STOP RUN
+           END-IF.
 
        2000-VERIFIER-CLIENT.
            EXEC SQL

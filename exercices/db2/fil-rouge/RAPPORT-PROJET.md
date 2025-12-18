@@ -1062,6 +1062,8 @@ J'ai utilise ACCEPT pour lire le numero de compte depuis SYSIN. La requete SELEC
 
 **Technique utilisee** : ACCEPT pour saisie + SUM/COUNT + COALESCE pour gerer les NULL
 
+**Validation ajoutee** : Le programme verifie que le numero de compte n'est pas vide avant d'executer les requetes SQL (evite ABEND 4038).
+
 ### Captures d'ecran suggerees
 - [ ] JCL avec donnee In-Stream (SYSIN)
 - [ ] Resultat pour un client specifique
