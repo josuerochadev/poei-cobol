@@ -115,9 +115,13 @@ CREATE TABLE CLIENT (
 
 > **Note** : `POS` remplace `POSITION` (mot reserve COBOL)
 
-### Captures d'ecran suggerees
-- [ ] Panel SPUFI avec le script de creation
-- [ ] Resultat d'execution (SQLCODE = 0 pour chaque CREATE)
+### Captures d'ecran
+
+![pt1ex01-1](images-pt1/pt1ex01%201.PNG)
+![pt1ex01-2](images-pt1/pt1ex01%202.PNG)
+![pt1ex01-3](images-pt1/pt1ex01%203.PNG)
+![pt1ex01-4](images-pt1/pt1ex01%204.PNG)
+![pt1ex01-5](images-pt1/pt1ex01%205.PNG)
 
 ---
 
@@ -183,9 +187,15 @@ INSERT INTO CLIENT VALUES ('020','04','40','GUYOT','PAULINE',DATE('1990-07-13'),
 | Position | 8 DB / 12 CR |
 | Professions | Toutes representees |
 
-### Captures d'ecran suggerees
-- [ ] Execution des INSERT (SQLCODE = 0)
-- [ ] Message de confirmation du nombre de lignes inserees
+### Captures d'ecran
+
+![pt1ex02-1](images-pt1/pt1ex02%201.PNG)
+![pt1ex02-2](images-pt1/pt1ex02%202.PNG)
+![pt1ex02-3](images-pt1/pt1ex02%203.PNG)
+![pt1ex02-4](images-pt1/pt1ex02%204.PNG)
+![pt1ex02-5](images-pt1/pt1ex02%205.PNG)
+![pt1ex02-6](images-pt1/pt1ex02%206.PNG)
+![pt1ex02-7](images-pt1/pt1ex02%207.PNG)
 
 ---
 
@@ -212,10 +222,13 @@ SELECT * FROM PROFESSI;
 SELECT * FROM CLIENT;
 ```
 
-### Captures d'ecran suggerees
+### Captures d'ecran
 
-- [ ] Resultat SELECT * FROM CLIENT (liste des 20 clients)
-- [ ] Resultat des tables referentielles
+![pt1ex03-1](images-pt1/pt1ex03%201.PNG)
+![pt1ex03-2](images-pt1/pt1ex03%202.PNG)
+![pt1ex03-3](images-pt1/pt1ex03%203.PNG)
+![pt1ex03-4](images-pt1/pt1ex03%204.PNG)
+![pt1ex03-5](images-pt1/pt1ex03%205.PNG)
 
 ---
 
@@ -269,9 +282,14 @@ SELECT * FROM V_CLIENT_FONCTION;
 SELECT * FROM V_CLIENT_MEDECIN;
 ```
 
-### Captures d'ecran suggerees
-- [ ] Creation des vues (SQLCODE = 0)
-- [ ] Resultat SELECT sur une des vues
+### Captures d'ecran
+
+![pt2ex01-1](images-pt1/pt2ex01%201.PNG)
+![pt2ex01-2](images-pt1/pt2ex01%202.PNG)
+![pt2ex01-3](images-pt1/pt2ex01%203.PNG)
+![pt2ex01-4](images-pt1/pt2ex01%204.PNG)
+![pt2ex01-5](images-pt1/pt2ex01%205.PNG)
+![pt2ex01-6](images-pt1/pt2ex01%206.PNG)
 
 ---
 
@@ -312,9 +330,15 @@ SELECT * FROM V_CLIENT_DEBITEUR;
 SELECT * FROM V_CLIENT_CREDITEUR;
 ```
 
-### Captures d'ecran suggerees
-- [ ] Liste des clients debiteurs
-- [ ] Liste des clients crediteurs
+### Captures d'ecran
+
+![pt2ex02-1](images-pt1/pt2ex02%201.PNG)
+![pt2ex02-2](images-pt1/pt2ex02%202.PNG)
+![pt2ex02-3](images-pt1/pt2ex02%203.PNG)
+![pt2ex02-4](images-pt1/pt2ex02%204.PNG)
+![pt2ex02-5](images-pt1/pt2ex02%205.PNG)
+![pt2ex02-6](images-pt1/pt2ex02%206.PNG)
+![pt2ex02-7](images-pt1/pt2ex02%207.PNG)
 
 ---
 
@@ -372,8 +396,18 @@ WHERE R.NOM_REGION = 'LILLE';
 SELECT * FROM V_CLIENT_MARSEILLE;
 ```
 
-### Captures d'ecran suggerees
-- [ ] Resultat d'une vue par region (ex: V_CLIENT_MARSEILLE)
+### Captures d'ecran
+
+![pt2ex03-1](images-pt1/pt2ex03%201.PNG)
+![pt2ex03-2](images-pt1/pt2ex03%202.PNG)
+![pt2ex03-3](images-pt1/pt2ex03%203.PNG)
+![pt2ex03-4](images-pt1/pt2ex03%204.PNG)
+![pt2ex03-5](images-pt1/pt2ex03%205.PNG)
+![pt2ex03-6](images-pt1/pt2ex03%206.PNG)
+![pt2ex03-7](images-pt1/pt2ex03%207.PNG)
+![pt2ex03-8](images-pt1/pt2ex03%208.PNG)
+![pt2ex03-9](images-pt1/pt2ex03%209.PNG)
+![pt2ex03-10](images-pt1/pt2ex03%2010.PNG)
 
 ---
 
@@ -397,8 +431,10 @@ CREATE INDEX IDX_CLIENT_REGION ON CLIENT(CODE_REGION);
 SELECT * FROM CLIENT WHERE CODE_REGION = '01';
 ```
 
-### Captures d'ecran suggerees
-- [ ] Creation de l'index (SQLCODE = 0)
+### Captures d'ecran
+
+![pt2ex04-1](images-pt1/pt2ex04%201.PNG)
+![pt2ex04-2](images-pt1/pt2ex04%202.PNG)
 
 ---
 
@@ -422,8 +458,10 @@ CREATE INDEX IDX_CLIENT_PROF ON CLIENT(CODE_PROF);
 SELECT * FROM CLIENT WHERE CODE_PROF = '15';
 ```
 
-### Captures d'ecran suggerees
-- [ ] Creation de l'index (SQLCODE = 0)
+### Captures d'ecran
+
+![pt2ex05-1](images-pt1/pt2ex05%201.PNG)
+![pt2ex05-2](images-pt1/pt2ex05%202.PNG)
 
 ---
 
@@ -454,8 +492,11 @@ INNER JOIN PROFESSI P ON C.CODE_PROF = P.CODE_PROF
 ORDER BY C.CODE_REGION, C.CODE_PROF, C.NUM_COMPTE;
 ```
 
-### Captures d'ecran suggerees
-- [ ] Resultat de la requete triee (20 lignes ordonnees)
+### Captures d'ecran
+
+![pt2ex06-1](images-pt1/pt2ex06%201.PNG)
+![pt2ex06-2](images-pt1/pt2ex06%202.PNG)
+![pt2ex06-3](images-pt1/pt2ex06%203.PNG)
 
 ---
 
@@ -488,8 +529,11 @@ INNER JOIN PROFESSI P ON C.CODE_PROF = P.CODE_PROF
 WHERE P.LIB_PROF = 'FONCTIONNAIRE';
 ```
 
-### Captures d'ecran suggerees
-- [ ] Resultat de l'UNION (comptables + fonctionnaires)
+### Captures d'ecran
+
+![pt2ex07-1](images-pt1/pt2ex07%201.PNG)
+![pt2ex07-2](images-pt1/pt2ex07%202.PNG)
+![pt2ex07-3](images-pt1/pt2ex07%203.PNG)
 
 ---
 
@@ -523,8 +567,12 @@ FROM CLIENT;
 SELECT * FROM V_CLIENT_REDUIT;
 ```
 
-### Captures d'ecran suggerees
-- [ ] Structure de la vue (colonnes selectionnees)
+### Captures d'ecran
+
+![pt2ex08-1](images-pt1/pt2ex08%201.PNG)
+![pt2ex08-2](images-pt1/pt2ex08%202.PNG)
+![pt2ex08-3](images-pt1/pt2ex08%203.PNG)
+![pt2ex08-4](images-pt1/pt2ex08%204.PNG)
 
 ---
 
@@ -563,8 +611,11 @@ FROM CLIENT
 GROUP BY CODE_REGION;
 ```
 
-### Captures d'ecran suggerees
-- [ ] Tableau des statistiques par region (4 lignes)
+### Captures d'ecran
+
+![pt2ex09-1](images-pt1/pt2ex09%201.PNG)
+![pt2ex09-2](images-pt1/pt2ex09%202.PNG)
+![pt2ex09-3](images-pt1/pt2ex09%203.PNG)
 
 ---
 
@@ -597,8 +648,10 @@ ORDER BY C.CODE_PROF, C.SOLDE;
 
 > **Note** : La comparaison utilise `<` car les soldes debiteurs sont negatifs. Un solde de -450 est "plus debiteur" qu'un solde de -200.
 
-### Captures d'ecran suggerees
-- [ ] Liste des clients anormalement debiteurs
+### Captures d'ecran
+
+![pt2ex10-1](images-pt1/pt2ex10%201.PNG)
+![pt2ex10-2](images-pt1/pt2ex10%202.PNG)
 
 ---
 
