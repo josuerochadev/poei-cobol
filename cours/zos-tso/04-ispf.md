@@ -312,7 +312,8 @@ ISPF permet de travailler sur plusieurs écrans simultanément :
 │   │       ├── 3.12 SuperC       - Comparaison de fichiers      │
 │   │       ├── 3.13 SuperCE      - Comparaison étendue          │
 │   │       ├── 3.14 Search-For   - Recherche dans fichiers      │
-│   │       └── 3.15 Search-ForE  - Recherche étendue            │
+│   │       ├── 3.15 Search-ForE  - Recherche étendue            │
+│   │       └── 3.V  VSAM         - Utilitaires VSAM             │
 │   │                                                              │
 │   ├── 4  Foreground                                             │
 │   │       └── Compilation interactive                          │
@@ -578,6 +579,7 @@ L'**Option 3 (Utilities)** regroupe les utilitaires de gestion.
 │   13 SuperCE      Compare data sets (extended)                  │
 │   14 Search-For   Search data sets for strings                  │
 │   15 Search-ForE  Search data sets (extended)                   │
+│   V  VSAM         VSAM utilities                                │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -722,6 +724,41 @@ L'utilitaire **le plus utilisé** pour naviguer dans les datasets :
 | **c** | Copier |
 | **z** | Compresser (PDS) |
 | **j** | Soumettre comme JCL |
+
+#### Option 3.V - VSAM Utilities
+
+Utilitaires spécifiques pour la gestion des fichiers VSAM :
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 VSAM UTILITIES                                   │
+│                                                                  │
+│  Option ===> _                                                  │
+│                                                                  │
+│     D  Define    - Define a VSAM cluster                        │
+│     I  Information - Display VSAM catalog info                  │
+│     B  Browse    - Browse VSAM data set                         │
+│     E  Edit      - Edit VSAM data set (KSDS)                    │
+│     R  Repro     - Copy VSAM data set                           │
+│     P  Print     - Print VSAM data set                          │
+│     L  Listcat   - List catalog entries                         │
+│     A  Alter     - Alter VSAM attributes                        │
+│     X  Delete    - Delete VSAM cluster                          │
+│                                                                  │
+│  Data Set Name ===> ___________________________________________│
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+| Option | Fonction |
+|--------|----------|
+| **D** | Définir un cluster VSAM (KSDS, ESDS, RRDS) |
+| **I** | Informations sur le fichier VSAM |
+| **B** | Parcourir (Browse) un fichier VSAM |
+| **E** | Éditer un fichier VSAM (KSDS uniquement) |
+| **R** | Copier (REPRO) un fichier VSAM |
+| **L** | Lister les entrées du catalogue |
+| **X** | Supprimer un cluster VSAM |
 
 ---
 
@@ -1103,6 +1140,7 @@ L'éditeur ISPF est l'outil central du développement mainframe.
 │    • 3.1 Library : Gestion membres PDS                         │
 │    • 3.2 Data Set : Création/suppression datasets              │
 │    • 3.4 Dslist : Liste et actions sur datasets                │
+│    • 3.V VSAM : Utilitaires VSAM (Define, Browse, Repro...)    │
 │                                                                  │
 │  ✓ SDSF                                                         │
 │    • Gestion du spool et des jobs                              │
@@ -1133,7 +1171,8 @@ L'éditeur ISPF est l'outil central du développement mainframe.
 │  =2         Edit                  =5         Batch              │
 │  =3         Utilities             =6         Command            │
 │  =3.1       Library               =S         SDSF               │
-│  =3.2       Data Set              =X         Exit               │
+│  =3.2       Data Set              =3.V       VSAM Utilities     │
+│  =3.4       Dslist                =X         Exit               │
 │                                                                  │
 │  TOUCHES DE FONCTION                                            │
 │  ────────────────────────────────────────────────────────────── │
