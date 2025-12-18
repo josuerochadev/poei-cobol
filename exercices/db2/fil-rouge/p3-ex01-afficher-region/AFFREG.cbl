@@ -16,7 +16,7 @@
 
       * DCLGEN pour la table REGION
            EXEC SQL
-               INCLUDE DCLREGION
+               INCLUDE REGION
            END-EXEC.
 
        PROCEDURE DIVISION.

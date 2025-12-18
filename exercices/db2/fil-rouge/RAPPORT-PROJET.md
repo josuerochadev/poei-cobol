@@ -666,7 +666,7 @@ Ecrire un programme COBOL-DB2 permettant d'afficher la region Marseille (02).
 
 Premier programme COBOL-DB2 : j'ai utilise SELECT INTO pour lire une seule ligne. La variable SQLCODE me permet de verifier si la requete a reussi (0) ou echoue.
 
-**Utilisation de DCLGEN** : Au lieu de declarer manuellement les variables host, j'utilise `EXEC SQL INCLUDE DCLREGION END-EXEC` pour inclure les variables generees par l'utilitaire DCLGEN de DB2.
+**Utilisation de DCLGEN** : Au lieu de declarer manuellement les variables host, j'utilise `EXEC SQL INCLUDE REGION END-EXEC` pour inclure les variables generees par l'utilitaire DCLGEN de DB2.
 
 **Avantages DCLGEN** :
 - Variables host generees automatiquement depuis la structure de la table
@@ -682,7 +682,7 @@ Premier programme COBOL-DB2 : j'ai utilise SELECT INTO pour lire une seule ligne
       * SQLCA pour gestion erreurs DB2
            EXEC SQL INCLUDE SQLCA END-EXEC.
       * DCLGEN pour la table REGION
-           EXEC SQL INCLUDE DCLREGION END-EXEC.
+           EXEC SQL INCLUDE REGION END-EXEC.
 
        PROCEDURE DIVISION.
        1000-SELECT-REGION.
