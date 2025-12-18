@@ -1046,23 +1046,28 @@ J'ai utilise ACCEPT pour lire le numero de compte depuis SYSIN. La requete SELEC
 **Programme : TOTMVT.cbl**
 
 ```cobol
-       PROCEDURE DIVISION.
+       1000-LIRE-NUM-COMPTE.
            ACCEPT WS-NUM-COMPTE
+           DISPLAY 'NUMERO COMPTE SAISI : [' WS-NUM-COMPTE ']'
 
+           IF WS-NUM-COMPTE = SPACES
+               DISPLAY 'ERREUR : NUMERO COMPTE VIDE'
+               DISPLAY 'VERIFIER SYSIN DANS LE JCL'
+               STOP RUN
+           END-IF.
+
+       3000-CALCULER-TOTAUX.
            EXEC SQL
                SELECT COALESCE(SUM(MONTANT_MVT), 0), COUNT(*)
                INTO :WS-TOTAL-MVT, :WS-NB-MVT
                FROM MOUVEMENT
                WHERE NUM_COMPTE = :WS-NUM-COMPTE
-           END-EXEC
-
-           DISPLAY 'NOMBRE MOUVEMENTS : ' WS-NB-MVT
-           DISPLAY 'TOTAL MOUVEMENTS  : ' WS-TOTAL-MVT.
+           END-EXEC.
 ```
 
 **Technique utilisee** : ACCEPT pour saisie + SUM/COUNT + COALESCE pour gerer les NULL
 
-**Validation ajoutee** : Le programme verifie que le numero de compte n'est pas vide avant d'executer les requetes SQL (evite ABEND 4038).
+**Validation importante** : Le programme verifie que le numero de compte n'est pas vide avant d'executer les requetes SQL. Cela evite l'erreur ABEND 4038 si le SYSIN est mal configure.
 
 ### Captures d'ecran suggerees
 - [ ] JCL avec donnee In-Stream (SYSIN)
