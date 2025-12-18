@@ -858,12 +858,26 @@ J'ai utilise UPDATE avec une clause WHERE pour cibler un client specifique (005)
 **Programme : MAJCLI.cbl**
 
 ```cobol
-       PROCEDURE DIVISION.
-           MOVE '005' TO WS-NUM-COMPTE
-           MOVE '20 AVENUE FOCH' TO WS-ADRESSE
-           MOVE 2800.00 TO WS-SOLDE
-           MOVE 'CR' TO WS-POS
+       WORKING-STORAGE SECTION.
+      * Variables host pour DB2
+       01 WS-NUM-COMPTE     PIC X(03).
+       01 WS-ADRESSE        PIC X(20).
+       01 WS-SOLDE          PIC S9(8)V99 COMP-3.
+       01 WS-POS            PIC X(02).
+      * Variable pour saisie du solde
+       01 WS-SOLDE-IN       PIC X(10).
 
+       PROCEDURE DIVISION.
+       1000-LIRE-DONNEES.
+      * Lecture des donnees depuis SYSIN (JCL In-Stream)
+           ACCEPT WS-NUM-COMPTE
+           ACCEPT WS-ADRESSE
+           ACCEPT WS-SOLDE-IN
+           ACCEPT WS-POS
+      * Conversion du solde (texte -> numerique)
+           COMPUTE WS-SOLDE = FUNCTION NUMVAL(WS-SOLDE-IN)
+
+       2000-UPDATE-CLIENT.
            EXEC SQL
                UPDATE CLIENT
                SET ADRESSE = :WS-ADRESSE,
@@ -878,7 +892,17 @@ J'ai utilise UPDATE avec une clause WHERE pour cibler un client specifique (005)
            END-IF.
 ```
 
-**Technique utilisee** : UPDATE avec clause WHERE + COMMIT
+**JCL d'execution avec SYSIN** :
+```jcl
+//SYSIN    DD *
+005
+20 AVENUE FOCH
+2800.00
+CR
+/*
+```
+
+**Technique utilisee** : UPDATE avec clause WHERE + COMMIT + ACCEPT pour donnees dynamiques
 
 ### Captures d'ecran suggerees
 - [ ] Execution (message de succes)

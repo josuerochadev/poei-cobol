@@ -15,6 +15,9 @@
        01 WS-SOLDE          PIC S9(8)V99 COMP-3.
        01 WS-POS            PIC X(02).
 
+      * Variable pour saisie du solde
+       01 WS-SOLDE-IN       PIC X(10).
+
       * SQLCA pour gestion erreurs DB2
            EXEC SQL
                INCLUDE SQLCA
@@ -22,17 +25,26 @@
 
        PROCEDURE DIVISION.
        0000-PRINCIPAL.
-           PERFORM 1000-INIT-DONNEES
+           PERFORM 1000-LIRE-DONNEES
            PERFORM 2000-UPDATE-CLIENT
            PERFORM 9000-FIN
            STOP RUN.
 
-       1000-INIT-DONNEES.
-      * Exemple de mise a jour du client 005
-           MOVE '005'               TO WS-NUM-COMPTE
-           MOVE '20 AVENUE FOCH'    TO WS-ADRESSE
-           MOVE 2800.00             TO WS-SOLDE
-           MOVE 'CR'                TO WS-POS.
+       1000-LIRE-DONNEES.
+      * Lecture des donnees depuis SYSIN (JCL In-Stream)
+           ACCEPT WS-NUM-COMPTE
+           ACCEPT WS-ADRESSE
+           ACCEPT WS-SOLDE-IN
+           ACCEPT WS-POS
+
+      * Conversion du solde (texte -> numerique)
+           COMPUTE WS-SOLDE = FUNCTION NUMVAL(WS-SOLDE-IN)
+
+           DISPLAY 'DONNEES LUES DEPUIS SYSIN'
+           DISPLAY 'NUM COMPTE : ' WS-NUM-COMPTE
+           DISPLAY 'NV ADRESSE : ' WS-ADRESSE
+           DISPLAY 'NV SOLDE   : ' WS-SOLDE
+           DISPLAY 'NV POS     : ' WS-POS.
 
        2000-UPDATE-CLIENT.
            EXEC SQL
