@@ -971,8 +971,18 @@ J'ai implemente les ruptures de controle en conservant les valeurs precedentes d
 
 **Technique utilisee** : Variables de rupture pour detecter les changements de groupe
 
-### Captures d'ecran suggerees
-- [ ] Sortie avec les en-tetes de rupture region/profession
+### Captures d'ecran
+
+![P3 Ex05 - 1](images-pt3-2/pt3ex05%201.PNG)
+![P3 Ex05 - 2](images-pt3-2/pt3ex05%202.PNG)
+![P3 Ex05 - 3](images-pt3-2/pt3ex05%203.PNG)
+![P3 Ex05 - 4](images-pt3-2/pt3ex05%204.PNG)
+![P3 Ex05 - 5](images-pt3-2/pt3ex05%205.PNG)
+![P3 Ex05 - 6](images-pt3-2/pt3ex05%206.PNG)
+![P3 Ex05 - 7](images-pt3-2/pt3ex05%207.PNG)
+![P3 Ex05 - 8](images-pt3-2/pt3ex05%208.PNG)
+![P3 Ex05 - 9](images-pt3-2/pt3ex05%209.PNG)
+![P3 Ex05 - 10](images-pt3-2/pt3ex05%2010.PNG)
 
 ---
 
@@ -1016,8 +1026,14 @@ J'ai fait deux SELECT INTO avec les fonctions SUM, AVG et COUNT : un pour les de
 
 **Technique utilisee** : Fonctions d'agregation SQL (SUM, AVG, COUNT)
 
-### Captures d'ecran suggerees
-- [ ] Affichage des statistiques (totaux et moyennes)
+### Captures d'ecran
+
+![P3 Ex06 - 1](images-pt3-2/pt3ex06%201.PNG)
+![P3 Ex06 - 2](images-pt3-2/pt3ex06%202.PNG)
+![P3 Ex06 - 3](images-pt3-2/pt3ex06%203.PNG)
+![P3 Ex06 - 4](images-pt3-2/pt3ex06%204.PNG)
+![P3 Ex06 - 5](images-pt3-2/pt3ex06%205.PNG)
+![P3 Ex06 - 6](images-pt3-2/pt3ex06%206.PNG)
 
 ---
 
@@ -1058,8 +1074,15 @@ J'ai declare des niveaux 88 pour representer les 4 regions (REGION-PARIS, REGION
 
 **Technique utilisee** : Niveau 88 pour representer les codes regions + boucle PERFORM VARYING
 
-### Captures d'ecran suggerees
-- [ ] Totaux DB/CR pour chaque region
+### Captures d'ecran
+
+![P3 Ex07 - 1](images-pt3-2/pt3ex07%201.PNG)
+![P3 Ex07 - 2](images-pt3-2/pt3ex07%202.PNG)
+![P3 Ex07 - 3](images-pt3-2/pt3ex07%203.PNG)
+![P3 Ex07 - 4](images-pt3-2/pt3ex07%204.PNG)
+![P3 Ex07 - 5](images-pt3-2/pt3ex07%205.PNG)
+![P3 Ex07 - 6](images-pt3-2/pt3ex07%206.PNG)
+![P3 Ex07 - 7](images-pt3-2/pt3ex07%207.PNG)
 
 ---
 
@@ -1259,8 +1282,15 @@ J'ai utilise la fonction YEAR(DATE_MVT) dans le WHERE pour filtrer uniquement l'
 
 **Technique utilisee** : Fonction YEAR() pour filtrer par annee + jointure CLIENT
 
-### Captures d'ecran suggerees
-- [ ] Liste des mouvements 2024 avec compteur total
+### Captures d'ecran
+
+![P3 Ex11 - 1](images-pt3-2/pt3ex11%201.PNG)
+![P3 Ex11 - 2](images-pt3-2/pt3ex11%202.PNG)
+![P3 Ex11 - 3](images-pt3-2/pt3ex11%203.PNG)
+![P3 Ex11 - 4](images-pt3-2/pt3ex11%204.PNG)
+![P3 Ex11 - 5](images-pt3-2/pt3ex11%205.PNG)
+![P3 Ex11 - 6](images-pt3-2/pt3ex11%206.PNG)
+![P3 Ex11 - 7](images-pt3-2/pt3ex11%207.PNG)
 
 ---
 
@@ -1316,9 +1346,17 @@ Ce programme reprend la logique des mouvements 2024 (Ex11) mais pour un client s
 
 **Technique utilisee** : CURSOR avec double filtre (NUM_COMPTE + YEAR) + ACCEPT pour parametre dynamique
 
-### Captures d'ecran suggerees
-- [ ] JCL avec SYSIN In-Stream
-- [ ] Mouvements 2024 du client specifique
+### Captures d'ecran
+
+![P3 Ex12 - 1](images-pt3-2/pt3ex12%201.PNG)
+![P3 Ex12 - 2](images-pt3-2/pt3ex12%202.PNG)
+![P3 Ex12 - 3](images-pt3-2/pt3ex12%203.PNG)
+![P3 Ex12 - 4](images-pt3-2/pt3ex12%204.PNG)
+![P3 Ex12 - 5](images-pt3-2/pt3ex12%205.PNG)
+![P3 Ex12 - 6](images-pt3-2/pt3ex12%206.PNG)
+![P3 Ex12 - 7](images-pt3-2/pt3ex12%207.PNG)
+![P3 Ex12 - 9](images-pt3-2/pt3ex12%209.PNG)
+![P3 Ex12 - 10](images-pt3-2/pt3ex12%2010.PNG)
 
 ---
 
