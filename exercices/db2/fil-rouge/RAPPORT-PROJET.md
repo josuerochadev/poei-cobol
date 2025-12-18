@@ -705,9 +705,12 @@ Premier programme COBOL-DB2 : j'ai utilise SELECT INTO pour lire une seule ligne
 - SELECT INTO (lecture d'une seule ligne)
 - DCLGEN (variables host generees par DB2)
 
-### Captures d'ecran suggerees
-- [ ] Code source dans ISPF
-- [ ] Resultat d'execution (CODE: 02, NOM: MARSEILLE)
+### Captures d'ecran
+
+![P3 Ex01 - 1](images-pt3-1/pt3ex01%201.PNG)
+![P3 Ex01 - 2](images-pt3-1/pt3ex01%202.PNG)
+![P3 Ex01 - 3](images-pt3-1/pt3ex01%203.PNG)
+![P3 Ex01 - 4](images-pt3-1/pt3ex01%204.PNG)
 
 ---
 
@@ -779,9 +782,17 @@ CR
 - FUNCTION NUMVAL pour convertir le solde texte en numerique
 - COMMIT/ROLLBACK pour la gestion transactionnelle
 
-### Captures d'ecran suggerees
-- [ ] Execution du programme (message de succes)
-- [ ] Verification avec SELECT du nouveau client
+### Captures d'ecran
+
+![P3 Ex02 - 1](images-pt3-1/pt3ex02%201.PNG)
+![P3 Ex02 - 2](images-pt3-1/pt3ex02%202.PNG)
+![P3 Ex02 - 3](images-pt3-1/pt3ex02%203.PNG)
+![P3 Ex02 - 4](images-pt3-1/pt3ex02%204.PNG)
+![P3 Ex02 - 5](images-pt3-1/pt3ex02%205.PNG)
+![P3 Ex02 - 6](images-pt3-1/pt3ex02%206.PNG)
+![P3 Ex02 - 7](images-pt3-1/pt3ex02%207.PNG)
+![P3 Ex02 - 8](images-pt3-1/pt3ex02%208.PNG)
+![P3 Ex02 - 9](images-pt3-1/pt3ex02%209.PNG)
 
 ---
 
@@ -837,8 +848,15 @@ Pour lire plusieurs lignes, j'ai utilise un CURSOR. Le cycle complet est : DECLA
 
 **Technique utilisee** : CURSOR (DECLARE, OPEN, FETCH, CLOSE) pour lecture multiple
 
-### Captures d'ecran suggerees
-- [ ] Liste des clients Marseille (5 clients)
+### Captures d'ecran
+
+![P3 Ex03 - 1](images-pt3-1/pt3ex03%201.PNG)
+![P3 Ex03 - 2](images-pt3-1/pt3ex03%202.PNG)
+![P3 Ex03 - 3](images-pt3-1/pt3ex03%203.PNG)
+![P3 Ex03 - 4](images-pt3-1/pt3ex03%204.PNG)
+![P3 Ex03 - 5](images-pt3-1/pt3ex03%205.PNG)
+![P3 Ex03 - 6](images-pt3-1/pt3ex03%206.PNG)
+![P3 Ex03 - 7](images-pt3-1/pt3ex03%207.PNG)
 
 ---
 
@@ -904,9 +922,16 @@ CR
 
 **Technique utilisee** : UPDATE avec clause WHERE + COMMIT + ACCEPT pour donnees dynamiques
 
-### Captures d'ecran suggerees
-- [ ] Execution (message de succes)
-- [ ] Verification avant/apres mise a jour
+### Captures d'ecran
+
+![P3 Ex04 - 1](images-pt3-1/pt3ex04%201.PNG)
+![P3 Ex04 - 2](images-pt3-1/pt3ex04%202.PNG)
+![P3 Ex04 - 3](images-pt3-1/pt3ex04%203.PNG)
+![P3 Ex04 - 4](images-pt3-1/pt3ex04%204.PNG)
+![P3 Ex04 - 5](images-pt3-1/pt3ex04%205.PNG)
+![P3 Ex04 - 6](images-pt3-1/pt3ex04%206.PNG)
+![P3 Ex04 - 7](images-pt3-1/pt3ex04%207.PNG)
+![P3 Ex04 - 8](images-pt3-1/pt3ex04%208.PNG)
 
 ---
 
@@ -1069,9 +1094,16 @@ INSERT INTO MOUVEMENT VALUES ('001','CHEQUE 001',200.00,'DB','CHQ',DATE('2024-01
 -- ... autres mouvements de test ...
 ```
 
-### Captures d'ecran suggerees
-- [ ] Creation de la table MOUVEMENT
-- [ ] SELECT * FROM MOUVEMENT (donnees de test)
+### Captures d'ecran
+
+![P3 Ex08 - 1](images-pt3-1/pt3ex08%201.PNG)
+![P3 Ex08 - 2](images-pt3-1/pt3ex08%202.PNG)
+![P3 Ex08 - 3](images-pt3-1/pt3ex08%203.PNG)
+![P3 Ex08 - 4](images-pt3-1/pt3ex08%204.PNG)
+![P3 Ex08 - 5](images-pt3-1/pt3ex08%205.PNG)
+![P3 Ex08 - 6](images-pt3-1/pt3ex08%206.PNG)
+![P3 Ex08 - 7](images-pt3-1/pt3ex08%207.PNG)
+![P3 Ex08 - 8](images-pt3-1/pt3ex08%208.PNG)
 
 ---
 
@@ -1114,9 +1146,17 @@ J'ai utilise ACCEPT pour lire le numero de compte depuis SYSIN. La requete SELEC
 
 **Validation importante** : Le programme verifie que le numero de compte n'est pas vide avant d'executer les requetes SQL. Cela evite l'erreur ABEND 4038 si le SYSIN est mal configure.
 
-### Captures d'ecran suggerees
-- [ ] JCL avec donnee In-Stream (SYSIN)
-- [ ] Resultat pour un client specifique
+### Captures d'ecran
+
+![P3 Ex09 - 1](images-pt3-1/pt3ex09%201.PNG)
+![P3 Ex09 - 2](images-pt3-1/pt3ex09%202.PNG)
+![P3 Ex09 - 3](images-pt3-1/pt3ex09%203.PNG)
+![P3 Ex09 - 4](images-pt3-1/pt3ex09%204.PNG)
+![P3 Ex09 - 5](images-pt3-1/pt3ex09%205.PNG)
+![P3 Ex09 - 6](images-pt3-1/pt3ex09%206.PNG)
+![P3 Ex09 - 7](images-pt3-1/pt3ex09%207.PNG)
+![P3 Ex09 - 8](images-pt3-1/pt3ex09%208.PNG)
+![P3 Ex09 - 9](images-pt3-1/pt3ex09%209.PNG)
 
 ---
 
@@ -1173,8 +1213,19 @@ Date operation  Libelle         Credit    Debit
 ================================================
 ```
 
-### Captures d'ecran suggerees
-- [ ] Releve de compte formate avec colonnes Credit/Debit
+### Captures d'ecran
+
+![P3 Ex10 - 1](images-pt3-1/pt3ex10%201.PNG)
+![P3 Ex10 - 2](images-pt3-1/pt3ex10%202.PNG)
+![P3 Ex10 - 3](images-pt3-1/pt3ex10%203.PNG)
+![P3 Ex10 - 4](images-pt3-1/pt3ex10%204.PNG)
+![P3 Ex10 - 5](images-pt3-1/pt3ex10%205.PNG)
+![P3 Ex10 - 6](images-pt3-1/pt3ex10%206.PNG)
+![P3 Ex10 - 7](images-pt3-1/pt3ex10%207.PNG)
+![P3 Ex10 - 8](images-pt3-1/pt3ex10%208.PNG)
+![P3 Ex10 - 9](images-pt3-1/pt3ex10%209.PNG)
+![P3 Ex10 - 10](images-pt3-1/pt3ex10%2010.PNG)
+![P3 Ex10 - 11](images-pt3-1/pt3ex10%2011.PNG)
 
 ---
 
