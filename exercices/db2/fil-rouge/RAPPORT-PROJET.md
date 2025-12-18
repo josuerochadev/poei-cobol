@@ -666,41 +666,44 @@ Ecrire un programme COBOL-DB2 permettant d'afficher la region Marseille (02).
 
 Premier programme COBOL-DB2 : j'ai utilise SELECT INTO pour lire une seule ligne. La variable SQLCODE me permet de verifier si la requete a reussi (0) ou echoue.
 
-**Structure du programme** : Declaration des variables host, INCLUDE SQLCA, SELECT INTO, test SQLCODE, DISPLAY.
+**Utilisation de DCLGEN** : Au lieu de declarer manuellement les variables host, j'utilise `EXEC SQL INCLUDE DCLREGION END-EXEC` pour inclure les variables generees par l'utilitaire DCLGEN de DB2.
+
+**Avantages DCLGEN** :
+- Variables host generees automatiquement depuis la structure de la table
+- Correspondance exacte avec les types de colonnes DB2
+- Maintenabilite : si la table change, on regenere le DCLGEN
 
 ### Resolution
 
 **Programme : AFFREG.cbl**
 
 ```cobol
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. AFFREG.
-
-       DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01 WS-CODE-REGION    PIC X(02).
-       01 WS-NOM-REGION     PIC X(15).
+      * SQLCA pour gestion erreurs DB2
            EXEC SQL INCLUDE SQLCA END-EXEC.
+      * DCLGEN pour la table REGION
+           EXEC SQL INCLUDE DCLREGION END-EXEC.
 
        PROCEDURE DIVISION.
-       0000-PRINCIPAL.
+       1000-SELECT-REGION.
            EXEC SQL
                SELECT CODE_REGION, NOM_REGION
-               INTO :WS-CODE-REGION, :WS-NOM-REGION
+               INTO :CODE-REGION, :NOM-REGION
                FROM REGION
                WHERE CODE_REGION = '02'
            END-EXEC
 
            IF SQLCODE = 0
-               DISPLAY 'CODE   : ' WS-CODE-REGION
-               DISPLAY 'NOM    : ' WS-NOM-REGION
+               DISPLAY 'CODE   : ' CODE-REGION
+               DISPLAY 'NOM    : ' NOM-REGION
            ELSE
                DISPLAY 'ERREUR SQL - SQLCODE : ' SQLCODE
-           END-IF
-           STOP RUN.
+           END-IF.
 ```
 
-**Technique utilisee** : SELECT INTO (lecture d'une seule ligne)
+**Techniques utilisees** :
+- SELECT INTO (lecture d'une seule ligne)
+- DCLGEN (variables host generees par DB2)
 
 ### Captures d'ecran suggerees
 - [ ] Code source dans ISPF

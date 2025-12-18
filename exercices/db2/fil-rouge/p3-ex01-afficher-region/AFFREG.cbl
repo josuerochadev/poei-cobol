@@ -9,13 +9,14 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
 
-      * Variables host pour DB2
-       01 WS-CODE-REGION    PIC X(02).
-       01 WS-NOM-REGION     PIC X(15).
-
       * SQLCA pour gestion erreurs DB2
            EXEC SQL
                INCLUDE SQLCA
+           END-EXEC.
+
+      * DCLGEN pour la table REGION
+           EXEC SQL
+               INCLUDE DCLREGION
            END-EXEC.
 
        PROCEDURE DIVISION.
@@ -27,7 +28,7 @@
        1000-SELECT-REGION.
            EXEC SQL
                SELECT CODE_REGION, NOM_REGION
-               INTO :WS-CODE-REGION, :WS-NOM-REGION
+               INTO :CODE-REGION, :NOM-REGION
                FROM REGION
                WHERE CODE_REGION = '02'
            END-EXEC
@@ -36,8 +37,8 @@
                DISPLAY '================================'
                DISPLAY 'REGION MARSEILLE'
                DISPLAY '================================'
-               DISPLAY 'CODE   : ' WS-CODE-REGION
-               DISPLAY 'NOM    : ' WS-NOM-REGION
+               DISPLAY 'CODE   : ' CODE-REGION
+               DISPLAY 'NOM    : ' NOM-REGION
                DISPLAY '================================'
            ELSE
                DISPLAY 'ERREUR SQL - SQLCODE : ' SQLCODE
