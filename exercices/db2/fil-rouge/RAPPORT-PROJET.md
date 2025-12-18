@@ -224,7 +224,14 @@ SELECT * FROM CLIENT;
 ## Exercice 1 : Extraction des clients par profession
 
 ### Enonce
+
 Extraire la liste des clients exercant les professions COMPTABLE, FONCTIONNAIRE et MEDECIN. Creer des vues permanentes pour chacune de ces categories.
+
+### Mon travail
+
+J'ai d'abord realise des SELECT simples pour verifier les donnees, puis j'ai cree 3 vues permanentes. J'ai utilise des jointures INNER JOIN avec la table PROFESSI pour inclure le libelle de la profession dans chaque vue.
+
+**Choix technique** : Filtrer par LIB_PROF plutot que CODE_PROF rend le code plus lisible et maintenable.
 
 ### Resolution
 
@@ -271,7 +278,14 @@ SELECT * FROM V_CLIENT_MEDECIN;
 ## Exercice 2 : Repartition selon la position du compte (DB/CR)
 
 ### Enonce
+
 Realiser deux requetes SQL permettant d'isoler les clients debiteurs (DB) et les clients crediteurs (CR). Materialiser ces selections sous forme de vues.
+
+### Mon travail
+
+J'ai cree deux vues distinctes pour separer les clients selon leur position. Ces vues seront utiles pour les programmes COBOL-DB2 qui traiteront separement les debiteurs et crediteurs.
+
+**Observation** : Sur les 20 clients, 8 sont debiteurs (solde negatif) et 12 sont crediteurs (solde positif).
 
 ### Resolution
 
@@ -307,7 +321,14 @@ SELECT * FROM V_CLIENT_CREDITEUR;
 ## Exercice 3 : Repartition des clients par region
 
 ### Enonce
+
 Mettre en place une repartition des clients par region. Chaque region doit faire l'objet d'une extraction distincte.
+
+### Mon travail
+
+J'ai cree 4 vues, une par region (Paris, Marseille, Lyon, Lille). Chaque vue inclut une jointure avec REGION pour afficher le nom de la region.
+
+**Verification** : Chaque region contient exactement 5 clients comme prevu dans la repartition initiale.
 
 ### Resolution
 
@@ -361,6 +382,12 @@ SELECT * FROM V_CLIENT_MARSEILLE;
 ### Enonce
 Creer un index secondaire sur la colonne CODE_REGION pour optimiser les recherches par region.
 
+### Mon travail
+
+J'ai cree un index sur CODE_REGION pour accelerer les requetes de recherche par region. Cet index est particulierement utile car plusieurs de nos vues et requetes filtrent par region.
+
+**Impact** : Les SELECT avec WHERE CODE_REGION = ... beneficient desormais d'un acces indexe au lieu d'un scan complet de la table.
+
 ### Resolution
 
 ```sql
@@ -379,6 +406,12 @@ SELECT * FROM CLIENT WHERE CODE_REGION = '01';
 
 ### Enonce
 Creer un index secondaire sur la colonne CODE_PROF afin de faciliter les traitements regroupes par profession.
+
+### Mon travail
+
+De meme que pour la region, j'ai cree un index sur CODE_PROF. Les vues V_CLIENT_COMPTABLE, V_CLIENT_FONCTION et V_CLIENT_MEDECIN beneficieront de cet index.
+
+**Remarque** : Les deux index (region et profession) peuvent etre utilises simultanement par l'optimiseur DB2 pour les requetes combinant ces deux criteres.
 
 ### Resolution
 
@@ -402,6 +435,12 @@ Concevoir une requete SQL permettant d'afficher les clients dans l'ordre suivant
 2. Puis par profession (CODE_PROF)
 3. Puis par numero de compte (NUM_COMPTE)
 
+### Mon travail
+
+J'ai ecrit une requete avec double jointure (REGION et PROFESSI) pour afficher les libelles plutot que les codes. Le tri multi-niveaux ORDER BY permet de regrouper visuellement les donnees.
+
+**Utilite** : Cette requete servira de base pour le programme COBOL-DB2 avec ruptures (P3-Ex05).
+
 ### Resolution
 
 ```sql
@@ -424,6 +463,12 @@ ORDER BY C.CODE_REGION, C.CODE_PROF, C.NUM_COMPTE;
 
 ### Enonce
 Realiser une requete SQL permettant de fusionner les listes de clients COMPTABLES et FONCTIONNAIRES dans un meme resultat.
+
+### Mon travail
+
+J'ai utilise l'operateur UNION pour fusionner deux SELECT independants. Chaque SELECT filtre sur une profession differente et inclut la jointure avec PROFESSI pour le libelle.
+
+**Note technique** : UNION elimine automatiquement les doublons (si un client etait dans les deux categories). Pour conserver les doublons, on utiliserait UNION ALL.
 
 ### Resolution
 
@@ -452,6 +497,12 @@ WHERE P.LIB_PROF = 'FONCTIONNAIRE';
 
 ### Enonce
 Creer une vue simplifiee de la table CLIENT contenant uniquement : numero de compte, code region, nature de compte, nom/prenom, activite professionnelle, situation familiale, solde, position.
+
+### Mon travail
+
+J'ai cree une vue qui exclut les colonnes DATE_NAIS, SEXE et ADRESSE. Cette vue allege les requetes qui n'ont pas besoin de ces informations personnelles.
+
+**Avantage** : La vue peut aussi servir a limiter l'acces aux donnees sensibles (date de naissance, adresse) pour certains utilisateurs.
 
 ### Resolution
 
@@ -487,6 +538,12 @@ Afficher, pour chaque region :
 - Solde total debiteur
 - Solde total crediteur
 
+### Mon travail
+
+J'ai utilise la technique CASE WHEN dans les fonctions d'agregation pour calculer des sous-totaux conditionnels en une seule requete. Cela evite de faire plusieurs requetes separees.
+
+**Technique cle** : `SUM(CASE WHEN POS = 'DB' THEN 1 ELSE 0 END)` compte le nombre de debiteurs par region.
+
 ### Resolution
 
 ```sql
@@ -512,6 +569,12 @@ ORDER BY R.CODE_REGION;
 
 ### Enonce
 Lister les clients debiteurs dont le solde est superieur a la moyenne des soldes debiteurs de leur profession.
+
+### Mon travail
+
+Cet exercice m'a demande une sous-requete correlee. La sous-requete calcule la moyenne des soldes debiteurs pour chaque profession, et la requete principale compare chaque client a cette moyenne.
+
+**Subtilite** : Les soldes debiteurs etant negatifs, un client "plus debiteur" a un solde inferieur (ex: -450 < -200). D'ou l'utilisation de `<` au lieu de `>`.
 
 ### Resolution
 
@@ -542,6 +605,12 @@ ORDER BY C.CODE_PROF, C.SOLDE;
 
 ### Enonce
 Ecrire un programme COBOL-DB2 permettant d'afficher la region Marseille (02).
+
+### Mon travail
+
+Premier programme COBOL-DB2 : j'ai utilise SELECT INTO pour lire une seule ligne. La variable SQLCODE me permet de verifier si la requete a reussi (0) ou echoue.
+
+**Structure du programme** : Declaration des variables host, INCLUDE SQLCA, SELECT INTO, test SQLCODE, DISPLAY.
 
 ### Resolution
 
@@ -587,6 +656,12 @@ Ecrire un programme COBOL-DB2 permettant d'afficher la region Marseille (02).
 
 ### Enonce
 Ecrire un programme COBOL-DB2 permettant d'inserer un nouveau client dans la table CLIENT.
+
+### Mon travail
+
+J'ai utilise INSERT INTO avec des variables host pour inserer le client 021. J'ai ajoute la gestion transactionnelle avec COMMIT en cas de succes et ROLLBACK en cas d'erreur.
+
+**Bonne pratique** : Toujours tester SQLCODE apres un INSERT pour valider ou annuler la transaction.
 
 ### Resolution
 
@@ -637,6 +712,12 @@ Ecrire un programme COBOL-DB2 permettant d'inserer un nouveau client dans la tab
 
 ### Enonce
 Ecrire un programme COBOL-DB2 permettant d'afficher tous les clients de la region Marseille (02).
+
+### Mon travail
+
+Pour lire plusieurs lignes, j'ai utilise un CURSOR. Le cycle complet est : DECLARE (definition), OPEN (ouverture), FETCH en boucle (lecture), CLOSE (fermeture).
+
+**Gestion fin de fichier** : SQLCODE = 100 indique qu'il n'y a plus de lignes a lire.
 
 ### Resolution
 
@@ -689,6 +770,12 @@ Ecrire un programme COBOL-DB2 permettant d'afficher tous les clients de la regio
 ### Enonce
 Ecrire un programme COBOL-DB2 qui permet de mettre a jour l'adresse, le solde et la position d'un client existant.
 
+### Mon travail
+
+J'ai utilise UPDATE avec une clause WHERE pour cibler un client specifique (005). Comme pour l'INSERT, j'applique COMMIT apres verification du SQLCODE.
+
+**Test** : J'ai verifie avec un SELECT avant et apres la mise a jour pour confirmer les changements.
+
 ### Resolution
 
 **Programme : MAJCLI.cbl**
@@ -727,6 +814,12 @@ Ecrire un programme COBOL-DB2 qui permet de mettre a jour l'adresse, le solde et
 ### Enonce
 Ecrire un programme COBOL-DB2 qui affiche la liste des clients tries par region puis par profession. Pour chaque changement, afficher un titre de rupture.
 
+### Mon travail
+
+J'ai implemente les ruptures de controle en conservant les valeurs precedentes de CODE_REGION et CODE_PROF. A chaque FETCH, je compare les nouvelles valeurs avec les precedentes pour detecter les changements.
+
+**Logique** : Si la region change, j'affiche le titre region ET je reinitialise la rupture profession (car on change de groupe).
+
 ### Resolution
 
 **Programme : LSTRUPT.cbl**
@@ -761,6 +854,12 @@ Ecrire un programme COBOL-DB2 qui affiche la liste des clients tries par region 
 
 ### Enonce
 Ecrire un programme COBOL-DB2 permettant de calculer le montant general et la moyenne des comptes debiteurs et crediteurs.
+
+### Mon travail
+
+J'ai fait deux SELECT INTO avec les fonctions SUM, AVG et COUNT : un pour les debiteurs (POS = 'DB') et un pour les crediteurs (POS = 'CR').
+
+**Affichage** : Les variables d'edition (PIC ZZZ,ZZ9.99) permettent de formater les montants avec separateurs et decimales.
 
 ### Resolution
 
@@ -801,6 +900,12 @@ Ecrire un programme COBOL-DB2 permettant de calculer le montant general et la mo
 ### Enonce
 Ecrire un programme COBOL-DB2 qui calcule, pour chaque region, la valeur totale des comptes debiteurs et crediteurs. Utiliser une variable conditionnelle (niveau 88).
 
+### Mon travail
+
+J'ai declare des niveaux 88 pour representer les 4 regions (REGION-PARIS, REGION-MARSEILLE, etc.). Une boucle PERFORM VARYING parcourt les regions et SET permet d'activer chaque condition.
+
+**Avantage du niveau 88** : Le code est plus lisible avec IF REGION-PARIS qu'avec IF WS-CODE-REGION = '01'.
+
 ### Resolution
 
 **Programme : TOTREG.cbl**
@@ -837,6 +942,12 @@ Ecrire un programme COBOL-DB2 qui calcule, pour chaque region, la valeur totale 
 ### Enonce
 Creer une table DB2 permettant de gerer les mouvements des clients avec : numero de compte, libelle, montant, sens (DB/CR), nature (CHQ/VER/VIR), date.
 
+### Mon travail
+
+J'ai cree la table MOUVEMENT avec une cle etrangere vers CLIENT(NUM_COMPTE). Deux contraintes CHECK valident les valeurs de SENS (DB/CR) et NATURE (CHQ/VER/VIR).
+
+**Donnees de test** : J'ai insere plusieurs mouvements pour differents clients afin de tester les programmes suivants (releve, total, etc.).
+
 ### Resolution
 
 ```sql
@@ -867,6 +978,12 @@ INSERT INTO MOUVEMENT VALUES ('001','CHEQUE 001',200.00,'DB','CHQ',DATE('2024-01
 
 ### Enonce
 Ecrire un programme COBOL-DB2 permettant de calculer le montant total des mouvements d'un client et le nombre total de mouvements. Recevoir le numero via ACCEPT.
+
+### Mon travail
+
+J'ai utilise ACCEPT pour lire le numero de compte depuis SYSIN. La requete SELECT utilise SUM et COUNT avec COALESCE pour eviter les valeurs NULL si le client n'a pas de mouvements.
+
+**Parametrage JCL** : Le numero de compte est passe via donnee In-Stream (//SYSIN DD *).
 
 ### Resolution
 
@@ -899,6 +1016,12 @@ Ecrire un programme COBOL-DB2 permettant de calculer le montant total des mouvem
 
 ### Enonce
 Ecrire un programme COBOL-DB2 permettant d'editer un releve de compte des mouvements d'un client avec colonnes Credit/Debit separees.
+
+### Mon travail
+
+J'ai cree un releve bancaire avec en-tete client et liste des mouvements. Chaque mouvement s'affiche soit dans la colonne Credit (si SENS = 'CR') soit dans la colonne Debit.
+
+**Presentation** : L'en-tete affiche le nom du client et son numero de compte, suivi des colonnes Date/Libelle/Credit/Debit.
 
 ### Resolution
 
@@ -944,6 +1067,12 @@ Date operation  Libelle         Credit    Debit
 ### Enonce
 Ecrire un programme COBOL-DB2 permettant d'afficher les mouvements de l'annee 2024 de tous les clients.
 
+### Mon travail
+
+J'ai utilise la fonction YEAR(DATE_MVT) dans le WHERE pour filtrer uniquement l'annee 2024. Une jointure avec CLIENT permet d'afficher le nom du client a cote de chaque mouvement.
+
+**Compteur** : Le programme compte et affiche le nombre total de mouvements 2024 a la fin.
+
 ### Resolution
 
 **Programme : MVT2024.cbl**
@@ -972,6 +1101,12 @@ Ecrire un programme COBOL-DB2 permettant d'afficher les mouvements de l'annee 20
 
 ### Enonce
 Refaire l'exercice 10 en precisant le numero de compte d'un client determine (ex: 012). Recuperer le numero via donnee In-Stream.
+
+### Mon travail
+
+Ce programme reprend la logique du releve (Ex10) mais le numero de compte est lu dynamiquement via ACCEPT au lieu d'etre code en dur. Le JCL passe le numero '012' via SYSIN.
+
+**Avantage** : Le meme programme peut generer le releve de n'importe quel client en changeant simplement la donnee In-Stream.
 
 ### Resolution
 
