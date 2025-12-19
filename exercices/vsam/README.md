@@ -29,10 +29,9 @@ exercices/vsam/
     ├── README.md
     ├── tp-gdg-formateur.jcl       # TP GDG du formateur (TESTGDG.COMPTE.MENSUEL)
     ├── tp01-clients.jcl           # Gestion fichier clients avec AIX
-    ├── tp02-gdg.jcl               # Gestion des GDG
     ├── tp03-workflow.jcl          # Workflow batch complet
     ├── cleanup.jcl
-    └── extra/                     # TP supplementaires
+    └── extra/                     # TP supplementaires (FTEST.*)
 ```
 
 ---
@@ -119,7 +118,6 @@ Les exercices supplementaires dans `extra/` utilisent `FTEST.*`.
 |---------|-------------|
 | `tp/tp-gdg-formateur.jcl` | **TP GDG du formateur** : TESTGDG.COMPTE.MENSUEL, LIMIT(4), rotation |
 | `tp/tp01-clients.jcl` | Gestion complete fichier clients avec AIX |
-| `tp/tp02-gdg.jcl` | Gestion des Generation Data Groups |
 | `tp/tp03-workflow.jcl` | Workflow batch complet |
 | `tp/cleanup.jcl` | Nettoyage de tous les objets |
 

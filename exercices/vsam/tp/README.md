@@ -14,7 +14,6 @@ Ce TP de synthese permet de valider la maitrise des concepts VSAM :
 |---------|-------------|
 | `tp-gdg-formateur.jcl` | **TP GDG du formateur** (TESTGDG.COMPTE.MENSUEL, LIMIT(4)) |
 | `tp01-clients.jcl` | Gestion complete fichier clients avec AIX |
-| `tp02-gdg.jcl` | Gestion des Generation Data Groups |
 | `tp03-workflow.jcl` | Workflow batch complet |
 | `cleanup.jcl` | Nettoyage de tous les objets |
 
@@ -230,18 +229,20 @@ Combien d'octets fait un RDF ?
 
 ---
 
-### TP 02 : Gestion des GDG
+### TP 02 : Gestion des GDG (Formateur)
 
-**Fichier :** `tp02-gdg.jcl`
+**Fichier :** `tp-gdg-formateur.jcl`
 
-**Objectif :** Maitriser les Generation Data Groups
+**Objectif :** Maitriser les Generation Data Groups (exercice exact du formateur)
 
 **Instructions :**
-1. Definir un GDG avec LIMIT(3) NOEMPTY
-2. Creer 3 generations successives
-3. Creer une 4eme generation (observer la rotation)
-4. Concatener toutes les generations
-5. Supprimer le GDG avec FORCE
+1. Definir un GDG TESTGDG.COMPTE.MENSUEL avec LIMIT(4)
+2. Creer ESDS et charger les donnees clients
+3. Convertir ESDS vers KSDS avec REPRO
+4. Creer 4 generations mensuelles
+5. Creer une 5eme generation (observer la rotation)
+6. Concatener toutes les generations
+7. LISTCAT et PRINT pour verification
 
 ---
 
@@ -275,7 +276,7 @@ Supprime tous les objets crees pendant les TP.
 |---------|--------|
 | QCM (10 questions) | 20 |
 | TP01 - Clients et AIX | 30 |
-| TP02 - GDG | 25 |
+| TP02 - GDG Formateur | 25 |
 | TP03 - Workflow | 25 |
 | **Total** | **100** |
 

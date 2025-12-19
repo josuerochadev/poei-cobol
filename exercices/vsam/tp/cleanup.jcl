@@ -18,10 +18,13 @@
   DELETE (TESTGDG.TP01.BACKUP) NONVSAM PURGE
 
   /*-----------------------------------------------------------------*/
-  /* TP 02 - GDG                                                     */
+  /* TP GDG FORMATEUR - COMPTE.MENSUEL                               */
   /*-----------------------------------------------------------------*/
-  DELETE (TESTGDG.TP02.DAILY) GDG FORCE
-  DELETE (TESTGDG.TP02.CONCAT) NONVSAM PURGE
+  DELETE (TESTGDG.COMPTE.MENSUEL) GDG FORCE
+  DELETE (TESTGDG.COMPTE.ESDS) CLUSTER PURGE
+  DELETE (TESTGDG.COMPTE.KSDS) CLUSTER PURGE
+  DELETE (TESTGDG.COMPTE.CONCAT) NONVSAM PURGE
+  DELETE (TESTGDG.COMPTE.BACKUP) NONVSAM PURGE
 
   /*-----------------------------------------------------------------*/
   /* TP 03 - WORKFLOW                                                */
