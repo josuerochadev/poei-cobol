@@ -1129,7 +1129,56 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 /*
 ```
 
-### 8.7 MERGE - Fusion de fichiers tries
+### 8.7 FINDREP - Recherche et remplacement
+
+FINDREP permet de rechercher et remplacer des chaines de caracteres dans les enregistrements.
+
+```jcl
+//SORTFIND EXEC PGM=SORT
+//SYSOUT   DD SYSOUT=*
+//SORTIN   DD DSN=USER.DATA.INPUT,DISP=SHR
+//SORTOUT  DD DSN=USER.DATA.OUTPUT,
+//            DISP=(NEW,CATLG,DELETE),
+//            SPACE=(CYL,(2,1),RLSE),
+//            DCB=*.SORTIN,
+//            UNIT=SYSDA
+//SYSIN    DD *
+  SORT FIELDS=COPY
+  OUTREC FINDREP=(IN=C'ANCIEN',OUT=C'NOUVEAU')
+/*
+```
+
+**Syntaxe FINDREP :**
+
+```
+OUTREC FINDREP=(IN=C'chaine_recherche',OUT=C'chaine_remplacement')
+```
+
+**Exemples pratiques :**
+
+```jcl
+* Remplacer une valeur par une autre
+  OUTREC FINDREP=(IN=C'OUI',OUT=C'NON')
+
+* Remplacer un code par un libelle
+  OUTREC FINDREP=(IN=C'75',OUT=C'PARIS')
+
+* Remplacements multiples
+  OUTREC FINDREP=(IN=C'ANCIEN',OUT=C'NOUVEAU',
+                 IN=C'OLD',OUT=C'NEW')
+
+* Remplacement avec chaines de longueurs differentes
+  OUTREC FINDREP=(IN=C'ABC',OUT=C'ABCDEF',INOUT=(1,80))
+```
+
+**Notes :**
+- Si la chaine de remplacement est plus courte, des espaces sont ajoutes
+- Si plus longue, specifier INOUT pour definir la zone de travail
+- Peut etre combine avec SORT ou COPY
+
+---
+
+### 8.8 MERGE - Fusion de fichiers tries
 
 ```jcl
 //MERGE    EXEC PGM=SORT
@@ -1149,7 +1198,7 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 
 **Note :** Les fichiers en entree DOIVENT etre deja tries sur la meme cle.
 
-### 8.8 SUM - Suppression des doublons
+### 8.9 SUM - Suppression des doublons
 
 ```jcl
 //SORTSUM  EXEC PGM=SORT
@@ -1167,7 +1216,7 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 /*
 ```
 
-### 8.9 COPY - Copie sans tri
+### 8.10 COPY - Copie sans tri
 
 ```jcl
 //SORTCOPY EXEC PGM=SORT
@@ -1183,7 +1232,7 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 /*
 ```
 
-### 8.10 OUTFIL - Sorties multiples
+### 8.11 OUTFIL - Sorties multiples
 
 ```jcl
 //SORTMULT EXEC PGM=SORT
@@ -1212,7 +1261,7 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 /*
 ```
 
-### 8.11 Codes retour SORT
+### 8.12 Codes retour SORT
 
 | RC | Signification |
 |----|---------------|

@@ -1422,6 +1422,135 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 
 ---
 
+## I-3 Codes Retour et ABEND
+
+### I-3-1 Codes retour standards
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CODES RETOUR (RETURN CODES)                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   Le code retour indique le resultat de l'execution d'un step  │
+│                                                                 │
+│   CODE    SIGNIFICATION                                         │
+│   ────    ─────────────                                        │
+│    0      Succes complet                                       │
+│    4      Warning (avertissement) - traitement OK              │
+│    8      Erreur - traitement partiel ou echoue                │
+│   12      Erreur grave                                         │
+│   16      Erreur critique                                      │
+│                                                                 │
+│   Utilisation avec COND :                                       │
+│   ───────────────────────                                      │
+│   COND=(4,LT)     Ne pas executer si RC < 4                    │
+│   COND=(8,LE)     Ne pas executer si RC <= 8                   │
+│   COND=EVEN       Executer meme si ABEND precedent             │
+│   COND=ONLY       Executer seulement si ABEND precedent        │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### I-3-2 Codes ABEND systeme
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CODES ABEND SYSTEME (Sxxx)                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   CODE    DESCRIPTION                              CAUSE TYPIQUE│
+│   ────    ───────────                              ─────────────│
+│   S001    Erreur I/O                               Fichier      │
+│   S013    Erreur ouverture fichier                 DCB/DSN      │
+│   S0C1    Operation invalide                       Code machine │
+│   S0C4    Violation protection memoire             Pointeur     │
+│   S0C7    Donnees non numeriques                   MOVE/COMPUTE │
+│   S0CB    Division par zero                        DIVIDE       │
+│   S0D3    Erreur virgule flottante                 Calcul       │
+│   S106    Module introuvable (FETCH)               Programme    │
+│   S122    Operateur a annule le job                Operateur    │
+│   S137    Fin de volume inattend                   Bande/Disque │
+│   S213    Erreur ouverture fichier sortie          DISP/SPACE   │
+│   S222    Job annule par operateur                 Operateur    │
+│   S237    Fin de volume (bande)                    Bande        │
+│   S306    Module introuvable en memoire            Link-edit    │
+│   S322    Temps CPU depasse (TIME)                 Boucle infini│
+│   S522    Attente trop longue (WAIT)               Deadlock     │
+│   S613    Erreur I/O magnetique                    Hardware     │
+│   S706    Module introuvable (LOAD)                STEPLIB      │
+│   S713    Erreur ouverture fichier bande           Bande        │
+│   S722    Lignes imprimees depassees               OUTLIM       │
+│   S806    Module introuvable (LINK/ATTACH)         JOBLIB       │
+│   S837    Fin de volume disque                     Espace plein │
+│   S913    Erreur securite RACF                     Droits acces │
+│   SB14    Erreur QSAM close                        Fichier      │
+│   SB37    Espace disque insuffisant                SPACE        │
+│   SD37    Espace primaire insuffisant              SPACE        │
+│   SE37    Espace secondaire insuffisant            Extensions   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### I-3-3 Codes ABEND utilisateur
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CODES ABEND UTILISATEUR (Unnnn)               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   Les codes Unnnn sont definis par les programmes utilisateur   │
+│                                                                 │
+│   CODE    DESCRIPTION                                           │
+│   ────    ───────────                                          │
+│   U0001   Erreur applicative generale                          │
+│   U0016   Erreur COBOL (STOP RUN avec code)                    │
+│   U1000+  Erreurs definies par l'application                   │
+│   U4038   Erreur Language Environment (LE)                     │
+│   U4093   Fin anormale demandee                                │
+│                                                                 │
+│   En COBOL, generation d'ABEND :                                │
+│   ───────────────────────────────                              │
+│   CALL 'CEE3ABD' USING abort-code timing                       │
+│   ou STOP RUN avec RETURN-CODE                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### I-3-4 Diagnostic et resolution
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    DIAGNOSTIC DES ABEND                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ETAPES DE DIAGNOSTIC :                                        │
+│   ───────────────────────                                      │
+│   1. Consulter le JESMSGLG (messages JES)                      │
+│   2. Examiner le JESYSMSG (messages systeme)                   │
+│   3. Lire le SYSOUT du step en erreur                          │
+│   4. Analyser le dump (SYSUDUMP/CEEDUMP)                       │
+│                                                                 │
+│   SOLUTIONS COURANTES :                                         │
+│   ─────────────────────                                        │
+│   S0C7  → Verifier les donnees en entree                       │
+│   S806  → Verifier STEPLIB/JOBLIB                              │
+│   S913  → Verifier les droits RACF                             │
+│   SB37  → Augmenter SPACE ou liberer de l'espace               │
+│   S322  → Augmenter TIME ou corriger boucle                    │
+│   S013  → Verifier DSN et DISP                                 │
+│                                                                 │
+│   MESSAGES UTILES :                                             │
+│   ─────────────────                                            │
+│   IEF450I  jobname stepname - ABEND=Sxxx                       │
+│   IEF451I  jobname stepname - ABEND=Unnnn                      │
+│   IGZ0xxxW Messages COBOL runtime                               │
+│   CEE3xxx  Messages Language Environment                        │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## Synthese
 
 ```
@@ -1512,6 +1641,16 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   &SYSUID          Userid                                      │
 │   &LYYMMDD         Date AAAAMMJJ                               │
 │   &SYSTIME         Heure HH.MM.SS                              │
+│                                                                 │
+│   CODES ABEND FREQUENTS                                         │
+│   ─────────────────────────────────────────────────────────    │
+│   S0C7   Donnees non numeriques                               │
+│   S0C4   Violation memoire                                    │
+│   S806   Module introuvable                                   │
+│   S913   Erreur RACF (securite)                               │
+│   SB37   Espace disque insuffisant                            │
+│   S322   Temps CPU depasse                                    │
+│   S013   Erreur ouverture fichier                             │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
