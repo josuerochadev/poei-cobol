@@ -22,6 +22,17 @@ poei-cobol/
 │   │   ├── 03-procedures.md
 │   │   └── 04-utilitaires.md
 │   │
+│   ├── algorithmique/      # Module Algorithmique (9 chapitres)
+│   │   ├── 01-introduction-algorithmique.md
+│   │   ├── 02-01-structures-donnees.md
+│   │   ├── 02-02-pointeurs-listes.md
+│   │   ├── 02-03-piles-files.md
+│   │   ├── 03-recursivite.md
+│   │   ├── 04-algorithmes-tri.md
+│   │   ├── 05-complexite-algorithmique.md
+│   │   ├── 06-algorithmes-fichiers.md
+│   │   └── 07-modularite.md
+│   │
 │   ├── cobol/              # Module COBOL (12 chapitres)
 │   │   ├── 01-structure-programme.md
 │   │   ├── ...
@@ -57,6 +68,10 @@ poei-cobol/
 │   │   ├── chapitre-03/
 │   │   ├── chapitre-04/
 │   │   └── chapitre-05/    # Travaux pratiques + QCM
+│   │
+│   ├── algorithmique/      # Exercices Algorithmique (40 exercices + 9 QCM)
+│   │   ├── theorie/        # QCM par chapitre
+│   │   └── pratique/       # Exercices pratiques (5 chapitres)
 │   │
 │   ├── cobol/              # Exercices COBOL (61 programmes)
 │   │   ├── chapitre-02/
@@ -102,6 +117,20 @@ poei-cobol/
 | III | Procédures JCL | ✅ | ✅ |
 | IV | Utilitaires (IEBGENER, IDCAMS, SORT...) | ✅ | ✅ |
 | V | Travaux pratiques (QCM + TPs) | - | ✅ |
+
+### Module Algorithmique
+
+| Chapitre | Sujet | Cours | Exercices |
+|----------|-------|-------|-----------|
+| I | Introduction à l'algorithmique | ✅ | ✅ QCM + 9 ex |
+| II.1 | Structures de données (tableaux, enregistrements) | ✅ | ✅ QCM + 16 ex |
+| II.2 | Pointeurs et listes chaînées | ✅ | ✅ QCM + 3 ex |
+| II.3 | Piles et files (LIFO/FIFO) | ✅ | ✅ QCM + 4 ex |
+| III | Récursivité | ✅ | ✅ QCM + 8 ex |
+| IV | Algorithmes de tri | ✅ | ✅ QCM |
+| V | Complexité algorithmique | ✅ | ✅ QCM |
+| VI | Algorithmes sur fichiers | ✅ | ✅ QCM |
+| VII | Modularité | ✅ | ✅ QCM |
 
 ### Module COBOL
 

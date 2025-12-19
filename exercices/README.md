@@ -9,7 +9,7 @@ Ce dossier contient les exercices pratiques organisés par module.
 | [Z/OS et TSO](zos-tso/) | Exercices TSO, commandes système | 14 exercices |
 | [JCL](jcl/) | Exercices JCL (chapitres 02 à 05) | 24 exercices |
 | [VSAM](vsam/) | QCM + TP IDCAMS + Exercices pratiques | 40 exercices |
-| [Algorithmique](algorithmique/) | QCM + Exercices pratiques | 24 exercices |
+| [Algorithmique](algorithmique/) | 9 QCM + 40 exercices pratiques | 49 exercices |
 | [COBOL](cobol/) | Exercices COBOL (chapitres 02 à 12) | 61 programmes |
 | [CICS](cics/) | QCM + TP pratiques + TP Gestion des Credits | 93 exercices |
 | [DB2/SQL](db2/) | QCM + TP SQL + DDL/DML | 144 exercices |
@@ -35,8 +35,13 @@ exercices/
 │   └── tp/             # TP IDCAMS formateur
 │
 ├── algorithmique/
-│   ├── theorie/        # QCM (15 questions)
-│   └── pratique/       # 9 exercices algorithmiques
+│   ├── theorie/        # QCM par chapitre (9 QCM, ~135 questions)
+│   └── pratique/       # 40 exercices (5 chapitres)
+│       ├── chapitre-01/    # Introduction (9 exercices)
+│       ├── chapitre-02-01/ # Tableaux et chaînes (16 exercices)
+│       ├── chapitre-02-02/ # Listes chaînées (3 exercices)
+│       ├── chapitre-02-03/ # Piles et files (4 exercices)
+│       └── chapitre-03/    # Récursivité (8 exercices)
 │
 ├── cobol/
 │   ├── chapitre-02/    # DISPLAY, chaînes

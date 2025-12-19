@@ -9,7 +9,7 @@ Ce dossier contient les supports de cours organisés par module.
 | [Z/OS et TSO/ISPF](zos-tso/) | Système z/OS, TSO, ISPF | 5 chapitres |
 | [JCL](jcl/) | Job Control Language | 4 chapitres + TP |
 | [VSAM](vsam/) | Virtual Storage Access Method | 7 chapitres |
-| [Algorithmique](algorithmique/) | Algorithmique et programmation structurée | 1 chapitre |
+| [Algorithmique](algorithmique/) | Algorithmique et programmation structurée | 9 chapitres |
 | [COBOL](cobol/) | Langage COBOL et programmation mainframe | 12 chapitres |
 | [CICS](cics/) | Moniteur transactionnel CICS | 8 chapitres |
 | [DB2/SQL](db2/) | Bases de données relationnelles et SQL | 10 chapitres |
@@ -27,7 +27,7 @@ Ce dossier contient les supports de cours organisés par module.
    └── Chapitres I à VII
 
 4. Module Algorithmique (logique de programmation)
-   └── Chapitre I
+   └── Chapitres I à VII (9 fiches)
 
 5. Module COBOL (programmation)
    └── Chapitres I à XII
