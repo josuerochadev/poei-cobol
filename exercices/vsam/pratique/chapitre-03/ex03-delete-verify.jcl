@@ -1,0 +1,102 @@
+//FTEST11  JOB (ACCT),'DELETE VERIFY',CLASS=A,MSGCLASS=A,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*********************************************************************
+//*  EXERCICE 3 : DELETE ET VERIFY                                    *
+//*  - Suppression standard                                           *
+//*  - Suppression avec ERASE                                         *
+//*  - Verification d'integrite                                       *
+//*********************************************************************
+//*
+//CLEANUP  EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE (FTEST.DELETE.TEST1) CLUSTER PURGE
+  DELETE (FTEST.DELETE.TEST2) CLUSTER PURGE
+  DELETE (FTEST.VERIFY.TEST) CLUSTER PURGE
+  SET MAXCC = 0
+/*
+//*
+//* ETAPE 1: CREATION DE DEUX CLUSTERS
+//*
+//DEFCLUST EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  /* Cluster 1 - standard */
+  DEFINE CLUSTER (NAME(FTEST.DELETE.TEST1) -
+    TRACKS(1 1) VOLUMES(ZASYS1) INDEXED -
+    RECORDSIZE(50 50) KEYS(5 0)) -
+  DATA (NAME(FTEST.DELETE.TEST1.DATA)) -
+  INDEX (NAME(FTEST.DELETE.TEST1.INDEX))
+
+  /* Cluster 2 - pour ERASE */
+  DEFINE CLUSTER (NAME(FTEST.DELETE.TEST2) -
+    TRACKS(1 1) VOLUMES(ZASYS1) INDEXED -
+    RECORDSIZE(50 50) KEYS(5 0)) -
+  DATA (NAME(FTEST.DELETE.TEST2.DATA)) -
+  INDEX (NAME(FTEST.DELETE.TEST2.INDEX))
+
+  /* Cluster 3 - pour VERIFY */
+  DEFINE CLUSTER (NAME(FTEST.VERIFY.TEST) -
+    TRACKS(1 1) VOLUMES(ZASYS1) INDEXED -
+    RECORDSIZE(50 50) KEYS(5 0)) -
+  DATA (NAME(FTEST.VERIFY.TEST.DATA)) -
+  INDEX (NAME(FTEST.VERIFY.TEST.INDEX))
+
+  /* Charger les donnees */
+  REPRO INFILE(DATA) OUTDATASET(FTEST.DELETE.TEST1)
+  REPRO INFILE(DATA) OUTDATASET(FTEST.DELETE.TEST2)
+  REPRO INFILE(DATA) OUTDATASET(FTEST.VERIFY.TEST)
+//DATA     DD *
+00001DONNEES CONFIDENTIELLES CLIENT A
+00002DONNEES CONFIDENTIELLES CLIENT B
+00003DONNEES CONFIDENTIELLES CLIENT C
+/*
+//*
+//* ETAPE 2: SUPPRESSION STANDARD
+//*
+//DELETE1  EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE (FTEST.DELETE.TEST1) -
+    CLUSTER -
+    PURGE
+
+  IF LASTCC = 0 THEN DO -
+    /* Verifier que le cluster n'existe plus */ -
+    LISTCAT ENTRIES(FTEST.DELETE.TEST1) NAME -
+  END
+/*
+//*
+//* ETAPE 3: SUPPRESSION AVEC ERASE (donnees sensibles)
+//*
+//DELETE2  EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  /* ERASE ecrase les donnees avec des zeros avant suppression */
+  DELETE (FTEST.DELETE.TEST2) -
+    CLUSTER -
+    ERASE -
+    PURGE
+/*
+//*
+//* ETAPE 4: UTILISATION DE VERIFY
+//*
+//VERIFY   EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  /* VERIFY verifie et repare un fichier mal ferme */
+  VERIFY DATASET(FTEST.VERIFY.TEST)
+
+  IF LASTCC <= 4 THEN DO -
+    SET MAXCC = 0 -
+  END
+/*
+//*
+//* ETAPE 5: AFFICHER LE CONTENU APRES VERIFY
+//*
+//PRINT    EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  PRINT INDATASET(FTEST.VERIFY.TEST) CHARACTER
+/*
+//

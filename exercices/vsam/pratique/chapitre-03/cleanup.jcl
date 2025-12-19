@@ -1,0 +1,30 @@
+//FCLEAN3  JOB (ACCT),'CLEANUP CHAP 03',CLASS=A,MSGCLASS=A,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*********************************************************************
+//*  NETTOYAGE : SUPPRESSION DES CLUSTERS CHAPITRE 03                 *
+//*********************************************************************
+//*
+//CLEANUP  EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  /* Exercice 1 - REPRO */
+  DELETE (FTEST.REPRO.SOURCE) CLUSTER PURGE
+  DELETE (FTEST.REPRO.TARGET) CLUSTER PURGE
+  DELETE (FTEST.REPRO.BACKUP) NONVSAM PURGE
+
+  /* Exercice 2 - ALTER */
+  DELETE (FTEST.ALTER.TEST) CLUSTER PURGE
+  DELETE (FTEST.ALTER.RENAMED) CLUSTER PURGE
+
+  /* Exercice 3 - DELETE/VERIFY */
+  DELETE (FTEST.DELETE.TEST1) CLUSTER PURGE
+  DELETE (FTEST.DELETE.TEST2) CLUSTER PURGE
+  DELETE (FTEST.VERIFY.TEST) CLUSTER PURGE
+
+  /* Exercice 4 - PRINT */
+  DELETE (FTEST.PRINT.TEST) CLUSTER PURGE
+
+  /* Ignorer les erreurs */
+  SET MAXCC = 0
+/*
+//
