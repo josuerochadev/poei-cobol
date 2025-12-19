@@ -8,6 +8,16 @@ Ce TP de synthese permet de valider la maitrise des concepts VSAM :
 - Manipulation avec IDCAMS
 - Gestion des GDG
 
+## Fichiers
+
+| Fichier | Description |
+|---------|-------------|
+| `tp-gdg-formateur.jcl` | **TP GDG du formateur** (TESTGDG.COMPTE.MENSUEL, LIMIT(4)) |
+| `tp01-clients.jcl` | Gestion complete fichier clients avec AIX |
+| `tp02-gdg.jcl` | Gestion des Generation Data Groups |
+| `tp03-workflow.jcl` | Workflow batch complet |
+| `cleanup.jcl` | Nettoyage de tous les objets |
+
 ---
 
 ## Partie 1 : QCM de Comprehension
@@ -268,6 +278,37 @@ Supprime tous les objets crees pendant les TP.
 | TP02 - GDG | 25 |
 | TP03 - Workflow | 25 |
 | **Total** | **100** |
+
+---
+
+## TP GDG Formateur (tp-gdg-formateur.jcl)
+
+Ce TP correspond exactement a l'exercice de fin de module du formateur :
+
+1. Definition GDG TESTGDG.COMPTE.MENSUEL avec LIMIT(4)
+2. Creation ESDS et chargement donnees clients
+3. Conversion ESDS vers KSDS avec REPRO
+4. Creation de 4 generations mensuelles
+5. Creation d'une 5eme generation pour observer la rotation
+6. Concatenation des generations
+7. LISTCAT et PRINT pour verification
+
+### Structure des donnees
+
+```
+Pos 01-06 : Code Client (cle)
+Pos 07-26 : Nom Client
+Pos 27-27 : Etat operation (D=Debit, C=Credit)
+Pos 28-37 : Solde (10 chiffres)
+Pos 38-45 : Date operation (AAAAMMJJ)
+Pos 46-80 : Reserve
+```
+
+---
+
+## Dossier extra/
+
+Le dossier `extra/` contient des TP supplementaires avec la nomenclature `FTEST.*` pour approfondir les connaissances.
 
 ---
 *Travaux Pratiques VSAM - M2i Formation*

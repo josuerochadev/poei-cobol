@@ -9,92 +9,55 @@ Les exercices sont organises en trois parties :
 
 ---
 
-## Partie Theorique (QCM)
-
-Les QCM sont organises par chapitre du cours et permettent de valider la comprehension des concepts.
-
-| Fichier | Chapitre | Nombre de questions |
-|---------|----------|---------------------|
-| `theorie/qcm-01-introduction.md` | I - Introduction a VSAM | 20 questions |
-| `theorie/qcm-02-organisation.md` | II - Catalogues et Data Space | 20 questions |
-| `theorie/qcm-03-structures.md` | III - CI, CA, ESDS, KSDS, RRDS, LDS | 25 questions |
-| `theorie/qcm-04-commandes.md` | IV-VII - Commandes IDCAMS | 30 questions |
-
-**Total : 95 questions**
-
-### Themes couverts par QCM
-
-#### QCM-01 : Introduction
-- Presentation VSAM, DASD, VTOC
-- Types ESDS, KSDS, RRDS, LDS
-- Formats FB, VB, structures PDS/PDSE
-
-#### QCM-02 : Organisation
-- Master Catalog et User Catalog
-- SHAREOPTIONS et partage
-- Data Space et ALIAS
-
-#### QCM-03 : Structures
-- Control Interval (CI) et Control Area (CA)
-- RDF, CIDF, SPANNED
-- Alternate Index (AIX)
-
-#### QCM-04 : Commandes
-- DEFINE CLUSTER, AIX, PATH
-- REPRO, ALTER, DELETE, VERIFY, PRINT
-- LISTCAT et analyse
-- GDG et codes retour
-
----
-
-## Partie Pratique
-
-Les exercices pratiques sont organises par chapitre du cours VSAM.
-Chaque chapitre contient des fichiers `.jcl` directement executables.
-
 ## Structure
 
 ```
 exercices/vsam/
 ├── README.md
-├── theorie/                        # QCM theoriques
-│   ├── qcm-01-introduction.md
-│   ├── qcm-02-organisation.md
-│   ├── qcm-03-structures.md
-│   └── qcm-04-commandes.md
-├── pratique/                       # Exercices pratiques par chapitre
+├── theorie/                        # QCM theoriques (formateur)
+│   ├── qcm-01-introduction.md      # 9 questions avec erreurs a detecter
+│   ├── qcm-02-organisation.md      # 8 questions
+│   ├── qcm-03-structures.md        # 10 questions
+│   ├── qcm-04-commandes.md         # 10 questions + exercice pratique
+│   └── extra/                      # QCM supplementaires (95 questions)
+├── pratique/                       # Exercices pratiques (TESTGDG.*)
 │   ├── chapitre-01/               # Definition de clusters
-│   │   ├── README.md
-│   │   ├── ex01-esds.jcl
-│   │   ├── ex02-ksds.jcl
-│   │   ├── ex03-rrds.jcl
-│   │   ├── ex04-lds.jcl
-│   │   ├── ex-bonus-all-types.jcl
-│   │   └── cleanup.jcl
 │   ├── chapitre-02/               # Index alternatifs (AIX)
-│   │   ├── README.md
-│   │   ├── ex01-aix-ksds.jcl
-│   │   ├── ex02-aix-nonunique.jcl
-│   │   ├── ex03-aix-esds.jcl
-│   │   └── cleanup.jcl
-│   └── chapitre-03/               # Manipulation IDCAMS
-│       ├── README.md
-│       ├── ex01-repro.jcl
-│       ├── ex02-alter.jcl
-│       ├── ex03-delete-verify.jcl
-│       ├── ex04-print.jcl
-│       └── cleanup.jcl
-└── tp/                             # Travaux pratiques de synthese
+│   ├── chapitre-03/               # Manipulation IDCAMS
+│   └── extra/                     # Exercices supplementaires (FTEST.*)
+└── tp/                            # Travaux pratiques de synthese
     ├── README.md
-    ├── tp01-clients.jcl
-    ├── tp02-gdg.jcl
-    ├── tp03-workflow.jcl
-    └── cleanup.jcl
+    ├── tp-gdg-formateur.jcl       # TP GDG du formateur (TESTGDG.COMPTE.MENSUEL)
+    ├── tp01-clients.jcl           # Gestion fichier clients avec AIX
+    ├── tp02-gdg.jcl               # Gestion des GDG
+    ├── tp03-workflow.jcl          # Workflow batch complet
+    ├── cleanup.jcl
+    └── extra/                     # TP supplementaires
 ```
 
 ---
 
-## Exercices Pratiques (pratique/)
+## Partie Theorique (QCM)
+
+Les QCM du formateur contiennent des **erreurs intentionnelles** a detecter pour valider la comprehension.
+
+| Fichier | Chapitre | Questions |
+|---------|----------|-----------|
+| `theorie/qcm-01-introduction.md` | I - Introduction a VSAM | 9 questions |
+| `theorie/qcm-02-organisation.md` | II - Catalogues et Data Space | 8 questions |
+| `theorie/qcm-03-structures.md` | III - CI, CA, Types VSAM | 10 questions |
+| `theorie/qcm-04-commandes.md` | IV - Commandes IDCAMS | 10 questions |
+
+**Total : 37 questions** (+ 95 questions supplementaires dans `extra/`)
+
+---
+
+## Partie Pratique
+
+### Nomenclature
+
+Les exercices utilisent la nomenclature `TESTGDG.*` du formateur.
+Les exercices supplementaires dans `extra/` utilisent `FTEST.*`.
 
 ### Chapitre 01 - Definition de Clusters
 
@@ -154,15 +117,22 @@ exercices/vsam/
 
 | Fichier | Description |
 |---------|-------------|
+| `tp/tp-gdg-formateur.jcl` | **TP GDG du formateur** : TESTGDG.COMPTE.MENSUEL, LIMIT(4), rotation |
 | `tp/tp01-clients.jcl` | Gestion complete fichier clients avec AIX |
 | `tp/tp02-gdg.jcl` | Gestion des Generation Data Groups |
 | `tp/tp03-workflow.jcl` | Workflow batch complet |
 | `tp/cleanup.jcl` | Nettoyage de tous les objets |
 
-**Contenu :**
-- 10 questions QCM de revision
-- 3 travaux pratiques complets
-- Simulation d'un environnement reel
+### TP GDG Formateur (tp-gdg-formateur.jcl)
+
+Ce TP correspond exactement a l'exercice de fin de module :
+1. Definition GDG TESTGDG.COMPTE.MENSUEL avec LIMIT(4)
+2. Creation ESDS et chargement donnees clients
+3. Conversion ESDS vers KSDS avec REPRO
+4. Creation de 4 generations mensuelles
+5. Creation d'une 5eme generation pour observer la rotation
+6. Concatenation des generations
+7. LISTCAT et PRINT pour verification
 
 ---
 
@@ -177,47 +147,15 @@ exercices/vsam/
 
 ### Sur mainframe z/OS
 
-1. Uploader les fichiers .jcl dans un PDS (ex: FTEST.JCL.SOURCE)
-2. Editer pour remplacer `FTEST` par votre userid
-3. Remplacer `ZASYS1` par votre volume
-4. Soumettre avec `SUB` ou `=S` dans ISPF
+1. Uploader les fichiers .jcl dans un PDS (ex: TESTGDG.JCL.SOURCE)
+2. Remplacer `ZASYS1` par votre volume
+3. Soumettre avec `SUB` ou `=S` dans ISPF
 
 ### Sur Hercules/TK4-
 
-1. Remplacer `FTEST` par votre userid (ex: `HERC01`)
-2. Remplacer `ZASYS1` par `PUB001` ou votre volume
-3. Utiliser `CLASS=A,MSGCLASS=A`
-4. Soumettre via TSO ou ISPF
-
-### Ordre d'execution
-
-**Pratique - Chapitre 01 :**
-```
-ex01 -> ex02 -> ex03 -> ex04
-     ou
-ex-bonus-all-types (tout en un)
-```
-
-**Pratique - Chapitre 02 :**
-```
-ex01 -> ex02 -> ex03
-(Chaque exercice est independant)
-```
-
-**Pratique - Chapitre 03 :**
-```
-Chaque exercice est independant
-```
-
-**TP - Synthese :**
-```
-tp01 -> tp02 -> tp03
-(Ordre recommande mais chaque TP peut etre fait independamment)
-```
-
-### Nettoyage
-
-Apres les exercices, executer `cleanup.jcl` pour supprimer les Data Sets crees.
+1. Remplacer `ZASYS1` par `PUB001` ou votre volume
+2. Utiliser `CLASS=A,MSGCLASS=A`
+3. Soumettre via TSO ou ISPF
 
 ---
 
@@ -225,8 +163,8 @@ Apres les exercices, executer `cleanup.jcl` pour supprimer les Data Sets crees.
 
 1. **Theorie d'abord** : Faire les QCM pour valider la comprehension
 2. **Pratique ensuite** : Realiser les exercices hands-on
-3. **TP de synthese** : Valider les competences acquises
-4. **Revision** : Refaire les QCM apres la pratique pour consolider
+3. **TP de synthese** : Valider les competences avec le TP GDG formateur
+4. **Approfondissement** : Explorer les exercices supplementaires dans `extra/`
 
 ---
 
@@ -236,6 +174,7 @@ Apres les exercices, executer `cleanup.jcl` pour supprimer les Data Sets crees.
 - Les fichiers `.jcl` sont les solutions executables
 - Adapter les noms de Data Sets et volumes selon votre environnement
 - Les codes retour attendus sont 0 sauf indication contraire
+- Les QCM contiennent des erreurs intentionnelles a detecter
 
 ---
 *Formation VSAM - M2i Formation*

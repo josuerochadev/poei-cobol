@@ -1,4 +1,4 @@
-//TESTGDG01  JOB (ACCT),'DEFINE ESDS',CLASS=A,MSGCLASS=A,
+//FTEST01  JOB (ACCT),'DEFINE ESDS',CLASS=A,MSGCLASS=A,
 //             MSGLEVEL=(1,1),NOTIFY=&SYSUID
 //*********************************************************************
 //*  EXERCICE 1 : CREATION D'UN CLUSTER ESDS                          *
@@ -9,12 +9,12 @@
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
   /* Suppression si existe (ignorer erreur) */
-  DELETE (TESTGDG.VSAM.ESDS) CLUSTER PURGE
+  DELETE (FTEST.VSAM.ESDS) CLUSTER PURGE
   IF LASTCC <= 8 THEN SET MAXCC = 0
 
   /* Definition du cluster ESDS */
   DEFINE CLUSTER ( -
-    NAME(TESTGDG.VSAM.ESDS) -
+    NAME(FTEST.VSAM.ESDS) -
     TRACKS(1 1) -
     VOLUMES(ZASYS1) -
     CONTROLINTERVALSIZE(4096) -
@@ -23,10 +23,10 @@
     SHAREOPTIONS(1 3) -
     REUSE) -
   DATA ( -
-    NAME(TESTGDG.VSAM.ESDS.DATA))
+    NAME(FTEST.VSAM.ESDS.DATA))
 
   /* Verification */
   IF LASTCC = 0 THEN -
-    LISTCAT ENTRIES(TESTGDG.VSAM.ESDS) ALL
+    LISTCAT ENTRIES(FTEST.VSAM.ESDS) ALL
 /*
 //

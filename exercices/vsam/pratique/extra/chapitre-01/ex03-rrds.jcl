@@ -1,32 +1,32 @@
-//TESTGDG01  JOB (ACCT),'DEFINE ESDS',CLASS=A,MSGCLASS=A,
+//FTEST03  JOB (ACCT),'DEFINE RRDS',CLASS=A,MSGCLASS=A,
 //             MSGLEVEL=(1,1),NOTIFY=&SYSUID
 //*********************************************************************
-//*  EXERCICE 1 : CREATION D'UN CLUSTER ESDS                          *
-//*  Objectif : Definir un Entry Sequenced Data Set                   *
+//*  EXERCICE 3 : CREATION D'UN CLUSTER RRDS                          *
+//*  Objectif : Definir un Relative Record Data Set                   *
 //*********************************************************************
 //*
-//DEFESDS  EXEC PGM=IDCAMS
+//DEFRRDS  EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
   /* Suppression si existe (ignorer erreur) */
-  DELETE (TESTGDG.VSAM.ESDS) CLUSTER PURGE
+  DELETE (FTEST.VSAM.RRDS) CLUSTER PURGE
   IF LASTCC <= 8 THEN SET MAXCC = 0
 
-  /* Definition du cluster ESDS */
+  /* Definition du cluster RRDS */
   DEFINE CLUSTER ( -
-    NAME(TESTGDG.VSAM.ESDS) -
+    NAME(FTEST.VSAM.RRDS) -
     TRACKS(1 1) -
     VOLUMES(ZASYS1) -
     CONTROLINTERVALSIZE(4096) -
-    NONINDEXED -
-    RECORDSIZE(80 80) -
+    NUMBERED -
+    RECORDSIZE(50 50) -
     SHAREOPTIONS(1 3) -
-    REUSE) -
+    NOREUSE) -
   DATA ( -
-    NAME(TESTGDG.VSAM.ESDS.DATA))
+    NAME(FTEST.VSAM.RRDS.DATA))
 
   /* Verification */
   IF LASTCC = 0 THEN -
-    LISTCAT ENTRIES(TESTGDG.VSAM.ESDS) ALL
+    LISTCAT ENTRIES(FTEST.VSAM.RRDS) ALL
 /*
 //

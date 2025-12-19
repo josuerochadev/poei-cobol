@@ -1,4 +1,4 @@
-//TESTGDG02  JOB (ACCT),'DEFINE KSDS',CLASS=A,MSGCLASS=A,
+//FTEST02  JOB (ACCT),'DEFINE KSDS',CLASS=A,MSGCLASS=A,
 //             MSGLEVEL=(1,1),NOTIFY=&SYSUID
 //*********************************************************************
 //*  EXERCICE 2 : CREATION D'UN CLUSTER KSDS                          *
@@ -9,12 +9,12 @@
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
   /* Suppression si existe (ignorer erreur) */
-  DELETE (TESTGDG.VSAM.KSDS) CLUSTER PURGE
+  DELETE (FTEST.VSAM.KSDS) CLUSTER PURGE
   IF LASTCC <= 8 THEN SET MAXCC = 0
 
   /* Definition du cluster KSDS */
   DEFINE CLUSTER ( -
-    NAME(TESTGDG.VSAM.KSDS) -
+    NAME(FTEST.VSAM.KSDS) -
     TRACKS(1 1) -
     VOLUMES(ZASYS1) -
     CONTROLINTERVALSIZE(4096) -
@@ -25,12 +25,12 @@
     SHAREOPTIONS(1 3) -
     REUSE) -
   DATA ( -
-    NAME(TESTGDG.VSAM.KSDS.DATA)) -
+    NAME(FTEST.VSAM.KSDS.DATA)) -
   INDEX ( -
-    NAME(TESTGDG.VSAM.KSDS.INDEX))
+    NAME(FTEST.VSAM.KSDS.INDEX))
 
   /* Verification */
   IF LASTCC = 0 THEN -
-    LISTCAT ENTRIES(TESTGDG.VSAM.KSDS) ALL
+    LISTCAT ENTRIES(FTEST.VSAM.KSDS) ALL
 /*
 //

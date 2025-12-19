@@ -1,4 +1,4 @@
-//TESTGDG04  JOB (ACCT),'DEFINE LDS',CLASS=A,MSGCLASS=A,
+//FTEST04  JOB (ACCT),'DEFINE LDS',CLASS=A,MSGCLASS=A,
 //             MSGLEVEL=(1,1),NOTIFY=&SYSUID
 //*********************************************************************
 //*  EXERCICE 4 : CREATION D'UN CLUSTER LDS                           *
@@ -9,22 +9,22 @@
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
   /* Suppression si existe (ignorer erreur) */
-  DELETE (TESTGDG.VSAM.LDS) CLUSTER PURGE
+  DELETE (FTEST.VSAM.LDS) CLUSTER PURGE
   IF LASTCC <= 8 THEN SET MAXCC = 0
 
   /* Definition du cluster LDS */
   DEFINE CLUSTER ( -
-    NAME(TESTGDG.VSAM.LDS) -
+    NAME(FTEST.VSAM.LDS) -
     TRACKS(2 1) -
     VOLUMES(ZASYS1) -
     LINEAR -
     SHAREOPTIONS(1 3) -
     REUSE) -
   DATA ( -
-    NAME(TESTGDG.VSAM.LDS.DATA))
+    NAME(FTEST.VSAM.LDS.DATA))
 
   /* Verification */
   IF LASTCC = 0 THEN -
-    LISTCAT ENTRIES(TESTGDG.VSAM.LDS) ALL
+    LISTCAT ENTRIES(FTEST.VSAM.LDS) ALL
 /*
 //

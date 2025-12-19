@@ -1,4 +1,4 @@
-//TESTGDG05  JOB (ACCT),'ALL VSAM TYPES',CLASS=A,MSGCLASS=A,
+//FTEST05  JOB (ACCT),'ALL VSAM TYPES',CLASS=A,MSGCLASS=A,
 //             MSGLEVEL=(1,1),NOTIFY=&SYSUID
 //*********************************************************************
 //*  EXERCICE BONUS : CREATION DES 4 TYPES DE CLUSTERS                *
@@ -9,10 +9,10 @@
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
   /* Nettoyage prealable */
-  DELETE (TESTGDG.VSAM.ESDS) CLUSTER PURGE
-  DELETE (TESTGDG.VSAM.KSDS) CLUSTER PURGE
-  DELETE (TESTGDG.VSAM.RRDS) CLUSTER PURGE
-  DELETE (TESTGDG.VSAM.LDS) CLUSTER PURGE
+  DELETE (FTEST.VSAM.ESDS) CLUSTER PURGE
+  DELETE (FTEST.VSAM.KSDS) CLUSTER PURGE
+  DELETE (FTEST.VSAM.RRDS) CLUSTER PURGE
+  DELETE (FTEST.VSAM.LDS) CLUSTER PURGE
   SET MAXCC = 0
 /*
 //*
@@ -23,7 +23,7 @@
   /* ESDS - Entry Sequenced Data Set                                 */
   /*-----------------------------------------------------------------*/
   DEFINE CLUSTER ( -
-    NAME(TESTGDG.VSAM.ESDS) -
+    NAME(FTEST.VSAM.ESDS) -
     TRACKS(1 1) -
     VOLUMES(ZASYS1) -
     CONTROLINTERVALSIZE(4096) -
@@ -31,7 +31,7 @@
     RECORDSIZE(80 80) -
     SHAREOPTIONS(1 3) -
     REUSE) -
-  DATA (NAME(TESTGDG.VSAM.ESDS.DATA))
+  DATA (NAME(FTEST.VSAM.ESDS.DATA))
 
   IF LASTCC NE 0 THEN DO -
     SET MAXCC = 16 -
@@ -41,7 +41,7 @@
   /* KSDS - Key Sequenced Data Set                                   */
   /*-----------------------------------------------------------------*/
   DEFINE CLUSTER ( -
-    NAME(TESTGDG.VSAM.KSDS) -
+    NAME(FTEST.VSAM.KSDS) -
     TRACKS(1 1) -
     VOLUMES(ZASYS1) -
     CONTROLINTERVALSIZE(4096) -
@@ -51,8 +51,8 @@
     FREESPACE(10 10) -
     SHAREOPTIONS(1 3) -
     REUSE) -
-  DATA (NAME(TESTGDG.VSAM.KSDS.DATA)) -
-  INDEX (NAME(TESTGDG.VSAM.KSDS.INDEX))
+  DATA (NAME(FTEST.VSAM.KSDS.DATA)) -
+  INDEX (NAME(FTEST.VSAM.KSDS.INDEX))
 
   IF LASTCC NE 0 THEN DO -
     SET MAXCC = 16 -
@@ -62,14 +62,14 @@
   /* RRDS - Relative Record Data Set                                 */
   /*-----------------------------------------------------------------*/
   DEFINE CLUSTER ( -
-    NAME(TESTGDG.VSAM.RRDS) -
+    NAME(FTEST.VSAM.RRDS) -
     TRACKS(1 1) -
     VOLUMES(ZASYS1) -
     CONTROLINTERVALSIZE(4096) -
     NUMBERED -
     RECORDSIZE(50 50) -
     SHAREOPTIONS(1 3)) -
-  DATA (NAME(TESTGDG.VSAM.RRDS.DATA))
+  DATA (NAME(FTEST.VSAM.RRDS.DATA))
 
   IF LASTCC NE 0 THEN DO -
     SET MAXCC = 16 -
@@ -79,13 +79,13 @@
   /* LDS - Linear Data Set                                           */
   /*-----------------------------------------------------------------*/
   DEFINE CLUSTER ( -
-    NAME(TESTGDG.VSAM.LDS) -
+    NAME(FTEST.VSAM.LDS) -
     TRACKS(2 1) -
     VOLUMES(ZASYS1) -
     LINEAR -
     SHAREOPTIONS(1 3) -
     REUSE) -
-  DATA (NAME(TESTGDG.VSAM.LDS.DATA))
+  DATA (NAME(FTEST.VSAM.LDS.DATA))
 
   IF LASTCC NE 0 THEN DO -
     SET MAXCC = 16 -
@@ -96,6 +96,6 @@
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
   /* Lister tous les clusters crees */
-  LISTCAT LEVEL(TESTGDG.VSAM) ALL
+  LISTCAT LEVEL(FTEST.VSAM) ALL
 /*
 //
