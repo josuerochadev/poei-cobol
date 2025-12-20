@@ -1,8 +1,30 @@
 # Chapitre VII - Gestion des Fichiers
 
+Ce chapitre traite la déclaration et toutes les opérations E/S menées sur les fichiers. Chaque nature de fichier identifié par son organisation et son type d'accès nécessite un traitement particulier.
+
+---
+
 ## VII-1 Notion de fichiers sous COBOL
 
 Un **fichier** est un ensemble d'enregistrements stockés sur un support externe.
+
+### Terminologie
+
+| Terme | Définition |
+|-------|------------|
+| **Champ (Field)** | Élément de donnée unique (ex: nom, date). La taille = nombre de caractères |
+| **Enregistrement (Record)** | Ensemble de champs décrivant une entité. Taille = somme des champs |
+| **Enreg. Physique** | Information sur le périphérique externe |
+| **Enreg. Logique** | Information traitée par le programme (un à la fois) |
+| **Fichier (File)** | Collection d'enregistrements associés |
+
+### Types de clés
+
+| Type | Description |
+|------|-------------|
+| **Clé Primaire** | Unique à chaque enregistrement, identifie l'enregistrement |
+| **Clé Secondaire** | Valeur unique ou non, permet une recherche alternative |
+| **Champ Descripteur** | Décrit une entité (non utilisé comme clé) |
 
 ### Table vs Fichier
 
@@ -57,7 +79,14 @@ Un **fichier** est un ensemble d'enregistrements stockés sur un support externe
 
 ### 1. SEQUENTIAL (ESDS)
 
-Enregistrements stockés dans l'ordre d'écriture.
+Enregistrements stockés et consultés dans l'ordre séquentiel.
+
+**Caractéristiques :**
+- Les enregistrements sont lus dans l'ordre de création
+- Pour lire un enregistrement, il faut lire tous les précédents
+- Impossible d'insérer entre des enregistrements existants
+- Impossible de supprimer un enregistrement
+- Modification possible par écrasement complet
 
 ```cobol
        SELECT FICHIER-SEQ
@@ -71,12 +100,18 @@ Enregistrements stockés dans l'ordre d'écriture.
 |--------|--------|
 | Accès | Séquentiel uniquement |
 | Ajout | En fin (EXTEND) |
-| Modification | Impossible |
+| Modification | Écrasement seulement |
 | Usage | Logs, historiques, batch |
 
 ### 2. INDEXED (KSDS/VSAM)
 
-Accès via une clé unique + clés secondaires optionnelles.
+Fichier composé de deux éléments : le fichier de données et le fichier d'index.
+
+**Caractéristiques :**
+- Lecture séquentielle OU directe par clé
+- Clé primaire obligatoire et unique
+- Clés secondaires (ALTERNATE KEY) possibles
+- Sous VSAM, le PATH constitue un fichier lié aux données
 
 ```cobol
        SELECT FICHIER-IDX
@@ -98,7 +133,14 @@ Accès via une clé unique + clés secondaires optionnelles.
 
 ### 3. RELATIVE (RRDS)
 
-Accès par numéro de position (RRN).
+Enregistrements organisés par position relative (numéro d'emplacement).
+
+**Caractéristiques :**
+- Accès séquentiel OU direct par clé relative (RRN)
+- La clé relative = emplacement par rapport au début du fichier
+- Accès le plus rapide aux enregistrements
+- L'espace est réservé pour tous les emplacements (même vides)
+- Les enregistrements manquants occupent de l'espace
 
 ```cobol
        SELECT FICHIER-REL

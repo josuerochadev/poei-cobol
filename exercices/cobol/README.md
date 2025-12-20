@@ -2,11 +2,43 @@
 
 ## Organisation
 
-Les exercices sont organisés par chapitre du cours.
+Les exercices sont organisés en trois parties :
+
+```
+exercices/cobol/
+├── theorie/          # QCM pour valider les connaissances
+├── pratique/         # Exercices hands-on par chapitre
+└── fil-rouge/        # → Voir projets/fil-rouge/ (projet capstone)
+```
+
+---
+
+## Partie Théorique (QCM)
+
+Les QCM permettent de valider la compréhension des concepts avant la pratique.
+
+| Fichier | Chapitre | Questions |
+|---------|----------|-----------|
+| `theorie/qcm-01-structure-programme.md` | I - Structure d'un Programme | 25 |
+| `theorie/qcm-02-ispf-commandes.md` | II - Interface ISPF | 23 |
+| `theorie/qcm-03-declaration-variables.md` | III - Déclaration Variables | 25 |
+| `theorie/qcm-04-operations-donnees.md` | IV - Opérations Données | 25 |
+| `theorie/qcm-05-traitement-conditionnel.md` | V - Traitement Conditionnel | 25 |
+| `theorie/qcm-06-gestion-tables.md` | VI - Gestion des Tables | 25 |
+| `theorie/qcm-07-gestion-fichiers.md` | VII - Gestion des Fichiers | 25 |
+| `theorie/qcm-08-operations-es.md` | VIII - Opérations E/S | 25 |
+| `theorie/qcm-09-sous-programmes.md` | IX - Sous-programmes | 25 |
+| `theorie/qcm-10-traitement-fichiers.md` | X - Traitement Fichiers | 25 |
+| `theorie/qcm-11-tri-interne.md` | XI - Tri Interne | 25 |
+| `theorie/qcm-12-fichier-impression.md` | XII - Fichier Impression | 25 |
+
+---
+
+## Partie Pratique
+
+Les exercices pratiques sont organisés par chapitre du cours.
 
 **Convention de nommage :** `CXX-SUJET.cbl` où XX = numéro de chapitre
-
-## Chapitres
 
 ### Chapitre 02 - ISPF et premiers programmes
 
@@ -59,137 +91,101 @@ Les exercices sont organisés par chapitre du cours.
 
 | Programme | Description |
 |-----------|-------------|
-| `C08-EMPL-WRITE.cbl` | Création fichier EMPLOYE étendu (ID, NOM, PRENOM, ADRESSE, DEBIT, CREDIT, SALAIRE) |
-| `C08-EMPL-PRINT.cbl` | Lecture et affichage format tableau avec symbole Euro |
-| `C08-RRDS-WRITE.cbl` | Création fichier RRDS (RELATIVE) avec 10 enregistrements |
+| `C08-EMPL-WRITE.cbl` | Création fichier EMPLOYE étendu |
+| `C08-EMPL-PRINT.cbl` | Lecture et affichage format tableau |
+| `C08-RRDS-WRITE.cbl` | Création fichier RRDS (RELATIVE) |
 | `C08-RRDS-READ.cbl` | Lecture enregistrement N°6 (ACCESS RANDOM) |
-| `C08-RRDS-ADD.cbl` | Écriture enregistrement N°13 à position spécifique |
+| `C08-RRDS-ADD.cbl` | Écriture enregistrement à position spécifique |
 | `C08-RRDS-REWRITE.cbl` | Modification enregistrement N°4 |
 | `C08-RRDS-DELETE.cbl` | Suppression enregistrement N°3 |
 | `C08-RRDS-LIST.cbl` | Liste complète du fichier RRDS |
+| `C08-RELEVE-INIT.cbl` | Création fichier BUFFER.DAT |
+| `C08-RELEVE.cbl` | Dispatch vers fichiers KSDS |
 
 ### Chapitre 09 - Programmes et Sous-programmes
 
 | Programme | Description |
 |-----------|-------------|
-| `C09-PERSREV.cbl` | **TP Formateur** - Programme principal calcul revenu annuel (CALL) |
-| `C09-CALREV.cbl` | **TP Formateur** - Sous-programme calcul (LINKAGE SECTION, GOBACK) |
-| `C09-APPELANT.cbl` | Programme appelant démonstration CALL (TVA, validation, tri) |
-| `C09-CALCUL.cbl` | Sous-programme calcul TVA (BY CONTENT, BY REFERENCE) |
-| `C09-VALID.cbl` | Sous-programme validation données (numérique, alphabétique) |
-| `C09-TRIEUR.cbl` | Sous-programme tri de tableau (bubble sort) |
-| `C09-MODIF.cbl` | Démonstration modification paramètres BY REFERENCE |
-| `C09-BYREF-DEMO.cbl` | Démonstration BY REFERENCE vs BY CONTENT |
+| `C09-PERSREV.cbl` | Programme principal calcul revenu annuel |
+| `C09-CALREV.cbl` | Sous-programme calcul (LINKAGE SECTION) |
+| `C09-APPELANT.cbl` | Programme appelant (TVA, validation, tri) |
+| `C09-CALCUL.cbl` | Sous-programme calcul TVA |
+| `C09-VALID.cbl` | Sous-programme validation données |
+| `C09-TRIEUR.cbl` | Sous-programme tri de tableau |
+| `C09-MODIF.cbl` | Démonstration BY REFERENCE |
+| `C09-BYREF-DEMO.cbl` | BY REFERENCE vs BY CONTENT |
 
 ### Chapitre 10 - Traitement des Fichiers (synthèse)
 
-#### Démonstrations
-
 | Programme | Description |
 |-----------|-------------|
-| `C10-OPTIONAL.cbl` | Clause OPTIONAL - Fichier pouvant ne pas exister |
-| `C10-ALTKEY.cbl` | ALTERNATE RECORD KEY - Accès par clé secondaire |
-
-#### TP Complet : Manipulation fichier KSDS PERSONNEL
-
-| Programme | Exercice | Description |
-|-----------|----------|-------------|
-| `C10-PERS-CREATE.cbl` | Préparation | Création fichier KSDS avec clé primaire (MATRICULE) et secondaire (NUM-SS) |
-| `C10-PERS-LIST.cbl` | Ex. 1 | Lecture séquentielle avec DISPLAY de chaque enregistrement |
-| `C10-PERS-BYSS.cbl` | Ex. 2-3 | Lecture par clé secondaire (N° Sécurité Sociale) |
-| `C10-PERS-UPDATE.cbl` | Ex. 4 | Modification Nom/Prénom d'un salarié (REWRITE) |
-| `C10-PERS-ADD.cbl` | Ex. 5-6 | Ajout nouveau salarié + vérification mise à jour index secondaire |
-| `C10-PERS-START.cbl` | Ex. 8 | Lecture enregistrement le plus proche avec START >= |
-
-**Ordre d'exécution du TP :**
-1. `C10-PERS-CREATE` - Créer le fichier PERSONNEL.KSDS
-2. `C10-PERS-LIST` - Vérifier le contenu
-3. `C10-PERS-BYSS` - Rechercher par N° SS
-4. `C10-PERS-UPDATE` - Modifier un salarié
-5. `C10-PERS-ADD` - Ajouter un nouveau salarié
-6. `C10-PERS-LIST` - Vérifier les modifications
-7. `C10-PERS-START` - Tester START avec clé inexistante
+| `C10-OPTIONAL.cbl` | Clause OPTIONAL |
+| `C10-ALTKEY.cbl` | ALTERNATE RECORD KEY |
+| `C10-PERS-CREATE.cbl` | Création fichier KSDS PERSONNEL |
+| `C10-PERS-LIST.cbl` | Lecture séquentielle |
+| `C10-PERS-BYSS.cbl` | Lecture par clé secondaire |
+| `C10-PERS-UPDATE.cbl` | Modification (REWRITE) |
+| `C10-PERS-ADD.cbl` | Ajout nouveau salarié |
+| `C10-PERS-START.cbl` | START >= |
 
 ### Chapitre 11 - Tri Interne (SORT / MERGE)
 
-#### Démonstrations
-
 | Programme | Description |
 |-----------|-------------|
-| `C11-SORT-SIMPLE.cbl` | SORT avec USING/GIVING - tri simple mono et multi-clés |
-| `C11-SORT-INPUT.cbl` | INPUT PROCEDURE avec RELEASE - filtrage avant tri |
-| `C11-SORT-OUTPUT.cbl` | OUTPUT PROCEDURE avec RETURN - édition avec ruptures |
-| `C11-MERGE.cbl` | MERGE - fusion de fichiers régionaux pré-triés |
-| `C11-SORT-COMPLET.cbl` | TP complet - INPUT + OUTPUT PROCEDURE combinées |
-
-#### TP Institution Financière - Fichier CLIENT
-
-| Programme | Exercice | Description |
-|-----------|----------|-------------|
-| `C11-CLIENT-CREATE.cbl` | Préparation | Création fichier CLIENT.PS (10 clients en désordre) |
-| `C11-CLIENT-TRI-ASC.cbl` | Ex. 1 | TRI ASCENDING sur ID-CLIENT (USING/GIVING) |
-| `C11-CLIENT-TRI-DESC.cbl` | Ex. 2 | TRI DESCENDING sur ID-CLIENT (USING/GIVING) |
-| `C11-CLIENT-TRI-PROC.cbl` | Ex. 3 | TRI PROCÉDURAL (INPUT/OUTPUT PROCEDURE) |
-| `C11-CLIENT-SPLIT.cbl` | Ex. 4 | Création 2 DS avec clés spécifiques (C-, E-) |
-| `C11-CLIENT-MERGE.cbl` | Ex. 5 | MERGE des 3 Data Sets en un seul fichier |
-
-**Ordre d'exécution du TP :**
-
-1. `C11-CLIENT-CREATE` - Créer le fichier CLIENT.PS
-2. `C11-CLIENT-TRI-ASC` - Tri ascendant
-3. `C11-CLIENT-TRI-DESC` - Tri descendant
-4. `C11-CLIENT-TRI-PROC` - Tri procédural
-5. `C11-CLIENT-SPLIT` - Séparer en CLIENT-COURANT.PS et CLIENT-EPARGNE.PS
-6. `C11-CLIENT-MERGE` - Fusionner les 3 fichiers
+| `C11-SORT-SIMPLE.cbl` | SORT avec USING/GIVING |
+| `C11-SORT-INPUT.cbl` | INPUT PROCEDURE avec RELEASE |
+| `C11-SORT-OUTPUT.cbl` | OUTPUT PROCEDURE avec RETURN |
+| `C11-MERGE.cbl` | MERGE - fusion de fichiers |
+| `C11-SORT-COMPLET.cbl` | INPUT + OUTPUT combinées |
+| `C11-CLIENT-CREATE.cbl` | Création fichier CLIENT.PS |
+| `C11-CLIENT-TRI-ASC.cbl` | TRI ASCENDING |
+| `C11-CLIENT-TRI-DESC.cbl` | TRI DESCENDING |
+| `C11-CLIENT-TRI-PROC.cbl` | TRI PROCÉDURAL |
+| `C11-CLIENT-SPLIT.cbl` | Séparation par clé |
+| `C11-CLIENT-MERGE.cbl` | MERGE des Data Sets |
 
 ### Chapitre 12 - Fichier d'impression
 
 | Programme | Description |
 |-----------|-------------|
-| `C12-EDITION-SIMPLE.cbl` | Insertion simple (B, /, 0) - dates, téléphones, SIRET |
-| `C12-EDITION-MONTANT.cbl` | Suppression zéros (Z), astérisques (*), symboles Euro |
-| `C12-EDITION-SIGNE.cbl` | Signes (+, -) fixes et flottants, CR/DB |
-| `C12-FACTURE.cbl` | TP complet - Édition facture avec en-tête et totaux |
-| `C12-RAPPORT.cbl` | Rapport multi-pages avec WRITE AFTER ADVANCING |
+| `C12-EDITION-SIMPLE.cbl` | Insertion simple (B, /, 0) |
+| `C12-EDITION-MONTANT.cbl` | Suppression zéros (Z), astérisques (*) |
+| `C12-EDITION-SIGNE.cbl` | Signes (+, -), CR/DB |
+| `C12-FACTURE.cbl` | Édition facture complète |
+| `C12-RAPPORT.cbl` | Rapport multi-pages |
+| `C12-RELEVE-PREP.cbl` | Préparation fichier AIMPRIM |
+| `C12-RELEVE-PRINT.cbl` | Impression relevé bancaire |
 
-#### TP Relevé Bancaire (Exercices 05-06)
+---
 
-| Programme | Exercice | Description |
-|-----------|----------|-------------|
-| `C12-RELEVE-PREP.cbl` | Ex. 5 | Préparation fichier AIMPRIM (E=Entête, D=Détail, P=Pied) |
-| `C12-RELEVE-PRINT.cbl` | Ex. 6 | Impression relevé bancaire (57 lignes/page) |
+## Projet Fil Rouge
 
-**Prérequis** : Exécuter d'abord les programmes du chapitre 08 pour créer les fichiers KSDS :
-1. `C08-RELEVE-INIT` - Créer le fichier BUFFER.DAT
-2. `C08-RELEVE` - Dispatcher vers AGENCE.DAT, CLIENT.DAT, RIB.DAT, MVTC.DAT
+Le projet fil rouge est un système de gestion financière complet avec 21 exercices progressifs.
 
-**Ordre d'exécution du TP :**
-1. `C12-RELEVE-PREP` - Génère AIMPRIM.DAT (client 01210, mai 2025)
-2. `C12-RELEVE-PRINT` - Génère RELEVE.TXT (relevé imprimable)
+**Emplacement :** [`projets/fil-rouge/`](../../projets/fil-rouge/)
+
+Ce projet met en pratique l'ensemble des compétences COBOL et JCL acquises pendant la formation.
+
+---
 
 ## Compilation
 
+### Programme simple
+
 ```bash
-# Se placer dans le dossier du chapitre
-cd chapitre-06
-
-# Compiler
+cd pratique/chapitre-06
 cobc -x C06-TINDICE.cbl -o C06-TINDICE
-
-# Exécuter
 ./C06-TINDICE
 ```
 
-### Compilation avec sous-programmes (Chapitre 09)
+### Avec sous-programmes (Chapitre 09)
 
 ```bash
-cd chapitre-09
+cd pratique/chapitre-09
 
-# Compiler le sous-programme
-cobc -c -x C09-CALREV.cbl
-
-# Compiler le programme principal
-cobc -c -x C09-PERSREV.cbl
+# Compiler les modules
+cobc -c C09-CALREV.cbl
+cobc -c C09-PERSREV.cbl
 
 # Édition de liens
 cobc -x -o C09-PERSREV C09-PERSREV.o C09-CALREV.o
@@ -197,3 +193,21 @@ cobc -x -o C09-PERSREV C09-PERSREV.o C09-CALREV.o
 # Exécuter
 ./C09-PERSREV
 ```
+
+### Avec mode debug (ligne D en colonne 7)
+
+```bash
+cobc -x -fdebugging-line C06-BANQUE01.cbl -o C06-BANQUE01
+```
+
+---
+
+## Progression recommandée
+
+1. **Théorie** : Faire le QCM du chapitre pour valider la compréhension
+2. **Pratique** : Réaliser les exercices hands-on
+3. **Révision** : Refaire le QCM après la pratique
+4. **Fil Rouge** : Appliquer les compétences sur le projet complet
+
+---
+*Formation COBOL - M2i Formation*

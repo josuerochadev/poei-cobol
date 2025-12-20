@@ -17,6 +17,16 @@ Le **tri interne** COBOL permet de trier un fichier selon un ou plusieurs critè
 └─────────────────┘      └──────────┘      └─────────────────┘
 ```
 
+### Les 5 étapes de l'opération de tri
+
+| Étape | Description |
+|-------|-------------|
+| 1. Ouverture | Ouvre le fichier de travail en I-O, le fichier d'entrée en INPUT et le fichier de sortie en OUTPUT |
+| 2. Transfert initial | Transfère les enregistrements du fichier d'entrée vers le fichier de travail |
+| 3. Tri | Trie les enregistrements dans l'ordre spécifié (croissant/décroissant) par clé(s) |
+| 4. Transfert final | Transfère les enregistrements triés du fichier de travail vers le fichier de sortie |
+| 5. Fermeture | Ferme les fichiers d'entrée et de sortie, supprime le fichier de travail |
+
 ### Déclaration du fichier de travail (SD)
 
 Le tri nécessite un **fichier de travail** déclaré avec **SD** (Sort Description) au lieu de FD.
@@ -60,6 +70,21 @@ Le tri nécessite un **fichier de travail** déclaré avec **SD** (Sort Descript
 - Pas de RECORDING MODE, BLOCK CONTAINS, etc.
 - Structure identique aux fichiers d'entrée/sortie
 - Les clés de tri doivent être définies dans la structure
+
+### Règles sur les clés de tri
+
+| Règle | Description |
+|-------|-------------|
+| Position | La variable KEY doit être physiquement à la même position et avoir le même format dans le fichier d'entrée |
+| Longueur variable | Pour les enregistrements de longueur variable, les clés doivent être dans la taille minimale d'enregistrement |
+| OCCURS | Les variables KEY ne doivent pas contenir de clause OCCURS ni être subordonnées à un élément avec OCCURS |
+| Priorité | Quand plusieurs clés sont spécifiées, la signification diminue de gauche à droite (la plus à gauche = la plus significative) |
+
+**Types de données autorisés pour les clés :**
+- Alphabétiques, alphanumériques
+- Numériques (signés ou non)
+- Virgule flottante interne ou d'affichage
+- Édition numérique
 
 ---
 
@@ -118,6 +143,27 @@ Préserve l'ordre relatif des enregistrements ayant la même clé.
            WITH DUPLICATES IN ORDER
            USING F-ENTREE
            GIVING F-SORTIE
+```
+
+### Variable SORT-RETURN
+
+La variable spéciale `SORT-RETURN` contient le code retour de l'opération SORT ou MERGE :
+
+| Valeur | Signification |
+|--------|---------------|
+| 0 | Opération réussie |
+| 16 | Erreur lors de l'opération |
+
+```cobol
+       SORT F-TRI
+           ON ASCENDING KEY TRI-CLE
+           USING F-ENTREE
+           GIVING F-SORTIE
+
+       IF SORT-RETURN > 0
+           DISPLAY "ERREUR SORT - CODE: " SORT-RETURN
+           STOP RUN
+       END-IF.
 ```
 
 ---
@@ -361,6 +407,16 @@ L'instruction **MERGE** fusionne plusieurs fichiers **déjà triés** en un seul
 
 **Note :** MERGE n'a pas d'INPUT PROCEDURE (les fichiers doivent être pré-triés).
 
+### Comparaison SORT vs MERGE
+
+| Aspect | SORT | MERGE |
+|--------|------|-------|
+| **Fichiers d'entrée** | Un seul fichier | Deux ou plusieurs fichiers |
+| **Pré-tri requis** | Non | Oui (tous les fichiers doivent être pré-triés) |
+| **INPUT PROCEDURE** | Oui | Non |
+| **OUTPUT PROCEDURE** | Oui | Oui |
+| **Utilisation type** | Trier des données non ordonnées | Combiner des fichiers déjà triés |
+
 ### Exemple MERGE
 
 ```cobol
@@ -437,7 +493,36 @@ L'instruction **MERGE** fusionne plusieurs fichiers **déjà triés** en un seul
 
 ---
 
-## XI-6 Récapitulatif
+## XI-6 JCL d'exécution
+
+Exemple de JCL pour exécuter un programme de tri :
+
+```jcl
+//SORTFILE JOB SORTFIL,'TRI COBOL',MSGLEVEL=(1,1),
+//            MSGCLASS=A,CLASS=A,NOTIFY=&SYSUID
+//*============================================================
+//* TRI INTERNE D'UN FICHIER PS
+//*============================================================
+//JOBLIB    DD DSN=USER.COBOL.LOAD,DISP=SHR
+//STEP0001  EXEC PGM=TRIFILE
+//FINPUT    DD DSN=USER.FICHIER.ENTREE,DISP=SHR
+//FOUTPUT   DD DSN=USER.FICHIER.SORTIE,DISP=(NEW,CATLG,DELETE),
+//             UNIT=3390,SPACE=(TRK,(4,1),RLSE),
+//             DCB=(LRECL=80,BLKSIZE=800,RECFM=FB)
+//FWORK     DD DSN=&&SORTWORK,DISP=(,DELETE,DELETE),
+//             UNIT=3390,SPACE=(TRK,(10,5),RLSE)
+//SYSOUT    DD SYSOUT=*
+/*
+```
+
+**Points importants JCL :**
+- Le fichier de travail (FWORK) peut être temporaire (`&&nom`)
+- Prévoir suffisamment d'espace pour le tri
+- Le fichier de travail est automatiquement supprimé en fin de job
+
+---
+
+## XI-7 Récapitulatif
 
 ### Instructions de tri
 

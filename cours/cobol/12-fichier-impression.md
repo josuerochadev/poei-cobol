@@ -23,6 +23,8 @@ Donnée brute     →    Donnée éditée
 20231215         →    15/12/2023
 ```
 
+> **Important** : Les éléments édités ne peuvent pas être utilisés comme **opérandes** dans un calcul. Ils peuvent uniquement être utilisés comme **destination** (à droite du mot `GIVING`).
+
 ### Déclaration d'un fichier d'impression
 
 ```cobol
@@ -74,7 +76,34 @@ Donnée brute     →    Donnée éditée
 
 ---
 
-## XII-2 Caractères d'édition
+## XII-2 Méthodes d'édition
+
+### Classification des méthodes
+
+Il existe deux méthodes générales d'édition :
+
+| Méthode | Types | Symboles |
+|---------|-------|----------|
+| **Édition d'insertion** | Simple, spéciale, fixe, flottante | `B` `0` `/` `.` `$` `+` `-` `CR` `DB` |
+| **Suppression et remplacement** | Zéro par espaces, zéro par astérisques | `Z` `*` |
+
+### Types d'édition par catégorie de données
+
+| Catégorie | Type d'édition | Symboles |
+|-----------|----------------|----------|
+| Alphabétique | Aucun | - |
+| Numérique | Aucun | - |
+| **Édition numérique** | Insertion simple | `B` `0` `/` |
+| | Insertion spéciale | `.` |
+| | Insertion fixe | `$` `+` `-` `CR` `DB` |
+| | Insertion flottante | `$` `+` `-` |
+| | Suppression du zéro | `Z` `*` |
+| Alphanumérique | Aucun | - |
+| **Édition alphanumérique** | Insertion simple | `B` `0` `/` |
+
+---
+
+## XII-3 Caractères d'édition
 
 ### Tableau des caractères d'édition
 
@@ -94,10 +123,11 @@ Donnée brute     →    Donnée éditée
 | `B` | Blanc | Insertion d'espace |
 | `/` | Barre | Insertion de / |
 | `0` | Zéro | Insertion de 0 |
+| `BLANK WHEN ZERO` | Clause | Remplit l'élément d'espaces si valeur = 0 |
 
 ---
 
-## XII-3 Édition par insertion simple
+## XII-4 Édition par insertion simple
 
 ### Insertion de caractères fixes
 
@@ -156,7 +186,7 @@ Les caractères `B`, `0`, `/` sont insérés à leur position exacte.
 
 ---
 
-## XII-4 Édition par insertion spéciale
+## XII-5 Édition par insertion spéciale
 
 ### Point décimal (.) et Virgule (,)
 
@@ -190,7 +220,7 @@ Le **point** représente le séparateur décimal. La **virgule** sépare les mil
 
 ---
 
-## XII-5 Édition par insertion fixe
+## XII-6 Édition par insertion fixe
 
 ### Signe fixe (+, -)
 
@@ -268,11 +298,28 @@ Le signe est placé à une position fixe (début ou fin).
 
 ---
 
-## XII-6 Édition par insertion flottante
+## XII-7 Édition par insertion flottante
 
 ### Concept de flottant
 
 Un symbole **flottant** se déplace pour se positionner juste avant le premier chiffre significatif.
+
+L'édition par insertion flottante est spécifiée en utilisant une chaîne d'**au moins deux** symboles d'insertion flottante (`$`, `+`, `-`).
+
+### Règles de fonctionnement
+
+| Règle | Description |
+|-------|-------------|
+| Symbole le plus à gauche | Représente la limite la plus à gauche où le caractère peut apparaître |
+| Symbole le plus à droite | Représente la limite la plus à droite |
+| Deuxième symbole | Représente la limite la plus à gauche où les données numériques peuvent apparaître |
+
+### Taille minimale recommandée
+
+Pour éviter la troncature, la taille de la chaîne PICTURE doit être :
+- Nombre de positions de l'élément source
+- **+** Nombre de symboles d'insertion non flottants
+- **+** Une position pour le symbole flottant
 
 ### Symbole monétaire flottant ($, €)
 
@@ -337,7 +384,7 @@ PIC ++++++9,99   →  "   -123,45"  (valeur négative)
 
 ---
 
-## XII-7 Suppression des zéros (Z)
+## XII-8 Suppression des zéros (Z)
 
 ### Caractère Z
 
@@ -383,7 +430,7 @@ Le `Z` remplace les zéros non significatifs par des **espaces**.
 
 ---
 
-## XII-8 Remplacement par astérisques (*)
+## XII-9 Remplacement par astérisques (*)
 
 ### Protection des montants
 
@@ -414,7 +461,7 @@ Le `*` remplace les zéros non significatifs par des **astérisques** (protectio
 
 ---
 
-## XII-9 Tableau récapitulatif
+## XII-10 Tableau récapitulatif
 
 ### Éditions les plus courantes
 
@@ -440,7 +487,7 @@ Le `*` remplace les zéros non significatifs par des **astérisques** (protectio
 
 ---
 
-## XII-10 Exemple complet - État d'impression
+## XII-11 Exemple complet - État d'impression
 
 ```cobol
        IDENTIFICATION DIVISION.

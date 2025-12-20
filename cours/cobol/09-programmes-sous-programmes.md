@@ -180,6 +180,59 @@ Passage **par valeur** selon les conventions C. Utilisé principalement pour int
        END-CALL
 ```
 
+### Démonstration : BY REFERENCE vs BY CONTENT
+
+**Programme Principal :**
+```cobol
+       WORKING-STORAGE SECTION.
+       01 WS-NUMCARTE    PIC 9(10) VALUE 1111111111.
+       01 WS-NAME-CLT    PIC X(15) VALUE 'JEAN'.
+
+       PROCEDURE DIVISION.
+           DISPLAY 'AVANT APPEL : '
+           DISPLAY 'NUMERO : ' WS-NUMCARTE
+           DISPLAY 'NOM    : ' WS-NAME-CLT
+
+           CALL 'MODIFIER' USING WS-NUMCARTE, WS-NAME-CLT.
+
+           DISPLAY 'APRES APPEL : '
+           DISPLAY 'NUMERO : ' WS-NUMCARTE
+           DISPLAY 'NOM    : ' WS-NAME-CLT
+           STOP RUN.
+```
+
+**Sous-Programme MODIFIER :**
+```cobol
+       LINKAGE SECTION.
+       01 LS-NUMCARTE    PIC 9(10).
+       01 LS-NAME-CLT    PIC X(15).
+
+       PROCEDURE DIVISION USING LS-NUMCARTE, LS-NAME-CLT.
+           MOVE 2222222222   TO LS-NUMCARTE.
+           MOVE 'JEAN-MICHEL' TO LS-NAME-CLT.
+           EXIT PROGRAM.
+```
+
+**Résultat avec BY REFERENCE (par défaut) :**
+```
+AVANT APPEL :
+NUMERO : 1111111111
+NOM    : JEAN
+APRES APPEL :
+NUMERO : 2222222222    ← Valeur MODIFIÉE
+NOM    : JEAN-MICHEL   ← Valeur MODIFIÉE
+```
+
+**Résultat avec BY CONTENT :**
+```
+AVANT APPEL :
+NUMERO : 1111111111
+NOM    : JEAN
+APRES APPEL :
+NUMERO : 1111111111    ← Valeur INCHANGÉE
+NOM    : JEAN          ← Valeur INCHANGÉE
+```
+
 ---
 
 ## IX-4 LINKAGE SECTION
@@ -572,7 +625,75 @@ L'instruction **END PROGRAM** marque la fin du code source d'un programme.
 
 ---
 
-## IX-12 Bonnes pratiques
+## IX-12 Compilation et Édition de liens
+
+### JCL de compilation standard (programme simple)
+
+```jcl
+//COMPPGM  JOB COMPIL,'COMPPGM',MSGLEVEL=(1,1),REGION=4M,
+//         MSGCLASS=A,CLASS=A,NOTIFY=&SYSUID
+//*========================================================
+//* COMPILATION PROGRAMME SIMPLE
+//*========================================================
+//COMPIL   EXEC IGYWCL
+//COBOL.SYSIN DD DSN=FTEST.COBOL.SOURCE(PGMMAIN),DISP=SHR
+//LKED.SYSLMOD DD DSN=FTEST.COBOL.LOAD(PGMMAIN),DISP=SHR
+/*
+```
+
+### JCL avec édition de liens (programme + sous-programme)
+
+Pour lier un sous-programme au programme principal :
+
+```jcl
+//CLNKPGM  JOB COMPLNK,'COMPLNK',MSGLEVEL=(1,1),REGION=4M,
+//         MSGCLASS=A,CLASS=A,NOTIFY=&SYSUID
+//*========================================================
+//* COMPILATION AVEC GENERATION OBJET
+//*========================================================
+//COMPIL   EXEC PGM=IGYCRCTL,PARM='OBJECT'
+//STEPLIB  DD DSN=IGY410.SIGYCOMP,DISP=SHR
+//SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT2   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT3   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT4   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT5   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT6   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT7   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSPRINT DD SYSOUT=*
+//COBOL.SYSIN DD DSN=FTEST.COBOL.SOURCE(PGSECOND),DISP=SHR
+//COBOL.SYSLIN DD DSN=FTEST.COBOL.LINK(PGSECOND),DISP=SHR
+//*========================================================
+//* ETAPE DE LINKAGE DES PROGRAMMES
+//*========================================================
+//LKED     EXEC PGM=IEWBLINK,COND=(8,LT,COMPIL),REGION=0M
+//SYSLIB   DD DSN=CEE.SCEELKED,DISP=SHR
+//         DD DSN=CEE.SCEELKEX,DISP=SHR
+//         DD DSN=FTEST.COBOL.LINK,DISP=SHR
+//SYSPRINT DD SYSOUT=*
+//LKED.SYSLIN DD DSN=FTEST.COBOL.LINK(PGSECOND),DISP=SHR
+//SYSLMOD  DD DSN=FTEST.COBOL.LOAD(PGSECOND),DISP=SHR
+//SYSUT1   DD UNIT=SYSALLDA,SPACE=(CYL,(1,1))
+/*
+```
+
+### JCL d'exécution avec passage de paramètres (BY VALUE)
+
+```jcl
+//JCLVAL   JOB JCLCAL,'JCLVAL',MSGLEVEL=(1,1),REGION=4M,
+//         MSGCLASS=A,CLASS=A,NOTIFY=&SYSUID
+//*========================================================
+//* EXECUTION AVEC PARAMETRE PARM
+//*========================================================
+//JOBLIB   DD DSN=FTEST.COBOL.LOAD,DISP=SHR
+//STEPVAL  EXEC PGM=VALSECND,PARM=(9999999999AAAAAAAAAAAAAAA)
+//SYSOUT   DD SYSOUT=C
+/*
+```
+
+---
+
+## IX-13 Bonnes pratiques
 
 ### Conventions de nommage
 
@@ -672,16 +793,57 @@ L'instruction **END PROGRAM** marque la fin du code source d'un programme.
 
 ## Exercices pratiques
 
-### Exercice 1 : Sous-programme de calcul
+### Exercice 1 : Calcul du Revenu Annuel (PERSREV/CALREV)
+
+Développer deux programmes où l'un appelle l'autre.
+
+**Programme Principal (PERSREV) :**
+
+1. Lecture d'un Data Set ESDS `PERSONNEL.ESDS.REVENU` avec les champs suivants :
+
+| Champ | Type | Taille |
+|-------|------|--------|
+| Matricule | Numérique | 6 caractères |
+| Nom | Alphabétique | 15 caractères |
+| Prénom | Alphabétique | 15 caractères |
+| Salaire | Numérique | 6 caractères |
+| Primes | Numérique | 6 caractères |
+| Revenu annuel | Numérique | 8 caractères |
+| Numéro S-Social | Numérique | 10 caractères |
+
+2. Appel du sous-programme CALREV pour calculer le revenu annuel
+3. Affectation du résultat dans le champ Revenu annuel
+4. Édition de l'enregistrement
+
+**Sous-Programme (CALREV) :**
+
+Calcul : `Revenu annuel = (12 × Salaire) + Primes`
+
+```cobol
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CALREV.
+
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01 LS-SALAIRE         PIC 9(6).
+       01 LS-PRIMES          PIC 9(6).
+       01 LS-REVENU          PIC 9(8).
+
+       PROCEDURE DIVISION USING LS-SALAIRE, LS-PRIMES, LS-REVENU.
+           COMPUTE LS-REVENU = (12 * LS-SALAIRE) + LS-PRIMES.
+           EXIT PROGRAM.
+```
+
+### Exercice 2 : Sous-programme de calcul TVA
 Créer un sous-programme qui calcule le montant TTC à partir du HT et du taux de TVA.
 
-### Exercice 2 : Validation de données
+### Exercice 3 : Validation de données
 Créer un sous-programme qui valide un numéro de compte bancaire (format IBAN).
 
-### Exercice 3 : Gestion d'erreurs
+### Exercice 4 : Gestion d'erreurs
 Créer un programme principal qui appelle plusieurs sous-programmes avec gestion des codes retour.
 
-### Exercice 4 : Passage de tableau
+### Exercice 5 : Passage de tableau
 Créer un sous-programme qui trie un tableau de 10 éléments en ordre croissant.
 
 ---

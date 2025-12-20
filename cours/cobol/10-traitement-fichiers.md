@@ -14,6 +14,39 @@ Ce chapitre consolide les concepts de gestion de fichiers et approfondit les asp
 | **KSDS** (Key-Sequenced) | INDEXED | Accès par clé primaire/secondaire |
 | **RRDS** (Relative Record) | RELATIVE | Accès par numéro de position |
 
+### Caractéristiques détaillées par type
+
+#### Data Sets Séquentiels (ESDS / PS / QSAM)
+
+| Caractéristique | Description |
+|-----------------|-------------|
+| **Stockage** | Enregistrements stockés dans l'ordre d'écriture |
+| **Accès** | Lecture séquentielle uniquement |
+| **Lecture aléatoire** | Non possible |
+| **Autres noms** | Fichiers plats, non-VSAM, PS |
+
+#### Data Sets Indexés (KSDS)
+
+| Caractéristique | Description |
+|-----------------|-------------|
+| **Stockage** | Organisés par valeur de clé |
+| **Accès** | Rapide, basé sur la clé |
+| **Modes d'accès** | Séquentiel, aléatoire ou dynamique |
+| **Doublons clé primaire** | Non autorisés |
+| **Support** | Disque uniquement (pas de bande) |
+| **Clé** | Ne peut pas être modifiée |
+| **Suppression** | Possible |
+
+#### Data Sets Relatifs (RRDS)
+
+| Caractéristique | Description |
+|-----------------|-------------|
+| **Stockage** | Par numéro d'enregistrement relatif (RRN) |
+| **Accès** | Aléatoire via le RRN |
+| **Modes d'accès** | Séquentiel, aléatoire et dynamique |
+| **Suppression** | Possible mais espace non réutilisé |
+| **RRN** | Défini automatiquement par le système |
+
 ### Comparatif des organisations
 
 | Critère | SEQUENTIAL | INDEXED | RELATIVE |

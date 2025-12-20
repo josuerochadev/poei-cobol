@@ -1,6 +1,22 @@
 # Chapitre VIII - Opérations d'E/S sur les Fichiers
 
-Ce chapitre détaille toutes les opérations de lecture, écriture, modification et suppression sur les fichiers COBOL.
+Ce chapitre constitue une continuation du chapitre précédent et traite toutes les opérations de lecture, écriture, modification et suppression sur les fichiers COBOL. En fonction de l'organisation et de l'accès aux données, chaque opération prend une forme spécifique.
+
+---
+
+## Les verbes COBOL pour les opérations sur fichiers
+
+Les fichiers VSAM sont manipulés par sept verbes COBOL :
+
+1. **OPEN** - Ouverture du fichier
+2. **READ** - Lecture d'enregistrements
+3. **WRITE** - Écriture d'enregistrements
+4. **REWRITE** - Mise à jour d'enregistrements
+5. **DELETE** - Suppression d'enregistrements
+6. **START** - Positionnement du pointeur
+7. **CLOSE** - Fermeture du fichier
+
+Chaque verbe est exécuté et son résultat est soumis à un test via `FILE STATUS`.
 
 ---
 
@@ -32,6 +48,37 @@ L'instruction **OPEN** établit la connexion entre le programme et le fichier ph
 | **RELATIVE** | ✅ | ✅ | ✅ | ✅ |
 
 *\* SEQUENTIAL en I-O : REWRITE possible mais pas DELETE*
+
+### Opérations autorisées selon le mode d'accès
+
+#### Accès Séquentiel (ESDS, KSDS & RRDS)
+
+| Opération | INPUT | OUTPUT | I-O | EXTEND |
+|-----------|:-----:|:------:|:---:|:------:|
+| READ      | ✅    |        | ✅  |        |
+| WRITE     |       | ✅     |     | ✅     |
+| REWRITE   |       |        | ✅  |        |
+
+#### Accès Aléatoire (KSDS & RRDS uniquement)
+
+| Opération | INPUT | OUTPUT | I-O | EXTEND |
+|-----------|:-----:|:------:|:---:|:------:|
+| READ      | ✅    |        | ✅  |        |
+| WRITE     |       | ✅     | ✅  |        |
+| REWRITE   |       |        | ✅  |        |
+| DELETE    |       |        | ✅  |        |
+
+#### Accès Dynamique (KSDS & RRDS uniquement)
+
+| Opération | INPUT | OUTPUT | I-O | EXTEND |
+|-----------|:-----:|:------:|:---:|:------:|
+| READ      | ✅    |        | ✅  |        |
+| WRITE     |       | ✅     | ✅  |        |
+| REWRITE   |       |        | ✅  |        |
+| START     | ✅    |        | ✅  |        |
+| DELETE    |       |        | ✅  |        |
+
+> **Note :** Le mode EXTEND n'est pas autorisé pour les fichiers en accès Aléatoire ou Dynamique.
 
 ### Exemples
 
@@ -106,6 +153,11 @@ L'instruction **READ** transfère un enregistrement du fichier vers la zone FD.
 ### READ selon l'organisation et le mode d'accès
 
 #### 1. Fichier SEQUENTIAL (ou accès SEQUENTIAL)
+
+> **Note Mainframe :** Pour les Data Set ESDS sous z/OS, utilisez le préfixe `AS-` dans le ASSIGN TO :
+> ```cobol
+>        SELECT EMPLOYE ASSIGN TO AS-IN1
+> ```
 
 ```cobol
       * Lecture séquentielle simple
