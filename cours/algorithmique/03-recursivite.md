@@ -507,4 +507,11 @@ Les exercices de ce chapitre sont disponibles dans :
 
 ---
 
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre II (Partie 3) - Piles et Files](02-03-piles-files.md) | [Chapitre IV - Algorithmes de Tri](04-algorithmes-tri.md) |
+
+---
 *Formation POEI Developpeur COBOL Grand Systeme - M2i Formation*

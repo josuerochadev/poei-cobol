@@ -357,4 +357,12 @@ Seuils d'alerte:
 ```
 
 ---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre V - Commandes de Manipulation IDCAMS](05-manipulation-idcams.md) | [Chapitre VII - GDG et Codes Retour VSAM](07-gdg-codes-retour.md) |
+
+---
 *Formation VSAM - M2i Formation*

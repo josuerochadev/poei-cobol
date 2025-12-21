@@ -622,4 +622,11 @@ Les exercices de ce chapitre sont disponibles dans :
 
 ---
 
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre III - Récursivité](03-recursivite.md) | [Chapitre V - Complexité Algorithmique](05-complexite-algorithmique.md) |
+
+---
 *Formation POEI Developpeur COBOL Grand Systeme - M2i Formation*

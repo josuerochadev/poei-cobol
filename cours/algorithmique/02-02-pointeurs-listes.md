@@ -522,4 +522,11 @@ Les exercices de ce chapitre sont disponibles dans :
 
 ---
 
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre II - Structures de Données](02-01-structures-donnees.md) | [Chapitre II (Partie 3) - Piles et Files](02-03-piles-files.md) |
+
+---
 *Formation POEI Developpeur COBOL Grand Systeme - M2i Formation*

@@ -578,4 +578,11 @@ Les exercices de ce chapitre sont disponibles dans :
 
 ---
 
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre II (Partie 2) - Pointeurs et Listes](02-02-pointeurs-listes.md) | [Chapitre III - Récursivité](03-recursivite.md) |
+
+---
 *Formation POEI Developpeur COBOL Grand Systeme - M2i Formation*

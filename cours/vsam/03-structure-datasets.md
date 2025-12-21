@@ -448,4 +448,12 @@ AIX:
 ```
 
 ---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre II - Les Modes d'Organisation VSAM](02-modes-organisation.md) | [Chapitre IV - Langage de Commandes AMS](04-commandes-ams.md) |
+
+---
 *Formation VSAM - M2i Formation*

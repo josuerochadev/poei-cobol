@@ -434,4 +434,11 @@ Les exercices de ce chapitre sont disponibles dans :
 
 ---
 
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre VI - Algorithmes sur Fichiers](06-algorithmes-fichiers.md) | [Module Algorithmique](README.md) |
+
+---
 *Formation POEI Developpeur COBOL Grand Systeme - M2i Formation*

@@ -1,43 +1,43 @@
 # Module JCL (Job Control Language)
 
-## Presentation
+## Présentation
 
-Ce module couvre le **Job Control Language (JCL)**, le langage de controle des travaux sur z/OS. Le JCL est essentiel pour soumettre et executer des programmes batch sur mainframe.
+Ce module couvre le **Job Control Language (JCL)**, le langage de contrôle des travaux sur z/OS. Le JCL est essentiel pour soumettre et exécuter des programmes batch sur mainframe.
 
 ## Chapitres disponibles
 
 | Fichier | Chapitre | Contenu |
 |---------|----------|---------|
-| [01-cartes-job-exec-dd.md](01-cartes-job-exec-dd.md) | I | Cartes JOB, EXEC, DD - Structure et parametres |
-| [02-fichiers-parametres.md](02-fichiers-parametres.md) | II | Concatenation, fichiers PS/PO, temporaires, references |
-| [03-procedures.md](03-procedures.md) | III | Procedures in-stream, cataloguees, imbriquees, parametres |
-| [04-utilitaires.md](04-utilitaires.md) | IV | Utilitaires systeme (IEBGENER, IEBCOPY, IDCAMS, SORT) |
+| [01-cartes-job-exec-dd.md](01-cartes-job-exec-dd.md) | I | Cartes JOB, EXEC, DD - Structure et paramètres |
+| [02-fichiers-parametres.md](02-fichiers-parametres.md) | II | Concaténation, fichiers PS/PO, temporaires, références |
+| [03-procedures.md](03-procedures.md) | III | Procédures in-stream, cataloguées, imbriquées, paramètres |
+| [04-utilitaires.md](04-utilitaires.md) | IV | Utilitaires système (IEBGENER, IEBCOPY, IDCAMS, SORT) |
 
-**Travaux Pratiques :** [Exercices JCL](../../exercices/jcl/chapitre-05/README.md) - QCM et TP de synthese
+**Travaux Pratiques :** [Exercices JCL](../../exercices/jcl/tp/README.md) - QCM et TP de synthèse
 
-## Objectifs pedagogiques
+## Objectifs pédagogiques
 
-A l'issue de ce module, vous serez capable de :
+À l'issue de ce module, vous serez capable de :
 
 - Comprendre la structure et la syntaxe du JCL
-- Ecrire des cartes JOB, EXEC et DD
-- Definir des fichiers avec les parametres DSN, DISP, DCB, SPACE
-- Utiliser les procedures cataloguees et in-stream
-- Gerer les bibliotheques (JOBLIB, STEPLIB, JCLLIB)
-- Utiliser les utilitaires systeme courants
+- Écrire des cartes JOB, EXEC et DD
+- Définir des fichiers avec les paramètres DSN, DISP, DCB, SPACE
+- Utiliser les procédures cataloguées et in-stream
+- Gérer les bibliothèques (JOBLIB, STEPLIB, JCLLIB)
+- Utiliser les utilitaires système courants
 
 ## Progression
 
 - [x] Chapitre I - Cartes JOB, EXEC, DD
-- [x] Chapitre II - Fichiers speciaux et parametres
-- [x] Chapitre III - Procedures
+- [x] Chapitre II - Fichiers spéciaux et paramètres
+- [x] Chapitre III - Procédures
 - [x] Chapitre IV - Utilitaires
 - [x] Chapitre V - Travaux pratiques (dans exercices/)
 
-## Prerequis
+## Prérequis
 
-- Module Z/OS et TSO/ISPF (recommande)
-- Comprehension de l'environnement mainframe
+- Module Z/OS et TSO/ISPF (recommandé)
+- Compréhension de l'environnement mainframe
 - Notions de base sur les datasets
 
 ## Structure d'un JCL
@@ -74,7 +74,7 @@ A l'issue de ce module, vous serez capable de :
 │          │                                                      │
 │          ▼                                                      │
 │   ┌─────────────┐                                               │
-│   │    JCL      │  ◄── VOUS ETES ICI                           │
+│   │    JCL      │  ◄── VOUS ÊTES ICI                           │
 │   │             │                                               │
 │   └──────┬──────┘                                               │
 │          │                                                      │
@@ -86,7 +86,7 @@ A l'issue de ce module, vous serez capable de :
 │          │                                                      │
 │          ▼                                                      │
 │   ┌─────────────┐                                               │
-│   │   CICS      │  Transactionnel temps reel                    │
+│   │   CICS      │  Transactionnel temps réel                    │
 │   │             │                                               │
 │   └─────────────┘                                               │
 │                                                                 │

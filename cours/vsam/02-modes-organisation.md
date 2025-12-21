@@ -311,4 +311,12 @@ Valeurs courantes:
 ```
 
 ---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre I - Introduction à VSAM](01-introduction-vsam.md) | [Chapitre III - Structure des Data Sets VSAM](03-structure-datasets.md) |
+
+---
 *Formation VSAM - M2i Formation*

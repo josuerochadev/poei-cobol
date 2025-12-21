@@ -547,4 +547,12 @@ Sequence AIX:
 ```
 
 ---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre III - Structure des Data Sets VSAM](03-structure-datasets.md) | [Chapitre V - Commandes de Manipulation IDCAMS](05-manipulation-idcams.md) |
+
+---
 *Formation VSAM - M2i Formation*

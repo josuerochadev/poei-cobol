@@ -514,4 +514,11 @@ Les exercices de ce chapitre sont disponibles dans :
 
 ---
 
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Chapitre I - Introduction](01-introduction-algorithmique.md) | [Chapitre II (Partie 2) - Pointeurs et Listes](02-02-pointeurs-listes.md) |
+
+---
 *Formation POEI Developpeur COBOL Grand Systeme - M2i Formation*

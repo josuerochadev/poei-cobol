@@ -245,4 +245,12 @@ Types VSAM:
 ```
 
 ---
+
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Module VSAM](README.md) | [Chapitre II - Les Modes d'Organisation VSAM](02-modes-organisation.md) |
+
+---
 *Formation VSAM - M2i Formation*

@@ -378,4 +378,11 @@ Les exercices de ce chapitre sont disponibles dans :
 
 ---
 
+## Navigation
+
+| Précédent | Suivant |
+|-----------|---------|
+| [Module Algorithmique](README.md) | [Chapitre II - Structures de Données](02-01-structures-donnees.md) |
+
+---
 *Formation POEI Développeur COBOL Grand Système - M2i Formation*
