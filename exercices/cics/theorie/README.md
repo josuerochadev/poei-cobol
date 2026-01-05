@@ -6,17 +6,18 @@ Ce dossier contient les QCM (Questionnaires à Choix Multiples) pour valider la 
 
 ## Fichiers disponibles
 
-| QCM | Chapitre | Questions |
-|-----|----------|-----------|
-| [qcm-01-presentation.md](qcm-01-presentation.md) | I - Présentation de CICS | 15 |
-| [qcm-02-organisation.md](qcm-02-organisation.md) | II - Organisation de CICS | 15 |
-| [qcm-03-architecture.md](qcm-03-architecture.md) | III - Architecture CICS | 10 |
-| [qcm-04-presentation.md](qcm-04-presentation.md) | IV - Présentation des programmes | 12 |
-| [qcm-05-traitement.md](qcm-05-traitement.md) | V - Traitement des données | 15 |
-| [qcm-06-donnees.md](qcm-06-donnees.md) | VI - Gestion des données | 15 |
+| QCM | Chapitre(s) couvert(s) | Questions |
+|-----|------------------------|-----------|
+| [qcm-01-presentation.md](qcm-01-presentation.md) | I - Présentation générale de CICS | 10 |
+| [qcm-02-organisation.md](qcm-02-organisation.md) | II - Organisation du système CICS | 12 |
+| [qcm-03-architecture.md](qcm-03-architecture.md) | III-IV - SGBD IMS et Architecture Multicouches | 15 |
+| [qcm-04-presentation.md](qcm-04-presentation.md) | V - Couche Présentation (BMS) | 15 |
+| [qcm-05-traitement.md](qcm-05-traitement.md) | VI - Couche de Traitement | 15 |
+| [qcm-06-donnees.md](qcm-06-donnees.md) | VII - Couche des Données (Browse, Transactions) | 15 |
+| [qcm-08-travaux-pratiques.md](qcm-08-travaux-pratiques.md) | VIII - Travaux Pratiques (Gestion Crédits) | 20 |
 | [qcm-09-architecture-tsi.md](qcm-09-architecture-tsi.md) | IX - Architecture et Transactions TSI | 25 |
 
-**Total : 107 questions**
+**Total : 127 questions**
 
 ## Utilisation
 
