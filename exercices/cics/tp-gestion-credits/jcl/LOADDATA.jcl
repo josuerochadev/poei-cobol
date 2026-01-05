@@ -1,71 +1,65 @@
-//LOADDATA JOB (ACCT),'LOAD VSAM DATA',CLASS=A,MSGCLASS=X
+//LOADDATA JOB (ACCT),'LOAD DATA CREDITS',CLASS=A,MSGCLASS=X,
+//             NOTIFY=&SYSUID
 //*********************************************************************
-//* JCL : LOADDATA.jcl
-//* Description : Chargement des données de test dans les fichiers VSAM
-//* Prérequis : Exécuter DEFVSAM.jcl avant ce JCL
+//* JCL     : LOADDATA
+//* Auteur  : Formation CICS
+//* Date    : 2024-01
+//* 
+//* Fonction: Chargement des données de test dans les fichiers VSAM
+//*           EMPLOYE et CREDEMP
+//*
+//* Prérequis: 
+//*   - Fichiers VSAM déjà définis (DEFVSAM.jcl)
+//*   - Fichiers séquentiels de données disponibles
+//*
+//* Données chargées :
+//*   - 6 employés (EMP001 à EMP006)
+//*   - 4 crédits (pour EMP001, EMP003, EMP004, EMP006)
 //*********************************************************************
 //*
-//* ÉTAPE 1 : Chargement du fichier EMPLOYE (6 enregistrements)
-//*
-//LOADEMP  EXEC PGM=IDCAMS
+//*-------------------------------------------------------------------*
+//* ETAPE 1 : Chargement fichier EMPLOYE
+//*-------------------------------------------------------------------*
+//LOADEMPL EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //INFILE   DD *
-EMP001MARTIN JEAN                  COMPTA    Y
-EMP002DUPONT MARIE                 INFO      N
-EMP003DURAND PIERRE                RH        Y
-EMP004LEROY SOPHIE                 COMPTA    Y
-EMP005MOREAU PAUL                  INFO      N
-EMP006SIMON ANNE                   RH        Y
+EMP001MARTIN JEAN                   COMPTA    0350000Y
+EMP002DUPONT MARIE                  INFO      0420000N
+EMP003DURAND PIERRE                 RH        0380000Y
+EMP004LEROY SOPHIE                  COMPTA    0320000Y
+EMP005MOREAU PAUL                   INFO      0450000N
+EMP006SIMON ANNE                    RH        0360000Y
 /*
 //OUTFILE  DD DSN=USER.CICS.EMPLOYE,DISP=SHR
 //SYSIN    DD *
   REPRO INFILE(INFILE) OUTFILE(OUTFILE)
 /*
 //*
-//* ÉTAPE 2 : Chargement du fichier CRE-EMP (4 enregistrements)
-//*
-//LOADCRD  EXEC PGM=IDCAMS
+//*-------------------------------------------------------------------*
+//* ETAPE 2 : Chargement fichier CREDEMP
+//*-------------------------------------------------------------------*
+//LOADCRED EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //INFILE   DD *
-EMP001PRET AUTO
-EMP003PRET IMMO
-EMP004PRET PERSO
-EMP006PRET ETUDES
+EMP001PRET AUTO            01500000004500001260000
+EMP003PRET IMMO            05000000008000004840000
+EMP004PRET PERSO           00500000002500000025000
+EMP006PRET ETUDES          00800000002000000680000
 /*
 //OUTFILE  DD DSN=USER.CICS.CREDEMP,DISP=SHR
 //SYSIN    DD *
   REPRO INFILE(INFILE) OUTFILE(OUTFILE)
 /*
-//*********************************************************************
-//* NOTE : Les données ci-dessus sont simplifiées.
-//* En production, utiliser un programme COBOL pour charger
-//* les données avec les formats COMP-3 corrects.
 //*
-//* Données complètes (format lisible) :
-//*
-//* EMPLOYE :
-//* EMP001 MARTIN JEAN        COMPTA     3500.00 Y
-//* EMP002 DUPONT MARIE       INFO       4200.00 N
-//* EMP003 DURAND PIERRE      RH         3800.00 Y
-//* EMP004 LEROY SOPHIE       COMPTA     3200.00 Y
-//* EMP005 MOREAU PAUL        INFO       4500.00 N
-//* EMP006 SIMON ANNE         RH         3600.00 Y
-//*
-//* CRE-EMP :
-//* EMP001 PRET AUTO     15000.00  450.00 12600.00
-//* EMP003 PRET IMMO     50000.00  800.00 48400.00
-//* EMP004 PRET PERSO     5000.00  250.00   250.00
-//* EMP006 PRET ETUDES    8000.00  200.00  6800.00
-//*********************************************************************
-//*
-//* ÉTAPE 3 : Vérification du chargement
-//*
-//VERIFY   EXEC PGM=IDCAMS
+//*-------------------------------------------------------------------*
+//* ETAPE 3 : Vérification des données chargées
+//*-------------------------------------------------------------------*
+//PRINT    EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
+//EMPLOYE  DD DSN=USER.CICS.EMPLOYE,DISP=SHR
+//CREDEMP  DD DSN=USER.CICS.CREDEMP,DISP=SHR
 //SYSIN    DD *
-  LISTCAT ENTRIES(USER.CICS.EMPLOYE) ALL
-  LISTCAT ENTRIES(USER.CICS.CREDEMP) ALL
+  PRINT INFILE(EMPLOYE) COUNT(10)
+  PRINT INFILE(CREDEMP) COUNT(10)
 /*
-//*********************************************************************
-//* FIN DU JOB
-//*********************************************************************
+//

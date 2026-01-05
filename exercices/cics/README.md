@@ -33,7 +33,7 @@ cics/
 
 ## Contenu detaille
 
-### Theorie (82 questions)
+### Theorie (127 questions)
 
 | QCM | Chapitre | Questions |
 |-----|----------|-----------|
@@ -43,6 +43,8 @@ cics/
 | [QCM 04](theorie/qcm-04-presentation.md) | Couche Presentation (BMS) | 15 |
 | [QCM 05](theorie/qcm-05-traitement.md) | Couche Traitement | 15 |
 | [QCM 06](theorie/qcm-06-donnees.md) | Couche Donnees | 15 |
+| [QCM 08](theorie/qcm-08-travaux-pratiques.md) | Travaux Pratiques | 20 |
+| [QCM 09](theorie/qcm-09-architecture-tsi.md) | Architecture et Transactions TSI | 25 |
 
 ### Pratique (10 exercices)
 
@@ -54,24 +56,30 @@ cics/
 
 Voir [pratique/README.md](pratique/README.md) pour les details.
 
-### TP Gestion Credits (1 TP)
+### TP Gestion Credits (1 TP complet)
 
-Application CICS simplifiee demonstrant l'utilisation de READ/REWRITE avec SEND TEXT.
+Application CICS complete en **architecture 3 tiers** pour la gestion des credits employes.
 
 | Composant | Description |
 |-----------|-------------|
 | Transaction | CRED |
-| Programme | PROGCRED.cbl |
-| Fichiers VSAM | EMPLOYE, CRE-EMP |
+| Programmes | CREDPRES (Presentation), CREDTRT (Traitement), CREDDAO (Donnees) |
+| Fichiers VSAM | EMPLOYE (6 enr.), CREDEMP (4 enr.) |
+| Ecran BMS | CREDSET/CREDMAP |
+
+**Fonctionnalites :**
+- Consulter un employe et son credit
+- Payer une echeance (PF5)
+- Solde automatique du credit (RESTE = 0 → ETAT = 'N')
 
 Voir [tp-gestion-credits/README.md](tp-gestion-credits/README.md) pour les details.
 
 ## Progression recommandee
 
 ```
-1. THEORIE
+1. THEORIE (Partie 1)
    QCM 01 → QCM 02 → QCM 03 → QCM 04 → QCM 05 → QCM 06
-   (Valider la comprehension des concepts)
+   (Valider la comprehension des concepts fondamentaux)
 
 2. PRATIQUE BMS
    MAPTEST → Comprendre les ecrans CICS
@@ -81,11 +89,15 @@ Voir [tp-gestion-credits/README.md](tp-gestion-credits/README.md) pour les detai
    PROGREAD → PROGWRIT → PROGREWT → PROGDELT
    (Maitriser les commandes fichier)
 
-4. TP GESTION CREDITS
-   Application complete avec SEND TEXT
+4. TP GESTION CREDITS + QCM 08
+   Application 3-tiers complete
    (Integration de tous les concepts)
 
-5. FIL ROUGE
+5. THEORIE (Partie 2)
+   QCM 09 → Architecture et Transactions TSI
+   (Concepts avances : accesseurs, TSI, web, administration)
+
+6. FIL ROUGE
    Application complete (a venir)
 ```
 
@@ -111,10 +123,10 @@ Voir [tp-gestion-credits/README.md](tp-gestion-credits/README.md) pour les detai
 
 ## Total
 
-- **82 questions** theoriques (QCM)
+- **127 questions** theoriques (8 QCM)
 - **10 exercices** pratiques
-- **1 TP** complet (CRED)
-- **93 exercices** au total
+- **1 TP** complet architecture 3 tiers (CRED)
+- **138 exercices** au total
 
 ---
 *Formation CICS - M2i Formation*

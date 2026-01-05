@@ -1,8 +1,9 @@
       ******************************************************************
-      * Copybook : EMPLOYE.cpy
-      * Description : Structure enregistrement fichier EMPLOYE
+      * Copybook : EMPLOYE
+      * Description : Structure enregistrement employé
       * Fichier VSAM : EMPLOYE (KSDS)
-      * Longueur : 52 octets
+      * Clé primaire : EMP-ID (6 caractères)
+      * Longueur enregistrement : 52 octets
       ******************************************************************
        01  EMPLOYE-REC.
            05  EMP-ID              PIC X(6).
@@ -13,6 +14,13 @@
                88  EMP-A-CREDIT    VALUE 'Y'.
                88  EMP-SANS-CREDIT VALUE 'N'.
       ******************************************************************
-      * Longueur totale : 6 + 30 + 10 + 5 + 1 = 52 octets
-      * Note : COMP-3 9(7)V99 = 5 octets (9 chiffres / 2 + 1)
+      * Détail des champs :
+      * -----------------------------------------------------------------
+      * EMP-ID         : Identifiant unique employé (EMP001-EMP999)
+      * EMP-NAME       : Nom complet de l'employé
+      * EMP-DEPT       : Département (COMPTA, INFO, RH, etc.)
+      * EMP-SALAIRE    : Salaire mensuel en format packed (COMP-3)
+      * EMP-ETAT-CRED  : Indicateur crédit actif
+      *                  'Y' = Crédit en cours
+      *                  'N' = Pas de crédit
       ******************************************************************
