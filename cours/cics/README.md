@@ -30,6 +30,12 @@ CICS (Customer Information Control System) est un moniteur transactionnel dével
 | 07 | [Couche des Données](07-couche-donnees.md) | Accès VSAM, DB2, IMS |
 | 08 | [Travaux Pratiques](08-travaux-pratiques.md) | Application complète gestion des crédits |
 
+### Partie 3 : CICS Avancé
+
+| Chapitre | Titre | Description |
+|----------|-------|-------------|
+| 09 | [Architecture et Transactions TSI](09-architecture-transactions-tsi.md) | Accesseurs, TSI, intégration Web, gestion erreurs, administration CICS |
+
 ## Objectifs pédagogiques
 
 À l'issue de ce module, vous serez capable de :
@@ -49,6 +55,15 @@ CICS (Customer Information Control System) est un moniteur transactionnel dével
 - Créer des écrans BMS dans la couche de présentation
 - Implémenter la logique métier dans la couche de traitement
 - Accéder aux données VSAM et DB2 dans la couche des données
+
+### CICS Avancé
+- Comprendre les accesseurs logiques et physiques
+- Maîtriser les structures TSI pour la traçabilité
+- Intégrer CICS avec des technologies Web modernes (React, Angular, Vue.js)
+- Utiliser IBM MQ pour la communication asynchrone
+- Gérer les conditions exceptionnelles (RESP, HANDLE CONDITION, HANDLE ABEND)
+- Administrer CICS avec CEMT, CEDA, CECI et CEDF
+- Maîtriser les opérations E/S avancées (navigation, verrouillage)
 
 ## Liens avec le module COBOL
 
@@ -132,7 +147,7 @@ Les connaissances acquises dans le module COBOL (structures de données, fichier
 
 | Module précédent | Module suivant |
 |------------------|----------------|
-| [COBOL](../cobol/README.md) | - |
+| [COBOL](../cobol/README.md) | [DB2](../db2/README.md) |
 
 ---
 *Formation COBOL - M2i Formation*

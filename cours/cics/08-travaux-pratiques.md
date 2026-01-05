@@ -910,7 +910,7 @@ exercices/cics/tp-gestion-credits/
 
 | Précédent | Suivant |
 |-----------|---------|
-| [Chapitre VII - Couche des Données](07-couche-donnees.md) | - |
+| [Chapitre VII - Couche des Données](07-couche-donnees.md) | [Chapitre IX - Architecture et Transactions TSI](09-architecture-transactions-tsi.md) |
 
 ---
 *Formation COBOL - Module CICS*

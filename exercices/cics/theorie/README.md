@@ -14,8 +14,9 @@ Ce dossier contient les QCM (Questionnaires à Choix Multiples) pour valider la 
 | [qcm-04-presentation.md](qcm-04-presentation.md) | IV - Présentation des programmes | 12 |
 | [qcm-05-traitement.md](qcm-05-traitement.md) | V - Traitement des données | 15 |
 | [qcm-06-donnees.md](qcm-06-donnees.md) | VI - Gestion des données | 15 |
+| [qcm-09-architecture-tsi.md](qcm-09-architecture-tsi.md) | IX - Architecture et Transactions TSI | 25 |
 
-**Total : 82 questions**
+**Total : 107 questions**
 
 ## Utilisation
 
