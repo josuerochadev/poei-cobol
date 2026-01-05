@@ -1,0 +1,36 @@
+***********************************************************************
+*  MAPSET : CLNTSET - Consultation Client
+***********************************************************************
+CLNTSET  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+CLNTMAP  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(1,25),LENGTH=25,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='CONSULTATION CLIENT'
+         DFHMDF POS=(3,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='────────────────────────────────────────────────X
+               ──────────────────────────────────'
+         DFHMDF POS=(5,2),LENGTH=10,ATTRB=ASKIP,INITIAL='N° Client:'
+NUMCLI   DFHMDF POS=(5,14),LENGTH=6,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(5,21),LENGTH=1,ATTRB=ASKIP
+         DFHMDF POS=(7,2),LENGTH=10,ATTRB=ASKIP,INITIAL='Nom      :'
+NOM      DFHMDF POS=(7,14),LENGTH=25,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(8,2),LENGTH=10,ATTRB=ASKIP,INITIAL='Prenom   :'
+PRENOM   DFHMDF POS=(8,14),LENGTH=20,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(9,2),LENGTH=10,ATTRB=ASKIP,INITIAL='Adresse  :'
+ADRESSE  DFHMDF POS=(9,14),LENGTH=30,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(10,2),LENGTH=10,ATTRB=ASKIP,INITIAL='Ville    :'
+VILLE    DFHMDF POS=(10,14),LENGTH=20,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(11,2),LENGTH=10,ATTRB=ASKIP,INITIAL='CP       :'
+CPOST    DFHMDF POS=(11,14),LENGTH=5,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(12,2),LENGTH=10,ATTRB=ASKIP,INITIAL='Tel      :'
+TEL      DFHMDF POS=(12,14),LENGTH=10,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(13,2),LENGTH=10,ATTRB=ASKIP,INITIAL='Date ouv :'
+DATEOUV  DFHMDF POS=(13,14),LENGTH=8,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(14,2),LENGTH=10,ATTRB=ASKIP,INITIAL='Region   :'
+REGION   DFHMDF POS=(14,14),LENGTH=2,ATTRB=(ASKIP,BRT)
+MSG      DFHMDF POS=(20,5),LENGTH=60,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,5),LENGTH=60,ATTRB=ASKIP,                       X
+               INITIAL='PF3=Menu  PF5=Comptes  ENTER=Rechercher'
+         DFHMSD TYPE=FINAL
+         END

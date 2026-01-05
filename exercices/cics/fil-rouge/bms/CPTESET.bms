@@ -1,0 +1,35 @@
+***********************************************************************
+*  MAPSET : CPTESET - Gestion Comptes
+***********************************************************************
+CPTESET  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+CPTEMAP  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(1,28),LENGTH=20,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='GESTION COMPTES'
+         DFHMDF POS=(3,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='────────────────────────────────────────────────X
+               ──────────────────────────────────'
+         DFHMDF POS=(5,2),LENGTH=12,ATTRB=ASKIP,INITIAL='N° Compte  :'
+NUMCPT   DFHMDF POS=(5,16),LENGTH=11,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(5,28),LENGTH=1,ATTRB=ASKIP
+         DFHMDF POS=(7,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Client     :'
+CLIENT   DFHMDF POS=(7,16),LENGTH=6,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(8,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Type       :'
+TYPE     DFHMDF POS=(8,16),LENGTH=1,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(8,20),LENGTH=25,ATTRB=ASKIP,                       X
+               INITIAL='(C=Courant E=Epargne T=Titre)'
+         DFHMDF POS=(9,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Libelle    :'
+LIBELL   DFHMDF POS=(9,16),LENGTH=20,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(11,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Solde      :'
+SOLDE    DFHMDF POS=(11,16),LENGTH=14,ATTRB=(ASKIP,BRT),               X
+               PICOUT='----,---,--9.99'
+         DFHMDF POS=(12,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Date ouv   :'
+DATEOUV  DFHMDF POS=(12,16),LENGTH=8,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(13,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Derniere op:'
+DATEDER  DFHMDF POS=(13,16),LENGTH=8,ATTRB=(ASKIP,BRT)
+MSG      DFHMDF POS=(20,5),LENGTH=60,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,5),LENGTH=60,ATTRB=ASKIP,                       X
+               INITIAL='PF3=Menu  PF7=Prec  PF8=Suiv  ENTER=Rechercher'
+         DFHMSD TYPE=FINAL
+         END

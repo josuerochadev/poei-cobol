@@ -28,7 +28,12 @@ cics/
 │   ├── data/
 │   └── jcl/
 │
-└── fil-rouge/                 # Projet fil rouge (a venir)
+└── fil-rouge/                 # Projet fil rouge bancaire complet
+    ├── cobol/                 # 7 programmes (MENU, CLNT, CPTE)
+    ├── bms/                   # 3 mapsets
+    ├── copybooks/             # CLIENT, COMPTE
+    ├── jcl/                   # DEFVSAM, LOADDATA
+    └── data/                  # 10 clients, 15 comptes
 ```
 
 ## Contenu detaille
@@ -74,6 +79,27 @@ Application CICS complete en **architecture 3 tiers** pour la gestion des credit
 
 Voir [tp-gestion-credits/README.md](tp-gestion-credits/README.md) pour les details.
 
+### Fil Rouge Bancaire (1 application complete)
+
+Application bancaire CICS multi-transactions en **architecture 3 tiers**.
+
+| Transaction | Programmes | Fonction |
+|-------------|------------|----------|
+| MENU | MENUPRES | Menu principal, navigation |
+| CLNT | CLNTPRES, CLNTTRT, CLNTDAO | Consultation client |
+| CPTE | CPTEPRES, CPTETRT, CPTEDAO | Gestion comptes avec browse |
+
+**Donnees :**
+- 10 clients (CLI001-CLI010)
+- 15 comptes (Courant, Epargne, Titres)
+
+**Concepts avances :**
+- Navigation multi-transactions (XCTL)
+- Browse VSAM (STARTBR, READNEXT, READPREV, ENDBR)
+- 3 mapsets BMS distincts
+
+Voir [fil-rouge/README.md](fil-rouge/README.md) pour les details.
+
 ## Progression recommandee
 
 ```
@@ -97,8 +123,9 @@ Voir [tp-gestion-credits/README.md](tp-gestion-credits/README.md) pour les detai
    QCM 09 → Architecture et Transactions TSI
    (Concepts avances : accesseurs, TSI, web, administration)
 
-6. FIL ROUGE
-   Application complete (a venir)
+6. FIL ROUGE BANCAIRE
+   Application multi-transactions (MENU, CLNT, CPTE)
+   (Navigation XCTL, Browse VSAM, 3 mapsets)
 ```
 
 ## Outils CICS utiles
@@ -126,7 +153,8 @@ Voir [tp-gestion-credits/README.md](tp-gestion-credits/README.md) pour les detai
 - **127 questions** theoriques (8 QCM)
 - **10 exercices** pratiques
 - **1 TP** complet architecture 3 tiers (CRED)
-- **138 exercices** au total
+- **1 Fil Rouge** bancaire multi-transactions (MENU, CLNT, CPTE)
+- **7 programmes COBOL** + **3 mapsets BMS** dans le fil rouge
 
 ---
 *Formation CICS - M2i Formation*

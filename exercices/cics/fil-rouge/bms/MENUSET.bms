@@ -1,0 +1,27 @@
+***********************************************************************
+*  MAPSET : MENUSET - Menu principal application bancaire
+***********************************************************************
+MENUSET  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MENUMAP  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(1,25),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='APPLICATION BANCAIRE CICS'
+         DFHMDF POS=(3,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='════════════════════════════════════════════════X
+               ══════════════════════════════════'
+         DFHMDF POS=(7,20),LENGTH=40,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='MENU PRINCIPAL'
+         DFHMDF POS=(10,20),LENGTH=30,ATTRB=ASKIP,                      X
+               INITIAL='1. Consultation Client'
+         DFHMDF POS=(12,20),LENGTH=30,ATTRB=ASKIP,                      X
+               INITIAL='2. Gestion Comptes'
+         DFHMDF POS=(16,20),LENGTH=15,ATTRB=ASKIP,                      X
+               INITIAL='Votre choix :'
+CHOIX    DFHMDF POS=(16,36),LENGTH=1,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(16,38),LENGTH=1,ATTRB=ASKIP
+MSG      DFHMDF POS=(20,5),LENGTH=60,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,5),LENGTH=50,ATTRB=ASKIP,                       X
+               INITIAL='PF3=Quitter  ENTER=Valider'
+         DFHMSD TYPE=FINAL
+         END
