@@ -34,7 +34,7 @@
            MOVE 'EMP099' TO WS-REC-KEY.
 
       *----------------------------------------------------------------*
-      *    4000 - Lecture de la cle dans le Data Set
+      *    Lecture de la cle dans le Data Set
       *----------------------------------------------------------------*
            EXEC CICS READ
                FILE('EMPLOYE')
@@ -44,7 +44,7 @@
            END-EXEC.
 
       *----------------------------------------------------------------*
-      *    4300 - Si lecture correcte, la cle existe deja
+      *    Si lecture correcte, la cle existe deja
       *----------------------------------------------------------------*
            IF WS-RESP = DFHRESP(NORMAL)
                MOVE 'ERREUR: CLE EXISTE DEJA - PAS D ECRITURE' TO WS-MSG
@@ -53,7 +53,7 @@
            END-IF.
 
       *----------------------------------------------------------------*
-      *    5500 - Cle n'existe pas, on peut ecrire
+      *    Cle n'existe pas, on peut ecrire
       *----------------------------------------------------------------*
            IF WS-RESP NOT = DFHRESP(NOTFND)
                MOVE 'ERREUR LECTURE INATTENDUE' TO WS-MSG
@@ -70,7 +70,7 @@
            MOVE 'N'               TO EMP-ETAT-CRED.
 
       *----------------------------------------------------------------*
-      *    7000 - Ecriture dans le Data Set par WRITE
+      *    Ecriture dans le Data Set par WRITE
       *----------------------------------------------------------------*
            EXEC CICS WRITE
                FILE('EMPLOYE')

@@ -1,23 +1,33 @@
 //LOADDATA JOB (ACCT),'LOAD VSAM DATA',CLASS=A,MSGCLASS=X
 //*********************************************************************
 //* JCL : LOADDATA.jcl
-//* Description : Chargement des donnees de test dans EMPLOYE
-//* Fichier : FTEST.CICS.EMPLOYE (KSDS, LRECL=80)
+//* Description : Chargement des donnees de test pour TP CICS
 //*********************************************************************
 //*
-//* Structure enregistrement (80 octets) :
-//*   EMP-ID        : X(6)     positions 1-6   (cle)
-//*   EMP-NAME      : X(30)    positions 7-36
-//*   EMP-DEPT      : X(10)    positions 37-46
-//*   EMP-SALAIRE   : 9(7)V99  positions 47-55 (ex: 004500000 = 45000.00)
-//*   EMP-ETAT-CRED : X(1)     position 56     (Y ou N)
-//*   FILLER        : X(24)    positions 57-80
+//*===================================================================*
+//* STRUCTURE EMPLOYE (80 octets)
+//*===================================================================*
+//*   ID-EMPL        : X(6)     positions 1-6   (cle)
+//*   NAME-EMPL      : X(30)    positions 7-36
+//*   DEPT-EMPL      : X(10)    positions 37-46
+//*   SALAIRE-EMPL   : 9(7)V99  positions 47-55
+//*   ETAT-CRED-EMPL : X(1)     position 56     (Y=credit, N=pas credit)
+//*   FILLER         : X(24)    positions 57-80
 //*
-//*********************************************************************
+//*===================================================================*
+//* STRUCTURE CRE-EMP (80 octets)
+//*===================================================================*
+//*   ID-EMPL           : X(6)     positions 1-6   (cle)
+//*   LIB-CREDIT-EMPL   : X(20)    positions 7-26
+//*   MONTANT-CREDIT    : 9(9)V99  positions 27-37
+//*   MONTANT-ECHEANCE  : 9(7)V99  positions 38-46
+//*   RESTE-CREDIT      : 9(9)V99  positions 47-57
+//*   FILLER            : X(23)    positions 58-80
 //*
-//* ETAPE 1 : Chargement via REPRO avec donnees en ligne
-//*
-//LOAD     EXEC PGM=IDCAMS
+//*===================================================================*
+//* ETAPE 1 : Chargement EMPLOYE (6 enregistrements)
+//*===================================================================*
+//LOADEMP  EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //INFILE   DD *
 EMP001DUPONT JEAN                    FINANCE   003500000Y
@@ -25,10 +35,27 @@ EMP002MARTIN MARIE                   RH        004200000N
 EMP003DURAND PIERRE                  IT        005500000Y
 EMP004BERNARD SOPHIE                 FINANCE   003800000N
 EMP005PETIT ALAIN                    IT        006200000Y
+EMP006MOREAU CLAIRE                  RH        004800000Y
 /*
 //SYSIN    DD *
   REPRO INFILE(INFILE) -
         OUTDATASET(FTEST.CICS.EMPLOYE)
+/*
+//*
+//*===================================================================*
+//* ETAPE 2 : Chargement CRE-EMP (4 enregistrements)
+//*===================================================================*
+//LOADCRE  EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//INFILE   DD *
+EMP001CREDIT IMMOBILIER   0015000000000150000001200000
+EMP003CREDIT AUTO         0002500000000025000000150000
+EMP005CREDIT CONSO        0000800000000010000000050000
+EMP006CREDIT TRAVAUX      0001200000000015000000090000
+/*
+//SYSIN    DD *
+  REPRO INFILE(INFILE) -
+        OUTDATASET(FTEST.CICS.CREDEMP)
 /*
 //*********************************************************************
 //* FIN DU JOB
