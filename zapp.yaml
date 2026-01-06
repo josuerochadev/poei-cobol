@@ -1,25 +1,76 @@
-name: Document ZAPP généré
+name: Formation POEI COBOL
 description: >-
-  CRRZG5299I Notez que ce fichier par défaut recherche tous vos dossiers locaux
-  dans tous les espaces de travail VS Code ouverts, ce qui peut être très
-  inefficace. Modifiez les entrées de localisation pour qu'elles soient aussi
-  spécifiques que possible. Ajoutez une nouvelle entrée de type "MVS" pour
-  spécifier des localisations distantes. Voir la documentation pour plus de
-  détails : <
-  https://ibm.github.io/zopeneditor-about/Docs/setting_propertygroup.html >
-author: IBM Z Open Editor
+  Configuration Z Open Editor pour la formation POEI Développeur Mainframe COBOL.
+  Optimisé pour des chemins spécifiques afin d'améliorer les performances.
+author: Formation M2i
+
 propertyGroups:
-  - name: search-all
+  # Groupe principal pour les exercices COBOL
+  - name: exercices-cobol
+    language: cobol
     libraries:
       - name: syslib
         type: local
         locations:
-          - '**'
-      - name: maclib
+          - 'exercices/cobol/**/*.cbl'
+          - 'exercices/cobol/**/*.cpy'
+      - name: copylib
         type: local
         locations:
-          - '**'
+          - 'exercices/cobol/**/copy/**'
+
+  # Groupe pour le projet fil rouge
+  - name: projet-fil-rouge
+    language: cobol
+    libraries:
+      - name: syslib
+        type: local
+        locations:
+          - 'projets/fil-rouge/**/*.cbl'
+          - 'projets/fil-rouge/**/*.cpy'
+
+  # Groupe pour les exercices DB2
+  - name: exercices-db2
+    language: cobol
+    libraries:
+      - name: syslib
+        type: local
+        locations:
+          - 'exercices/db2/**/*.cbl'
+          - 'exercices/db2/**/*.sqb'
+
+  # Groupe pour les exercices CICS
+  - name: exercices-cics
+    language: cobol
+    libraries:
+      - name: syslib
+        type: local
+        locations:
+          - 'exercices/cics/**/*.cbl'
+          - 'exercices/cics/**/*.cpy'
+      - name: maplib
+        type: local
+        locations:
+          - 'exercices/cics/**/bms/**'
+          - 'exercices/cics/**/maps/**'
+
+  # Groupe pour les exemples
+  - name: exemples
+    language: cobol
+    libraries:
+      - name: syslib
+        type: local
+        locations:
+          - 'exemples/**/*.cbl'
+
+  # JCL - Procédures cataloguées
+  - name: jcl-hercules
+    language: jcl
+    libraries:
       - name: proclib
         type: local
         locations:
-          - '**'
+          - 'hercules/proclib/**'
+          - 'hercules/jcl/**'
+          - 'projets/fil-rouge/**/*.jcl'
+

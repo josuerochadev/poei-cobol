@@ -187,7 +187,7 @@ Ce module couvre les fondamentaux du langage COBOL jusqu'aux techniques avancée
 
 | Module précédent | Module suivant |
 |------------------|----------------|
-| [JCL](../jcl/README.md) | [CICS](../cics/README.md) |
+| [Algorithmique](../algorithmique/README.md) | [CICS](../cics/README.md) |
 
 ---
 *Formation COBOL - M2i Formation*

@@ -1,16 +1,17 @@
 # Exercices Pratiques CICS
 
-Ce dossier contient les exercices pratiques CICS organises par type de ressource.
+Ce dossier contient les exercices pratiques CICS alignes avec le support de formation (Chapitre IX - Architecture Multicouches).
 
 ## Structure
 
 ```
 pratique/
-├── bms/            # Ecrans BMS
-│   ├── MAPTEST.bms    # Ecran de test simple (message)
-│   └── TESTSET.bms    # Mapset pour les exercices
+├── bms/            # Ecrans BMS (MAPs)
+│   ├── MAPTEST.bms    # Ecran de bienvenue (Couche Presentation)
+│   └── TESTSET.bms    # Mapset pour les exercices VSAM
 │
 ├── cobol/          # Programmes COBOL-CICS
+│   ├── PROGTEST.cbl   # Affichage MAPTEST (Couche Presentation)
 │   ├── PROGREAD.cbl   # Programme READ (lecture)
 │   ├── PROGWRIT.cbl   # Programme WRITE (creation)
 │   ├── PROGREWT.cbl   # Programme REWRITE (mise a jour)
@@ -26,15 +27,23 @@ pratique/
     └── LOADDATA.jcl   # Chargement donnees initiales
 ```
 
+## Correspondance avec le support de formation
+
+| Support | Fichier | Description |
+|---------|---------|-------------|
+| MAPTEST | `bms/MAPTEST.bms` | MAP ecran de bienvenue |
+| PROGTEST | `cobol/PROGTEST.cbl` | Programme affichage MAP |
+| ASSBLMAP | `jcl/ASSBLMAP.jcl` | JCL assemblage MAP |
+| COMPPGR | `jcl/COMPPGR.jcl` | JCL compilation programme |
+
 ## Exercices par theme
 
-### 1. BMS - Basic Mapping Support (Chapitre V)
+### 1. Couche Presentation (II-1 du support)
 
-| Exercice | Description | Fichiers |
-|----------|-------------|----------|
-| MAPTEST | Afficher un message simple | `bms/MAPTEST.bms` |
-| MAP NOM | Saisir un nom et le reafficher | A creer |
-| WELCOMES | Ecran d'accueil avec date/heure | A creer |
+| Composant | Transaction | Description | Fichiers |
+|-----------|-------------|-------------|----------|
+| MAPTEST | - | Ecran de bienvenue CICS | `bms/MAPTEST.bms` |
+| PROGTEST | TR01 | Programme affichant MAPTEST | `cobol/PROGTEST.cbl` |
 
 ### 2. Commandes VSAM (Chapitre VI)
 
@@ -90,8 +99,11 @@ Voir `jcl/DEFVSAM.jcl` pour la definition et `jcl/LOADDATA.jcl` pour le chargeme
 ## Progression recommandee
 
 ```
-1. BMS - Creer un ecran simple
-   MAPTEST.bms → Compiler → Tester avec CEDF
+1. COUCHE PRESENTATION - Afficher un ecran
+   a. Assembler MAPTEST.bms avec ASSBLMAP.jcl
+   b. Compiler PROGTEST.cbl avec COMPPGR.jcl
+   c. Definir transaction TR01 dans CICS
+   d. Tester : entrer TR01 dans le terminal CICS
 
 2. READ - Lire un enregistrement
    PROGREAD.cbl → Compiler → Transaction READ
@@ -104,6 +116,16 @@ Voir `jcl/DEFVSAM.jcl` pour la definition et `jcl/LOADDATA.jcl` pour le chargeme
 
 5. DELETE - Supprimer un enregistrement
    PROGDELT.cbl → Compiler → Transaction DELT
+```
+
+## Installation CICS
+
+### Definir la transaction TR01
+```
+CEDA DEF TRANS(TR01) GROUP(GRPTEST) PROG(PROGTEST)
+CEDA DEF PROG(PROGTEST) GROUP(GRPTEST) LANG(COBOL)
+CEDA DEF MAPSET(MAPTEST) GROUP(GRPTEST)
+CEDA INS GROUP(GRPTEST)
 ```
 
 ---

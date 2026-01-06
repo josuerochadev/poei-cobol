@@ -8,10 +8,10 @@
 
 ## Priorité Moyenne
 
-- [ ] **Accents JCL** : Harmoniser les accents dans `cours/jcl/*.md` (chapitres)
-- [ ] **Accents VSAM** : Harmoniser les accents dans `cours/vsam/*.md`
-- [ ] **Accents Algorithmique** : Harmoniser les accents dans `cours/algorithmique/*.md`
-- [ ] **Accents exercices JCL** : Harmoniser `exercices/jcl/README.md`
+- [x] **Accents JCL** : Harmoniser les accents dans `cours/jcl/*.md` (chapitres) ✅
+- [x] **Accents VSAM** : Harmoniser les accents dans `cours/vsam/*.md` ✅
+- [x] **Accents Algorithmique** : Harmoniser les accents dans `cours/algorithmique/*.md` ✅ (déjà correct)
+- [x] **Accents exercices JCL** : Harmoniser `exercices/jcl/README.md` ✅
 - [x] **README exercices/jcl/theorie/** : Ajouter un README ✅
 - [x] **README exercices/cics/theorie/** : Ajouter un README ✅
 - [x] **README exercices/algorithmique/theorie/** : Ajouter un README ✅
@@ -20,11 +20,14 @@
 
 ## Priorité Basse
 
-- [ ] **Activité DB2 manquante** : Vérifier si activite-03 doit exister dans `exercices/db2/tp/` ou renommer les autres
-- [ ] **Navigation README zos-tso** : Ajouter navigation inter-modules à `cours/zos-tso/README.md`
-- [ ] **Navigation README jcl** : Ajouter navigation inter-modules à `cours/jcl/README.md`
-- [ ] **Navigation README vsam** : Ajouter navigation inter-modules à `cours/vsam/README.md`
-- [ ] **Navigation README algorithmique** : Ajouter navigation inter-modules à `cours/algorithmique/README.md`
+- [x] **Activité DB2 manquante** : Vérifié - activite-03 (fonctions scalaires) intentionnellement non incluse, documenté dans README ✅
+- [x] **Navigation README zos-tso** : Ajouter navigation inter-modules à `cours/zos-tso/README.md` ✅
+- [x] **Navigation README jcl** : Ajouter navigation inter-modules à `cours/jcl/README.md` ✅
+- [x] **Navigation README vsam** : Ajouter navigation inter-modules à `cours/vsam/README.md` ✅
+- [x] **Navigation README algorithmique** : Ajouter navigation inter-modules à `cours/algorithmique/README.md` ✅
+- [x] **Navigation README cobol** : Ajouter navigation inter-modules à `cours/cobol/README.md` ✅
+- [x] **Navigation README cics** : Ajouter navigation inter-modules à `cours/cics/README.md` ✅
+- [x] **Navigation README db2** : Navigation inter-modules à `cours/db2/README.md` ✅
 - [x] **Gitignore binaires** : Ajouter les exécutables compilés au `.gitignore` ✅
 
 ---

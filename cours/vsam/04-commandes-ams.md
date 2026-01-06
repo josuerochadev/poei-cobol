@@ -4,9 +4,9 @@
 
 ### Qu'est-ce que IDCAMS ?
 
-**IDCAMS = Integrated Data Cluster Access Method Services**
+**IDCAMS = Integrated Data Cluster Accèss Method Services**
 
-IDCAMS est l'utilitaire principal pour gerer les objets VSAM. Il permet de creer, modifier, supprimer et manipuler les clusters, catalogues, index et autres objets VSAM.
+IDCAMS est l'utilitaire principal pour gerer les objets VSAM. Il permet de créer, modifiér, supprimer et manipuler les clusters, catalogues, index et autres objets VSAM.
 
 ### Structure JCL Standard
 
@@ -24,9 +24,9 @@ IDCAMS est l'utilitaire principal pour gerer les objets VSAM. Il permet de creer
 | Commande | Fonction |
 |----------|----------|
 | **DEFINE** | Cree catalogues, clusters, AIX, paths, espaces |
-| **DELETE** | Supprime entrees de catalogue |
-| **ALTER** | Modifie entrees existantes |
-| **LISTCAT** | Liste et repertorie les entrees |
+| **DELETE** | Supprime entrées de catalogue |
+| **ALTER** | Modifie entrées existantes |
+| **LISTCAT** | Liste et repertorie les entrées |
 | **PRINT** | Imprime Data Sets VSAM et non-VSAM |
 | **REPRO** | Copie Data Sets, convertit formats |
 | **EXPORT** | Cree copie de sauvegarde portable |
@@ -46,7 +46,7 @@ IDCAMS est l'utilitaire principal pour gerer les objets VSAM. Il permet de creer
 | Continuation | Tiret haut `-` pour continuer sur ligne suivante |
 | Separateurs | Valeurs separees par espace ou virgule |
 | Commentaires | Entre `/*` et `*/` |
-| Sous-parametres | Signe `+` pour separer parametre et sous-parametre |
+| Sous-paramètres | Signe `+` pour separer paramètre et sous-paramètre |
 
 ### Exemple de Syntaxe
 
@@ -86,7 +86,7 @@ IDCAMS est l'utilitaire principal pour gerer les objets VSAM. Il permet de creer
 | 0 | Normal | Succes |
 | 4 | Mineure | Avertissement, fonction completee |
 | 8 | Majeure | Specifications contournees |
-| 12 | Logique | Erreur de parametres |
+| 12 | Logique | Erreur de paramètres |
 | 16 | Grave | Echec, flux AMS vide |
 
 ### SET - Reinitialiser les Variables
@@ -230,7 +230,7 @@ Allouer ou elargir l'espace d'un User Catalog.
 
 ## IV-6. DEFINE CLUSTER
 
-### Syntaxe Generale
+### Syntaxe Générale
 
 ```jcl
 DEFINE CLUSTER (
@@ -258,7 +258,7 @@ DEFINE CLUSTER (
 [CATALOG(catname)]
 ```
 
-### Parametres Cles
+### Parametres Clés
 
 | Parametre | Description |
 |-----------|-------------|
@@ -266,7 +266,7 @@ DEFINE CLUSTER (
 | **NONINDEXED** | Cluster ESDS |
 | **NUMBERED** | Cluster RRDS |
 | **LINEAR** | Cluster LDS |
-| **KEYS(len off)** | Longueur et offset de la cle (KSDS) |
+| **KEYS(len off)** | Longueur et offset de la clé (KSDS) |
 | **RECORDSIZE(avg max)** | Si egaux = fixe, si differents = variable |
 | **FREESPACE(ci ca)** | % espace libre CI et CA (KSDS, VRRDS) |
 | **REUSE** | Vide le cluster a chaque ouverture OUTPUT |
@@ -402,8 +402,8 @@ INDEX(NAME(aix-index-name)) -
 | Parametre | Description |
 |-----------|-------------|
 | RELATE | Nom du cluster de base |
-| UNIQUEKEY | Cle AIX unique |
-| NONUNIQUEKEY | Cle AIX peut avoir des doublons |
+| UNIQUEKEY | Clé AIX unique |
+| NONUNIQUEKEY | Clé AIX peut avoir des doublons |
 | UPGRADE | Mise a jour automatique de l'AIX |
 | NOUPGRADE | Pas de mise a jour automatique |
 
@@ -488,7 +488,7 @@ BLDINDEX
 |-----------|-------------|
 | INDATASET | Nom du cluster de base |
 | OUTDATASET | Nom de l'AIX a construire |
-| INTERNALSORT | Tri en memoire |
+| INTERNALSORT | Tri en mémoire |
 | EXTERNALSORT | Tri externe (DFSORT) |
 | NOSORTCALL | Ne pas utiliser SORT |
 
@@ -509,7 +509,7 @@ BLDINDEX
 
 ---
 
-## Resume du Chapitre
+## Résumé du Chapitre
 
 | Commande | Usage |
 |----------|-------|
@@ -518,7 +518,7 @@ BLDINDEX
 | **DEFINE CLUSTER** | Creer cluster ESDS/KSDS/RRDS/LDS |
 | **DEFINE AIX** | Creer index alternatif |
 | **DEFINE PATH** | Creer chemin vers AIX |
-| **BLDINDEX** | Construire les entrees de l'AIX |
+| **BLDINDEX** | Construire les entrées de l'AIX |
 | **IF-THEN-ELSE** | Controle conditionnel |
 | **SET** | Reinitialiser LASTCC/MAXCC |
 
@@ -543,7 +543,7 @@ Codes retour IDCAMS:
 Sequence AIX:
 1. DEFINE AIX (avec RELATE)
 2. DEFINE PATH (avec PATHENTRY)
-3. BLDINDEX (apres chargement donnees)
+3. BLDINDEX (apres chargement données)
 ```
 
 ---

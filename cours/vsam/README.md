@@ -1,15 +1,15 @@
-# Module VSAM - Virtual Storage Access Method
+# Module VSAM - Virtual Storage Accèss Method
 
-## Presentation
+## Présentation
 
-Ce module couvre VSAM (Virtual Storage Access Method), la methode d'acces aux donnees la plus utilisee sur les systemes z/OS. VSAM permet de stocker et d'acceder aux donnees de maniere sequentielle, indexee ou directe.
+Ce module couvre VSAM (Virtual Storage Accèss Method), la méthode d'accès aux données la plus utilisée sur les systèmes z/OS. VSAM permet de stocker et d'acceder aux données de maniere séquentielle, indexée ou directe.
 
 ## Objectifs
 
 - Comprendre l'architecture et les concepts VSAM
 - Maitriser les differents types d'organisation (ESDS, KSDS, RRDS, LDS)
-- Savoir definir et gerer des clusters VSAM avec IDCAMS
-- Manipuler les donnees VSAM (REPRO, PRINT, EXPORT/IMPORT)
+- Savoir définir et gerer des clusters VSAM avec IDCAMS
+- Manipuler les données VSAM (REPRO, PRINT, EXPORT/IMPORT)
 - Analyser les sorties LISTCAT
 - Gerer les GDG (Generation Data Groups)
 
@@ -28,10 +28,10 @@ Ce module couvre VSAM (Virtual Storage Access Method), la methode d'acces aux do
 ## Chapitres Detailles
 
 ### Chapitre I - Introduction a VSAM
-- Presentation generale et historique
+- Présentation générale et historique
 - Types d'organisation VSAM
 - Notion de VTOC
-- Methodes d'acces aux Data Sets
+- Méthodes d'accès aux Data Sets
 - Structure physique et logique
 
 ### Chapitre II - Modes d'Organisation
@@ -60,7 +60,7 @@ Ce module couvre VSAM (Virtual Storage Access Method), la methode d'acces aux do
 
 ### Chapitre V - Manipulation IDCAMS
 - LISTCAT - Lister le catalogue
-- REPRO - Copier les donnees
+- REPRO - Copier les données
 - ALTER - Modifier les attributs
 - DELETE - Supprimer
 - VERIFY - Verifier/reparer
@@ -75,7 +75,7 @@ Ce module couvre VSAM (Virtual Storage Access Method), la methode d'acces aux do
 ### Chapitre VII - GDG et Codes Retour
 - Generation Data Groups
 - DEFINE/ALTER/DELETE GDG
-- Referencement relatif
+- Référencement relatif
 - Codes retour VSAM
 
 ## Prerequis
@@ -90,4 +90,12 @@ Ce module couvre VSAM (Virtual Storage Access Method), la methode d'acces aux do
 - Projet fil-rouge : `projets/fil-rouge/`
 
 ---
-*Formation POEI Developpeur Mainframe - M2i Formation*
+
+## Navigation
+
+| Module précédent | Module suivant |
+|------------------|----------------|
+| [JCL](../jcl/README.md) | [Algorithmique](../algorithmique/README.md) |
+
+---
+*Formation VSAM - M2i Formation*

@@ -1,0 +1,125 @@
+***********************************************************************
+*  MAPSET : MAPWRIT - Ecran creation employe (Chapitre IX)            *
+*  Transaction : TWRT                                                  *
+*  Description : Saisie et creation enregistrement VSAM               *
+***********************************************************************
+MAPWRIT  DFHMSD TYPE=&SYSPARM,                                         X
+               LANG=COBOL,                                             X
+               MODE=INOUT,                                             X
+               TIOAPFX=YES,                                            X
+               CTRL=(FREEKB,FRSET),                                    X
+               STORAGE=AUTO,                                           X
+               TERM=3270-2
+*
+***********************************************************************
+*  MAPWRT1 : Ecran saisie nouvel employe                              *
+***********************************************************************
+MAPWRT1  DFHMDI SIZE=(24,80),                                          X
+               LINE=1,                                                 X
+               COLUMN=1
+*
+*----------------------- LIGNE DE TITRE ------------------------------
+         DFHMDF POS=(1,1),                                             X
+               LENGTH=60,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='=========== CREATION EMPLOYE (WRITE) =========X
+               ======'
+*
+         DFHMDF POS=(1,75),                                            X
+               LENGTH=4,                                               X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='TWRT'
+*
+*----------------------- ZONE DE SAISIE ------------------------------
+         DFHMDF POS=(4,2),                                             X
+               LENGTH=50,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='--------- SAISIE NOUVEL EMPLOYE -------------X
+               -'
+*
+         DFHMDF POS=(6,2),                                             X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Code Employe     :'
+*
+EMPID    DFHMDF POS=(6,23),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(UNPROT,IC),                                      X
+               INITIAL='______'
+         DFHMDF POS=(6,30),                                            X
+               LENGTH=1,                                               X
+               ATTRB=ASKIP
+*
+         DFHMDF POS=(8,2),                                             X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Nom              :'
+*
+EMPNOM   DFHMDF POS=(8,23),                                            X
+               LENGTH=30,                                              X
+               ATTRB=UNPROT,                                           X
+               INITIAL='______________________________'
+         DFHMDF POS=(8,54),                                            X
+               LENGTH=1,                                               X
+               ATTRB=ASKIP
+*
+         DFHMDF POS=(10,2),                                            X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Departement      :'
+*
+EMPDEPT  DFHMDF POS=(10,23),                                           X
+               LENGTH=10,                                              X
+               ATTRB=UNPROT,                                           X
+               INITIAL='__________'
+         DFHMDF POS=(10,34),                                           X
+               LENGTH=1,                                               X
+               ATTRB=ASKIP
+*
+         DFHMDF POS=(12,2),                                            X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Salaire          :'
+*
+EMPSAL   DFHMDF POS=(12,23),                                           X
+               LENGTH=9,                                               X
+               ATTRB=(UNPROT,NUM),                                     X
+               PICIN='9(7)V99',                                        X
+               INITIAL='_________'
+         DFHMDF POS=(12,33),                                           X
+               LENGTH=1,                                               X
+               ATTRB=ASKIP
+*
+         DFHMDF POS=(14,2),                                            X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Credit (O/N)     :'
+*
+EMPCRED  DFHMDF POS=(14,23),                                           X
+               LENGTH=1,                                               X
+               ATTRB=UNPROT,                                           X
+               INITIAL='_'
+         DFHMDF POS=(14,25),                                           X
+               LENGTH=1,                                               X
+               ATTRB=ASKIP
+*
+*----------------------- ZONE MESSAGE --------------------------------
+         DFHMDF POS=(19,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='----------------------------------------------X
+               ------------------------'
+*
+MSG      DFHMDF POS=(20,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+*----------------------- LIGNE DE COMMANDES --------------------------
+         DFHMDF POS=(23,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='PF3=Quitter       ENTER=Creer       CLEAR=EffaX
+               cer'
+*
+         DFHMSD TYPE=FINAL
+         END

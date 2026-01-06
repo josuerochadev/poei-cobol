@@ -1,0 +1,221 @@
+***********************************************************************
+*  MAPSET : MAPBRWS - Ecran Browse VSAM (Chapitre IX)                 *
+*  Transaction : TBRW                                                  *
+*  Description : Navigation STARTBR/READNEXT/READPREV/ENDBR           *
+***********************************************************************
+MAPBRWS  DFHMSD TYPE=&SYSPARM,                                         X
+               LANG=COBOL,                                             X
+               MODE=INOUT,                                             X
+               TIOAPFX=YES,                                            X
+               CTRL=(FREEKB,FRSET),                                    X
+               STORAGE=AUTO,                                           X
+               TERM=3270-2
+*
+***********************************************************************
+*  MAPBRW1 : Ecran liste employes                                     *
+***********************************************************************
+MAPBRW1  DFHMDI SIZE=(24,80),                                          X
+               LINE=1,                                                 X
+               COLUMN=1
+*
+*----------------------- LIGNE DE TITRE ------------------------------
+         DFHMDF POS=(1,1),                                             X
+               LENGTH=60,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='========== LISTE EMPLOYES (BROWSE) ==========X
+               ======'
+*
+         DFHMDF POS=(1,75),                                            X
+               LENGTH=4,                                               X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='TBRW'
+*
+*----------------------- ZONE RECHERCHE ------------------------------
+         DFHMDF POS=(3,2),                                             X
+               LENGTH=20,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='Debut recherche  :'
+*
+STARTKEY DFHMDF POS=(3,23),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(UNPROT,IC),                                      X
+               INITIAL='______'
+         DFHMDF POS=(3,30),                                            X
+               LENGTH=1,                                               X
+               ATTRB=ASKIP
+*
+*----------------------- EN-TETE LISTE -------------------------------
+         DFHMDF POS=(5,2),                                             X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='CODE   NOM                           DEPT      X
+                  SALAIRE'
+*
+         DFHMDF POS=(6,2),                                             X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               INITIAL='------ ------------------------------ --------X
+               -- -----------'
+*
+*----------------------- LIGNES DE DONNEES ---------------------------
+*    Ligne 1
+EMP1ID   DFHMDF POS=(7,2),                                             X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP1NOM  DFHMDF POS=(7,9),                                             X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP1DEP  DFHMDF POS=(7,40),                                            X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP1SAL  DFHMDF POS=(7,51),                                            X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 2
+EMP2ID   DFHMDF POS=(8,2),                                             X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP2NOM  DFHMDF POS=(8,9),                                             X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP2DEP  DFHMDF POS=(8,40),                                            X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP2SAL  DFHMDF POS=(8,51),                                            X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 3
+EMP3ID   DFHMDF POS=(9,2),                                             X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP3NOM  DFHMDF POS=(9,9),                                             X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP3DEP  DFHMDF POS=(9,40),                                            X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP3SAL  DFHMDF POS=(9,51),                                            X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 4
+EMP4ID   DFHMDF POS=(10,2),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP4NOM  DFHMDF POS=(10,9),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP4DEP  DFHMDF POS=(10,40),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP4SAL  DFHMDF POS=(10,51),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 5
+EMP5ID   DFHMDF POS=(11,2),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP5NOM  DFHMDF POS=(11,9),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP5DEP  DFHMDF POS=(11,40),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP5SAL  DFHMDF POS=(11,51),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 6
+EMP6ID   DFHMDF POS=(12,2),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP6NOM  DFHMDF POS=(12,9),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP6DEP  DFHMDF POS=(12,40),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP6SAL  DFHMDF POS=(12,51),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 7
+EMP7ID   DFHMDF POS=(13,2),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP7NOM  DFHMDF POS=(13,9),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP7DEP  DFHMDF POS=(13,40),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP7SAL  DFHMDF POS=(13,51),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 8
+EMP8ID   DFHMDF POS=(14,2),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP8NOM  DFHMDF POS=(14,9),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP8DEP  DFHMDF POS=(14,40),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP8SAL  DFHMDF POS=(14,51),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 9
+EMP9ID   DFHMDF POS=(15,2),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EMP9NOM  DFHMDF POS=(15,9),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP9DEP  DFHMDF POS=(15,40),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EMP9SAL  DFHMDF POS=(15,51),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*    Ligne 10
+EM10ID   DFHMDF POS=(16,2),                                            X
+               LENGTH=6,                                               X
+               ATTRB=(ASKIP,NORM)
+EM10NOM  DFHMDF POS=(16,9),                                            X
+               LENGTH=30,                                              X
+               ATTRB=(ASKIP,NORM)
+EM10DEP  DFHMDF POS=(16,40),                                           X
+               LENGTH=10,                                              X
+               ATTRB=(ASKIP,NORM)
+EM10SAL  DFHMDF POS=(16,51),                                           X
+               LENGTH=12,                                              X
+               ATTRB=(ASKIP,NORM),                                     X
+               PICOUT='ZZZ,ZZZ.99'
+*
+*----------------------- ZONE MESSAGE --------------------------------
+         DFHMDF POS=(19,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='----------------------------------------------X
+               ------------------------'
+*
+MSG      DFHMDF POS=(20,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=(ASKIP,BRT)
+*
+*----------------------- LIGNE DE COMMANDES --------------------------
+         DFHMDF POS=(23,2),                                            X
+               LENGTH=70,                                              X
+               ATTRB=ASKIP,                                            X
+               INITIAL='PF3=Quitter  PF7=Page-  PF8=Page+  ENTER=RechX
+               ercher'
+*
+         DFHMSD TYPE=FINAL
+         END

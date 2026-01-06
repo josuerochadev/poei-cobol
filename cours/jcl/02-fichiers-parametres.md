@@ -1,13 +1,13 @@
-# Chapitre II - Les fichiers speciaux et les parametres
+# Chapitre II - Les fichiers spéciaux et les paramètres
 
 ## Introduction
 
-Ce chapitre presente les differentes manieres de definir et manipuler les fichiers en JCL :
+Ce chapitre presente les differentes manieres de définir et manipuler les fichiers en JCL :
 
 - **Concatenation** - Combiner plusieurs datasets en un seul flux logique
-- **Fichiers partitionnes et sequentiels** - Comprendre les organisations PS et PO
+- **Fichiers partitionnes et séquentiels** - Comprendre les organisations PS et PO
 - **Fichiers temporaires** - Creer des fichiers de travail ephemeres
-- **Backward references** - Referencer des datasets definis precedemment
+- **Backward références** - Référencer des datasets définis precedemment
 
 ---
 
@@ -15,7 +15,7 @@ Ce chapitre presente les differentes manieres de definir et manipuler les fichie
 
 ### II-1-1 Principe de la concatenation
 
-La **concatenation** permet de traiter plusieurs datasets comme un seul fichier logique. Les datasets sont lus sequentiellement dans l'ordre de declaration.
+La **concatenation** permet de traiter plusieurs datasets comme un seul fichier logique. Les datasets sont lus séquentiellement dans l'ordre de declaration.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -56,7 +56,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 | DDname | Uniquement sur la premiere carte DD |
 | Ordre | Les fichiers sont lus dans l'ordre de declaration |
 | Limite | Maximum 255 datasets concatenes |
-| DCB | Caracteristiques du premier fichier utilisees par defaut |
+| DCB | Caracteristiques du premier fichier utilisees par défaut |
 | DISP | Chaque dataset a sa propre disposition |
 
 ### II-1-3 Concatenation et DCB
@@ -78,7 +78,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   • BLKSIZE <= BLKSIZE du premier                              │
 │                                                                 │
 │   ATTENTION : Si un fichier suivant a un LRECL plus grand,     │
-│   les donnees seront TRONQUEES !                               │
+│   les données seront TRONQUEES !                               │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -94,7 +94,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 //INPUT  DD DSN=FILE2,DISP=SHR             BLKSIZE=8000
 //       DD DSN=FILE1,DISP=SHR             BLKSIZE=800   <- OK
 
-//* Solution 2 : Specifier le BLKSIZE maximum sur la premiere DD
+//* Solution 2 : Spécifiér le BLKSIZE maximum sur la premiere DD
 //INPUT  DD DSN=FILE1,DISP=SHR,DCB=BLKSIZE=8000
 //       DD DSN=FILE2,DISP=SHR
 ```
@@ -111,7 +111,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   //STEPLIB DD DSN=USER.LOADLIB,DISP=SHR                       │
 │   //        DD DSN=PROD.LOADLIB,DISP=SHR                       │
 │   //        DD DSN=SYS1.LINKLIB,DISP=SHR                       │
-│   Recherche sequentielle du programme                          │
+│   Recherche séquentielle du programme                          │
 │                                                                 │
 │   2. FICHIERS DE DONNEES MENSUELS                               │
 │   ───────────────────────────────                               │
@@ -170,7 +170,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 //            DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
 ```
 
-**Exemple 3 : Concatenation de bibliotheques**
+**Exemple 3 : Concatenation de bibliothèques**
 
 ```jcl
 //COMPILE  JOB ...
@@ -188,7 +188,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 
 ---
 
-## II-2 Les fichiers partitionnes et sequentiels
+## II-2 Les fichiers partitionnes et séquentiels
 
 ### II-2-1 Organisation des datasets
 
@@ -199,9 +199,9 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │                                                                 │
 │   PS - PHYSICAL SEQUENTIAL (Sequentiel)                         │
 │   ──────────────────────────────────────                        │
-│   • Enregistrements stockes sequentiellement                   │
+│   • Enregistrements stockes séquentiellement                   │
 │   • Acces du debut a la fin                                    │
-│   • Utilisations : fichiers de donnees, logs, rapports         │
+│   • Utilisations : fichiers de données, logs, rapports         │
 │                                                                 │
 │   ┌─────────────────────────────────────────┐                  │
 │   │ Enr1 │ Enr2 │ Enr3 │ Enr4 │ ... │ EnrN │                  │
@@ -209,9 +209,9 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │                                                                 │
 │   PO - PARTITIONED ORGANIZATION (PDS)                           │
 │   ───────────────────────────────────                           │
-│   • Ensemble de membres (fichiers) dans un repertoire          │
-│   • Chaque membre est un fichier sequentiel                    │
-│   • Utilisations : bibliotheques source, COPYLIB, LOADLIB      │
+│   • Ensemble de membres (fichiers) dans un répertoire          │
+│   • Chaque membre est un fichier séquentiel                    │
+│   • Utilisations : bibliothèques source, COPYLIB, LOADLIB      │
 │                                                                 │
 │   ┌──────────────────────────────────────┐                     │
 │   │  REPERTOIRE          │    DONNEES    │                     │
@@ -232,10 +232,10 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### II-2-2 Creation d'un fichier sequentiel (PS)
+### II-2-2 Creation d'un fichier séquentiel (PS)
 
 ```jcl
-//* Creation d'un fichier sequentiel
+//* Creation d'un fichier séquentiel
 //CREATE   EXEC PGM=IEFBR14
 //NEWFILE  DD DSN=FTEST.DATA.SEQFILE,
 //            DISP=(NEW,CATLG,DELETE),
@@ -244,11 +244,11 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 //            UNIT=SYSDA
 ```
 
-**Parametres pour fichiers sequentiels :**
+**Parametres pour fichiers séquentiels :**
 
 | Parametre | Description | Exemple |
 |-----------|-------------|---------|
-| DSORG=PS | Organisation sequentielle | `DCB=(...,DSORG=PS)` |
+| DSORG=PS | Organisation séquentielle | `DCB=(...,DSORG=PS)` |
 | RECFM | Format enregistrement | FB, VB, F, V |
 | LRECL | Longueur enregistrement | 80, 133, etc. |
 | BLKSIZE | Taille de bloc | 0 = optimise |
@@ -257,7 +257,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 ### II-2-3 Creation d'un fichier partitionne (PDS)
 
 ```jcl
-//* Creation d'un PDS (bibliotheque)
+//* Creation d'un PDS (bibliothèque)
 //CREATE   EXEC PGM=IEFBR14
 //NEWPDS   DD DSN=FTEST.SOURCE.COBOL,
 //            DISP=(NEW,CATLG,DELETE),
@@ -274,14 +274,14 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   SPACE=(TRK,(primaire,secondaire,directory))                   │
 │                   │          │          │                       │
 │                   │          │          └── Blocs pour          │
-│                   │          │              le repertoire       │
+│                   │          │              le répertoire       │
 │                   │          │              (obligatoire PDS)   │
 │                   │          │                                  │
 │                   │          └── Extensions                     │
 │                   │                                             │
 │                   └── Espace initial                            │
 │                                                                 │
-│   Le nombre de blocs de repertoire determine le nombre         │
+│   Le nombre de blocs de répertoire determine le nombre         │
 │   maximum de membres :                                          │
 │   • 1 bloc = environ 5 membres                                 │
 │   • 20 blocs = environ 100 membres                             │
@@ -316,7 +316,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 | Espace libere | Non recupere | Recupere automatiquement |
 | Membres | ~16000 max | Illimite pratiquement |
 | Partage | Limite | Ameliore |
-| DSNTYPE | (defaut) | LIBRARY |
+| DSNTYPE | (défaut) | LIBRARY |
 
 ### II-2-5 Acces aux membres d'un PDS
 
@@ -353,7 +353,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 
 ### II-2-6 Exemples pratiques
 
-**Exemple 1 : Copie de membre PDS vers fichier sequentiel**
+**Exemple 1 : Copie de membre PDS vers fichier séquentiel**
 
 ```jcl
 //COPYMEM  JOB ...
@@ -368,7 +368,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 //            DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
 ```
 
-**Exemple 2 : Copie fichier sequentiel vers membre PDS**
+**Exemple 2 : Copie fichier séquentiel vers membre PDS**
 
 ```jcl
 //ADDMEM   JOB ...
@@ -437,7 +437,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 //            DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
 ```
 
-**Methode 2 : Sans DSN (nom genere par systeme)**
+**Methode 2 : Sans DSN (nom genere par système)**
 
 ```jcl
 //STEP1    EXEC PGM=PROG1
@@ -457,7 +457,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 //            DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
 ```
 
-### II-3-3 Cycle de vie d'un fichier temporaire
+### II-3-3 Cyclé de vie d'un fichier temporaire
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -501,7 +501,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 ```jcl
 //COMPILE  JOB ...
 //*
-//* STEP 1 : Compilation - cree un module objet temporaire
+//* STEP 1 : Compilation - créé un module objet temporaire
 //COB      EXEC PGM=IGYCRCTL
 //SYSLIN   DD DSN=&&OBJMOD,
 //            DISP=(NEW,PASS),
@@ -522,7 +522,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 ```jcl
 //SORTJOB  JOB ...
 //*
-//* STEP 1 : Extraction des donnees
+//* STEP 1 : Extraction des données
 //EXTRACT  EXEC PGM=MYPROG
 //INPUT    DD DSN=FTEST.MASTER.FILE,DISP=SHR
 //OUTPUT   DD DSN=&&EXTRACT,
@@ -530,7 +530,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 //            SPACE=(CYL,(5,2)),
 //            DCB=(RECFM=FB,LRECL=100,BLKSIZE=0)
 //*
-//* STEP 2 : Tri des donnees extraites
+//* STEP 2 : Tri des données extraites
 //SORT     EXEC PGM=SORT
 //SORTIN   DD DSN=&&EXTRACT,DISP=(OLD,DELETE)
 //SORTOUT  DD DSN=FTEST.SORTED.DATA,
@@ -569,7 +569,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │                    UNIT=VIO                                      │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   VIO = Virtual I/O - Stockage en memoire paginee              │
+│   VIO = Virtual I/O - Stockage en mémoire paginee              │
 │                                                                 │
 │   AVANTAGES :                                                   │
 │   • Tres rapide (pas d'I/O disque)                             │
@@ -577,7 +577,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   • Reduit la charge I/O                                       │
 │                                                                 │
 │   LIMITATIONS :                                                 │
-│   • Limite a quelques cylindres (depend config systeme)        │
+│   • Limite a quelques cylindres (depend config système)        │
 │   • Ne peut pas etre passe entre jobs                          │
 │   • Pas pour les gros fichiers                                 │
 │                                                                 │
@@ -598,9 +598,9 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 
 ---
 
-## II-4 Backward References (References arrieres)
+## II-4 Backward Références (Références arrieres)
 
-### II-4-1 Concept des references arrieres
+### II-4-1 Concept des références arrieres
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -608,28 +608,28 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   Une REFERENCE ARRIERE permet de :                             │
-│   • Acceder a un dataset defini dans un step precedent         │
+│   • Acceder a un dataset défini dans un step précédent         │
 │   • Copier les caracteristiques (DCB) d'un autre DD            │
 │   • Utiliser le meme volume qu'un autre dataset                │
 │                                                                 │
 │   SYNTAXE GENERALE :                                            │
 │   ─────────────────                                            │
 │   *.stepname.ddname                Dans le meme job            │
-│   *.procstep.stepname.ddname       Dans une procedure          │
+│   *.procstep.stepname.ddname       Dans une procédure          │
 │                                                                 │
 │   TYPES DE REFERENCES :                                         │
 │   ─────────────────────                                        │
-│   DSN=*.STEP1.DDNAME      Reference au nom du dataset          │
-│   VOL=REF=*.STEP1.DDNAME  Reference au volume                  │
-│   DCB=*.STEP1.DDNAME      Reference aux caracteristiques       │
+│   DSN=*.STEP1.DDNAME      Référence au nom du dataset          │
+│   VOL=REF=*.STEP1.DDNAME  Référence au volume                  │
+│   DCB=*.STEP1.DDNAME      Référence aux caracteristiques       │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### II-4-2 Reference au DSN
+### II-4-2 Référence au DSN
 
 ```jcl
-//* Reference au nom du dataset
+//* Référence au nom du dataset
 //STEP1    EXEC PGM=PROG1
 //OUTPUT   DD DSN=&&TEMPFILE,
 //            DISP=(NEW,PASS),
@@ -646,7 +646,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │                    DSN=*.stepname.ddname                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Signification : Utiliser le meme DSN que celui defini        │
+│   Signification : Utiliser le meme DSN que celui défini        │
 │                   dans la DD 'ddname' du step 'stepname'       │
 │                                                                 │
 │   Exemple:                                                      │
@@ -665,10 +665,10 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### II-4-3 Reference au DCB
+### II-4-3 Référence au DCB
 
 ```jcl
-//* Reference aux caracteristiques DCB
+//* Référence aux caracteristiques DCB
 //STEP1    EXEC PGM=PROG1
 //INPUT    DD DSN=FTEST.MASTER.FILE,DISP=SHR
 //OUTPUT   DD DSN=FTEST.OUTPUT.FILE,
@@ -693,22 +693,22 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │            ───────────                                          │
 │            Copie RECFM=FB,LRECL=100                            │
 │                                                                 │
-│   Reference depuis un autre step:                               │
+│   Référence depuis un autre step:                               │
 │   //STEP2  ...                                                  │
 │   //OUT2   DD DSN=...,DCB=*.STEP1.INPUT                        │
 │                                                                 │
 │   UTILISATION :                                                 │
 │   • Creer un fichier avec memes caracteristiques              │
 │   • Assurer la compatibilite entre fichiers                    │
-│   • Eviter de re-specifier tous les parametres                 │
+│   • Eviter de re-spécifiér tous les paramètres                 │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### II-4-4 Reference au volume
+### II-4-4 Référence au volume
 
 ```jcl
-//* Reference au volume
+//* Référence au volume
 //STEP1    EXEC PGM=PROG1
 //FILE1    DD DSN=FTEST.DATA1,DISP=SHR
 //FILE2    DD DSN=FTEST.DATA2,
@@ -724,7 +724,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   Signification : Placer le nouveau dataset sur le meme        │
-│                   volume que le dataset reference              │
+│                   volume que le dataset référence              │
 │                                                                 │
 │   //FILE1 DD DSN=FTEST.DATA1,DISP=SHR   (sur volume PROD01)    │
 │   //FILE2 DD DSN=FTEST.DATA2,                                   │
@@ -736,20 +736,20 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   • Faciliter la gestion des volumes                           │
 │                                                                 │
 │   Variantes:                                                    │
-│   VOL=REF=dsname             Reference a un dataset catalogue  │
-│   VOL=REF=*.stepname.ddname  Reference dans le meme job        │
+│   VOL=REF=dsname             Référence a un dataset catalogue  │
+│   VOL=REF=*.stepname.ddname  Référence dans le meme job        │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### II-4-5 References dans les procedures
+### II-4-5 Références dans les procédures
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                REFERENCES DANS LES PROCEDURES                    │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Dans une procedure, la syntaxe est:                           │
+│   Dans une procédure, la syntaxe est:                           │
 │   *.procstep.stepname.ddname                                    │
 │                                                                 │
 │   Exemple:                                                      │
@@ -762,7 +762,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   //OUT    DD DSN=&&TEMP,DISP=(NEW,PASS)                       │
 │   //STEP2  EXEC PGM=PROG2                                       │
 │   //IN     DD DSN=*.STEP1.OUT,DISP=(OLD,DELETE)                │
-│            ──────────────── Reference interne a la proc        │
+│            ──────────────── Référence interne a la proc        │
 │                                                                 │
 │   Depuis le JCL appelant:                                       │
 │   //STEPX  EXEC PGM=PROGX                                       │
@@ -775,7 +775,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 
 ### II-4-6 Exemples complets
 
-**Exemple 1 : Chaine de traitement avec references**
+**Exemple 1 : Chaine de traitement avec références**
 
 ```jcl
 //CHAINJOB JOB ...
@@ -788,7 +788,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 //            SPACE=(CYL,(10,5)),
 //            DCB=(RECFM=FB,LRECL=200,BLKSIZE=0)
 //*
-//* STEP 2 : Transformation (reference DSN et DCB)
+//* STEP 2 : Transformation (référence DSN et DCB)
 //TRANSF   EXEC PGM=TRANSFRM
 //INPUT    DD DSN=*.EXTRACT.OUTPUT,
 //            DISP=(OLD,PASS)
@@ -844,7 +844,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 
 ---
 
-## Synthese
+## Synthèse
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -855,7 +855,7 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   ─────────────                                                │
 │   • Combine plusieurs datasets en un flux logique              │
 │   • DDname uniquement sur premiere DD                          │
-│   • DCB du premier fichier utilise par defaut                  │
+│   • DCB du premier fichier utilise par défaut                  │
 │   • Maximum 255 datasets                                       │
 │                                                                 │
 │   FICHIERS PS ET PO                                             │
@@ -869,22 +869,22 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   ────────────────────                                         │
 │   • DSN=&&nom ou sans DSN                                      │
 │   • Supprimes automatiquement en fin de job                    │
-│   • DISP=(NEW,PASS) pour creer et passer                       │
-│   • UNIT=VIO pour stockage en memoire                          │
+│   • DISP=(NEW,PASS) pour créer et passer                       │
+│   • UNIT=VIO pour stockage en mémoire                          │
 │                                                                 │
 │   BACKWARD REFERENCES                                           │
 │   ───────────────────                                          │
-│   • DSN=*.step.dd    Reference au nom                          │
-│   • DCB=*.step.dd    Reference aux caracteristiques            │
-│   • VOL=REF=*.step.dd Reference au volume                      │
-│   • *.procstep.step.dd pour procedures                         │
+│   • DSN=*.step.dd    Référence au nom                          │
+│   • DCB=*.step.dd    Référence aux caracteristiques            │
+│   • VOL=REF=*.step.dd Référence au volume                      │
+│   • *.procstep.step.dd pour procédures                         │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Aide-memoire
+## Aide-mémoire
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -908,14 +908,14 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 │   DSN=&&TEMP,DISP=(NEW,PASS)     Creation                      │
 │   DSN=&&TEMP,DISP=(OLD,PASS)     Utilisation                   │
 │   DSN=&&TEMP,DISP=(OLD,DELETE)   Derniere utilisation          │
-│   UNIT=VIO                        Memoire (rapide)             │
+│   UNIT=VIO                        Mémoire (rapide)             │
 │                                                                 │
 │   BACKWARD REFERENCES                                           │
 │   ─────────────────────────────────────────────────────────    │
 │   DSN=*.STEP1.DDNAME             Nom du dataset                │
 │   DCB=*.STEP1.DDNAME             Caracteristiques              │
 │   VOL=REF=*.STEP1.DDNAME         Volume                        │
-│   *.PROCSTEP.STEP.DD             Dans procedure                │
+│   *.PROCSTEP.STEP.DD             Dans procédure                │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -924,6 +924,6 @@ La **concatenation** permet de traiter plusieurs datasets comme un seul fichier 
 
 ## Navigation
 
-| Precedent | Suivant |
+| Précédent | Suivant |
 |-----------|---------|
-| [Chapitre I - Cartes JOB, EXEC, DD](01-cartes-job-exec-dd.md) | [Chapitre III - Les procedures](03-procedures.md) |
+| [Chapitre I - Cartes JOB, EXEC, DD](01-cartes-job-exec-dd.md) | [Chapitre III - Les procédures](03-procédures.md) |

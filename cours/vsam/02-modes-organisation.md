@@ -40,16 +40,16 @@ Le catalogue VSAM est une structure essentielle qui :
 
 ## II-2. Master Catalog
 
-### Caracteristiques
+### Caractéristiques
 
-- **Un seul** Master Catalog par systeme z/OS
-- Cree lors de la generation du systeme
-- Reside sur le volume systeme
+- **Un seul** Master Catalog par système z/OS
+- Cree lors de la generation du système
+- Reside sur le volume système
 - Gere et surveille toutes les operations VSAM
 
 ### Fonctions du Master Catalog
 
-1. Acces VSAM pour les Data Sets
+1. Accès VSAM pour les Data Sets
 2. Autorisation de mot de passe
 3. Gestion de l'espace
 4. Emplacement des Data Sets
@@ -61,7 +61,7 @@ Le catalogue VSAM est une structure essentielle qui :
 |-------|-------------|
 | HLQ uniquement | Stocke uniquement les High Level Qualifiers |
 | Pas de Data Sets | Ne pas cataloguer directement les VSAM/Non-VSAM |
-| Systeme | Gere par les administrateurs systeme |
+| Systeme | Gere par les administrateurs système |
 
 > **Note historique :** Le Master Catalog etait appele "VSAM King" dans les annees 1970.
 
@@ -69,19 +69,19 @@ Le catalogue VSAM est une structure essentielle qui :
 
 ## II-3. User Catalog
 
-### Caracteristiques
+### Caractéristiques
 
 - Meme structure et concept que le Master Catalog
-- Niveau hierarchique inferieur
+- Niveau hierarchique inférieur
 - Pas obligatoire mais **fortement recommande**
-- Ameliore securite et organisation
+- Ameliore sécurité et organisation
 
 ### Regles des User Catalogs
 
 - Proprietaire du volume sur lequel il reside
 - Doit etre le premier objet VSAM stocke sur le volume
 - Peut posseder plusieurs volumes
-- Cree par les administrateurs systemes
+- Cree par les administrateurs systèmes
 
 ### Exemple de Definition
 
@@ -105,10 +105,10 @@ Le catalogue VSAM est une structure essentielle qui :
 
 | Aspect | Master Catalog | User Catalog |
 |--------|----------------|--------------|
-| **Nombre** | 1 par systeme | Multiples |
-| **Creation** | Generation systeme | DEFINE USERCATALOG |
+| **Nombre** | 1 par système | Multiples |
+| **Creation** | Generation système | DEFINE USERCATALOG |
 | **Contenu** | Alias, User Catalogs | Data Sets, Clusters |
-| **Propriete** | Systeme | Volume specifique |
+| **Propriete** | Systeme | Volume spécifique |
 | **Obligatoire** | Oui | Non (recommande) |
 
 ---
@@ -117,13 +117,13 @@ Le catalogue VSAM est une structure essentielle qui :
 
 ### Definition
 
-Un Data Space est une zone de stockage sur un volume DASD reservee pour les donnees VSAM.
+Un Data Space est une zone de stockage sur un volume DASD reservee pour les données VSAM.
 
-### Caracteristiques
+### Caractéristiques
 
-- Ne peut contenir que des donnees VSAM
-- Relation etablie entre Data Space et catalogue lors de la definition VSAM
-- Le catalogue est proprietaire de l'espace de donnees
+- Ne peut contenir que des données VSAM
+- Relation etablie entre Data Space et catalogue lors de la définition VSAM
+- Le catalogue est proprietaire de l'espace de données
 - Un catalogue peut avoir plusieurs Data Spaces
 - Option **CANDIDATE** : reserve le volume sans allocation reelle
 
@@ -171,8 +171,8 @@ SHAREOPTIONS (cross-region cross-system)
 |--------|--------------|--------------|
 | **1** | Lecture multiple OU ecriture unique | Non valide |
 | **2** | Lecture multiple ET ecriture unique | Non valide |
-| **3** | Lecture/ecriture multiple (pas d'integrite) | Meme que region |
-| **4** | Comme 3 + rafraichissement buffer a chaque acces | Rafraichissement buffer |
+| **3** | Lecture/ecriture multiple (pas d'intégrité) | Meme que region |
+| **4** | Comme 3 + rafraichissement buffer a chaque accès | Rafraichissement buffer |
 
 ### Valeur par Defaut
 
@@ -191,7 +191,7 @@ SHAREOPTIONS (1 3)
 | - Un seul programme peut ecrire a la fois                 |
 | - Plusieurs programmes peuvent lire simultanement          |
 | - Pas de lecture pendant l'ecriture                        |
-| - Integrite des donnees garantie                           |
+| - Integrite des données garantie                           |
 +-----------------------------------------------------------+
 ```
 
@@ -204,7 +204,7 @@ SHAREOPTIONS (1 3)
 | - Un seul programme peut ecrire                            |
 | - Plusieurs programmes peuvent lire en meme temps          |
 | - Lecture possible pendant l'ecriture                      |
-| - Risque : donnees non commitees lues                      |
+| - Risque : données non commitees lues                      |
 +-----------------------------------------------------------+
 ```
 
@@ -216,7 +216,7 @@ SHAREOPTIONS (1 3)
 +-----------------------------------------------------------+
 | - Plusieurs programmes peuvent ecrire                      |
 | - Plusieurs programmes peuvent lire                        |
-| - Pas de controle d'integrite                              |
+| - Pas de contrôle d'intégrité                              |
 | - L'application doit gerer la synchronisation              |
 +-----------------------------------------------------------+
 ```
@@ -228,9 +228,9 @@ SHAREOPTIONS (1 3)
 | Cross-Region = 4                                           |
 +-----------------------------------------------------------+
 | - Comme SHAREOPTIONS(3)                                    |
-| - Buffer rafraichi a chaque acces                          |
+| - Buffer rafraichi a chaque accès                          |
 | - Performance degradee                                      |
-| - Meilleure coherence des donnees                          |
+| - Meilleure coherence des données                          |
 +-----------------------------------------------------------+
 ```
 
@@ -250,7 +250,7 @@ SHAREOPTIONS (1 3)
 
 ### Alias de Catalogue
 
-Un alias permet de lier un HLQ a un User Catalog specifique.
+Un alias permet de lier un HLQ a un User Catalog spécifique.
 
 ```jcl
 //DEFALIAS EXEC PGM=IDCAMS
@@ -272,21 +272,21 @@ Un alias permet de lier un HLQ a un User Catalog specifique.
 2. Systeme cherche alias FTEST dans Master Catalog
 3. Trouve : FTEST -> UCDISK01
 4. Systeme cherche FTEST.DATA.FILE dans UCDISK01
-5. Trouve l'entree et localise le Data Set
+5. Trouve l'entrée et localise le Data Set
 ```
 
 ---
 
-## Resume du Chapitre
+## Résumé du Chapitre
 
 | Concept | Description |
 |---------|-------------|
-| **Master Catalog** | Catalogue principal unique par systeme |
+| **Master Catalog** | Catalogue principal unique par système |
 | **User Catalog** | Catalogue secondaire pour organisation |
 | **Data Space** | Zone de stockage VSAM sur volume |
 | **SHAREOPTIONS(1,x)** | Lecture multiple OU ecriture unique |
 | **SHAREOPTIONS(2,x)** | Lecture pendant ecriture autorisee |
-| **SHAREOPTIONS(3,x)** | Aucune restriction (pas d'integrite) |
+| **SHAREOPTIONS(3,x)** | Aucune restriction (pas d'intégrité) |
 | **SHAREOPTIONS(4,x)** | Rafraichissement buffer systematique |
 | **ALIAS** | Lien entre HLQ et User Catalog |
 
@@ -296,18 +296,18 @@ Un alias permet de lier un HLQ a un User Catalog specifique.
 
 ```
 Catalogues:
-- Master Catalog = 1 par systeme (systeme)
-- User Catalog = N par systeme (utilisateur)
+- Master Catalog = 1 par système (système)
+- User Catalog = N par système (utilisateur)
 - ALIAS = lien HLQ -> User Catalog
 
 SHAREOPTIONS par defaut: (1 3)
-- 1 = Cross-region (meme systeme)
-- 3 = Cross-system (entre systemes)
+- 1 = Cross-region (meme système)
+- 3 = Cross-system (entre systèmes)
 
 Valeurs courantes:
 - (1,3) = Standard, securise
 - (2,3) = CICS, lecture pendant ecriture
-- (3,3) = Pas d'integrite, gestion applicative
+- (3,3) = Pas d'intégrité, gestion applicative
 ```
 
 ---

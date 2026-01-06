@@ -24,13 +24,13 @@ IBM propose un ensemble d'utilitaires qui permettent de manipuler les Data Sets 
 
 ---
 
-## 1. Definition des Data Sets
+## 1. Définition des Data Sets
 
 Avant d'utiliser les utilitaires, il est essentiel de comprendre les types de Data Sets qu'ils manipulent.
 
 ### 1.1 Data Set Sequentiel (PS - Physical Sequential)
 
-Organisation lineaire des enregistrements, acces sequentiel uniquement.
+Organisation lineaire des enregistrements, acces séquentiel uniquement.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -43,14 +43,14 @@ Organisation lineaire des enregistrements, acces sequentiel uniquement.
 │  └────────┴────────┴────────┴────────┴────────┴────────┘       │
 │                                                                 │
 │  Caracteristiques :                                             │
-│  - Lecture/ecriture sequentielle                                │
+│  - Lecture/ecriture séquentielle                                │
 │  - DSORG=PS                                                     │
-│  - Ideal pour : fichiers de donnees, logs, rapports             │
+│  - Ideal pour : fichiers de données, logs, rapports             │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Definition JCL :**
+**Définition JCL :**
 
 ```jcl
 //SEQFILE  DD DSN=USER.DATA.SEQUEN,
@@ -90,12 +90,12 @@ Bibliotheque contenant plusieurs membres, chacun accessible directement.
 │  Caracteristiques :                                             │
 │  - Acces direct aux membres via le directory                    │
 │  - DSORG=PO                                                     │
-│  - Ideal pour : sources, JCL, COPYBOOK, procedures              │
+│  - Ideal pour : sources, JCL, COPYBOOK, procédures              │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Definition JCL :**
+**Définition JCL :**
 
 ```jcl
 //PDSLIB   DD DSN=USER.SOURCE.COBOL,
@@ -105,7 +105,7 @@ Bibliotheque contenant plusieurs membres, chacun accessible directement.
 //            UNIT=SYSDA
 ```
 
-**Note :** Le troisieme parametre de SPACE (20) reserve l'espace pour le directory.
+**Note :** Le troisieme paramètre de SPACE (20) reserve l'espace pour le directory.
 
 ### 1.3 PDS Extended (PDSE)
 
@@ -119,13 +119,13 @@ Evolution du PDS avec des avantages significatifs.
 ├────────────────────────────┼────────────────────────────────────┤
 │ Directory de taille fixe   │ Directory extensible               │
 │ Fragmentation possible     │ Reutilisation automatique          │
-│ Compression manuelle       │ Pas de compression necessaire      │
+│ Compression manuelle       │ Pas de compression nécessaire      │
 │ Moins de ressources        │ Plus de fonctionnalites            │
-│ DSNTYPE non specifie       │ DSNTYPE=LIBRARY                    │
+│ DSNTYPE non spécifié       │ DSNTYPE=LIBRARY                    │
 └────────────────────────────┴────────────────────────────────────┘
 ```
 
-**Definition PDSE :**
+**Définition PDSE :**
 
 ```jcl
 //PDSELIB  DD DSN=USER.SOURCE.PDSE,
@@ -149,7 +149,7 @@ Evolution du PDS avec des avantages significatifs.
 │                                                                 │
 │  Annees 1960-1970 :                                             │
 │  ├── IEFBR14   : Utilitaire minimal (BR 14 = Branch Return)     │
-│  ├── IEBGENER  : Copie sequentielle                             │
+│  ├── IEBGENER  : Copie séquentielle                             │
 │  └── IEBCOPY   : Gestion des PDS                                │
 │                                                                 │
 │  Annees 1970-1980 :                                             │
@@ -169,7 +169,7 @@ Evolution du PDS avec des avantages significatifs.
 | Besoin | Utilitaire recommande |
 |--------|----------------------|
 | Creer/supprimer un dataset vide | IEFBR14 |
-| Copier un fichier sequentiel | IEBGENER |
+| Copier un fichier séquentiel | IEBGENER |
 | Copier/compresser un PDS | IEBCOPY |
 | Comparer deux fichiers | IEBCOMPR |
 | Gerer fichiers VSAM | IDCAMS |
@@ -181,7 +181,7 @@ Evolution du PDS avec des avantages significatifs.
 
 ### 3.1 Presentation
 
-IEFBR14 est le programme le plus simple de z/OS. Son code assembleur contient une seule instruction : `BR 14` (Branch to Register 14), qui retourne immediatement au systeme.
+IEFBR14 est le programme le plus simple de z/OS. Son code assembleur contient une seule instruction : `BR 14` (Branch to Register 14), qui retourne immediatement au système.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -197,7 +197,7 @@ IEFBR14 est le programme le plus simple de z/OS. Son code assembleur contient un
 │  └─────────────────────────────────────────────┘               │
 │                                                                 │
 │  Utilite : Les DD associees sont traitees par JES,              │
-│            permettant de creer ou supprimer des datasets        │
+│            permettant de créer ou supprimer des datasets        │
 │            sans aucun traitement programme.                     │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -254,13 +254,13 @@ IEFBR14 est le programme le plus simple de z/OS. Son code assembleur contient un
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ✓ Utiliser pour les operations de catalogue uniquement         │
-│  ✓ Preferer IDCAMS DELETE pour les suppressions conditionnelles │
-│  ✓ Toujours specifier DISP correctement :                       │
+│  ✓ Préférer IDCAMS DELETE pour les suppressions conditionnelles │
+│  ✓ Toujours spécifiér DISP correctement :                       │
 │    - (NEW,CATLG,DELETE) pour creation                           │
 │    - (OLD,DELETE,DELETE) pour suppression                       │
 │                                                                 │
-│  ✗ Ne pas utiliser pour copier ou traiter des donnees           │
-│  ✗ Ne pas oublier les parametres DCB pour les nouveaux DS       │
+│  ✗ Ne pas utiliser pour copier ou traiter des données           │
+│  ✗ Ne pas oublier les paramètres DCB pour les nouveaux DS       │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -271,7 +271,7 @@ IEFBR14 est le programme le plus simple de z/OS. Son code assembleur contient un
 
 ### 4.1 Presentation
 
-IEBGENER copie des fichiers sequentiels ou des membres de PDS. C'est l'utilitaire de copie le plus utilise pour les fichiers non-VSAM.
+IEBGENER copie des fichiers séquentiels ou des membres de PDS. C'est l'utilitaire de copie le plus utilise pour les fichiers non-VSAM.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -309,7 +309,7 @@ IEBGENER copie des fichiers sequentiels ou des membres de PDS. C'est l'utilitair
 
 ### 4.3 Exemples pratiques
 
-**a) Copie simple de fichier sequentiel :**
+**a) Copie simple de fichier séquentiel :**
 
 ```jcl
 //STEP01   EXEC PGM=IEBGENER
@@ -334,7 +334,7 @@ IEBGENER copie des fichiers sequentiels ou des membres de PDS. C'est l'utilitair
 //            DISP=SHR
 ```
 
-**c) Creation de fichier avec donnees in-stream :**
+**c) Creation de fichier avec données in-stream :**
 
 ```jcl
 //STEP03   EXEC PGM=IEBGENER
@@ -377,9 +377,9 @@ IEBGENER accepte des cartes de controle pour des operations avancees :
 
 | Carte | Fonction |
 |-------|----------|
-| GENERATE | Definit les maximums (champs, litteraux) |
+| GENERATE | Définit les maximums (champs, litteraux) |
 | RECORD | Reorganise les champs en sortie |
-| FIELD | Definition d'un champ (longueur, position in, position out) |
+| FIELD | Définition d'un champ (longueur, position in, position out) |
 | LABELS | Gestion des labels de bande |
 
 ### 4.5 Codes retour
@@ -409,8 +409,8 @@ IEBCOPY est l'utilitaire principal pour la gestion des Partitioned Data Sets (PD
 │   ┌──────────────────────────────────────────────────────┐     │
 │   │ COPY      : Copier membres entre PDS                 │     │
 │   │ COMPRESS  : Recuperer l'espace inutilise (in-place)  │     │
-│   │ UNLOAD    : Decharger PDS vers sequentiel            │     │
-│   │ LOAD      : Recharger sequentiel vers PDS            │     │
+│   │ UNLOAD    : Decharger PDS vers séquentiel            │     │
+│   │ LOAD      : Recharger séquentiel vers PDS            │     │
 │   └──────────────────────────────────────────────────────┘     │
 │                                                                 │
 │   DD Requises :                                                 │
@@ -561,7 +561,7 @@ La compression recupere l'espace des membres supprimes :
 
 ### 6.1 Presentation
 
-IEBCOMPR compare deux fichiers sequentiels ou deux membres de PDS enregistrement par enregistrement.
+IEBCOMPR compare deux fichiers séquentiels ou deux membres de PDS enregistrement par enregistrement.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -571,7 +571,7 @@ IEBCOMPR compare deux fichiers sequentiels ou deux membres de PDS enregistrement
 │   SYSUT1                    SYSUT2                              │
 │   ┌──────────────┐          ┌──────────────┐                   │
 │   │ Fichier 1    │   <=>    │ Fichier 2    │                   │
-│   │ (Reference)  │ Compare  │ (A verifier) │                   │
+│   │ (Référence)  │ Compare  │ (A verifier) │                   │
 │   └──────────────┘          └──────────────┘                   │
 │           │                         │                           │
 │           └────────────┬────────────┘                           │
@@ -584,7 +584,7 @@ IEBCOMPR compare deux fichiers sequentiels ou deux membres de PDS enregistrement
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 6.2 Comparaison de fichiers sequentiels
+### 6.2 Comparaison de fichiers séquentiels
 
 ```jcl
 //COMPARE  EXEC PGM=IEBCOMPR
@@ -814,7 +814,7 @@ IDCAMS (Access Method Services) est l'utilitaire le plus puissant pour la gestio
 /*
 ```
 
-**c) Copie selective (par cle) :**
+**c) Copie selective (par clé) :**
 
 ```jcl
 //REPROSEL EXEC PGM=IDCAMS
@@ -840,7 +840,7 @@ IDCAMS (Access Method Services) est l'utilitaire le plus puissant pour la gestio
 
 | Option | Description |
 |--------|-------------|
-| CHARACTER | Affichage en caracteres |
+| CHARACTER | Affichage en caractères |
 | HEX | Affichage hexadecimal |
 | DUMP | Les deux formats |
 | COUNT(n) | Limiter a n enregistrements |
@@ -900,7 +900,7 @@ IDCAMS (Access Method Services) est l'utilitaire le plus puissant pour la gestio
 
 ### 8.1 Presentation
 
-SORT (DFSORT ou SYNCSORT) est l'utilitaire de tri et de manipulation de donnees le plus utilise.
+SORT (DFSORT ou SYNCSORT) est l'utilitaire de tri et de manipulation de données le plus utilise.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -914,7 +914,7 @@ SORT (DFSORT ou SYNCSORT) est l'utilitaire de tri et de manipulation de donnees 
 │   │ COPY   : Copier avec ou sans transformation          │     │
 │   │ INCLUDE/OMIT  : Filtrer les enregistrements          │     │
 │   │ INREC/OUTREC  : Reformater les enregistrements       │     │
-│   │ SUM    : Agreger les donnees                         │     │
+│   │ SUM    : Agreger les données                         │     │
 │   └──────────────────────────────────────────────────────┘     │
 │                                                                 │
 │   DD Requises :                                                 │
@@ -949,7 +949,7 @@ SORT (DFSORT ou SYNCSORT) est l'utilitaire de tri et de manipulation de donnees 
 SORT FIELDS=(position,longueur,format,ordre,...)
 ```
 
-**Formats de donnees :**
+**Formats de données :**
 
 | Format | Description |
 |--------|-------------|
@@ -969,7 +969,7 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 
 ### 8.4 Exemples de tri
 
-**a) Tri simple sur une cle :**
+**a) Tri simple sur une clé :**
 
 ```jcl
 //TRISIMPL EXEC PGM=SORT
@@ -985,7 +985,7 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 /*
 ```
 
-**b) Tri sur plusieurs cles :**
+**b) Tri sur plusieurs clés :**
 
 ```jcl
 //TRIMULTI EXEC PGM=SORT
@@ -1105,7 +1105,7 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 //            DCB=(RECFM=FB,LRECL=30,BLKSIZE=0),
 //            UNIT=SYSDA
 //SYSIN    DD *
-* Extraire : code(8), nom(20), ville(2) = 30 caracteres
+* Extraire : code(8), nom(20), ville(2) = 30 caractères
   SORT FIELDS=(1,8,CH,A)
   OUTREC FIELDS=(1,8,10,20,40,2)
 /*
@@ -1131,7 +1131,7 @@ SORT FIELDS=(position,longueur,format,ordre,...)
 
 ### 8.7 FINDREP - Recherche et remplacement
 
-FINDREP permet de rechercher et remplacer des chaines de caracteres dans les enregistrements.
+FINDREP permet de rechercher et remplacer des chaines de caractères dans les enregistrements.
 
 ```jcl
 //SORTFIND EXEC PGM=SORT
@@ -1173,7 +1173,7 @@ OUTREC FINDREP=(IN=C'chaine_recherche',OUT=C'chaine_remplacement')
 
 **Notes :**
 - Si la chaine de remplacement est plus courte, des espaces sont ajoutes
-- Si plus longue, specifier INOUT pour definir la zone de travail
+- Si plus longue, spécifiér INOUT pour définir la zone de travail
 - Peut etre combine avec SORT ou COPY
 
 ---
@@ -1196,7 +1196,7 @@ OUTREC FINDREP=(IN=C'chaine_recherche',OUT=C'chaine_remplacement')
 /*
 ```
 
-**Note :** Les fichiers en entree DOIVENT etre deja tries sur la meme cle.
+**Note :** Les fichiers en entree DOIVENT etre deja tries sur la meme clé.
 
 ### 8.9 SUM - Suppression des doublons
 
@@ -1210,7 +1210,7 @@ OUTREC FINDREP=(IN=C'chaine_recherche',OUT=C'chaine_remplacement')
 //            DCB=*.SORTIN,
 //            UNIT=SYSDA
 //SYSIN    DD *
-* Supprimer les doublons bases sur la cle
+* Supprimer les doublons bases sur la clé
   SORT FIELDS=(1,8,CH,A)
   SUM FIELDS=NONE
 /*
@@ -1279,7 +1279,7 @@ OUTREC FINDREP=(IN=C'chaine_recherche',OUT=C'chaine_remplacement')
 ├──────────┬──────────────────────────────────────────────────────┤
 │ IEFBR14  │ Creer/supprimer datasets via les cartes DD           │
 ├──────────┼──────────────────────────────────────────────────────┤
-│ IEBGENER │ Copier fichiers sequentiels, imprimer, charger       │
+│ IEBGENER │ Copier fichiers séquentiels, imprimer, charger       │
 ├──────────┼──────────────────────────────────────────────────────┤
 │ IEBCOPY  │ Gerer PDS : copier, compresser, unload/load          │
 ├──────────┼──────────────────────────────────────────────────────┤
@@ -1298,7 +1298,7 @@ OUTREC FINDREP=(IN=C'chaine_recherche',OUT=C'chaine_remplacement')
 ### Exercice 1 : Operations de base
 Creer un JCL qui :
 1. Supprime un dataset s'il existe (IDCAMS)
-2. Cree un nouveau dataset avec des donnees in-stream (IEBGENER)
+2. Cree un nouveau dataset avec des données in-stream (IEBGENER)
 3. Copie ce dataset vers un autre (IEBGENER)
 
 ### Exercice 2 : Gestion PDS
@@ -1309,23 +1309,23 @@ Creer un JCL qui :
 
 ### Exercice 3 : Tri et filtrage
 Creer un JCL qui :
-1. Trie un fichier sur deux cles
+1. Trie un fichier sur deux clés
 2. Filtre pour ne garder que certains enregistrements
 3. Reformate la sortie pour n'avoir que certains champs
 
 ### Exercice 4 : VSAM
 Creer un JCL qui :
-1. Definit un KSDS VSAM (IDCAMS)
-2. Charge des donnees depuis un fichier sequentiel (IDCAMS REPRO)
+1. Définit un KSDS VSAM (IDCAMS)
+2. Charge des données depuis un fichier séquentiel (IDCAMS REPRO)
 3. Liste le contenu du catalogue pour verifier (IDCAMS LISTCAT)
 
 ---
 
 ## Navigation
 
-| Precedent | Suivant |
+| Précédent | Suivant |
 |-----------|---------|
-| [Chapitre III - Procedures](03-procedures.md) | [Travaux Pratiques](../../exercices/jcl/chapitre-05/README.md) |
+| [Chapitre III - Procedures](03-procédures.md) | [Travaux Pratiques](../../exercices/jcl/chapitre-05/README.md) |
 
 ---
 *Formation COBOL - Module JCL*

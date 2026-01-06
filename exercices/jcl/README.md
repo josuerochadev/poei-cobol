@@ -2,45 +2,45 @@
 
 ## Organisation
 
-Les exercices sont organises en deux parties :
-- **Theorie** : QCM pour valider les connaissances theoriques
-- **Pratique** : Exercices hands-on avec fichiers `.jcl` executables
+Les exercices sont organisés en deux parties :
+- **Théorie** : QCM pour valider les connaissances théoriques
+- **Pratique** : Exercices hands-on avec fichiers `.jcl` exécutables
 
 ---
 
 ## Partie Theorique (QCM)
 
-Les QCM sont organises par chapitre du cours et permettent de valider la comprehension des concepts.
+Les QCM sont organisés par chapitre du cours et permettent de valider la compréhension des concepts.
 
 | Fichier | Chapitre | Nombre de questions |
 |---------|----------|---------------------|
 | `theorie/qcm-01-cartes-jcl.md` | I - Cartes JOB, EXEC, DD | 30 questions |
-| `theorie/qcm-02-fichiers-parametres.md` | II - Fichiers et parametres | 25 questions |
-| `theorie/qcm-03-procedures.md` | III - Procedures JCL | 25 questions |
+| `theorie/qcm-02-fichiers-paramètres.md` | II - Fichiers et paramètres | 25 questions |
+| `theorie/qcm-03-procédures.md` | III - Procédures JCL | 25 questions |
 | `theorie/qcm-04-utilitaires.md` | IV - Utilitaires et SORT | 35 questions |
 
 **Total : 115 questions**
 
-### Themes couverts par QCM
+### Thèmes couverts par QCM
 
 #### QCM-01 : Cartes JCL
 - Instructions JOB, EXEC, DD
-- Parametres CLASS, MSGCLASS, MSGLEVEL, NOTIFY
+- Paramètres CLASS, MSGCLASS, MSGLEVEL, NOTIFY
 - DISP, DCB, SPACE
 - COND et codes retour
 - JOBLIB, STEPLIB, JCLLIB
 
-#### QCM-02 : Fichiers et parametres
+#### QCM-02 : Fichiers et paramètres
 - Types de fichiers (PS, PO, PDSE)
-- Concatenation et references arriere
+- Concaténation et références arrière
 - Fichiers temporaires (&&)
-- DUMMY, SYSOUT, donnees in-stream
-- Parametres avances (VIO, LIKE, OUTLIM)
+- DUMMY, SYSOUT, données in-stream
+- Paramètres avancés (VIO, LIKE, OUTLIM)
 
-#### QCM-03 : Procedures
-- Procedures in-stream et cataloguees
-- Parametres symboliques (&)
-- Symboles systeme (&SYSUID, &LYYMMDD)
+#### QCM-03 : Procédures
+- Procédures in-stream et cataloguées
+- Paramètres symboliques (&)
+- Symboles système (&SYSUID, &LYYMMDD)
 - Override (stepname.ddname)
 - INCLUDE et imbrication
 
@@ -55,33 +55,33 @@ Les QCM sont organises par chapitre du cours et permettent de valider la compreh
 
 ## Partie Pratique
 
-Les exercices pratiques sont organises par chapitre du cours JCL.
-Chaque chapitre contient des fichiers `.jcl` directement executables.
+Les exercices pratiques sont organisés par chapitre du cours JCL.
+Chaque chapitre contient des fichiers `.jcl` directement exécutables.
 
 ## Structure
 
 ```
 exercices/jcl/
 ├── README.md
-├── theorie/                        # QCM theoriques
+├── theorie/                        # QCM théoriques
 │   ├── qcm-01-cartes-jcl.md
-│   ├── qcm-02-fichiers-parametres.md
-│   ├── qcm-03-procedures.md
+│   ├── qcm-02-fichiers-paramètres.md
+│   ├── qcm-03-procédures.md
 │   └── qcm-04-utilitaires.md
 ├── pratique/                       # Exercices pratiques par chapitre
 │   ├── chapitre-02/
 │   │   ├── README.md
-│   │   ├── ex01-creation-esds.jcl
+│   │   ├── ex01-création-esds.jcl
 │   │   ├── ex02-copie-iebgener.jcl
 │   │   ├── ex03-fichier-temporaire.jcl
-│   │   ├── ex04-concatenation.jcl
+│   │   ├── ex04-concaténation.jcl
 │   │   ├── ex-bonus-complet.jcl
 │   │   └── cleanup.jcl
 │   ├── chapitre-03/
 │   │   ├── README.md
 │   │   ├── ex01-proc-instream.jcl
 │   │   ├── ex02-deux-procs.jcl
-│   │   ├── ex03-proc-imbriquees.jcl
+│   │   ├── ex03-proc-imbriquées.jcl
 │   │   ├── ex04-param-symboliques.jcl
 │   │   └── cleanup.jcl
 │   └── chapitre-04/
@@ -92,11 +92,11 @@ exercices/jcl/
 │       ├── ex04-idcams-vsam.jcl
 │       ├── ex-bonus-workflow.jcl
 │       └── cleanup.jcl
-└── tp/                             # Travaux pratiques de synthese
+└── tp/                             # Travaux pratiques de synthèse
     ├── README.md
     ├── tp01-dataset-ps.jcl
     ├── tp02-dataset-po.jcl
-    ├── tp03-concatenation.jcl
+    ├── tp03-concaténation.jcl
     ├── tp04-utilitaires.jcl
     ├── tp05-sort.jcl
     ├── tp06-analyse-erreurs.jcl
@@ -105,40 +105,40 @@ exercices/jcl/
 
 ## Exercices Pratiques (pratique/)
 
-### Chapitre 02 - Fichiers speciaux et parametres
+### Chapitre 02 - Fichiers spéciaux et paramètres
 
 | Fichier | Description |
 |---------|-------------|
-| `pratique/chapitre-02/ex01-creation-esds.jcl` | Creation dataset avec donnees in-stream |
+| `pratique/chapitre-02/ex01-création-esds.jcl` | Création dataset avec données in-stream |
 | `pratique/chapitre-02/ex02-copie-iebgener.jcl` | Copie dataset avec IEBGENER et DCB=* |
 | `pratique/chapitre-02/ex03-fichier-temporaire.jcl` | Fichier temporaire entre steps |
-| `pratique/chapitre-02/ex04-concatenation.jcl` | Concatenation de datasets |
+| `pratique/chapitre-02/ex04-concaténation.jcl` | Concaténation de datasets |
 | `pratique/chapitre-02/ex-bonus-complet.jcl` | Tous les exercices en un seul job |
 | `pratique/chapitre-02/cleanup.jcl` | Nettoyage des datasets |
 
 **Concepts couverts :**
 - IEBGENER et DD *
-- DCB=*.ddname (reference arriere)
+- DCB=*.ddname (référence arrière)
 - DSN=&&TEMP, DISP=(NEW,PASS)
-- Concatenation de fichiers
+- Concaténation de fichiers
 
 ---
 
-### Chapitre 03 - Procedures
+### Chapitre 03 - Procédures
 
 | Fichier | Description |
 |---------|-------------|
-| `pratique/chapitre-03/ex01-proc-instream.jcl` | Procedure in-stream avec override |
-| `pratique/chapitre-03/ex02-deux-procs.jcl` | Deux procedures successives |
-| `pratique/chapitre-03/ex03-proc-imbriquees.jcl` | Procedures imbriquees |
+| `pratique/chapitre-03/ex01-proc-instream.jcl` | Procédure in-stream avec override |
+| `pratique/chapitre-03/ex02-deux-procs.jcl` | Deux procédures successives |
+| `pratique/chapitre-03/ex03-proc-imbriquées.jcl` | Procédures imbriquées |
 | `pratique/chapitre-03/ex04-param-symboliques.jcl` | Parametrage multiple |
 | `pratique/chapitre-03/cleanup.jcl` | Nettoyage des datasets |
 
 **Concepts couverts :**
 - PROC...PEND
-- Parametres symboliques &param
+- Paramètres symboliques &param
 - Override stepname.ddname
-- Procedures imbriquees (procstep.step.ddname)
+- Procédures imbriquées (procstep.step.ddname)
 
 ---
 
@@ -146,7 +146,7 @@ exercices/jcl/
 
 | Fichier | Description |
 |---------|-------------|
-| `pratique/chapitre-04/ex01-iefbr14-iebgener.jcl` | IEFBR14 et IEBGENER : creation et chargement |
+| `pratique/chapitre-04/ex01-iefbr14-iebgener.jcl` | IEFBR14 et IEBGENER : création et chargement |
 | `pratique/chapitre-04/ex02-iebcopy-pds.jcl` | IEBCOPY : gestion des PDS |
 | `pratique/chapitre-04/ex03-sort-filtrage.jcl` | SORT : tri et filtrage |
 | `pratique/chapitre-04/ex04-idcams-vsam.jcl` | IDCAMS : gestion VSAM |
@@ -154,8 +154,8 @@ exercices/jcl/
 | `pratique/chapitre-04/cleanup.jcl` | Nettoyage des datasets |
 
 **Concepts couverts :**
-- IEFBR14 pour creation/suppression
-- IEBGENER pour copie sequentielle
+- IEFBR14 pour création/suppression
+- IEBGENER pour copie séquentielle
 - IEBCOPY pour gestion PDS (COPY, SELECT, compression)
 - IDCAMS (DELETE, DEFINE, REPRO, PRINT, LISTCAT)
 - SORT (FIELDS, INCLUDE/OMIT, OUTREC, OUTFIL)
@@ -163,28 +163,28 @@ exercices/jcl/
 
 ---
 
-## Travaux Pratiques de Synthese (tp/)
+## Travaux Pratiques de Synthèse (tp/)
 
 | Fichier | Description |
 |---------|-------------|
-| `tp/tp01-dataset-ps.jcl` | Creation d'un dataset sequentiel (PS) |
-| `tp/tp02-dataset-po.jcl` | Creation d'un dataset partitionne (PDS) |
-| `tp/tp03-concatenation.jcl` | Concatenation de datasets |
+| `tp/tp01-dataset-ps.jcl` | Création d'un dataset séquentiel (PS) |
+| `tp/tp02-dataset-po.jcl` | Création d'un dataset partitionne (PDS) |
+| `tp/tp03-concaténation.jcl` | Concaténation de datasets |
 | `tp/tp04-utilitaires.jcl` | Utilisation des utilitaires IBM |
 | `tp/tp05-sort.jcl` | Manipulation SORT complete |
 | `tp/tp06-analyse-erreurs.jcl` | Analyse des erreurs et codes retour |
 | `tp/cleanup.jcl` | Nettoyage des datasets |
 
 **Contenu :**
-- 6 travaux pratiques de synthese
+- 6 travaux pratiques de synthèse
 - Manipulation complete avec ISPF et TSO
 - Exercices couvrant tous les chapitres
 
-## Prerequis
+## Prérequis
 
-- Acces a un environnement z/OS (ou emulateur Hercules/TK4-)
+- Accès a un environnement z/OS (ou émulateur Hercules/TK4-)
 - Userid TSO valide
-- Droits de creation de datasets
+- Droits de création de datasets
 - Connaissance des chapitres du cours JCL
 
 ## Utilisation
@@ -198,11 +198,11 @@ exercices/jcl/
 ### Sur Hercules/TK4-
 
 1. Remplacer `FTEST` par votre userid (ex: `HERC01`)
-2. Ajouter `VOL=SER=PUB001,UNIT=3390` sur les DD de creation
+2. Ajouter `VOL=SER=PUB001,UNIT=3390` sur les DD de création
 3. Utiliser `CLASS=A,MSGCLASS=A`
 4. Soumettre via TSO ou ISPF
 
-### Ordre d'execution
+### Ordre d'exécution
 
 **Pratique - Chapitre 02 :**
 ```
@@ -213,37 +213,37 @@ pratique/chapitre-02/ex-bonus-complet (tout en un)
 
 **Pratique - Chapitre 03 :**
 ```
-Chaque exercice est independant
+Chaque exercice est indépendant
 ```
 
 **Pratique - Chapitre 04 :**
 ```
-pratique/chapitre-04/ex01 (creation donnees) -> ex03 (utilise ex01)
+pratique/chapitre-04/ex01 (création données) -> ex03 (utilise ex01)
                                              -> ex04 (utilise ex01)
-ex02 est independant
+ex02 est indépendant
 ex-bonus-workflow (tout en un)
 ```
 
-**TP - Synthese :**
+**TP - Synthèse :**
 ```
 tp/tp01 -> tp02 -> tp03 -> tp04 -> tp05 -> tp06
-(Ordre recommande mais chaque TP peut etre fait independamment)
+(Ordre recommandé mais chaque TP peut etre fait independamment)
 ```
 
 ### Nettoyage
 
-Apres les exercices, executer `cleanup.jcl` pour supprimer les datasets crees.
+Après les exercices, exécuter `cleanup.jcl` pour supprimer les datasets créés.
 
-## Progression recommandee
+## Progression recommandée
 
-1. **Theorie d'abord** : Faire les QCM pour valider la comprehension
-2. **Pratique ensuite** : Realiser les exercices hands-on
-3. **Revision** : Refaire les QCM apres la pratique pour consolider
+1. **Théorie d'abord** : Faire les QCM pour valider la compréhension
+2. **Pratique ensuite** : Réaliser les exercices hands-on
+3. **Révision** : Refaire les QCM après la pratique pour consolider
 
 ## Notes
 
-- Chaque dossier `chapitre-XX/` contient un `README.md` avec la documentation detaillee et les enonces
-- Les fichiers `.jcl` sont les solutions executables
+- Chaque dossier `chapitre-XX/` contient un `README.md` avec la documentation détaillée et les énoncés
+- Les fichiers `.jcl` sont les solutions exécutables
 - Adapter les noms de datasets selon votre environnement
 
 ---

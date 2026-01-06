@@ -147,3 +147,14 @@ Ce module couvre le **Job Control Language (JCL)**, le langage de contrôle des 
 
 - [IBM Z Trial](https://www.ibm.com/z/trials) - Accès gratuit à un environnement z/OS réel
 - [Hercules Emulator + TK4-](http://wotho.ethz.ch/tk4-/) - MVS 3.8j avec JES2 pour pratiquer le JCL
+
+---
+
+## Navigation
+
+| Module précédent | Module suivant |
+|------------------|----------------|
+| [Z/OS TSO/ISPF](../zos-tso/README.md) | [VSAM](../vsam/README.md) |
+
+---
+*Formation JCL - M2i Formation*

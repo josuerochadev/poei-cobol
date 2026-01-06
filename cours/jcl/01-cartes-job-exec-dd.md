@@ -2,11 +2,11 @@
 
 ## Introduction
 
-Ce chapitre traite des trois cartes fondamentales du JCL (Job Control Language) qui permettent a l'utilisateur de definir son traitement batch sur z/OS :
+Ce chapitre traite des trois cartes fondamentales du JCL (Job Control Language) qui permettent à l'utilisateur de définir son traitement batch sur z/OS :
 
-1. **La carte JOB** - Identifie le travail a traiter
-2. **La carte EXEC** - Identifie le programme a executer
-3. **La carte DD** - Identifie et localise les donnees concernees
+1. **La carte JOB** - Identifie le travail à traiter
+2. **La carte EXEC** - Identifie le programme à exécuter
+3. **La carte DD** - Identifie et localise les données concernées
 
 Ces trois cartes constituent la **base de tous les travaux batch** sur mainframe.
 
@@ -16,33 +16,33 @@ Ces trois cartes constituent la **base de tous les travaux batch** sur mainframe
 
 ### I-1-1 Qu'est-ce que le JCL ?
 
-Le **JCL (Job Control Language)** est le langage de controle des travaux sur z/OS. Il permet de :
+Le **JCL (Job Control Language)** est le langage de contrôle des travaux sur z/OS. Il permet de :
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    ROLE DU JCL                                   │
+│                    RÔLE DU JCL                                   │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   1. DEFINIR UN TRAVAIL (JOB)                                   │
+│   1. DÉFINIR UN TRAVAIL (JOB)                                   │
 │      • Nom du job                                               │
-│      • Classe d'execution                                       │
-│      • Priorite                                                 │
-│      • Comptabilite                                             │
+│      • Classe d'exécution                                       │
+│      • Priorité                                                 │
+│      • Comptabilité                                             │
 │                                                                 │
-│   2. SPECIFIER LES PROGRAMMES A EXECUTER                        │
+│   2. SPÉCIFIER LES PROGRAMMES À EXÉCUTER                        │
 │      • Nom du programme                                         │
-│      • Parametres d'execution                                   │
-│      • Ressources memoire                                       │
+│      • Paramètres d'exécution                                   │
+│      • Ressources mémoire                                       │
 │                                                                 │
-│   3. DECRIRE LES FICHIERS UTILISES                              │
+│   3. DÉCRIRE LES FICHIERS UTILISÉS                              │
 │      • Nom et localisation des datasets                         │
-│      • Caracteristiques (organisation, format, taille)          │
-│      • Mode d'acces (lecture, ecriture, creation)               │
+│      • Caractéristiques (organisation, format, taille)          │
+│      • Mode d'accès (lecture, écriture, création)               │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### I-1-2 Structure generale d'un JCL
+### I-1-2 Structure générale d'un JCL
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -58,14 +58,14 @@ Le **JCL (Job Control Language)** est le langage de controle des travaux sur z/O
 │   //STEP1    EXEC  PGM=IEFBR14                                  │
 │   //DD1      DD    DSN=MY.DATASET,DISP=SHR                      │
 │                                                                 │
-│   REGLES:                                                       │
+│   RÈGLES:                                                       │
 │   • Colonnes 1-2  : Toujours //                                │
-│   • Colonne 3     : Debut du nom (ou espace si pas de nom)     │
-│   • Colonnes 3-10 : Nom (1-8 caracteres alphanumeriques)       │
-│   • Apres le nom  : Au moins un espace                         │
-│   • Operation     : JOB, EXEC, DD, etc.                        │
-│   • Operandes     : Parametres separes par des virgules        │
-│   • Colonne 72    : Caractere de continuation (non-blanc)      │
+│   • Colonne 3     : Début du nom (ou espace si pas de nom)     │
+│   • Colonnes 3-10 : Nom (1-8 caractères alphanumériques)       │
+│   • Après le nom  : Au moins un espace                         │
+│   • Opération     : JOB, EXEC, DD, etc.                        │
+│   • Opérandes     : Paramètres séparés par des virgules        │
+│   • Colonne 72    : Caractère de continuation (non-blanc)      │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -74,48 +74,48 @@ Le **JCL (Job Control Language)** est le langage de controle des travaux sur z/O
 
 | Type | Description | Exemple |
 |------|-------------|---------|
-| **JOB** | Debut de travail | `//MYJOB JOB ...` |
-| **EXEC** | Execution programme | `//STEP1 EXEC PGM=PROG1` |
-| **DD** | Definition de donnees | `//INPUT DD DSN=...` |
-| **PROC** | Definition procedure | `//MYPROC PROC ...` |
-| **PEND** | Fin de procedure | `// PEND` |
+| **JOB** | Début de travail | `//MYJOB JOB ...` |
+| **EXEC** | Exécution programme | `//STEP1 EXEC PGM=PROG1` |
+| **DD** | Définition de données | `//INPUT DD DSN=...` |
+| **PROC** | Définition procédure | `//MYPROC PROC ...` |
+| **PEND** | Fin de procédure | `// PEND` |
 | **SET** | Variable symbolique | `// SET VAR=VALUE` |
 | **IF/THEN/ELSE/ENDIF** | Conditionnel | `// IF RC=0 THEN` |
-| **JCLLIB** | Bibliotheque JCL | `// JCLLIB ORDER=...` |
+| **JCLLIB** | Bibliothèque JCL | `// JCLLIB ORDER=...` |
 | **INCLUDE** | Inclusion membre | `// INCLUDE MEMBER=...` |
-| **/\*** | Delimiteur donnees | `/*` |
+| **/\*** | Délimiteur données | `/*` |
 | **//\*** | Commentaire | `//* Ceci est un commentaire` |
 
-### I-1-4 Regles de syntaxe
+### I-1-4 Règles de syntaxe
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    REGLES DE SYNTAXE JCL                        │
+│                    RÈGLES DE SYNTAXE JCL                        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   1. MAJUSCULES                                                 │
 │      Le JCL est en MAJUSCULES (sauf contenu entre apostrophes)  │
 │                                                                 │
-│   2. DEBUT DE LIGNE                                             │
+│   2. DÉBUT DE LIGNE                                             │
 │      // en colonnes 1-2 (obligatoire)                          │
 │                                                                 │
 │   3. NOMS                                                       │
-│      • 1 a 8 caracteres                                        │
+│      • 1 à 8 caractères                                        │
 │      • Commence par une lettre ou @, #, $                      │
-│      • Alphanumerique + @, #, $                                │
+│      • Alphanumérique + @, #, $                                │
 │                                                                 │
 │   4. CONTINUATION                                               │
-│      • Interrompre apres une virgule                           │
-│      • Caractere non-blanc en colonne 72 (optionnel)           │
+│      • Interrompre après une virgule                           │
+│      • Caractère non-blanc en colonne 72 (optionnel)           │
 │      • Continuer entre colonnes 4 et 16 sur ligne suivante     │
 │                                                                 │
 │   5. COMMENTAIRES                                               │
 │      • //* en colonnes 1-3                                     │
-│      • Ou apres les operandes (separe par espace)              │
+│      • Ou après les opérandes (séparé par espace)              │
 │                                                                 │
 │   6. FIN DE JOB                                                 │
 │      • // seul en colonnes 1-2 (null statement)                │
-│      • Ou debut d'un nouveau JOB                               │
+│      • Ou début d'un nouveau JOB                               │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -157,12 +157,12 @@ Le **JCL (Job Control Language)** est le langage de controle des travaux sur z/O
 
 ### I-2-a Structure des champs du JOB statement
 
-La carte **JOB** est la premiere instruction de tout travail batch. Elle identifie le job aupres du systeme.
+La carte **JOB** est la première instruction de tout travail batch. Elle identifie le job auprès du système.
 
-#### Syntaxe generale
+#### Syntaxe générale
 
 ```
-//jobname JOB accounting,'programmer-name',parametres...
+//jobname JOB accounting,'programmer-name',paramètres...
 ```
 
 #### I-2-a-i Champ identifiant (Colonnes 1-2)
@@ -175,12 +175,12 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 │   Colonnes 1-2 : //                                            │
 │                                                                 │
 │   • Obligatoire pour toutes les cartes JCL                     │
-│   • Identifie une instruction JCL pour le systeme              │
-│   • Distingue le JCL des donnees in-stream                     │
+│   • Identifie une instruction JCL pour le système              │
+│   • Distingue le JCL des données in-stream                     │
 │                                                                 │
 │   Exemples:                                                     │
 │   //MYJOB    JOB  ...      ◄── Carte JCL                       │
-│   DONNEES                   ◄── Donnees (pas de //)            │
+│   DONNEES                   ◄── Données (pas de //)            │
 │   /*                        ◄── Fin de donnees                 │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -193,17 +193,17 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 │                    CHAMP DE NOM (JOBNAME)                        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Position : Colonnes 3 a 10 (max 8 caracteres)                │
+│   Position : Colonnes 3 à 10 (max 8 caractères)                │
 │                                                                 │
-│   REGLES:                                                       │
+│   RÈGLES:                                                       │
 │   • Commence en colonne 3                                      │
-│   • 1 a 8 caracteres alphanumeriques                           │
-│   • Premier caractere : A-Z ou @, #, $                         │
-│   • Caracteres suivants : A-Z, 0-9, @, #, $                    │
-│   • Le nom doit etre UNIQUE dans le systeme                    │
+│   • 1 à 8 caractères alphanumériques                           │
+│   • Premier caractère : A-Z ou @, #, $                         │
+│   • Caractères suivants : A-Z, 0-9, @, #, $                    │
+│   • Le nom doit être UNIQUE dans le système                    │
 │                                                                 │
 │   CONVENTIONS COURANTES:                                        │
-│   • Prefixe = Userid (ex: FTEST)                               │
+│   • Préfixe = Userid (ex: FTEST)                               │
 │   • Suffixe = Identifiant unique                               │
 │                                                                 │
 │   Exemples valides:                                             │
@@ -214,7 +214,7 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 │                                                                 │
 │   Exemples INVALIDES:                                           │
 │   //1JOB       ◄── Commence par un chiffre                     │
-│   //MYVERYLONGJOB  ◄── Plus de 8 caracteres                    │
+│   //MYVERYLONGJOB  ◄── Plus de 8 caractères                    │
 │   //MY JOB     ◄── Contient un espace                          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -238,7 +238,7 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### I-2-a-iv Champ d'operande (parametres)
+#### I-2-a-iv Champ d'operande (paramètres)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -256,22 +256,22 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Parametres a mots-cles du JOB :**
+**Paramètres a mots-clés du JOB :**
 
-| Parametre | Description | Exemple |
+| Paramètre | Description | Exemple |
 |-----------|-------------|---------|
 | **CLASS** | Classe d'execution (A-Z, 0-9) | `CLASS=A` |
 | **MSGCLASS** | Classe de sortie des messages | `MSGCLASS=X` |
 | **MSGLEVEL** | Niveau de messages (statements,allocation) | `MSGLEVEL=(1,1)` |
 | **NOTIFY** | Userid a notifier | `NOTIFY=&SYSUID` |
-| **REGION** | Memoire pour le job | `REGION=4M` |
+| **REGION** | Mémoire pour le job | `REGION=4M` |
 | **TIME** | Temps CPU maximum | `TIME=(1,30)` ou `TIME=NOLIMIT` |
 | **TYPRUN** | Type d'execution | `TYPRUN=SCAN` ou `TYPRUN=HOLD` |
 | **PRTY** | Priorite (0-15) | `PRTY=8` |
 | **COND** | Condition de terminaison | `COND=(4,LT)` |
 | **RESTART** | Point de reprise | `RESTART=STEP020` |
 | **USER** | Userid d'execution | `USER=FTEST` |
-| **PASSWORD** | Mot de passe (obsolete) | - |
+| **PASSWORD** | Mot de passe (obsolète) | - |
 
 **Valeurs de MSGLEVEL :**
 
@@ -280,13 +280,13 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 │                    MSGLEVEL=(stmt,alloc)                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Premier parametre (stmt) - Affichage des instructions :       │
+│   Premier paramètre (stmt) - Affichage des instructions :       │
 │   ─────────────────────────────────────────────────────────     │
 │   0 = Seulement la carte JOB                                   │
 │   1 = Toutes les instructions JCL et JES                       │
 │   2 = Seulement les instructions JCL                           │
 │                                                                 │
-│   Second parametre (alloc) - Messages d'allocation :            │
+│   Second paramètre (alloc) - Messages d'allocation :            │
 │   ─────────────────────────────────────────────────────         │
 │   0 = Pas de messages (sauf si job ABEND)                      │
 │   1 = Tous les messages d'allocation                           │
@@ -300,8 +300,8 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 
 | Valeur | Description |
 |--------|-------------|
-| `TYPRUN=SCAN` | Verification syntaxe uniquement (pas d'execution) |
-| `TYPRUN=HOLD` | Job en attente (necessite release) |
+| `TYPRUN=SCAN` | Vérification syntaxe uniquement (pas d'execution) |
+| `TYPRUN=HOLD` | Job en attente (nécessite release) |
 | `TYPRUN=JCLHOLD` | Job en attente avec verification JCL |
 | `TYPRUN=COPY` | Copie du JCL dans le spool |
 
@@ -337,7 +337,7 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 //* Exemple 2 : JOB avec accounting et nom
 //MYJOB2   JOB (DEPT01),'JEAN DUPONT'
 
-//* Exemple 3 : JOB complet avec parametres
+//* Exemple 3 : JOB complet avec paramètres
 //FTESTJB1 JOB (ACCT123,SUBACCT),'FORMATION JCL',
 //             CLASS=A,
 //             MSGCLASS=X,
@@ -360,17 +360,17 @@ La carte **JOB** est la premiere instruction de tout travail batch. Elle identif
 
 ### I-2-b Structure des champs du EXEC statement
 
-La carte **EXEC** definit le programme ou la procedure a executer dans un step.
+La carte **EXEC** définit le programme ou la procédure a executer dans un step.
 
 #### Syntaxe generale
 
 ```
-//stepname EXEC PGM=program   ou   //stepname EXEC PROC=procedure
+//stepname EXEC PGM=program   ou   //stepname EXEC PROC=procédure
 ```
 
-#### Parametres du EXEC
+#### Paramètres du EXEC
 
-##### I-2-b-i Parametre PGM
+##### I-2-b-i Paramètre PGM
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -379,10 +379,10 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │                                                                 │
 │   PGM=program-name                                              │
 │                                                                 │
-│   • Specifie le programme a executer                           │
-│   • Le programme doit etre dans une bibliotheque systeme       │
-│     ou specifiee par JOBLIB/STEPLIB                            │
-│   • Nom de 1 a 8 caracteres                                    │
+│   • Spécifie le programme a executer                           │
+│   • Le programme doit etre dans une bibliothèque système       │
+│     ou spécifiée par JOBLIB/STEPLIB                            │
+│   • Nom de 1 a 8 caractères                                    │
 │                                                                 │
 │   Exemples:                                                     │
 │   //STEP1 EXEC PGM=IEFBR14     ◄── Programme IBM (ne fait rien)│
@@ -397,18 +397,18 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-##### I-2-b-ii Parametre PROC
+##### I-2-b-ii Paramètre PROC
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PARAMETRE PROC                                │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   PROC=procedure-name  ou simplement  procedure-name            │
+│   PROC=procédure-name  ou simplement  procédure-name            │
 │                                                                 │
-│   • Specifie une procedure cataloguee a executer               │
-│   • La procedure doit etre dans une bibliotheque PROCLIB       │
-│   • Le mot-cle PROC est optionnel                              │
+│   • Spécifie une procédure cataloguée a executer               │
+│   • La procédure doit etre dans une bibliothèque PROCLIB       │
+│   • Le mot-clé PROC est optionnel                              │
 │                                                                 │
 │   Exemples:                                                     │
 │   //STEP1 EXEC PROC=MYPROC                                      │
@@ -418,7 +418,7 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-##### I-2-b-iii Parametre REGION
+##### I-2-b-iii Paramètre REGION
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -427,21 +427,21 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │                                                                 │
 │   REGION=valeur                                                 │
 │                                                                 │
-│   • Specifie la memoire virtuelle pour le step                 │
+│   • Spécifie la mémoire virtuelle pour le step                 │
 │   • Peut etre en K (kilobytes) ou M (megabytes)                │
-│   • REGION=0M = memoire illimitee (jusqu'au max systeme)       │
+│   • REGION=0M = mémoire illimitee (jusqu'au max système)       │
 │                                                                 │
 │   Exemples:                                                     │
 │   //STEP1 EXEC PGM=PROG,REGION=4M                              │
 │   //STEP2 EXEC PGM=PROG,REGION=2048K                           │
-│   //STEP3 EXEC PGM=PROG,REGION=0M    ◄── Illimitee             │
+│   //STEP3 EXEC PGM=PROG,REGION=0M    ◄── Illimitée             │
 │                                                                 │
-│   Note : REGION sur EXEC ecrase REGION sur JOB pour ce step    │
+│   Note : REGION sur EXEC écrase REGION sur JOB pour ce step    │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-##### I-2-b-iv Parametre PARM
+##### I-2-b-iv Paramètre PARM
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -450,9 +450,9 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │                                                                 │
 │   PARM='valeur'  ou  PARM=(val1,val2,...)                       │
 │                                                                 │
-│   • Passe des parametres au programme                          │
-│   • Maximum 100 caracteres                                     │
-│   • Utiliser apostrophes si caracteres speciaux                │
+│   • Passe des paramètres au programme                          │
+│   • Maximum 100 caractères                                     │
+│   • Utiliser apostrophes si caractères spéciaux                │
 │                                                                 │
 │   Exemples:                                                     │
 │   //STEP1 EXEC PGM=MYPROG,PARM='DEBUG'                         │
@@ -460,7 +460,7 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │   //STEP3 EXEC PGM=SORT,PARM='MSG=AP'                          │
 │   //STEP4 EXEC PGM=IGYCRCTL,PARM='LIST,MAP'                    │
 │                                                                 │
-│   Pour COBOL, le parametre est recu dans :                      │
+│   Pour COBOL, le paramètre est reçu dans :                      │
 │   01 WS-PARM.                                                   │
 │      05 WS-PARM-LENGTH PIC S9(4) COMP.                         │
 │      05 WS-PARM-DATA   PIC X(100).                             │
@@ -468,7 +468,7 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-##### I-2-b-v Parametre ADDRSPC
+##### I-2-b-v Paramètre ADDRSPC
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -477,18 +477,18 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │                                                                 │
 │   ADDRSPC=VIRT | REAL                                           │
 │                                                                 │
-│   • VIRT = Memoire virtuelle (defaut)                          │
-│   • REAL = Memoire reelle (pour programmes speciaux)           │
+│   • VIRT = Mémoire virtuelle (défaut)                          │
+│   • REAL = Mémoire réelle (pour programmes spéciaux)           │
 │                                                                 │
 │   Exemple:                                                      │
 │   //STEP1 EXEC PGM=MYPROG,ADDRSPC=REAL                         │
 │                                                                 │
-│   Note : REAL rarement utilise, necessite privileges           │
+│   Note : REAL rarement utilisé, nécessite privileges           │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-##### I-2-b-vi Parametre MEMLIMIT
+##### I-2-b-vi Paramètre MEMLIMIT
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -497,7 +497,7 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │                                                                 │
 │   MEMLIMIT=valeur                                               │
 │                                                                 │
-│   • Limite de memoire au-dessus de la barre (>2GB)             │
+│   • Limite de mémoire au-dessus de la barre (>2GB)             │
 │   • Pour programmes 64-bit                                     │
 │   • MEMLIMIT=NOLIMIT pour pas de limite                        │
 │                                                                 │
@@ -508,7 +508,7 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-##### I-2-b-vii Parametre TIME
+##### I-2-b-vii Paramètre TIME
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -518,18 +518,18 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │   TIME=(minutes,secondes)  ou  TIME=minutes  ou  TIME=NOLIMIT   │
 │                                                                 │
 │   • Limite le temps CPU pour le step                           │
-│   • Protege contre les boucles infinies                        │
+│   • Protège contre les bouclés infinies                        │
 │   • TIME=NOLIMIT ou TIME=1440 = pas de limite                  │
 │                                                                 │
 │   Exemples:                                                     │
 │   //STEP1 EXEC PGM=PROG,TIME=5          ◄── 5 minutes          │
 │   //STEP2 EXEC PGM=PROG,TIME=(1,30)     ◄── 1 min 30 sec       │
-│   //STEP3 EXEC PGM=PROG,TIME=NOLIMIT    ◄── Illimite           │
+│   //STEP3 EXEC PGM=PROG,TIME=NOLIMIT    ◄── Illimité           │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-##### I-2-b-viii Parametre COND
+##### I-2-b-viii Paramètre COND
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -539,7 +539,7 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │   COND=(code,operateur)  ou  COND=((c1,op1),(c2,op2),...)       │
 │                                                                 │
 │   Conditionne l'execution du step selon les return codes       │
-│   precedents. Le step est BYPASSE si la condition est VRAIE.   │
+│   précédents. Le step est BYPASSE si la condition est VRAIE.   │
 │                                                                 │
 │   Operateurs:                                                   │
 │   GT = Greater Than (>)      LT = Less Than (<)                │
@@ -550,10 +550,10 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 │   COND=(4,LT)         Si RC < 4, bypass ce step                │
 │   COND=(0,NE)         Si RC <> 0, bypass (executer si RC=0)    │
 │   COND=(8,LE,STEP1)   Si STEP1.RC <= 8, bypass                 │
-│   COND=EVEN           Executer meme si ABEND precedent         │
-│   COND=ONLY           Executer SEULEMENT si ABEND precedent    │
+│   COND=EVEN           Exécuter meme si ABEND précédent         │
+│   COND=ONLY           Exécuter SEULEMENT si ABEND précédent    │
 │                                                                 │
-│   Note : Preferer IF/THEN/ELSE pour plus de clarte             │
+│   Note : Préférer IF/THEN/ELSE pour plus de clarté             │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -564,7 +564,7 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 //* Step simple
 //STEP010  EXEC PGM=IEFBR14
 
-//* Step avec parametres
+//* Step avec paramètres
 //STEP020  EXEC PGM=MYPROG,
 //             REGION=4M,
 //             TIME=5,
@@ -573,7 +573,7 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 //* Step conditionnel
 //STEP030  EXEC PGM=RAPPORT,COND=(4,LT)
 
-//* Appel de procedure
+//* Appel de procédure
 //STEP040  EXEC PROC=COBOLCL,
 //             PARM.COB='LIST,MAP'
 ```
@@ -582,12 +582,12 @@ La carte **EXEC** definit le programme ou la procedure a executer dans un step.
 
 ### I-2-c Structure des champs du DD statement
 
-La carte **DD (Data Definition)** definit les fichiers utilises par le programme. C'est la carte la plus riche en parametres.
+La carte **DD (Data Définition)** définit les fichiers utilisés par le programme. C'est la carte la plus riche en paramètres.
 
 #### Syntaxe generale
 
 ```
-//ddname   DD   parametres...
+//ddname   DD   paramètres...
 ```
 
 #### I-2-c-1 DSN (Data Set Name)
@@ -599,17 +599,17 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   DSN=dataset-name                                              │
 │                                                                 │
-│   • Nom du dataset (fichier) a utiliser                        │
+│   • Nom du dataset (fichier) a utilisér                        │
 │   • Format : qualificateur1.qualificateur2...                  │
-│   • Chaque qualificateur : 1-8 caracteres                      │
-│   • Maximum 44 caracteres au total                             │
+│   • Chaque qualificateur : 1-8 caractères                      │
+│   • Maximum 44 caractères au total                             │
 │                                                                 │
 │   Types de noms:                                                │
 │   ─────────────                                                 │
 │   DSN=FTEST.DATA.FILE           ◄── Dataset permanent          │
 │   DSN=FTEST.PDS(MEMBRE)         ◄── Membre de PDS              │
 │   DSN=&&TEMP                    ◄── Dataset temporaire         │
-│   DSN=*.STEP1.DDNAME            ◄── Reference arriere          │
+│   DSN=*.STEP1.DDNAME            ◄── Référence arriere          │
 │   DSN=NULLFILE                  ◄── Fichier nul                │
 │                                                                 │
 │   Exemples:                                                     │
@@ -631,18 +631,18 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   STATUT (etat initial) :                                       │
 │   ───────────────────────                                       │
-│   NEW      Le dataset sera cree par ce step                    │
+│   NEW      Le dataset sera créé par ce step                    │
 │   OLD      Dataset existant, acces exclusif                    │
-│   SHR      Dataset existant, acces partage                     │
+│   SHR      Dataset existant, acces partagé                     │
 │   MOD      Ajout en fin de fichier (ou creation si inexistant) │
 │                                                                 │
 │   FIN NORMALE (si step OK) :                                    │
 │   ──────────────────────────                                    │
 │   DELETE   Supprimer le dataset                                │
-│   KEEP     Conserver (non catalogue)                           │
+│   KEEP     Conserver (non catalogué)                           │
 │   PASS     Passer au step suivant                              │
 │   CATLG    Cataloguer le dataset                               │
-│   UNCATLG  Decataloguer                                        │
+│   UNCATLG  Décataloguér                                        │
 │                                                                 │
 │   FIN ANORMALE (si step ABEND) :                                │
 │   ──────────────────────────────                                │
@@ -656,12 +656,12 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 
 | DISP | Description | Utilisation |
 |------|-------------|-------------|
-| `DISP=SHR` | Lecture partagee | Fichiers en lecture |
+| `DISP=SHR` | Lecture partagée | Fichiers en lecture |
 | `DISP=OLD` | Acces exclusif | Mise a jour fichier |
-| `DISP=(NEW,CATLG,DELETE)` | Creation, catalogue si OK | Nouveaux fichiers permanents |
+| `DISP=(NEW,CATLG,DELETE)` | Creation, catalogué si OK | Nouveaux fichiers permanents |
 | `DISP=(NEW,PASS)` | Creation, passage au step suivant | Fichiers intermediaires |
 | `DISP=(NEW,DELETE)` | Creation, suppression | Fichiers de travail |
-| `DISP=(MOD,CATLG)` | Ajout/creation, catalogue | Log, cumul |
+| `DISP=(MOD,CATLG)` | Ajout/creation, catalogué | Log, cumul |
 | `DISP=(OLD,DELETE)` | Lecture exclusive puis suppression | Traitement puis purge |
 
 ```
@@ -670,11 +670,11 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   //INPUT  DD DSN=DATA.INPUT,DISP=SHR                          │
-│   //       Lecture partagee d'un fichier existant              │
+│   //       Lecture partagée d'un fichier existant              │
 │                                                                 │
 │   //OUTPUT DD DSN=DATA.OUTPUT,                                  │
 │   //          DISP=(NEW,CATLG,DELETE)                           │
-│   //       Creation, catalogue si OK, supprime si ABEND        │
+│   //       Creation, catalogué si OK, supprime si ABEND        │
 │                                                                 │
 │   //WORK   DD DSN=&&TEMP,                                       │
 │   //          DISP=(NEW,PASS,DELETE)                            │
@@ -693,9 +693,9 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                    PARAMETRE DCB                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   DCB=(sous-parametres)                                         │
+│   DCB=(sous-paramètres)                                         │
 │                                                                 │
-│   Definit les caracteristiques physiques du dataset            │
+│   Définit les caracteristiques physiques du dataset            │
 │                                                                 │
 │   RECFM = Record Format (format d'enregistrement)              │
 │   ────────────────────────────────────────────────              │
@@ -704,7 +704,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   V   = Variable                                               │
 │   VB  = Variable bloque                                        │
 │   U   = Undefined (load modules)                               │
-│   FA  = Fixe avec ASA (caracteres de controle imprimante)     │
+│   FA  = Fixe avec ASA (caractères de controle imprimante)     │
 │   FBA = Fixe bloque avec ASA                                   │
 │                                                                 │
 │   LRECL = Logical Record Length (longueur enregistrement)      │
@@ -715,7 +715,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   BLKSIZE = Block Size (taille de bloc)                        │
 │   ─────────────────────────────────────                        │
 │   Pour FB : multiple de LRECL                                  │
-│   BLKSIZE=0 : systeme calcule optimal                          │
+│   BLKSIZE=0 : système calcule optimal                          │
 │                                                                 │
 │   DSORG = Data Set Organization                                 │
 │   ─────────────────────────────────                            │
@@ -738,7 +738,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 //* Fichier impression avec controle ASA
 //PRINT DD DSN=...,DCB=(RECFM=FBA,LRECL=133,BLKSIZE=0)
 
-//* Reference DCB d'un autre fichier
+//* Référence DCB d'un autre fichier
 //OUTPUT DD DSN=...,DCB=*.INPUT
 ```
 
@@ -751,21 +751,21 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   UNIT=type-unite                                               │
 │                                                                 │
-│   Specifie le type de peripherique pour le dataset             │
+│   Spécifie le type de périphérique pour le dataset             │
 │                                                                 │
 │   Valeurs courantes:                                            │
 │   ──────────────────                                           │
-│   UNIT=SYSDA         Disque systeme (le plus courant)          │
+│   UNIT=SYSDA         Disque système (le plus courant)          │
 │   UNIT=SYSALLDA      Tous disques disponibles                  │
 │   UNIT=3390          Modele de disque specifique               │
 │   UNIT=TAPE          Bande magnetique                          │
 │   UNIT=3480          Cartouche                                 │
-│   UNIT=VIO           Virtual I/O (memoire)                     │
+│   UNIT=VIO           Virtual I/O (mémoire)                     │
 │                                                                 │
 │   Exemples:                                                     │
 │   //OUTPUT DD DSN=...,UNIT=SYSDA                               │
 │   //BACKUP DD DSN=...,UNIT=TAPE                                │
-│   //TEMP   DD DSN=&&T,UNIT=VIO    ◄── Tres rapide              │
+│   //TEMP   DD DSN=&&T,UNIT=VIO    ◄── Très rapide              │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -779,21 +779,21 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   VOL=SER=volume-serial                                         │
 │                                                                 │
-│   Specifie le volume (disque/bande) a utiliser                 │
+│   Spécifie le volume (disque/bande) a utilisér                 │
 │                                                                 │
-│   Sous-parametres:                                              │
+│   Sous-paramètres:                                              │
 │   ─────────────────                                            │
 │   SER=volser     Volume serial (nom du disque)                 │
 │   REF=dsname     Meme volume qu'un autre dataset               │
-│   PRIVATE       Volume prive (non partage)                     │
+│   PRIVATE       Volume privé (non partagé)                     │
 │   RETAIN        Conserver montage jusqu'a fin job              │
 │                                                                 │
 │   Exemples:                                                     │
 │   //DD1 DD DSN=...,VOL=SER=PROD01                              │
 │   //DD2 DD DSN=...,VOL=SER=(TAPE01,TAPE02)   ◄── Multi-volumes │
-│   //DD3 DD DSN=...,VOL=REF=*.STEP1.DD1       ◄── Reference     │
+│   //DD3 DD DSN=...,VOL=REF=*.STEP1.DD1       ◄── Référence     │
 │                                                                 │
-│   Note : Rarement necessaire si dataset catalogue              │
+│   Note : Rarement nécessaire si dataset catalogué              │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -805,7 +805,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                    PARAMETRE SPACE                               │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   SPACE=(unite,(primaire,secondaire,repertoire),RLSE)           │
+│   SPACE=(unite,(primaire,secondaire,répertoire),RLSE)           │
 │                                                                 │
 │   Allocation d'espace disque pour nouveaux datasets            │
 │                                                                 │
@@ -818,13 +818,13 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   QUANTITES :                                                   │
 │   ───────────                                                  │
-│   primaire   Espace initial alloue                             │
+│   primaire   Espace initial alloué                             │
 │   secondaire Espace additionnel (jusqu'a 15 extensions)        │
-│   repertoire Blocs pour repertoire PDS (uniquement PDS)        │
+│   répertoire Blocs pour répertoire PDS (uniquement PDS)        │
 │                                                                 │
 │   OPTIONS :                                                     │
 │   ──────────                                                   │
-│   RLSE       Liberer espace non utilise a la fermeture        │
+│   RLSE       Libérer espace non utilisé a la fermeture        │
 │   CONTIG     Espace contigu obligatoire                        │
 │   MXIG       Plus grande zone contigue                         │
 │   ALX        5 zones max                                       │
@@ -839,13 +839,13 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 //* Fichier sequentiel : 10 pistes + 5 extensions
 //OUTPUT DD DSN=...,SPACE=(TRK,(10,5),RLSE)
 
-//* Fichier PDS : 5 cylindres, 10 blocs repertoire
+//* Fichier PDS : 5 cylindres, 10 blocs répertoire
 //PDS DD DSN=...,SPACE=(CYL,(5,1,10))
 
 //* Allocation en nombre de blocs
 //DATA DD DSN=...,SPACE=(800,(1000,100),RLSE)
 
-//* Tres gros fichier : 100 cylindres
+//* Très gros fichier : 100 cylindres
 //BIG DD DSN=...,SPACE=(CYL,(100,50),RLSE,CONTIG)
 
 //* Fichier temporaire petit
@@ -884,10 +884,10 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   KEYLEN=longueur                                               │
-│   • Longueur de la cle pour fichiers VSAM KSDS                 │
+│   • Longueur de la clé pour fichiers VSAM KSDS                 │
 │                                                                 │
 │   KEYOFF=position                                               │
-│   • Position de la cle dans l'enregistrement                   │
+│   • Position de la clé dans l'enregistrement                   │
 │                                                                 │
 │   RECORG=organisation                                           │
 │   • KS = KSDS (Key Sequenced)                                  │
@@ -895,8 +895,8 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   • RR = RRDS (Relative Record)                                │
 │   • LS = Linear (fichiers lineaires)                           │
 │                                                                 │
-│   Note : Ces parametres sont rarement necessaires car          │
-│   les caracteristiques sont definies a la creation du fichier  │
+│   Note : Ces paramètres sont rarement nécessaires car          │
+│   les caracteristiques sont définies a la creation du fichier  │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -911,7 +911,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   OUTLIM=nombre                                                 │
 │                                                                 │
 │   • Limite le nombre de lignes pour SYSOUT                     │
-│   • Protege contre les impressions infinies                    │
+│   • Protège contre les impressions infinies                    │
 │   • Provoque ABEND si limite atteinte                          │
 │                                                                 │
 │   Exemple:                                                      │
@@ -952,7 +952,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### I-2-c-10 SYSIN (Donnees in-stream)
+#### I-2-c-10 SYSIN (Données in-stream)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -963,13 +963,13 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   donnees inline                                                │
 │   /*                                                            │
 │                                                                 │
-│   • DD * : Donnees inline (colonnes 1-80)                      │
+│   • DD * : Données inline (colonnes 1-80)                      │
 │   • DD DATA : Comme DD * mais permet // dans les donnees       │
-│   • /* : Delimiteur de fin de donnees                          │
+│   • /* : Délimiteur de fin de donnees                          │
 │                                                                 │
 │   Options:                                                      │
 │   ─────────                                                    │
-│   DLM='xx'   Delimiteur personnalise (2 caracteres)            │
+│   DLM='xx'   Délimiteur personnalisé (2 caractères)            │
 │                                                                 │
 │   Exemples:                                                     │
 │   //SYSIN DD *                                                  │
@@ -1001,7 +1001,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   • Simule un fichier vide                                     │
 │   • En lecture : retourne fin de fichier immediate             │
 │   • En ecriture : donnees ignorees (pas d'I/O)                 │
-│   • Utile pour tests ou desactiver temporairement un fichier   │
+│   • Utile pour tests ou désactiver temporairement un fichier   │
 │                                                                 │
 │   Equivalent:                                                   │
 │   //ddname DD DSN=NULLFILE                                      │
@@ -1009,7 +1009,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   Exemples:                                                     │
 │   //SYSIN  DD DUMMY                ◄── Pas de cartes controle  │
 │   //OUTPUT DD DUMMY                ◄── Ignorer les sorties     │
-│   //PRINT  DD DUMMY,DCB=(...       ◄── DCB peut etre specifie  │
+│   //PRINT  DD DUMMY,DCB=(...       ◄── DCB peut etre spécifié  │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -1028,7 +1028,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   //SYSABEND DD SYSOUT=*                                        │
 │   • Dump complet en cas d'ABEND                                │
-│   • Inclut les zones systeme                                   │
+│   • Inclut les zones système                                   │
 │   • Plus volumineux que SYSUDUMP                               │
 │                                                                 │
 │   //SYSMDUMP DD DSN=dump.dataset,...                            │
@@ -1057,12 +1057,12 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   //       DD DSN=fichier2,DISP=SHR                             │
 │   //       DD DSN=fichier3,DISP=SHR                             │
 │                                                                 │
-│   • Les fichiers sont lus sequentiellement comme un seul       │
-│   • Le DDname n'est specifie que sur la premiere DD            │
+│   • Les fichiers sont lus séquentiellement comme un seul       │
+│   • Le DDname n'est spécifié que sur la premiere DD            │
 │   • Jusqu'a 255 datasets concatenes                            │
 │   • DCB du premier fichier determine les caracteristiques      │
 │                                                                 │
-│   Exemple - Concatenation de bibliotheques:                     │
+│   Exemple - Concatenation de bibliothèques:                     │
 │   //STEPLIB DD DSN=USER.LOADLIB,DISP=SHR                       │
 │   //        DD DSN=PROD.LOADLIB,DISP=SHR                       │
 │   //        DD DSN=SYS1.LINKLIB,DISP=SHR                       │
@@ -1096,7 +1096,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   //WORK DD DISP=(NEW,PASS),                                    │
 │   //        SPACE=(TRK,(5,1))                                   │
-│   (sans DSN = systeme genere un nom)                           │
+│   (sans DSN = système genere un nom)                           │
 │                                                                 │
 │   //STEP2 DD DSN=&&TEMP,DISP=(OLD,DELETE)                      │
 │   (reprise du fichier temporaire)                               │
@@ -1104,7 +1104,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### I-2-c-15 REFERBACK (Reference arriere)
+#### I-2-c-15 REFERBACK (Référence arriere)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -1113,13 +1113,13 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   Syntaxe: *.stepname.ddname  ou  *.procstep.stepname.ddname    │
 │                                                                 │
-│   Permet de referencer un dataset defini dans un step precedent │
+│   Permet de référencer un dataset défini dans un step précédent │
 │                                                                 │
-│   Types de reference:                                           │
+│   Types de référence:                                           │
 │   ───────────────────                                          │
-│   DSN=*.STEP1.OUTPUT        ◄── Reference au DSN               │
-│   VOL=REF=*.STEP1.OUTPUT    ◄── Reference au volume            │
-│   DCB=*.STEP1.OUTPUT        ◄── Reference au DCB               │
+│   DSN=*.STEP1.OUTPUT        ◄── Référence au DSN               │
+│   VOL=REF=*.STEP1.OUTPUT    ◄── Référence au volume            │
+│   DCB=*.STEP1.OUTPUT        ◄── Référence au DCB               │
 │                                                                 │
 │   Exemples:                                                     │
 │   //STEP1   EXEC PGM=PROG1                                      │
@@ -1131,7 +1131,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   //           DCB=*.STEP1.OUTPUT,  ◄── Memes caracteristiques │
 │   //           DISP=(NEW,CATLG)                                 │
 │                                                                 │
-│   Dans une procedure:                                           │
+│   Dans une procédure:                                           │
 │   //INPUT   DD DSN=*.COMPILE.SYSLIN,DISP=(OLD,DELETE)          │
 │             ─────────────────────                               │
 │             procstep.ddname                                     │
@@ -1143,24 +1143,24 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 
 ### I-2-d JCL PROCEDURE Statement
 
-#### PROC Definition
+#### PROC Définition
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PROCEDURE JCL                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Une PROCEDURE est un ensemble de JCL reutilisable            │
+│   Une PROCEDURE est un ensemble de JCL réutilisable            │
 │                                                                 │
 │   Avantages:                                                    │
-│   • Reutilisation du code JCL                                  │
-│   • Maintenance centralisee                                    │
+│   • Réutilisation du code JCL                                  │
+│   • Maintenance centralisée                                    │
 │   • Standardisation des traitements                            │
 │   • Parametrisation flexible                                   │
 │                                                                 │
 │   Deux types:                                                   │
 │   • In-stream : Definie dans le JCL                            │
-│   • Cataloguee : Stockee dans une bibliotheque PROCLIB         │
+│   • Cataloguée : Stockée dans une bibliothèque PROCLIB         │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -1190,29 +1190,29 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   //procname PROC [param=default,...]                           │
-│   //...      (corps de la procedure)                            │
+│   //...      (corps de la procédure)                            │
 │   //         PEND                                               │
 │                                                                 │
 │   • Definie au debut du JCL (avant le premier EXEC)            │
 │   • Se termine par PEND                                        │
 │   • Appelee avec EXEC procname ou EXEC PROC=procname           │
-│   • Les parametres sont passes a l'appel                       │
+│   • Les paramètres sont passes a l'appel                       │
 │                                                                 │
-│   Note: Peu utilisee - preferer les procedures cataloguees     │
+│   Note: Peu utilisée - preferer les procédures cataloguées     │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-#### I-2-d-2 PROC Cataloguee
+#### I-2-d-2 PROC Cataloguée
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PROC CATALOGUEE                               │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Stockee dans une bibliotheque PROCLIB                         │
-│   • SYS1.PROCLIB (systeme)                                     │
-│   • Bibliotheque utilisateur specifiee par JCLLIB              │
+│   Stockée dans une bibliothèque PROCLIB                         │
+│   • SYS1.PROCLIB (système)                                     │
+│   • Bibliothèque utilisateur spécifiée par JCLLIB              │
 │                                                                 │
 │   Contenu du membre MYPROC dans la PROCLIB:                     │
 │   ──────────────────────────────────────────                   │
@@ -1236,7 +1236,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 
 ---
 
-### I-2-e Parametres symboliques
+### I-2-e Paramètres symboliques
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -1245,14 +1245,14 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   Syntaxe: &nom  ou  &nom.suffixe                               │
 │                                                                 │
-│   • Permettent de parametrer les procedures                    │
+│   • Permettent de paramètrer les procédures                    │
 │   • Remplaces a l'execution par les valeurs fournies           │
 │   • Le point (.) separe le symbole du texte suivant            │
 │                                                                 │
-│   Definition avec valeur par defaut:                            │
+│   Définition avec valeur par défaut:                            │
 │   //MYPROC PROC ENV=TEST,DATE=&LYYMMDD                         │
 │                                                                 │
-│   Symboles systeme predifinis:                                  │
+│   Symboles système predifinis:                                  │
 │   ────────────────────────────                                 │
 │   &SYSUID     Userid du soumetteur                             │
 │   &SYSDATE    Date au format yy.ddd                            │
@@ -1264,7 +1264,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   Exemple:                                                      │
 │   //OUTPUT DD DSN=&SYSUID..DATA.&ENV..D&LYYMMDD,               │
 │   //          DISP=(NEW,CATLG)                                  │
-│   Resultat: FTEST.DATA.TEST.D20241205                          │
+│   Résultat: FTEST.DATA.TEST.D20241205                          │
 │                                                                 │
 │   Note: && pour un & litteral dans les donnees                 │
 │                                                                 │
@@ -1274,7 +1274,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 **Instruction SET :**
 
 ```jcl
-//* Definition de variables avec SET
+//* Définition de variables avec SET
 //         SET ENV=PROD
 //         SET DATE=20241205
 //         SET HLQUAL=PROD.BATCH
@@ -1287,7 +1287,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 
 ---
 
-### I-2-f JCL - Bibliotheques de base
+### I-2-f JCL - Bibliothèques de base
 
 #### I-2-f-1 Declaration JOBLIB
 
@@ -1296,14 +1296,14 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                    JOBLIB                                        │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   //JOBLIB DD DSN=bibliotheque,DISP=SHR                         │
+│   //JOBLIB DD DSN=bibliothèque,DISP=SHR                         │
 │                                                                 │
 │   • Place immediatement apres la carte JOB                     │
-│   • Definit les bibliotheques de programmes pour TOUT le job   │
-│   • Le systeme cherche les programmes dans l'ordre:            │
-│     1. JOBLIB (si specifiee)                                   │
-│     2. STEPLIB (si specifiee dans le step)                     │
-│     3. Bibliotheques systeme (LINKLIB, etc.)                   │
+│   • Définit les bibliothèques de programmes pour TOUT le job   │
+│   • Le système cherche les programmes dans l'ordre:            │
+│     1. JOBLIB (si spécifiée)                                   │
+│     2. STEPLIB (si spécifiée dans le step)                     │
+│     3. Bibliothèques système (LINKLIB, etc.)                   │
 │                                                                 │
 │   Exemple:                                                      │
 │   //MYJOB   JOB ...                                             │
@@ -1321,10 +1321,10 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                    STEPLIB                                       │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   //STEPLIB DD DSN=bibliotheque,DISP=SHR                        │
+│   //STEPLIB DD DSN=bibliothèque,DISP=SHR                        │
 │                                                                 │
-│   • Definit les bibliotheques de programmes pour UN step       │
-│   • Ecrase JOBLIB pour ce step uniquement                      │
+│   • Définit les bibliothèques de programmes pour UN step       │
+│   • Écrase JOBLIB pour ce step uniquement                      │
 │   • Plus specifique que JOBLIB                                 │
 │                                                                 │
 │   Exemple:                                                      │
@@ -1350,10 +1350,10 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   // JCLLIB ORDER=(biblio1,biblio2,...)                         │
 │                                                                 │
-│   • Definit les bibliotheques de PROCEDURES et INCLUDE         │
+│   • Définit les bibliothèques de PROCEDURES et INCLUDE         │
 │   • Place apres JOB, avant tout EXEC                           │
-│   • Jusqu'a 15 bibliotheques                                   │
-│   • Recherche dans l'ordre specifie                            │
+│   • Jusqu'a 15 bibliothèques                                   │
+│   • Recherche dans l'ordre spécifié                            │
 │                                                                 │
 │   Exemple:                                                      │
 │   //MYJOB   JOB ...                                             │
@@ -1375,14 +1375,14 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                     JOBLIB              JCLLIB                   │
 │   ─────────────────────────────────────────────────────────    │
 │   Contenu        Load modules         JCL (PROC, INCLUDE)      │
-│                  (programmes)         (procedures)              │
+│                  (programmes)         (procédures)              │
 │                                                                 │
 │   Position       Apres JOB            Apres JOB                 │
 │                                       Avant 1er EXEC            │
 │                                                                 │
 │   Syntaxe        //JOBLIB DD ...      // JCLLIB ORDER=...      │
 │                                                                 │
-│   Portee         Tout le job          Tout le job               │
+│   Portée         Tout le job          Tout le job               │
 │                  (sauf si STEPLIB)                              │
 │                                                                 │
 │   Utilisation    Recherche PGM=       Recherche PROC=           │
@@ -1399,23 +1399,23 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 //MYJOB    JOB (ACCT),'EXEMPLE COMPLET',
 //             CLASS=A,MSGCLASS=X
 //*
-//* JCLLIB pour les procedures
+//* JCLLIB pour les procédures
 //         JCLLIB ORDER=(USER.PROCLIB,PROD.PROCLIB)
 //*
 //* JOBLIB pour les programmes
 //JOBLIB   DD DSN=USER.LOADLIB,DISP=SHR
 //         DD DSN=PROD.LOADLIB,DISP=SHR
 //*
-//* Step 1 : utilise JOBLIB
+//* Step 1 : utilisé JOBLIB
 //STEP1    EXEC PGM=MYPROG1
 //INPUT    DD DSN=DATA.INPUT,DISP=SHR
 //*
-//* Step 2 : utilise STEPLIB (ecrase JOBLIB)
+//* Step 2 : utilisé STEPLIB (écrase JOBLIB)
 //STEP2    EXEC PGM=MYPROG2
 //STEPLIB  DD DSN=TEST.LOADLIB,DISP=SHR
 //INPUT    DD DSN=DATA.INPUT,DISP=SHR
 //*
-//* Step 3 : appel procedure (trouvee via JCLLIB)
+//* Step 3 : appel procédure (trouvée via JCLLIB)
 //STEP3    EXEC MYPROC
 //
 ```
@@ -1431,13 +1431,13 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                    CODES RETOUR (RETURN CODES)                   │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Le code retour indique le resultat de l'execution d'un step  │
+│   Le code retour indique le résultat de l'execution d'un step  │
 │                                                                 │
 │   CODE    SIGNIFICATION                                         │
 │   ────    ─────────────                                        │
-│    0      Succes complet                                       │
+│    0      Succès complet                                       │
 │    4      Warning (avertissement) - traitement OK              │
-│    8      Erreur - traitement partiel ou echoue                │
+│    8      Erreur - traitement partiel ou échoué                │
 │   12      Erreur grave                                         │
 │   16      Erreur critique                                      │
 │                                                                 │
@@ -1445,13 +1445,13 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   ───────────────────────                                      │
 │   COND=(4,LT)     Ne pas executer si RC < 4                    │
 │   COND=(8,LE)     Ne pas executer si RC <= 8                   │
-│   COND=EVEN       Executer meme si ABEND precedent             │
-│   COND=ONLY       Executer seulement si ABEND precedent        │
+│   COND=EVEN       Exécuter meme si ABEND précédent             │
+│   COND=ONLY       Exécuter seulement si ABEND précédent        │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### I-3-2 Codes ABEND systeme
+### I-3-2 Codes ABEND système
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -1463,26 +1463,26 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   S001    Erreur I/O                               Fichier      │
 │   S013    Erreur ouverture fichier                 DCB/DSN      │
 │   S0C1    Operation invalide                       Code machine │
-│   S0C4    Violation protection memoire             Pointeur     │
-│   S0C7    Donnees non numeriques                   MOVE/COMPUTE │
+│   S0C4    Violation protection mémoire             Pointeur     │
+│   S0C7    Données non numériques                   MOVE/COMPUTE │
 │   S0CB    Division par zero                        DIVIDE       │
 │   S0D3    Erreur virgule flottante                 Calcul       │
 │   S106    Module introuvable (FETCH)               Programme    │
-│   S122    Operateur a annule le job                Operateur    │
+│   S122    Operateur a annulé le job                Operateur    │
 │   S137    Fin de volume inattend                   Bande/Disque │
 │   S213    Erreur ouverture fichier sortie          DISP/SPACE   │
-│   S222    Job annule par operateur                 Operateur    │
+│   S222    Job annulé par operateur                 Operateur    │
 │   S237    Fin de volume (bande)                    Bande        │
-│   S306    Module introuvable en memoire            Link-edit    │
-│   S322    Temps CPU depasse (TIME)                 Boucle infini│
+│   S306    Module introuvable en mémoire            Link-edit    │
+│   S322    Temps CPU dépassé (TIME)                 Bouclé infini│
 │   S522    Attente trop longue (WAIT)               Deadlock     │
 │   S613    Erreur I/O magnetique                    Hardware     │
 │   S706    Module introuvable (LOAD)                STEPLIB      │
 │   S713    Erreur ouverture fichier bande           Bande        │
-│   S722    Lignes imprimees depassees               OUTLIM       │
+│   S722    Lignes imprimees dépassées               OUTLIM       │
 │   S806    Module introuvable (LINK/ATTACH)         JOBLIB       │
 │   S837    Fin de volume disque                     Espace plein │
-│   S913    Erreur securite RACF                     Droits acces │
+│   S913    Erreur sécurité RACF                     Droits acces │
 │   SB14    Erreur QSAM close                        Fichier      │
 │   SB37    Espace disque insuffisant                SPACE        │
 │   SD37    Espace primaire insuffisant              SPACE        │
@@ -1498,15 +1498,15 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                    CODES ABEND UTILISATEUR (Unnnn)               │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Les codes Unnnn sont definis par les programmes utilisateur   │
+│   Les codes Unnnn sont définis par les programmes utilisateur   │
 │                                                                 │
 │   CODE    DESCRIPTION                                           │
 │   ────    ───────────                                          │
 │   U0001   Erreur applicative generale                          │
 │   U0016   Erreur COBOL (STOP RUN avec code)                    │
-│   U1000+  Erreurs definies par l'application                   │
+│   U1000+  Erreurs définies par l'application                   │
 │   U4038   Erreur Language Environment (LE)                     │
-│   U4093   Fin anormale demandee                                │
+│   U4093   Fin anormale demandée                                │
 │                                                                 │
 │   En COBOL, generation d'ABEND :                                │
 │   ───────────────────────────────                              │
@@ -1526,18 +1526,18 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   ETAPES DE DIAGNOSTIC :                                        │
 │   ───────────────────────                                      │
 │   1. Consulter le JESMSGLG (messages JES)                      │
-│   2. Examiner le JESYSMSG (messages systeme)                   │
+│   2. Examiner le JESYSMSG (messages système)                   │
 │   3. Lire le SYSOUT du step en erreur                          │
 │   4. Analyser le dump (SYSUDUMP/CEEDUMP)                       │
 │                                                                 │
 │   SOLUTIONS COURANTES :                                         │
 │   ─────────────────────                                        │
-│   S0C7  → Verifier les donnees en entree                       │
-│   S806  → Verifier STEPLIB/JOBLIB                              │
-│   S913  → Verifier les droits RACF                             │
-│   SB37  → Augmenter SPACE ou liberer de l'espace               │
-│   S322  → Augmenter TIME ou corriger boucle                    │
-│   S013  → Verifier DSN et DISP                                 │
+│   S0C7  → Vérifier les donnees en entree                       │
+│   S806  → Vérifier STEPLIB/JOBLIB                              │
+│   S913  → Vérifier les droits RACF                             │
+│   SB37  → Augmenter SPACE ou libérer de l'espace               │
+│   S322  → Augmenter TIME ou corriger bouclé                    │
+│   S013  → Vérifier DSN et DISP                                 │
 │                                                                 │
 │   MESSAGES UTILES :                                             │
 │   ─────────────────                                            │
@@ -1551,7 +1551,7 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 
 ---
 
-## Synthese
+## Synthèse
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -1561,18 +1561,18 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   CARTE JOB                                                     │
 │   ─────────                                                    │
 │   • Identifie le travail batch                                 │
-│   • Parametres: CLASS, MSGCLASS, MSGLEVEL, NOTIFY, REGION      │
+│   • Paramètres: CLASS, MSGCLASS, MSGLEVEL, NOTIFY, REGION      │
 │   • Une seule carte JOB par travail                            │
 │                                                                 │
 │   CARTE EXEC                                                    │
 │   ──────────                                                   │
-│   • Execute un programme (PGM=) ou procedure (PROC=)           │
-│   • Parametres: REGION, TIME, PARM, COND                       │
+│   • Exécute un programme (PGM=) ou procédure (PROC=)           │
+│   • Paramètres: REGION, TIME, PARM, COND                       │
 │   • Un ou plusieurs steps par job                              │
 │                                                                 │
 │   CARTE DD                                                      │
 │   ────────                                                     │
-│   • Definit les fichiers utilises                              │
+│   • Définit les fichiers utilisés                              │
 │   • DSN : nom du dataset                                       │
 │   • DISP : statut et disposition                               │
 │   • DCB : caracteristiques (RECFM, LRECL, BLKSIZE)             │
@@ -1581,25 +1581,25 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   BIBLIOTHEQUES                                                 │
 │   ─────────────                                                │
-│   • JOBLIB/STEPLIB : bibliotheques de programmes               │
-│   • JCLLIB : bibliotheques de procedures                       │
+│   • JOBLIB/STEPLIB : bibliothèques de programmes               │
+│   • JCLLIB : bibliothèques de procédures                       │
 │                                                                 │
 │   PROCEDURES                                                    │
 │   ───────────                                                  │
-│   • In-stream ou cataloguees                                   │
-│   • Parametres symboliques (&param)                            │
-│   • Symboles systeme (&SYSUID, &LYYMMDD, etc.)                │
+│   • In-stream ou cataloguées                                   │
+│   • Paramètres symboliques (&param)                            │
+│   • Symboles système (&SYSUID, &LYYMMDD, etc.)                │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Aide-memoire JCL
+## Aide-mémoire JCL
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    AIDE-MEMOIRE JCL                              │
+│                    AIDE-MÉMOIRE JCL                              │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   STRUCTURE DE BASE                                             │
@@ -1610,9 +1610,9 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   DISP - DISPOSITIONS COURANTES                                 │
 │   ─────────────────────────────────────────────────────────    │
-│   SHR              Lecture partagee                            │
+│   SHR              Lecture partagée                            │
 │   OLD              Acces exclusif                              │
-│   (NEW,CATLG,DEL)  Creation, catalogue si OK                   │
+│   (NEW,CATLG,DEL)  Creation, catalogué si OK                   │
 │   (NEW,PASS)       Creation, passer au step suivant            │
 │   (MOD,CATLG)      Ajout/creation                              │
 │                                                                 │
@@ -1627,13 +1627,13 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │   ─────────────────────────────────────────────────────────    │
 │   (TRK,(10,5))     10 pistes + 5 extensions                    │
 │   (CYL,(5,1,10))   5 cyl + 1 ext + 10 blocs PDS                │
-│   ,RLSE            Liberer espace non utilise                  │
+│   ,RLSE            Libérer espace non utilisé                  │
 │                                                                 │
 │   DD SPECIALES                                                  │
 │   ─────────────────────────────────────────────────────────    │
 │   SYSOUT=*         Sortie spool                                │
 │   DUMMY            Fichier vide/ignore                         │
-│   *                Donnees inline                              │
+│   *                Données inline                              │
 │   DSN=&&TEMP       Fichier temporaire                          │
 │                                                                 │
 │   SYMBOLES SYSTEME                                              │
@@ -1644,12 +1644,12 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 │                                                                 │
 │   CODES ABEND FREQUENTS                                         │
 │   ─────────────────────────────────────────────────────────    │
-│   S0C7   Donnees non numeriques                               │
-│   S0C4   Violation memoire                                    │
+│   S0C7   Données non numériques                               │
+│   S0C4   Violation mémoire                                    │
 │   S806   Module introuvable                                   │
-│   S913   Erreur RACF (securite)                               │
+│   S913   Erreur RACF (sécurité)                               │
 │   SB37   Espace disque insuffisant                            │
-│   S322   Temps CPU depasse                                    │
+│   S322   Temps CPU dépassé                                    │
 │   S013   Erreur ouverture fichier                             │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -1659,6 +1659,6 @@ La carte **DD (Data Definition)** definit les fichiers utilises par le programme
 
 ## Navigation
 
-| Precedent | Suivant |
+| Précédent | Suivant |
 |-----------|---------|
-| - | [Chapitre II - Fichiers speciaux et parametres](02-fichiers-parametres.md) |
+| - | [Chapitre II - Fichiers spéciaux et paramètres](02-fichiers-paramètres.md) |

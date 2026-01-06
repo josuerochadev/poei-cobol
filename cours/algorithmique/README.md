@@ -51,4 +51,11 @@
 
 ---
 
-*Module de la formation POEI Développeur COBOL Grand Système - M2i Formation*
+## Navigation
+
+| Module précédent | Module suivant |
+|------------------|----------------|
+| [VSAM](../vsam/README.md) | [COBOL](../cobol/README.md) |
+
+---
+*Formation Algorithmique - M2i Formation*

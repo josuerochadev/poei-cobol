@@ -13,7 +13,7 @@ Un cluster VSAM est compose d'un ou plusieurs composants :
 |                                                              |
 |  +---------------------+    +---------------------+          |
 |  |   DATA COMPONENT    |    |   INDEX COMPONENT   |          |
-|  |   (Enregistrements) |    |   (Cles + Pointeurs)|          |
+|  |   (Enregistrements) |    |   (Clés + Pointeurs)|          |
 |  +----------+----------+    +----------+----------+          |
 |             |                          |                     |
 |             v                          v                     |
@@ -32,7 +32,7 @@ Un cluster VSAM est compose d'un ou plusieurs composants :
 
 ### Definition
 
-Le Control Interval est la plus petite unite echangee entre disque et memoire. C'est l'equivalent du BLOCK pour les fichiers non-VSAM.
+Le Control Interval est la plus petite unite echangee entre disque et mémoire. C'est l'equivalent du BLOCK pour les fichiers non-VSAM.
 
 ### Structure d'un CI
 
@@ -51,26 +51,26 @@ Le Control Interval est la plus petite unite echangee entre disque et memoire. C
   - Nombre d'enregistrements adjacents de meme longueur     |
                                                             |
   CIDF: Control Interval Definition Field (4 octets) -------+
-  - Informations sur l'intervalle de controle
+  - Informations sur l'intervalle de contrôle
 ```
 
-### Caracteristiques du CI
+### Caractéristiques du CI
 
 | Caracteristique | Valeur |
 |-----------------|--------|
 | Taille | 512 octets a 32 Ko |
 | Stockage | Zone contigue obligatoire |
 | E/S | Lu/ecrit en une seule operation |
-| Acces aleatoire | Petits CI (economie memoire) |
-| Acces sequentiel | Grands CI (reduction E/S) |
+| Accès aléatoire | Petits CI (economie mémoire) |
+| Accès séquentiel | Grands CI (reduction E/S) |
 
 ### Choix de la Taille du CI
 
-| Type d'acces | Taille CI recommandee |
+| Type d'accès | Taille CI recommandee |
 |--------------|----------------------|
 | Aleatoire predominant | 512 - 2048 octets |
 | Mixte | 4096 octets (defaut) |
-| Sequentiel predominant | 8192 - 32768 octets |
+| Séquentiel predominant | 8192 - 32768 octets |
 
 ---
 
@@ -94,7 +94,7 @@ Quand un enregistrement est plus grand qu'un CI, il peut s'etendre sur plusieurs
 - Peut s'etendre sur plusieurs CI dans une seule CA
 - Un CI ne peut pas etre partage par deux enregistrements fractionnes
 - Taille limite = taille de la Control Area
-- Pour KSDS : la cle primaire doit etre dans le premier CI
+- Pour KSDS : la clé primaire doit etre dans le premier CI
 
 ---
 
@@ -122,7 +122,7 @@ La Control Area est un ensemble de deux ou plusieurs CI contigus.
 +-------------------------------------------------------------+
 ```
 
-### Caracteristiques de la CA
+### Caractéristiques de la CA
 
 | Caracteristique | Valeur |
 |-----------------|--------|
@@ -144,13 +144,13 @@ La Control Area est un ensemble de deux ou plusieurs CI contigus.
 
 ## III-5. ESDS - Entry Sequenced Data Set
 
-### Caracteristiques
+### Caractéristiques
 
 | Caracteristique | Description |
 |-----------------|-------------|
 | Ordre | Enregistrements stockes dans l'ordre de creation |
 | Identification | Par adresse RBA (Relative Byte Address) |
-| Modification RBA | Permanente, ne peut pas etre modifiee |
+| Modification RBA | Permanente, ne peut pas etre modifiée |
 | Insertion | Toujours a la fin |
 | Suppression | **Pas de suppression physique possible** |
 | Taille | Fixe ou variable |
@@ -187,13 +187,13 @@ Si taille enregistrement = 200 octets :
 - Record 2 : RBA = 200
 - Record 3 : RBA = 400
 
-### Types d'Acces ESDS
+### Types d'Accès ESDS
 
 | Type | Description |
 |------|-------------|
-| Sequentiel | Depuis le debut ou le milieu, pas de saut possible |
+| Séquentiel | Depuis le debut ou le milieu, pas de saut possible |
 | Direct (RBA) | Via la valeur RBA |
-| Via AIX | Index alternatif pour acces aleatoire |
+| Via AIX | Index alternatif pour accès aléatoire |
 
 ### ESDS Etendu
 
@@ -203,20 +203,20 @@ RBA sur 64 bits (XRBA) permet de depasser la limite 4 Go.
 
 ## III-6. KSDS - Key Sequenced Data Set
 
-### Caracteristiques
+### Caractéristiques
 
 | Caracteristique | Description |
 |-----------------|-------------|
 | Usage | Type le plus frequemment utilise |
 | Composants | **DATA** et **INDEX** |
-| Identification | Cle a position predefinie dans l'enregistrement |
+| Identification | Clé a position predéfinie dans l'enregistrement |
 | Index | Contient pointeurs vers tous les enregistrements |
 | Taille | Fixe ou variable |
-| Unicite | Cle unique identifie un seul enregistrement |
-| Chargement | Dans l'ordre croissant de la cle |
+| Unicite | Clé unique identifie un seul enregistrement |
+| Chargement | Dans l'ordre croissant de la clé |
 | Suppression | **Possible** (reorganisation automatique) |
 
-### Regles des Cles
+### Regles des Clés
 
 | Regle | Description |
 |-------|-------------|
@@ -225,13 +225,13 @@ RBA sur 64 bits (XRBA) permet de depasser la limite 4 Go.
 | Unicite | Obligatoire, pas de doublons |
 | Modification | Interdite apres creation |
 
-### Types d'Acces KSDS
+### Types d'Accès KSDS
 
 | Type | Description |
 |------|-------------|
-| Sequentiel | Dans l'ordre des cles (le plus rapide pour acces multiples) |
-| Direct | Par valeur de cle complete ou generique |
-| Dynamique | Positionnement par cle puis traitement sequentiel |
+| Séquentiel | Dans l'ordre des clés (le plus rapide pour accès multiples) |
+| Direct | Par valeur de clé complete ou generique |
+| Dynamique | Positionnement par clé puis traitement séquentiel |
 
 ### Structure Index B-Tree
 
@@ -240,7 +240,7 @@ RBA sur 64 bits (XRBA) permet de depasser la limite 4 Go.
 |                     INDEX COMPONENT                          |
 |                                                              |
 |                    +---------------+                         |
-|                    |  Index Set    | (Niveaux superieurs)    |
+|                    |  Index Set    | (Niveaux supérieurs)    |
 |                    |   (High Key)  |                         |
 |                    +-------+-------+                         |
 |              +-------------+-------------+                   |
@@ -262,13 +262,13 @@ RBA sur 64 bits (XRBA) permet de depasser la limite 4 Go.
 
 ## III-7. RRDS - Relative Record Data Set
 
-### Caracteristiques
+### Caractéristiques
 
 | Caracteristique | Description |
 |-----------------|-------------|
 | Identification | Par RRN (Relative Record Number) |
 | Numerotation | Numero de sequence relatif au premier enregistrement |
-| Acces | Aleatoire par numero d'enregistrement |
+| Accès | Aleatoire par numéro d'enregistrement |
 | Taille | **Fixe uniquement** (RRDS standard) |
 | Suppression | Laisse un emplacement vide (slot) |
 | Insertion | Dans emplacements vides |
@@ -301,19 +301,19 @@ RBA sur 64 bits (XRBA) permet de depasser la limite 4 Go.
 | Comportement | Slots fixes | Comme KSDS avec RRN |
 | Suppression | Slot vide | RRN reutilisable |
 
-### Types d'Acces RRDS
+### Types d'Accès RRDS
 
 | Type | Description |
 |------|-------------|
-| Sequentiel | Depuis le debut, ordre RRN croissant |
-| Direct | Par numero RRN |
-| Dynamique | Positionnement par RRN puis sequentiel |
+| Séquentiel | Depuis le debut, ordre RRN croissant |
+| Direct | Par numéro RRN |
+| Dynamique | Positionnement par RRN puis séquentiel |
 
 ---
 
 ## III-8. LDS - Linear Data Set
 
-### Caracteristiques
+### Caractéristiques
 
 | Caracteristique | Description |
 |-----------------|-------------|
@@ -321,7 +321,7 @@ RBA sur 64 bits (XRBA) permet de depasser la limite 4 Go.
 | Taille CI | Fixe **4 Ko** |
 | Type | Data Set non-VSAM avec fonctionnalites VSAM |
 | Enregistrements | Pas de concept d'enregistrements |
-| Contenu | Tous les octets sont des donnees |
+| Contenu | Tous les octets sont des données |
 | Composants | Uniquement DATA |
 | Usage | Frequemment utilise par **DB2** |
 
@@ -356,14 +356,14 @@ RBA sur 64 bits (XRBA) permet de depasser la limite 4 Go.
 |-----------------|:----:|:----:|:----:|:-----:|:---:|
 | Composant Data | X | X | X | X | X |
 | Composant Index | - | X | - | X | - |
-| Identification | RBA | Cle | RRN | RRN | - |
+| Identification | RBA | Clé | RRN | RRN | - |
 | Longueur fixe | X | X | X | - | - |
 | Longueur variable | X | X | - | X | - |
 | Suppression | - | X | X | X | - |
 | Insertion milieu | - | X | X | X | - |
-| Doublons cle | X | - | - | - | - |
-| Acces sequentiel | X | X | X | X | - |
-| Acces direct | RBA | Cle | RRN | RRN | - |
+| Doublons clé | X | - | - | - | - |
+| Accès séquentiel | X | X | X | X | - |
+| Accès direct | RBA | Clé | RRN | RRN | - |
 | AIX possible | X | X | - | - | - |
 
 ---
@@ -372,12 +372,12 @@ RBA sur 64 bits (XRBA) permet de depasser la limite 4 Go.
 
 ### Definition
 
-Un Alternate Index est un index secondaire permettant d'acceder a un cluster VSAM avec une cle differente de la cle primaire.
+Un Alternate Index est un index secondaire permettant d'acceder a un cluster VSAM avec une clé differente de la clé primaire.
 
-### Caracteristiques
+### Caractéristiques
 
-- Peut etre cree pour KSDS et ESDS
-- Cle secondaire peut avoir des doublons (NONUNIQUEKEY)
+- Peut etre créé pour KSDS et ESDS
+- Clé secondaire peut avoir des doublons (NONUNIQUEKEY)
 - AIX est lui-meme un cluster KSDS
 
 ### Etapes de Creation
@@ -391,7 +391,7 @@ Un Alternate Index est un index secondaire permettant d'acceder a un cluster VSA
 |     --> Etablit le chemin entre AIX et cluster de base      |
 |                                                              |
 |  3. BLDINDEX                                                 |
-|     --> Construit les cles de l'index secondaire            |
+|     --> Construit les clés de l'index secondaire            |
 +-------------------------------------------------------------+
 ```
 
@@ -400,23 +400,23 @@ Un Alternate Index est un index secondaire permettant d'acceder a un cluster VSA
 | Option | Description |
 |--------|-------------|
 | **UPGRADE** | AIX mis a jour automatiquement lors de modifications du cluster de base |
-| **NOUPGRADE** | AIX non maintenu, necessite reconstruction manuelle |
+| **NOUPGRADE** | AIX non maintenu, nécessite reconstruction manuelle |
 
 ---
 
-## Resume du Chapitre
+## Résumé du Chapitre
 
 | Concept | Description |
 |---------|-------------|
-| **CI** | Control Interval - unite d'echange disque/memoire |
+| **CI** | Control Interval - unite d'echange disque/mémoire |
 | **CA** | Control Area - groupe de CI contigus |
 | **RDF** | Record Definition Field - 3 octets par enregistrement |
 | **CIDF** | Control Interval Definition Field - 4 octets par CI |
-| **ESDS** | Sequentiel par RBA, pas de suppression |
-| **KSDS** | Indexe par cle, le plus utilise |
-| **RRDS** | Par numero RRN, slots fixes |
+| **ESDS** | Séquentiel par RBA, pas de suppression |
+| **KSDS** | Indexe par clé, le plus utilise |
+| **RRDS** | Par numéro RRN, slots fixes |
 | **LDS** | Lineaire 4K, utilise par DB2 |
-| **AIX** | Index alternatif pour acces secondaire |
+| **AIX** | Index alternatif pour accès secondaire |
 
 ---
 

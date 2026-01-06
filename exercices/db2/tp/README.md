@@ -1,54 +1,54 @@
 # Travaux Pratiques DB2/SQL
 
-Ce dossier contient les travaux pratiques SQL bases sur les activites de la formatrice.
+Ce dossier contient les travaux pratiques SQL basés sur les activités de la formatrice.
 
-## Prerequis
+## Prérequis
 
-Avant de commencer, executez le script de creation des tables :
+Avant de commencer, exécutez le script de création des tables :
 ```sql
--- Executer dans SPUFI ou votre client SQL
-@00-schema/creation-tables.sql
+-- Exécuter dans SPUFI ou votre client SQL
+@00-schema/création-tables.sql
 ```
 
-## Activites
+## Activités
 
-| Activite | Theme | Questions |
+| Activité | Thème | Questions |
 |----------|-------|-----------|
-| [00-schema](00-schema/) | Creation des tables | DDL + INSERT |
-| [activite-01-select](activite-01-select/) | SELECT elementaire | 6 |
-| [activite-02-selection-tri](activite-02-selection-tri/) | Selection et tri (WHERE, ORDER BY) | 12 |
-| [activite-04-jointures](activite-04-jointures/) | Jointures (INNER, LEFT, Self-join) | 11 |
-| [activite-05-operateurs-ensemblistes](activite-05-operateurs-ensemblistes/) | UNION, INTERSECT, EXCEPT | 5 |
-| [activite-06-fonctions-groupe](activite-06-fonctions-groupe/) | COUNT, SUM, AVG, GROUP BY, HAVING | 7 |
-| [activite-07-sous-requetes](activite-07-sous-requetes/) | Sous-requetes, IN, ANY, ALL, EXISTS | 15 |
+| [00-schema](00-schema/) | Création des tables | DDL + INSERT |
+| [activité-01-select](activité-01-select/) | SELECT élémentaire | 6 |
+| [activité-02-sélection-tri](activité-02-sélection-tri/) | Sélection et tri (WHERE, ORDER BY) | 12 |
+| [activité-04-jointures](activité-04-jointures/) | Jointures (INNER, LEFT, Self-join) | 11 |
+| [activité-05-operateurs-ensemblistes](activité-05-operateurs-ensemblistes/) | UNION, INTERSECT, EXCEPT | 5 |
+| [activité-06-fonctions-groupe](activité-06-fonctions-groupe/) | COUNT, SUM, AVG, GROUP BY, HAVING | 7 |
+| [activité-07-sous-requêtes](activité-07-sous-requêtes/) | Sous-requêtes, IN, ANY, ALL, EXISTS | 15 |
 
 **Total : 56 exercices**
 
 ## Organisation des dossiers
 
-Chaque activite contient :
+Chaque activité contient :
 ```
-activite-XX/
-├── README.md       # Enonces des questions
-└── solutions.sql   # Solutions SQL commentees
+activité-XX/
+├── README.md       # Énoncés des questions
+└── solutions.sql   # Solutions SQL commentées
 ```
 
-## Methode de travail recommandee
+## Méthode de travail recommandée
 
-1. Lire l'enonce dans README.md
-2. Ecrire votre requete
+1. Lire l'énoncé dans README.md
+2. Ecrire votre requête
 3. Tester dans SPUFI ou votre client SQL
 4. Comparer avec la solution dans solutions.sql
 
 ## Ordre de progression
 
 ```
-Activite 1 → Activite 2 → Activite 4 → Activite 5 → Activite 6 → Activite 7
-   SELECT      WHERE        JOIN        UNION        GROUP BY    Sous-requetes
+Activité 1 → Activité 2 → Activité 4 → Activité 5 → Activité 6 → Activité 7
+   SELECT      WHERE        JOIN        UNION        GROUP BY    Sous-requêtes
               ORDER BY                  EXCEPT       HAVING      EXISTS
 ```
 
-Note : L'activite 3 (exercice sur les fonctions scalaires) n'est pas incluse dans ce TP.
+Note : L'activité 3 (exercice sur les fonctions scalaires) n'est pas incluse dans ce TP.
 
 ---
 *Formation DB2/SQL - M2i Formation*

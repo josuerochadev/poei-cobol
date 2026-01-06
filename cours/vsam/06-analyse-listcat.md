@@ -59,7 +59,7 @@ INDEX ------- FTEST.KSDS.INDEX
 | CLUSTER ------- FTEST.KSDS                                |
 +----------------------------------------------------------+
 | Informations sur le cluster dans son ensemble             |
-| - IN-CAT: Catalogue contenant l'entree                    |
+| - IN-CAT: Catalogue contenant l'entrée                    |
 | - HISTORY: Dates et proprietaire                          |
 | - PROTECTION: Securite RACF                               |
 | - ASSOCIATIONS: Composants DATA et INDEX                  |
@@ -73,9 +73,9 @@ INDEX ------- FTEST.KSDS.INDEX
 | DATA ------- FTEST.KSDS.DATA                              |
 +----------------------------------------------------------+
 | Informations sur le composant DATA                        |
-| - ATTRIBUTES: Caracteristiques du fichier                 |
+| - ATTRIBUTES: Caractéristiques du fichier                 |
 | - STATISTICS: Statistiques d'utilisation                  |
-| - ALLOCATION: Espace alloue                               |
+| - ALLOCATION: Espace alloué                               |
 | - VOLUME: Volumes physiques                               |
 +----------------------------------------------------------+
 ```
@@ -87,9 +87,9 @@ INDEX ------- FTEST.KSDS.INDEX
 | INDEX ------- FTEST.KSDS.INDEX                            |
 +----------------------------------------------------------+
 | Informations sur le composant INDEX                       |
-| - ATTRIBUTES: Caracteristiques de l'index                 |
+| - ATTRIBUTES: Caractéristiques de l'index                 |
 | - STATISTICS: Statistiques d'utilisation                  |
-| - ALLOCATION: Espace alloue                               |
+| - ALLOCATION: Espace alloué                               |
 | - VOLUME: Volumes physiques                               |
 +----------------------------------------------------------+
 ```
@@ -102,7 +102,7 @@ INDEX ------- FTEST.KSDS.INDEX
 
 | Champ | Description | Exemple |
 |-------|-------------|---------|
-| **KEYLEN** | Longueur de la cle | 15 |
+| **KEYLEN** | Longueur de la clé | 15 |
 | **RKP** | Relative Key Position (offset) | 0 |
 | **AVGLRECL** | Longueur moyenne enregistrement | 100 |
 | **MAXLRECL** | Longueur maximale enregistrement | 100 |
@@ -126,7 +126,7 @@ INDEX ------- FTEST.KSDS.INDEX
 | REUSE / NOREUSE | Reutilisation a l'ouverture |
 | ERASE / NOERASE | Effacement a la suppression |
 | RECOVERY / SPEED | Mode de chargement |
-| WRITECHECK / NOWRITECHECK | Verification ecriture |
+| WRITECHECK / NOWRITECHECK | Vérification ecriture |
 
 ---
 
@@ -174,8 +174,8 @@ INDEX ------- FTEST.KSDS.INDEX
 
 | Champ | Description |
 |-------|-------------|
-| **HI-ALLOC-RBA** | Plus haute RBA allouee |
-| **HI-USED-RBA** | Plus haute RBA utilisee |
+| **HI-ALLOC-RBA** | Plus haute RBA allouée |
+| **HI-USED-RBA** | Plus haute RBA utilisée |
 
 ### Calcul du Taux d'Utilisation
 
@@ -325,14 +325,14 @@ DATA ------- PROD.CLIENTS.KSDS.DATA
 
 ---
 
-## Resume du Chapitre
+## Résumé du Chapitre
 
 | Section | Contenu |
 |---------|---------|
 | **CLUSTER** | Vue d'ensemble, associations |
-| **ATTRIBUTES** | Caracteristiques du fichier |
+| **ATTRIBUTES** | Caractéristiques du fichier |
 | **STATISTICS** | Compteurs d'operations et splits |
-| **ALLOCATION** | Espace alloue et utilise |
+| **ALLOCATION** | Espace alloué et utilise |
 | **VOLUME** | Informations physiques |
 
 ---
@@ -340,7 +340,7 @@ DATA ------- PROD.CLIENTS.KSDS.DATA
 ## Aide-Memoire
 
 ```
-Champs cles a surveiller:
+Champs clés a surveiller:
 - REC-TOTAL: Nombre d'enregistrements
 - SPLITS-CI: Indicateur de fragmentation CI
 - SPLITS-CA: Indicateur de fragmentation CA
@@ -350,7 +350,7 @@ Champs cles a surveiller:
 
 Seuils d'alerte:
 - SPLITS-CI > 100: Reorganisation recommandee
-- SPLITS-CA > 0: Reorganisation necessaire
+- SPLITS-CA > 0: Reorganisation nécessaire
 - FREESPACE < 5%: Risque de degradation
 - EXTENTS > 10: Fragmentation importante
 - Utilisation > 90%: Augmenter l'espace

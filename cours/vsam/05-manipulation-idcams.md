@@ -30,9 +30,9 @@ LISTCAT
 
 | Parametre | Description |
 |-----------|-------------|
-| ENTRIES | Liste d'entrees specifiques |
+| ENTRIES | Liste d'entrées spécifiques |
 | LEVEL | Prefixe de nom (ex: FTEST) |
-| CREATION | Fichiers crees dans les N derniers jours |
+| CREATION | Fichiers créés dans les N derniers jours |
 | EXPIRATION | Fichiers expirant dans les N prochains jours |
 
 ### Exemples
@@ -49,7 +49,7 @@ LISTCAT
 /*
 ```
 
-#### Lister une entree specifique
+#### Lister une entrée spécifique
 
 ```jcl
 //STEPLIST EXEC PGM=IDCAMS
@@ -76,7 +76,7 @@ LISTCAT
 
 ---
 
-## V-2. REPRO - Copier les Donnees
+## V-2. REPRO - Copier les Données
 
 ### Syntaxe
 
@@ -93,10 +93,10 @@ REPRO
 
 ### Fonctions REPRO
 
-- Copier donnees entre Data Sets
+- Copier données entre Data Sets
 - Charger clusters VSAM vides
 - Creer sauvegardes
-- Convertir formats (VSAM <-> sequentiel)
+- Convertir formats (VSAM <-> séquentiel)
 
 ### Parametres de Selection
 
@@ -109,7 +109,7 @@ REPRO
 
 ### Exemples
 
-#### Charger un KSDS depuis des donnees in-stream
+#### Charger un KSDS depuis des données in-stream
 
 ```jcl
 //STEPREPR EXEC PGM=IDCAMS
@@ -127,7 +127,7 @@ REPRO
 /*
 ```
 
-#### Copier VSAM vers sequentiel
+#### Copier VSAM vers séquentiel
 
 ```jcl
 //STEPBACK EXEC PGM=IDCAMS
@@ -140,7 +140,7 @@ REPRO
 /*
 ```
 
-#### Copier une plage de cles
+#### Copier une plage de clés
 
 ```jcl
 //STEPSEL  EXEC PGM=IDCAMS
@@ -198,7 +198,7 @@ ALTER vsam-file-name
 | `NEWNAME` | Renomme le Data Set |
 | `ADDVOLUMES` | Ajoute volumes supplementaires |
 | `REMOVEVOLUMES` | Supprime volumes |
-| `INHIBIT` | Acces lecture seule |
+| `INHIBIT` | Accès lecture seule |
 | `UNINHIBIT` | Supprime restriction lecture seule |
 | `FREESPACE` | Modifie l'espace libre CI/CA |
 | `SHAREOPTIONS` | Modifie les options de partage |
@@ -270,7 +270,7 @@ DELETE (entryname...)
 | `FORCE` | Force suppression meme si non vide (GDG, USERCATALOG) |
 | `MASK` | Entryname est un nom generique (ex: FTEST.*) |
 | `PURGE` | Supprime meme si periode de retention non expiree |
-| `SCRATCH` | Supprime aussi l'entree VTOC |
+| `SCRATCH` | Supprime aussi l'entrée VTOC |
 
 ### Exemples
 
@@ -286,7 +286,7 @@ DELETE (entryname...)
 /*
 ```
 
-#### Supprimer avec ERASE (donnees sensibles)
+#### Supprimer avec ERASE (données sensibles)
 
 ```jcl
 //STEPDELE EXEC PGM=IDCAMS
@@ -326,14 +326,14 @@ VERIFY {FILE(ddname)|DATASET(vsam-file-name)}
 VERIFY est utilise pour :
 - Verifier et reparer fichiers VSAM mal fermes apres erreur
 - Identifier la fin du Data Set
-- Reinitialiser l'entree de catalogue
-- Ajouter enregistrements de fin de donnees corrects
+- Reinitialiser l'entrée de catalogue
+- Ajouter enregistrements de fin de données corrects
 
 ### Quand Utiliser VERIFY
 
 - Apres un ABEND pendant l'ecriture
 - Quand OPEN echoue avec erreur "not properly closed"
-- En debut de job pour s'assurer de l'integrite
+- En debut de job pour s'assurer de l'intégrité
 
 ### Exemple
 
@@ -447,7 +447,7 @@ EXPORT entryname
 
 | Aspect | REPRO | EXPORT |
 |--------|-------|--------|
-| Contenu | Donnees uniquement | Donnees + metadata catalogue |
+| Contenu | Données uniquement | Données + metadata catalogue |
 | Usage | Copie simple | Sauvegarde complete |
 | Restauration | REPRO | IMPORT |
 | Format | Fichier standard | Format portable VSAM |
@@ -459,7 +459,7 @@ EXPORT entryname
 | `TEMPORARY` | Conserve l'original apres export |
 | `PERMANENT` | Supprime l'original apres export reussi |
 | `INHIBITSOURCE` | Marque source en lecture seule apres export |
-| `INHIBITTARGET` | Marque copies creees depuis export en lecture seule |
+| `INHIBITTARGET` | Marque copies créées depuis export en lecture seule |
 
 ### Exemple
 
@@ -496,8 +496,8 @@ IMPORT
 
 ### Comportement
 
-1. Recherche entree de meme nom dans catalogue cible
-2. Si inexistante : cree nouvelle entree depuis copie portable
+1. Recherche entrée de meme nom dans catalogue cible
+2. Si inexistante : créé nouvelle entrée depuis copie portable
 3. Si existante et marquee "exportee" : remplace
 4. Si existante non marquee : echec
 
@@ -519,12 +519,12 @@ IMPORT
 
 ---
 
-## Resume du Chapitre
+## Résumé du Chapitre
 
 | Commande | Usage |
 |----------|-------|
 | **LISTCAT** | Lister le contenu du catalogue |
-| **REPRO** | Copier donnees entre Data Sets |
+| **REPRO** | Copier données entre Data Sets |
 | **ALTER** | Modifier attributs d'un Data Set |
 | **DELETE** | Supprimer un Data Set |
 | **VERIFY** | Verifier/reparer fichier mal ferme |

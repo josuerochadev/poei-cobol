@@ -4,7 +4,7 @@
 
 ### Definition
 
-Un GDG (Generation Data Group) est un groupe de Data Sets lies par un nom commun, utilises pour collecter des donnees periodiques (journalier, hebdomadaire, mensuel).
+Un GDG (Generation Data Group) est un groupe de Data Sets lies par un nom commun, utilises pour collecter des données periodiques (journalier, hebdomadaire, mensuel).
 
 ### Structure d'un GDG
 
@@ -20,16 +20,16 @@ G: Numero de generation (0000-9999)
 V: Numero de version (00-99)
 ```
 
-### Referencement Relatif
+### Référencement Relatif
 
-| Reference | Signification |
+| Référence | Signification |
 |-----------|---------------|
 | `GDG.BASE(0)` | Generation actuelle (la plus recente) |
-| `GDG.BASE(+1)` | Nouvelle generation a creer |
+| `GDG.BASE(+1)` | Nouvelle generation a créer |
 | `GDG.BASE(-1)` | Generation precedente |
 | `GDG.BASE(-2)` | Avant-derniere generation |
 
-### Exemple de Referencement
+### Exemple de Référencement
 
 ```jcl
 //STEP1    EXEC PGM=MYPROG
@@ -63,8 +63,8 @@ DEFINE GENERATIONDATAGROUP (
 | **LIMIT** | Nombre max de generations en ligne (1-255) |
 | **EMPTY** | Supprime TOUTES les generations quand limite atteinte |
 | **NOEMPTY** | Supprime uniquement la plus ancienne generation |
-| **SCRATCH** | Supprime entree VTOC quand generation decataloguee |
-| **NOSCRATCH** | Conserve entree VTOC |
+| **SCRATCH** | Supprime entrée VTOC quand generation decataloguee |
+| **NOSCRATCH** | Conserve entrée VTOC |
 
 ### EMPTY vs NOEMPTY
 
@@ -127,10 +127,10 @@ Avec LIMIT(3) et EMPTY:
 
 ### Points Importants
 
-- `(+1)` cree une nouvelle generation
+- `(+1)` créé une nouvelle generation
 - La generation recoit automatiquement le suffixe G####V00
 - DISP doit etre (NEW,CATLG) pour cataloguer la generation
-- Plusieurs `(+1)` dans le meme job creent des generations distinctes
+- Plusieurs `(+1)` dans le meme job créént des generations distinctes
 
 ---
 
@@ -198,7 +198,7 @@ ALTER gdg-base-name
 //INPUT    DD DSN=TESTGDG.PAIE.MENSUEL,DISP=SHR
 ```
 
-Sans numero relatif, TOUTES les generations sont concatenees dans l'ordre inverse (plus recente en premier).
+Sans numéro relatif, TOUTES les generations sont concatenees dans l'ordre inverse (plus recente en premier).
 
 ### Exemple avec REPRO
 
@@ -225,16 +225,16 @@ Sans numero relatif, TOUTES les generations sont concatenees dans l'ordre invers
 | Code | Description |
 |------|-------------|
 | 00 | Operation reussie |
-| 02 | Cle AIX en double trouvee |
+| 02 | Clé AIX en double trouvee |
 | 04 | Enregistrement de longueur fixe invalide |
 | 05 | Fichier non present a l'OPEN |
 | 10 | Fin de fichier atteinte |
 | 14 | Lecture hors limites (RRDS) |
-| 20 | Cle invalide (KSDS/RRDS) |
-| 21 | Erreur de sequence ou changement de cle |
-| 22 | Cle primaire en double |
+| 20 | Clé invalide (KSDS/RRDS) |
+| 21 | Erreur de sequence ou changement de clé |
+| 22 | Clé primaire en double |
 | 23 | Enregistrement/fichier non trouve |
-| 24 | Cle hors limites |
+| 24 | Clé hors limites |
 | 30 | Erreur E/S permanente |
 | 34 | Enregistrement hors limites |
 | 35 | Fichier non present a l'OPEN |
@@ -253,7 +253,7 @@ Sans numero relatif, TOUTES les generations sont concatenees dans l'ordre invers
 | 92 | Erreur logique |
 | 93 | Ressources non disponibles |
 | 96 | Pas d'instruction DD pour le fichier |
-| 97 | OPEN reussi, integrite verifiee |
+| 97 | OPEN reussi, intégrité vérifiée |
 | 98 | Fichier verrouille - OPEN echoue |
 | 99 | Enregistrement verrouille |
 
@@ -275,13 +275,13 @@ Sans numero relatif, TOUTES les generations sont concatenees dans l'ordre invers
 | 10 | Fin de fichier (AT END) |
 | 14 | Hors limites RRDS |
 
-#### Codes de Cle (20-24)
+#### Codes de Clé (20-24)
 
 | Code | Signification |
 |------|---------------|
-| 20 | Cle invalide |
+| 20 | Clé invalide |
 | 21 | Sequence incorrecte |
-| 22 | Doublon cle primaire |
+| 22 | Doublon clé primaire |
 | 23 | Enregistrement non trouve |
 | 24 | Depassement limites |
 
@@ -334,7 +334,7 @@ Taille (tracks) = Taille (octets) / Taille_track_du_disque
 
 ### Exemple de Calcul
 
-**Donnees :**
+**Données :**
 - Taille enregistrement : 80 caracteres
 - Nombre estime : 5000 enregistrements initiaux
 - Evolution : 1000 enregistrements/mois
@@ -360,7 +360,7 @@ DEFINE CLUSTER (...
 
 ---
 
-## Resume du Chapitre
+## Résumé du Chapitre
 
 | Concept | Description |
 |---------|-------------|
@@ -373,7 +373,7 @@ DEFINE CLUSTER (...
 | **(-1)** | Generation precedente |
 | **Code 00** | Succes |
 | **Code 10** | Fin de fichier |
-| **Code 22** | Doublon cle |
+| **Code 22** | Doublon clé |
 | **Code 23** | Non trouve |
 
 ---
@@ -387,7 +387,7 @@ GDG:
 - NOEMPTY: Supprime la plus vieille
 - SCRATCH: Efface VTOC aussi
 
-References:
+Références:
 - (0) = actuelle
 - (+1) = nouvelle
 - (-1) = precedente
@@ -396,7 +396,7 @@ References:
 Codes retour critiques:
 - 00 = OK
 - 10 = Fin fichier
-- 22 = Doublon cle
+- 22 = Doublon clé
 - 23 = Non trouve
 - 35 = Fichier inexistant
 - 39 = Conflit attributs
