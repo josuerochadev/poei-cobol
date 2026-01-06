@@ -101,12 +101,9 @@ Ce travail pratique met en œuvre une application CICS complète en **architectu
 ```
 tp-gestion-credits/
 ├── README.md               # Ce fichier
-├── copybooks/
-│   ├── EMPLOYE.cpy         # Structure enregistrement employé
-│   └── CREDEMP.cpy         # Structure enregistrement crédit
 ├── cobol/
 │   ├── CREDPRES.cbl        # Couche Présentation
-│   ├── CREDTRT.cbl         # Couche Traitement
+│   ├── CREDTRT.cbl         # Couche Traitement (structures intégrées)
 │   └── CREDDAO.cbl         # Couche Données
 ├── bms/
 │   └── CREDSET.bms         # Définition écran BMS
@@ -114,6 +111,8 @@ tp-gestion-credits/
     ├── DEFVSAM.jcl         # Définition fichiers VSAM
     └── LOADDATA.jcl        # Chargement données test
 ```
+
+> **Note** : Les structures EMPLOYE et CREDIT sont intégrées directement dans CREDTRT.cbl (pas de copybooks externes).
 
 ## Instructions d'installation
 
