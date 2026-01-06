@@ -74,25 +74,27 @@ Ce travail pratique met en œuvre une application CICS complète en **architectu
 
 ## Structure des fichiers
 
-### Fichier EMPLOYE (KSDS)
+### Fichier EMPLOYE (KSDS, LRECL=80)
 
-| Champ | Type | Description |
-|-------|------|-------------|
-| EMP-ID | X(6) | Clé primaire (EMP001-EMP999) |
-| EMP-NAME | X(30) | Nom complet |
-| EMP-DEPT | X(10) | Département |
-| EMP-SALAIRE | 9(7)V99 COMP-3 | Salaire mensuel |
-| EMP-ETAT-CRED | X(1) | Y=Crédit actif, N=Pas de crédit |
+| Champ | Type | Positions | Description |
+|-------|------|-----------|-------------|
+| EMP-ID | X(6) | 1-6 | Cle primaire (EMP001-EMP999) |
+| EMP-NAME | X(30) | 7-36 | Nom complet |
+| EMP-DEPT | X(10) | 37-46 | Departement |
+| EMP-SALAIRE | 9(7)V99 | 47-55 | Salaire mensuel |
+| EMP-ETAT-CRED | X(1) | 56 | Y=Credit actif, N=Pas de credit |
+| FILLER | X(24) | 57-80 | Reserve |
 
-### Fichier CREDEMP (KSDS)
+### Fichier CREDEMP (KSDS, LRECL=80)
 
-| Champ | Type | Description |
-|-------|------|-------------|
-| CRD-ID-EMPL | X(6) | Clé primaire (FK vers EMPLOYE) |
-| CRD-LIBELLE | X(20) | Type de crédit |
-| CRD-MONTANT-TOTAL | 9(7)V99 COMP-3 | Montant initial |
-| CRD-MONTANT-ECH | 9(5)V99 COMP-3 | Échéance mensuelle |
-| CRD-RESTE | 9(7)V99 COMP-3 | Reste à payer |
+| Champ | Type | Positions | Description |
+|-------|------|-----------|-------------|
+| CRD-ID-EMPL | X(6) | 1-6 | Cle primaire (FK vers EMPLOYE) |
+| CRD-LIBELLE | X(20) | 7-26 | Type de credit |
+| CRD-MONTANT-TOTAL | 9(9)V99 | 27-37 | Montant initial |
+| CRD-MONTANT-ECH | 9(7)V99 | 38-46 | Echeance mensuelle |
+| CRD-RESTE | 9(9)V99 | 47-57 | Reste a payer |
+| FILLER | X(23) | 58-80 | Reserve |
 
 ## Contenu du TP
 
@@ -108,12 +110,9 @@ tp-gestion-credits/
 │   └── CREDDAO.cbl         # Couche Données
 ├── bms/
 │   └── CREDSET.bms         # Définition écran BMS
-├── jcl/
-│   ├── DEFVSAM.jcl         # Définition fichiers VSAM
-│   └── LOADDATA.jcl        # Chargement données test
-└── data/
-    ├── EMPLOYE.dat         # Données test employés
-    └── CREDEMP.dat         # Données test crédits
+└── jcl/
+    ├── DEFVSAM.jcl         # Définition fichiers VSAM
+    └── LOADDATA.jcl        # Chargement données test
 ```
 
 ## Instructions d'installation
@@ -125,8 +124,8 @@ SUBMIT jcl/DEFVSAM.jcl
 ```
 
 Ce JCL crée deux fichiers VSAM KSDS :
-- `USER.CICS.EMPLOYE`
-- `USER.CICS.CREDEMP`
+- `FTEST.CICS.EMPLOYE`
+- `FTEST.CICS.CREDEMP`
 
 ### Étape 2 : Chargement des données de test
 
@@ -166,11 +165,11 @@ DEFINE PROGRAM(CREDDAO) GROUP(CREDGRP)
        LANGUAGE(COBOL)
 
 DEFINE FILE(EMPLOYE) GROUP(CREDGRP)
-       DSNAME(USER.CICS.EMPLOYE)
+       DSNAME(FTEST.CICS.EMPLOYE)
        RECORDFORMAT(V) KEYLENGTH(6)
-       
+
 DEFINE FILE(CREDEMP) GROUP(CREDGRP)
-       DSNAME(USER.CICS.CREDEMP)
+       DSNAME(FTEST.CICS.CREDEMP)
        RECORDFORMAT(V) KEYLENGTH(6)
 
 DEFINE MAPSET(CREDSET) GROUP(CREDGRP)
@@ -194,14 +193,18 @@ CRED
 
 ### Données de test
 
-| ID | Nom | Département | Crédit | Reste |
-|----|-----|-------------|--------|-------|
-| EMP001 | MARTIN JEAN | COMPTA | PRET AUTO | 12 600 € |
-| EMP002 | DUPONT MARIE | INFO | - | - |
-| EMP003 | DURAND PIERRE | RH | PRET IMMO | 48 400 € |
-| EMP004 | LEROY SOPHIE | COMPTA | PRET PERSO | 250 € |
-| EMP005 | MOREAU PAUL | INFO | - | - |
-| EMP006 | SIMON ANNE | RH | PRET ETUDES | 6 800 € |
+| ID | Nom | Département | Salaire | Crédit | Reste |
+|----|-----|-------------|---------|--------|-------|
+| EMP001 | DUPONT JEAN | FINANCE | 35 000 € | CREDIT IMMOBILIER | 12 000 € |
+| EMP002 | MARTIN MARIE | RH | 42 000 € | - | - |
+| EMP003 | DURAND PIERRE | IT | 55 000 € | CREDIT AUTO | 1 500 € |
+| EMP004 | BERNARD SOPHIE | FINANCE | 38 000 € | CREDIT PERSO | 250 € |
+| EMP005 | PETIT ALAIN | IT | 62 000 € | - | - |
+| EMP006 | MOREAU CLAIRE | RH | 48 000 € | CREDIT TRAVAUX | 900 € |
+
+**Note**: EMP004 a un reste de 250 € pour faciliter le test du soldage de crédit.
+
+> **Important** : Les fichiers VSAM (FTEST.CICS.EMPLOYE et FTEST.CICS.CREDEMP) sont partagés avec le dossier `pratique/`. Les données sont identiques dans les deux JCL LOADDATA.jcl.
 
 ## Exercices suggérés
 

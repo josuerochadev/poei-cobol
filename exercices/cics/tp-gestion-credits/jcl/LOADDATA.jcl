@@ -1,65 +1,51 @@
-//LOADDATA JOB (ACCT),'LOAD DATA CREDITS',CLASS=A,MSGCLASS=X,
-//             NOTIFY=&SYSUID
+//LOADDATA JOB (ACCT),'LOAD VSAM DATA',CLASS=A,MSGCLASS=X
 //*********************************************************************
-//* JCL     : LOADDATA
-//* Auteur  : Formation CICS
-//* Date    : 2024-01
-//* 
-//* Fonction: Chargement des données de test dans les fichiers VSAM
-//*           EMPLOYE et CREDEMP
+//* JCL : LOADDATA.jcl - TP Gestion Credits
+//* Description : Chargement des donnees de test pour TP CICS
 //*
-//* Prérequis: 
-//*   - Fichiers VSAM déjà définis (DEFVSAM.jcl)
-//*   - Fichiers séquentiels de données disponibles
-//*
-//* Données chargées :
-//*   - 6 employés (EMP001 à EMP006)
-//*   - 4 crédits (pour EMP001, EMP003, EMP004, EMP006)
+//* NOTE: Identique a pratique/jcl/LOADDATA.jcl
 //*********************************************************************
 //*
-//*-------------------------------------------------------------------*
-//* ETAPE 1 : Chargement fichier EMPLOYE
-//*-------------------------------------------------------------------*
-//LOADEMPL EXEC PGM=IDCAMS
+//*===================================================================*
+//* DONNEES DE TEST :
+//*   - 6 employes (EMP001-EMP006)
+//*   - 4 credits (EMP001, EMP003, EMP004, EMP006)
+//*   - EMP004 a un petit reste (250) pour tester le soldage
+//*===================================================================*
+//*
+//*===================================================================*
+//* ETAPE 1 : Chargement EMPLOYE (6 enregistrements)
+//*===================================================================*
+//LOADEMP  EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //INFILE   DD *
-EMP001MARTIN JEAN                   COMPTA    0350000Y
-EMP002DUPONT MARIE                  INFO      0420000N
-EMP003DURAND PIERRE                 RH        0380000Y
-EMP004LEROY SOPHIE                  COMPTA    0320000Y
-EMP005MOREAU PAUL                   INFO      0450000N
-EMP006SIMON ANNE                    RH        0360000Y
+EMP001DUPONT JEAN                    FINANCE   003500000Y
+EMP002MARTIN MARIE                   RH        004200000N
+EMP003DURAND PIERRE                  IT        005500000Y
+EMP004BERNARD SOPHIE                 FINANCE   003800000Y
+EMP005PETIT ALAIN                    IT        006200000N
+EMP006MOREAU CLAIRE                  RH        004800000Y
 /*
-//OUTFILE  DD DSN=USER.CICS.EMPLOYE,DISP=SHR
 //SYSIN    DD *
-  REPRO INFILE(INFILE) OUTFILE(OUTFILE)
+  REPRO INFILE(INFILE) -
+        OUTDATASET(FTEST.CICS.EMPLOYE)
 /*
 //*
-//*-------------------------------------------------------------------*
-//* ETAPE 2 : Chargement fichier CREDEMP
-//*-------------------------------------------------------------------*
-//LOADCRED EXEC PGM=IDCAMS
+//*===================================================================*
+//* ETAPE 2 : Chargement CRE-EMP (4 enregistrements)
+//*===================================================================*
+//LOADCRE  EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //INFILE   DD *
-EMP001PRET AUTO            01500000004500001260000
-EMP003PRET IMMO            05000000008000004840000
-EMP004PRET PERSO           00500000002500000025000
-EMP006PRET ETUDES          00800000002000000680000
+EMP001CREDIT IMMOBILIER   0015000000000150000001200000
+EMP003CREDIT AUTO         0002500000000025000000150000
+EMP004CREDIT PERSO        0000050000000025000000025000
+EMP006CREDIT TRAVAUX      0001200000000015000000090000
 /*
-//OUTFILE  DD DSN=USER.CICS.CREDEMP,DISP=SHR
 //SYSIN    DD *
-  REPRO INFILE(INFILE) OUTFILE(OUTFILE)
+  REPRO INFILE(INFILE) -
+        OUTDATASET(FTEST.CICS.CREDEMP)
 /*
-//*
-//*-------------------------------------------------------------------*
-//* ETAPE 3 : Vérification des données chargées
-//*-------------------------------------------------------------------*
-//PRINT    EXEC PGM=IDCAMS
-//SYSPRINT DD SYSOUT=*
-//EMPLOYE  DD DSN=USER.CICS.EMPLOYE,DISP=SHR
-//CREDEMP  DD DSN=USER.CICS.CREDEMP,DISP=SHR
-//SYSIN    DD *
-  PRINT INFILE(EMPLOYE) COUNT(10)
-  PRINT INFILE(CREDEMP) COUNT(10)
-/*
-//
+//*********************************************************************
+//* FIN DU JOB
+//*********************************************************************

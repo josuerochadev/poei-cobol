@@ -1,87 +1,65 @@
-//DEFVSAM  JOB (ACCT),'DEF VSAM CREDITS',CLASS=A,MSGCLASS=X,
-//             NOTIFY=&SYSUID
+//DEFVSAM  JOB (ACCT),'DEFINE VSAM FILES',CLASS=A,MSGCLASS=X
 //*********************************************************************
-//* JCL     : DEFVSAM
-//* Auteur  : Formation CICS
-//* Date    : 2024-01
-//* 
-//* Fonction: Définition des fichiers VSAM pour l'application
-//*           de gestion des crédits employés
+//* JCL : DEFVSAM.jcl - TP Gestion Credits
+//* Description : Definition des fichiers VSAM pour TP CICS
+//* Fichiers crees :
+//*   - FTEST.CICS.EMPLOYE (KSDS - Employes, LRECL=80)
+//*   - FTEST.CICS.CREDEMP (KSDS - Credits employes, LRECL=80)
 //*
-//* Fichiers créés :
-//*   - USER.CICS.EMPLOYE  : Données employés (KSDS)
-//*   - USER.CICS.CREDEMP  : Données crédits (KSDS)
-//*
-//* Prérequis: 
-//*   - Espace disponible sur le volume
-//*   - Droits IDCAMS
+//* NOTE: Identique a pratique/jcl/DEFVSAM.jcl
 //*********************************************************************
 //*
-//*-------------------------------------------------------------------*
-//* ETAPE 1 : Suppression fichiers existants (si présents)
-//*-------------------------------------------------------------------*
+//*===================================================================*
+//* ETAPE 1 : Suppression des fichiers existants
+//*===================================================================*
 //DELETE   EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
-  DELETE USER.CICS.EMPLOYE CLUSTER PURGE
-  IF LASTCC <= 8 THEN SET MAXCC = 0
-  DELETE USER.CICS.CREDEMP CLUSTER PURGE
-  IF LASTCC <= 8 THEN SET MAXCC = 0
+  DELETE FTEST.CICS.EMPLOYE CLUSTER PURGE
+  SET MAXCC = 0
+  DELETE FTEST.CICS.CREDEMP CLUSTER PURGE
+  SET MAXCC = 0
 /*
 //*
-//*-------------------------------------------------------------------*
-//* ETAPE 2 : Définition fichier EMPLOYE (KSDS)
-//*-------------------------------------------------------------------*
+//*===================================================================*
+//* ETAPE 2 : Definition du fichier EMPLOYE
+//*===================================================================*
 //DEFEMPL  EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
-  DEFINE CLUSTER (                             -
-           NAME(USER.CICS.EMPLOYE)             -
-           INDEXED                             -
-           KEYS(6 0)                           -
-           RECORDSIZE(52 52)                   -
-           SHAREOPTIONS(2 3)                   -
-           FREESPACE(10 10)                    -
-           CYLINDERS(1 1)                      -
-         )                                     -
-         DATA (                                -
-           NAME(USER.CICS.EMPLOYE.DATA)        -
-         )                                     -
-         INDEX (                               -
-           NAME(USER.CICS.EMPLOYE.INDEX)       -
-         )
+  DEFINE CLUSTER                                  -
+         (NAME(FTEST.CICS.EMPLOYE)                -
+          INDEXED                                 -
+          RECORDSIZE(80 80)                       -
+          KEYS(6 0)                               -
+          VOLUMES(FDDBAS)                         -
+          SHAREOPTIONS(2 3)                       -
+          CYLINDERS(1 1))                         -
+         DATA                                     -
+         (NAME(FTEST.CICS.EMPLOYE.DATA))          -
+         INDEX                                    -
+         (NAME(FTEST.CICS.EMPLOYE.INDEX))
 /*
 //*
-//*-------------------------------------------------------------------*
-//* ETAPE 3 : Définition fichier CRE-EMP (KSDS)
-//*-------------------------------------------------------------------*
+//*===================================================================*
+//* ETAPE 3 : Definition du fichier CRE-EMP (Credits)
+//*===================================================================*
 //DEFCRED  EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
-  DEFINE CLUSTER (                             -
-           NAME(USER.CICS.CREDEMP)             -
-           INDEXED                             -
-           KEYS(6 0)                           -
-           RECORDSIZE(41 41)                   -
-           SHAREOPTIONS(2 3)                   -
-           FREESPACE(10 10)                    -
-           CYLINDERS(1 1)                      -
-         )                                     -
-         DATA (                                -
-           NAME(USER.CICS.CREDEMP.DATA)        -
-         )                                     -
-         INDEX (                               -
-           NAME(USER.CICS.CREDEMP.INDEX)       -
-         )
+  DEFINE CLUSTER                                  -
+         (NAME(FTEST.CICS.CREDEMP)                -
+          INDEXED                                 -
+          RECORDSIZE(80 80)                       -
+          KEYS(6 0)                               -
+          VOLUMES(FDDBAS)                         -
+          SHAREOPTIONS(2 3)                       -
+          CYLINDERS(1 1))                         -
+         DATA                                     -
+         (NAME(FTEST.CICS.CREDEMP.DATA))          -
+         INDEX                                    -
+         (NAME(FTEST.CICS.CREDEMP.INDEX))
 /*
-//*
-//*-------------------------------------------------------------------*
-//* ETAPE 4 : Vérification (LISTCAT)
-//*-------------------------------------------------------------------*
-//LISTCAT  EXEC PGM=IDCAMS
-//SYSPRINT DD SYSOUT=*
-//SYSIN    DD *
-  LISTCAT ENTRIES(USER.CICS.EMPLOYE) ALL
-  LISTCAT ENTRIES(USER.CICS.CREDEMP) ALL
-/*
-//
+//*********************************************************************
+//* FIN DU JOB
+//*********************************************************************
