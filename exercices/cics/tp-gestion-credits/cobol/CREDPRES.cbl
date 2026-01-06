@@ -1,11 +1,11 @@
       ******************************************************************
-      * Programme : CREDPRES - Couche Présentation
+      * Programme : CREDPRES - Couche Presentation
       * Transaction : CRED
-      * Fonction : Interface utilisateur gestion crédits employés
-      * 
+      * Fonction : Interface utilisateur gestion credits employes
+      *
       * Description :
-      *   Ce programme gère l'interface utilisateur de l'application
-      *   de gestion des crédits. Il affiche l'écran BMS, reçoit les
+      *   Ce programme gere l'interface utilisateur de l'application
+      *   de gestion des credits. Il affiche l'ecran BMS, recoit les
       *   saisies et appelle la couche Traitement via LINK.
       *
       * Écrans : CREDMAP (MAPSET CREDSET)
@@ -21,17 +21,19 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
 
-      *─── Copybooks système CICS ────────────────────────────────────
+      *--- Copybooks systeme CICS ------------------------------------
            COPY DFHAID.
            COPY DFHBMSCA.
 
-      *─── Copybook écran BMS ────────────────────────────────────────
+      *--- Copybook ecran BMS ----------------------------------------
            COPY CREDSET.
 
-      *─── Variables de travail ──────────────────────────────────────
+      *--- Variables de travail --------------------------------------
        01  WS-RESP                 PIC S9(8) COMP.
+       01  WS-MSG-FIN              PIC X(40)
+           VALUE 'Fin de transaction CRED. Au revoir.'.
 
-      *─── COMMAREA pour échange avec couche traitement ──────────────
+      *--- COMMAREA pour echange avec couche traitement --------------
        01  WS-COMMAREA.
            05  CA-ACTION           PIC X(1).
                88  CA-CONSULTER    VALUE 'C'.
@@ -54,7 +56,7 @@
                10  CA-MONTANT-ECH  PIC 9(5)V99.
                10  CA-RESTE        PIC 9(7)V99.
 
-      *─── Indicateur état transaction ───────────────────────────────
+      *--- Indicateur etat transaction -------------------------------
        01  WS-ETAT                 PIC X(1) VALUE 'I'.
            88  PREMIER-PASSAGE     VALUE 'I'.
 
@@ -64,7 +66,7 @@
        PROCEDURE DIVISION.
 
       ******************************************************************
-      * 0000-PRINCIPAL : Point d'entrée du programme
+      * 0000-PRINCIPAL : Point d'entree du programme
       ******************************************************************
        0000-PRINCIPAL.
 
@@ -88,7 +90,7 @@
        1000-AFFICHER-ECRAN-VIDE.
 
            INITIALIZE CREDMAPO
-           MOVE 'Entrez un ID employé (EMP001-EMP006)'
+           MOVE 'Entrez un ID employe (EMP001-EMP006)'
                TO MSGO
 
            EXEC CICS
@@ -99,7 +101,7 @@
            END-EXEC.
 
       ******************************************************************
-      * 2000-TRAITER-SAISIE : Traitement des entrées utilisateur
+      * 2000-TRAITER-SAISIE : Traitement des entrees utilisateur
       ******************************************************************
        2000-TRAITER-SAISIE.
 
@@ -123,7 +125,7 @@
                WHEN DFHPF3
                    PERFORM 9000-QUITTER
                WHEN OTHER
-                   MOVE 'Touche non autorisée' TO MSGO
+                   MOVE 'Touche non autorisee' TO MSGO
                    PERFORM 3000-AFFICHER-MESSAGE
            END-EVALUATE.
 
@@ -131,19 +133,19 @@
            EXIT.
 
       ******************************************************************
-      * 2100-RECHERCHER-EMPLOYE : Recherche d'un employé
+      * 2100-RECHERCHER-EMPLOYE : Recherche d'un employe
       ******************************************************************
        2100-RECHERCHER-EMPLOYE.
 
-      *─── Validation format ──────────────────────────────────────────
+      *--- Validation format ------------------------------------------
            IF IDEMPLL = 0 OR IDEMPLI = SPACES
-               MOVE 'ID employé obligatoire' TO MSGO
+               MOVE 'ID employe obligatoire' TO MSGO
                MOVE DFHBMDAR TO IDEMPLA
                PERFORM 3000-AFFICHER-MESSAGE
                GO TO 2100-EXIT
            END-IF
 
-      *─── Appel couche traitement ────────────────────────────────────
+      *--- Appel couche traitement ------------------------------------
            INITIALIZE WS-COMMAREA
            SET CA-CONSULTER TO TRUE
            MOVE IDEMPLI TO CA-ID-EMPL
@@ -153,7 +155,7 @@
                     COMMAREA(WS-COMMAREA)
            END-EXEC
 
-      *─── Affichage résultat ─────────────────────────────────────────
+      *--- Affichage resultat -----------------------------------------
            IF CA-OK
                PERFORM 2110-AFFICHER-RESULTAT
            ELSE
@@ -165,7 +167,7 @@
            EXIT.
 
       ******************************************************************
-      * 2110-AFFICHER-RESULTAT : Affichage données employé/crédit
+      * 2110-AFFICHER-RESULTAT : Affichage donnees employe/credit
       ******************************************************************
        2110-AFFICHER-RESULTAT.
 
@@ -179,12 +181,12 @@
                MOVE CA-MONTANT-TOT TO MTTOTALO
                MOVE CA-MONTANT-ECH TO MTECHO
                MOVE CA-RESTE       TO RESTEO
-               MOVE 'Crédit actif - PF5 pour payer une échéance'
+               MOVE 'Credit actif - PF5 pour payer une echeance'
                    TO MSGO
            ELSE
                MOVE SPACES TO LIBCREDO
                MOVE 0 TO MTTOTALO MTECHO RESTEO
-               MOVE 'Cet employé n''a pas de crédit en cours'
+               MOVE 'Cet employe n''a pas de credit en cours'
                    TO MSGO
            END-IF
 
@@ -196,12 +198,12 @@
            END-EXEC.
 
       ******************************************************************
-      * 2200-PAYER-ECHEANCE : Paiement d'une échéance
+      * 2200-PAYER-ECHEANCE : Paiement d'une echeance
       ******************************************************************
        2200-PAYER-ECHEANCE.
 
            IF CA-ETAT-CRED NOT = 'Y'
-               MOVE 'Aucun crédit à payer pour cet employé'
+               MOVE 'Aucun credit a payer pour cet employe'
                    TO MSGO
                PERFORM 3000-AFFICHER-MESSAGE
                GO TO 2200-EXIT
@@ -242,7 +244,8 @@
        9000-QUITTER.
 
            EXEC CICS
-               SEND TEXT FROM('Fin de transaction CRED. Au revoir.')
+               SEND TEXT FROM(WS-MSG-FIN)
+                    LENGTH(40)
                     ERASE
            END-EXEC
 

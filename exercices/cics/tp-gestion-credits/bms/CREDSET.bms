@@ -1,153 +1,52 @@
 ***********************************************************************
-*  MAPSET : CREDSET
-*  MAP    : CREDMAP
-*  Description : Écran de gestion des crédits employés
-*  Transaction : CRED
+*  MAPSET : CREDSET - MAP : CREDMAP
+*  Transaction : CRED - Gestion des credits employes
 ***********************************************************************
-CREDSET  DFHMSD TYPE=&SYSPARM,                                         X
-               MODE=INOUT,                                             X
-               LANG=COBOL,                                             X
-               STORAGE=AUTO,                                           X
-               CTRL=(FREEKB,FRSET),                                    X
-               TIOAPFX=YES
-***********************************************************************
-*  MAP CREDMAP : Écran principal
-***********************************************************************
-CREDMAP  DFHMDI SIZE=(24,80),                                          X
-               LINE=1,                                                 X
-               COLUMN=1
-***********************************************************************
+CREDSET  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,STORAGE=AUTO,      X
+               CTRL=(FREEKB,FRSET),TIOAPFX=YES
+CREDMAP  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 *  Ligne 1 : Titre
-***********************************************************************
-         DFHMDF POS=(1,1),                                             X
-               LENGTH=40,                                              X
-               ATTRB=(ASKIP,BRT),                                      X
+         DFHMDF POS=(1,1),LENGTH=28,ATTRB=(ASKIP,BRT),                  X
                INITIAL='GESTION DES CREDITS EMPLOYES'
-         DFHMDF POS=(1,70),                                            X
-               LENGTH=4,                                               X
-               ATTRB=(ASKIP,BRT),                                      X
-               INITIAL='CRED'
-***********************************************************************
-*  Ligne 3 : Séparateur
-***********************************************************************
-         DFHMDF POS=(3,1),                                             X
-               LENGTH=78,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='─────────────────────────────────────────────X
-               ──────────────────────────────────'
-***********************************************************************
-*  Ligne 5 : ID Employé
-***********************************************************************
-         DFHMDF POS=(5,2),                                             X
-               LENGTH=12,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='ID Employé :'
-IDEMPL   DFHMDF POS=(5,16),                                            X
-               LENGTH=6,                                               X
-               ATTRB=(UNPROT,IC),                                      X
-               INITIAL='      '
-         DFHMDF POS=(5,23),                                            X
-               LENGTH=1,                                               X
-               ATTRB=ASKIP
-***********************************************************************
-*  Ligne 7 : Nom employé
-***********************************************************************
-         DFHMDF POS=(7,2),                                             X
-               LENGTH=12,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='Nom        :'
-NOM      DFHMDF POS=(7,16),                                            X
-               LENGTH=30,                                              X
-               ATTRB=(ASKIP,BRT)
-***********************************************************************
-*  Ligne 8 : Département et Salaire
-***********************************************************************
-         DFHMDF POS=(8,2),                                             X
-               LENGTH=12,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='Département:'
-DEPT     DFHMDF POS=(8,16),                                            X
-               LENGTH=10,                                              X
-               ATTRB=(ASKIP,BRT)
-         DFHMDF POS=(8,32),                                            X
-               LENGTH=8,                                               X
-               ATTRB=ASKIP,                                            X
-               INITIAL='Salaire:'
-SAL      DFHMDF POS=(8,42),                                            X
-               LENGTH=12,                                              X
-               ATTRB=(ASKIP,BRT),                                      X
+         DFHMDF POS=(1,70),LENGTH=4,ATTRB=(ASKIP,BRT),INITIAL='CRED'
+*  Ligne 3 : Separateur
+         DFHMDF POS=(3,1),LENGTH=78,ATTRB=ASKIP
+*  Ligne 5 : ID Employe
+         DFHMDF POS=(5,2),LENGTH=12,ATTRB=ASKIP,INITIAL='ID Employe :'
+IDEMPL   DFHMDF POS=(5,16),LENGTH=6,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(5,23),LENGTH=1,ATTRB=ASKIP
+*  Ligne 7 : Nom employe
+         DFHMDF POS=(7,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Nom        :'
+NOM      DFHMDF POS=(7,16),LENGTH=30,ATTRB=(ASKIP,BRT)
+*  Ligne 8 : Departement et Salaire
+         DFHMDF POS=(8,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Departement:'
+DEPT     DFHMDF POS=(8,16),LENGTH=10,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(8,32),LENGTH=8,ATTRB=ASKIP,INITIAL='Salaire:'
+SAL      DFHMDF POS=(8,42),LENGTH=10,ATTRB=(ASKIP,BRT),                 X
                PICOUT='ZZZ,ZZZ.99'
-***********************************************************************
-*  Ligne 10 : Séparateur crédit
-***********************************************************************
-         DFHMDF POS=(10,2),                                            X
-               LENGTH=50,                                              X
-               ATTRB=(ASKIP,BRT),                                      X
-               INITIAL='═══════════════ INFORMATIONS CREDIT ═══════════'
-***********************************************************************
-*  Ligne 12 : Libellé crédit
-***********************************************************************
-         DFHMDF POS=(12,2),                                            X
-               LENGTH=12,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='Libellé    :'
-LIBCRED  DFHMDF POS=(12,16),                                           X
-               LENGTH=20,                                              X
-               ATTRB=(ASKIP,BRT)
-***********************************************************************
-*  Ligne 13 : Montant total et Échéance
-***********************************************************************
-         DFHMDF POS=(13,2),                                            X
-               LENGTH=12,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='Montant    :'
-MTTOTAL  DFHMDF POS=(13,16),                                           X
-               LENGTH=12,                                              X
-               ATTRB=(ASKIP,BRT),                                      X
+*  Ligne 10 : Separateur credit
+         DFHMDF POS=(10,2),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='=== INFORMATIONS CREDIT ==='
+*  Ligne 12 : Libelle credit
+         DFHMDF POS=(12,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Libelle    :'
+LIBCRED  DFHMDF POS=(12,16),LENGTH=20,ATTRB=(ASKIP,BRT)
+*  Ligne 13 : Montant total et Echeance
+         DFHMDF POS=(13,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Montant    :'
+MTTOTAL  DFHMDF POS=(13,16),LENGTH=10,ATTRB=(ASKIP,BRT),                X
                PICOUT='ZZZ,ZZZ.99'
-         DFHMDF POS=(13,32),                                           X
-               LENGTH=9,                                               X
-               ATTRB=ASKIP,                                            X
-               INITIAL='Échéance:'
-MTECH    DFHMDF POS=(13,43),                                           X
-               LENGTH=10,                                              X
-               ATTRB=(ASKIP,BRT),                                      X
+         DFHMDF POS=(13,32),LENGTH=9,ATTRB=ASKIP,INITIAL='Echeance:'
+MTECH    DFHMDF POS=(13,43),LENGTH=9,ATTRB=(ASKIP,BRT),                 X
                PICOUT='ZZ,ZZZ.99'
-***********************************************************************
-*  Ligne 14 : Reste à payer
-***********************************************************************
-         DFHMDF POS=(14,2),                                            X
-               LENGTH=12,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='Reste      :'
-RESTE    DFHMDF POS=(14,16),                                           X
-               LENGTH=12,                                              X
-               ATTRB=(ASKIP,BRT),                                      X
+*  Ligne 14 : Reste a payer
+         DFHMDF POS=(14,2),LENGTH=12,ATTRB=ASKIP,INITIAL='Reste      :'
+RESTE    DFHMDF POS=(14,16),LENGTH=10,ATTRB=(ASKIP,BRT),                X
                PICOUT='ZZZ,ZZZ.99'
-***********************************************************************
-*  Ligne 16 : Séparateur
-***********************************************************************
-         DFHMDF POS=(16,1),                                            X
-               LENGTH=78,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='─────────────────────────────────────────────X
-               ──────────────────────────────────'
-***********************************************************************
+*  Ligne 16 : Separateur
+         DFHMDF POS=(16,1),LENGTH=78,ATTRB=ASKIP
 *  Ligne 18 : Message
-***********************************************************************
-MSG      DFHMDF POS=(18,2),                                            X
-               LENGTH=60,                                              X
-               ATTRB=(ASKIP,BRT)
-***********************************************************************
+MSG      DFHMDF POS=(18,2),LENGTH=60,ATTRB=(ASKIP,BRT)
 *  Ligne 22 : Touches fonction
-***********************************************************************
-         DFHMDF POS=(22,2),                                            X
-               LENGTH=60,                                              X
-               ATTRB=ASKIP,                                            X
-               INITIAL='PF3=Quitter  PF5=Payer échéance  ENTER=RechercX
-               her'
-***********************************************************************
-*  Fin du MAPSET
-***********************************************************************
+         DFHMDF POS=(22,2),LENGTH=45,ATTRB=ASKIP,                       X
+               INITIAL='PF3=Quitter PF5=Payer ENTER=Rechercher'
          DFHMSD TYPE=FINAL
          END

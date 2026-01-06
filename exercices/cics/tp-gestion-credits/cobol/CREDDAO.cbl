@@ -1,16 +1,16 @@
       ******************************************************************
-      * Programme : CREDDAO - Couche Données (Data Access Object)
-      * Fonction : Accès aux fichiers VSAM EMPLOYE et CRE-EMP
+      * Programme : CREDDAO - Couche Donnees (Data Access Object)
+      * Fonction : Acces aux fichiers VSAM EMPLOYE et CRE-EMP
       *
       * Description :
-      *   Ce programme encapsule tous les accès aux fichiers VSAM.
-      *   Il fournit une interface uniforme pour les opérations CRUD.
+      *   Ce programme encapsule tous les acces aux fichiers VSAM.
+      *   Il fournit une interface uniforme pour les operations CRUD.
       *
-      * Actions supportées :
+      * Actions supportees :
       *   'READ' = Lecture simple
-      *   'UPDT' = Lecture avec verrouillage (pour mise à jour)
-      *   'REWT' = Réécriture après verrouillage
-      *   'WRIT' = Création nouvel enregistrement
+      *   'UPDT' = Lecture avec verrouillage (pour mise a jour)
+      *   'REWT' = Reecriture apres verrouillage
+      *   'WRIT' = Creation nouvel enregistrement
       *   'DELT' = Suppression
       *
       * Fichiers : EMPLOYE (KSDS), CREDEMP (KSDS)
@@ -23,12 +23,12 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
 
-      *─── Variables de travail ──────────────────────────────────────
+      *--- Variables de travail --------------------------------------
        01  WS-RESP                 PIC S9(8) COMP.
        01  WS-FICHIER              PIC X(8).
        01  WS-DATA-BUFFER          PIC X(100).
 
-      *─── COMMAREA interface ────────────────────────────────────────
+      *--- COMMAREA interface ----------------------------------------
        01  WS-COMMAREA.
            05  DAO-ACTION          PIC X(4).
                88  DAO-READ        VALUE 'READ'.
@@ -47,7 +47,7 @@
        PROCEDURE DIVISION.
 
       ******************************************************************
-      * 0000-PRINCIPAL : Aiguillage selon l'action demandée
+      * 0000-PRINCIPAL : Aiguillage selon l'action demandee
       ******************************************************************
        0000-PRINCIPAL.
 
@@ -100,7 +100,7 @@
            PERFORM 9000-TRAITER-RESP.
 
       ******************************************************************
-      * 2000-REECRIRE : Mise à jour après READ UPDATE
+      * 2000-REECRIRE : Mise a jour apres READ UPDATE
       ******************************************************************
        2000-REECRIRE.
 
@@ -115,7 +115,7 @@
            PERFORM 9000-TRAITER-RESP.
 
       ******************************************************************
-      * 3000-ECRIRE : Création nouvel enregistrement
+      * 3000-ECRIRE : Creation nouvel enregistrement
       ******************************************************************
        3000-ECRIRE.
 
