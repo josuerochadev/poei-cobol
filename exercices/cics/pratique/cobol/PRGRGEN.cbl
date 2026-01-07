@@ -17,7 +17,7 @@
        01  WS-REC-KEY            PIC 9(3).
 
        01  WS-REC-DATA.
-           05  WS-CDECLT         PIC 9(3).
+           05  WS-CDECLT         PIC X(3).
            05  WS-CODREG         PIC 99.
            05  WS-NATCPT         PIC 99.
            05  WS-NOMCPT         PIC X(10).
@@ -27,7 +27,7 @@
            05  WS-APRCPT         PIC 9(2).
            05  WS-SOCCPT         PIC X(1).
            05  WS-ADRCPT         PIC X(10).
-           05  WS-SLDCPT         PIC 9(10).
+           05  WS-SLDCPT         PIC 9(8)V9(2).
            05  WS-POSCPT         PIC X(02).
            05  FILLER            PIC X(19).
 
@@ -35,8 +35,9 @@
 
        MAIN-PARA.
 
-           MOVE 80 TO WS-REC-LEN.
-           MOVE 1  TO WS-KEY-LEN.
+           MOVE 80  TO WS-REC-LEN.
+           MOVE 005 TO WS-REC-KEY.
+           MOVE 3   TO WS-KEY-LEN.
 
            EXEC CICS SEND MAP('MAP1')
                MAPSET('MAPREAD') MAPONLY FREEKB ERASE
@@ -48,13 +49,12 @@
 
            MOVE CDECLTI TO WS-REC-KEY.
 
-      *--- Lecture generique avec cle partielle ---
            EXEC CICS READ FILE('FCLIENT') INTO(WS-REC-DATA)
                LENGTH(WS-REC-LEN) RIDFLD(WS-REC-KEY)
-               KEYLENGTH(WS-KEY-LEN)
-               GENERIC
+               KEYLENGTH(2) GENERIC GTEQ UPDATE
            END-EXEC.
 
+           MOVE WS-CDECLT TO CDECLTO.
            MOVE WS-CODREG TO CODREGO.
            MOVE WS-NATCPT TO NATCPTO.
            MOVE WS-NOMCPT TO NOMCPTO.
