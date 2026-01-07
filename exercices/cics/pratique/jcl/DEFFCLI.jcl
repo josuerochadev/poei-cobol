@@ -30,6 +30,7 @@
          KEYS(3 0) -
          RECORDSIZE(80 80) -
          TRACKS(5 5) -
+         VOLUMES(FDDBAS) -
          SHAREOPTIONS(2 3) -
          ) -
          DATA ( -
