@@ -1,0 +1,68 @@
+MAPIO1   DFHMSD TYPE=DSECT,                                            X
+               MODE=INOUT,                                             X
+               LANG=COBOL,                                             X
+               MAPATTS=(COLOR,HILIGHT,OUTLINE),                        X
+               DSATTS=(COLOR,HILIGHT),                                 X
+               STORAGE=AUTO,                                           X
+               TIOAPFX=YES
+*----------------------------------------------------------------------*
+*  MAP1 : Zone SIMPLE (ligne 10) - Champ INPUT texte                   *
+*----------------------------------------------------------------------*
+MAP1     DFHMDI SIZE=(01,80),                                          X
+               LINE=10,                                                X
+               COLUMN=01,                                              X
+               CTRL=(PRINT,FREEKB)
+         DFHMDF POS=(01,20),                                           X
+               LENGTH=16,                                              X
+               INITIAL='CHAMPS SANS PIC'
+SIMPLE   DFHMDF POS=(01,38),                                           X
+               ATTRB=(UNPROT,BRT,IC),                                  X
+               LENGTH=20,                                              X
+               COLOR=GREEN,                                            X
+               HILIGHT=REVERSE,                                        X
+               CASE=MIXED,                                             X
+               INITIAL='--------------------'
+         DFHMDF POS=(01,59),                                           X
+               LENGTH=1,                                               X
+               ATTRB=PROT
+*----------------------------------------------------------------------*
+*  MAP2 : Zone CHPOUT (ligne 15) - Champ OUTPUT numerique              *
+*----------------------------------------------------------------------*
+MAP2     DFHMDI SIZE=(01,80),                                          X
+               LINE=15,                                                X
+               COLUMN=01,                                              X
+               CTRL=(PRINT,FREEKB)
+         DFHMDF POS=(01,20),                                           X
+               LENGTH=15,                                              X
+               INITIAL='CHAMP OUTPUT : '
+CHPOUT   DFHMDF POS=(01,38),                                           X
+               ATTRB=(UNPROT,BRT,IC),                                  X
+               LENGTH=10,                                              X
+               PICOUT='$$$,$$0.0',                                     X
+               COLOR=BLUE
+         DFHMDF POS=(01,50),                                           X
+               LENGTH=1,                                               X
+               ATTRB=PROT
+*----------------------------------------------------------------------*
+*  MAP3 : Zone CHPIO (ligne 17) - Champ INPUT/OUTPUT numerique         *
+*----------------------------------------------------------------------*
+MAP3     DFHMDI SIZE=(01,80),                                          X
+               LINE=17,                                                X
+               COLUMN=01,                                              X
+               CTRL=(PRINT,FREEKB)
+         DFHMDF POS=(01,20),                                           X
+               LENGTH=16,                                              X
+               INITIAL='CHAMP I/O :    '
+CHPIO    DFHMDF POS=(01,38),                                           X
+               LENGTH=6,                                               X
+               ATTRB=(UNPROT,NORM,IC),                                 X
+               COLOR=GREEN,                                            X
+               OUTLINE=BOX,                                            X
+               HILIGHT=REVERSE,                                        X
+               PICIN='9999V99',                                        X
+               PICOUT='ZZ9.99'
+         DFHMDF POS=(01,45),                                           X
+               LENGTH=1,                                               X
+               ATTRB=PROT
+MAPIO1   DFHMSD TYPE=FINAL
+         END
