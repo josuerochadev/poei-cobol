@@ -51,7 +51,7 @@
 
            EXEC CICS READ FILE('FCLIENT') INTO(WS-REC-DATA)
                LENGTH(WS-REC-LEN) RIDFLD(WS-REC-KEY)
-               KEYLENGTH(2) GENERIC GTEQ UPDATE
+               KEYLENGTH(2) GENERIC
            END-EXEC.
 
            MOVE WS-CDECLT TO CDECLTO.
