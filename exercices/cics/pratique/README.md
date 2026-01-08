@@ -54,11 +54,27 @@ pratique/
 | PROGREWT | REWT | Mise a jour (READ UPDATE + REWRITE) |
 | PROGDELT | DELT | Suppression d'un enregistrement |
 
-### 3. Browse et Transactions (Chapitre VII)
+### 3. Browse VSAM (Chapitre VIII - Exercices 13 et 14)
+
+| Programme | Transaction | Description | Fichiers |
+|-----------|-------------|-------------|----------|
+| PGSTART | TSRT | BROWSE avec STARTBR/READNEXT/ENDBR (cle primaire) | `cobol/PGSTART.cbl` |
+| PGPATHF | TPTH | BROWSE avec ALTERNATE INDEX (cle NOMCPT) | `cobol/PGPATHF.cbl`, `bms/MAPPATH.bms` |
+
+#### Exercice 13 - BROWSE basique (PGSTART)
+- Parcours sequentiel avec cle generique
+- Commandes : STARTBR, READNEXT, ENDBR
+- Lit 3 enregistrements a partir d'une cle de depart
+
+#### Exercice 14 - BROWSE avec AIX (PRGPATH)
+- Parcours via ALTERNATE INDEX sur le champ NOMCPT
+- Pre-requis : AIX et PATH definis (`jcl/DEFPATH.jcl`)
+- Recherche par nom de client
+
+### 4. Transactions avancees (Chapitre VII)
 
 | Exercice | Description | Status |
 |----------|-------------|--------|
-| Parcours | STARTBR/READNEXT/ENDBR | Theorique |
 | Pagination | Navigation page suivante/precedente | Theorique |
 | Virement | SYNCPOINT/ROLLBACK | Theorique |
 
@@ -125,6 +141,26 @@ Voir `jcl/DEFVSAM.jcl` pour la definition et `jcl/LOADDATA.jcl` pour le chargeme
 CEDA DEF TRANS(TR01) GROUP(GRPTEST) PROG(PROGTEST)
 CEDA DEF PROG(PROGTEST) GROUP(GRPTEST) LANG(COBOL)
 CEDA DEF MAPSET(MAPTEST) GROUP(GRPTEST)
+CEDA INS GROUP(GRPTEST)
+```
+
+### Definir les transactions BROWSE (TSRT et TPTH)
+```
+* Exercice 13 - BROWSE basique
+CEDA DEF TRANS(TSRT) GROUP(GRPTEST) PROG(PGSTART)
+CEDA DEF PROG(PGSTART) GROUP(GRPTEST) LANG(COBOL)
+
+* Exercice 14 - BROWSE avec AIX
+CEDA DEF TRANS(TPTH) GROUP(GRPTEST) PROG(PGPATHF)
+CEDA DEF PROG(PGPATHF) GROUP(GRPTEST) LANG(COBOL)
+CEDA DEF MAPSET(MAPPATH) GROUP(GRPTEST)
+
+* Definition du fichier PATH pour AIX
+CEDA DEF FILE(PCLIENT) GROUP(GRPTEST) -
+     DSN(FTEST.CICS.FCLIENT.PATH) -
+     RLSACCESS(NO) RECOVERY(NONE) -
+     STATUS(ENABLED) OPENTIME(FIRSTREF)
+
 CEDA INS GROUP(GRPTEST)
 ```
 
