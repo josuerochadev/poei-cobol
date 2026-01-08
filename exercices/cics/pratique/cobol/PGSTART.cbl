@@ -5,25 +5,20 @@
       * Transaction : TSRT                                             *
       * Fichier : FCLIENT (KSDS)                                       *
       * Description : Parcours sequentiel avec cle generique           *
-      *               Lit 3 enregistrements a partir d'une cle donnee  *
+      *               Lit les enregistrements a partir d'une cle       *
       *================================================================*
       * Chapitre VIII - Exercice 13 : Commandes BROWSE                 *
       *----------------------------------------------------------------*
-      * Structure du programme :                                       *
-      *   1. Envoi MAP1 pour saisir cle de depart                      *
-      *   2. Reception de la cle saisie                                *
-      *   3. STARTBR avec cle generique (KEYLENGTH=2)                  *
-      *   4. READNEXT pour lire les enregistrements                    *
-      *   5. Affichage des donnees sur MAP2                            *
-      *   6. RECEIVE pour attendre l'utilisateur (ENTER = suivant)     *
-      *   7. ENDBR pour fermer le browse                               *
-      *================================================================*
-      * Version corrigee : ajout RECEIVE entre chaque affichage        *
+      * Touches :                                                      *
+      *   ENTER = Enregistrement suivant                               *
+      *   PF3   = Quitter le browse                                    *
+      *   CLEAR = Annuler                                              *
       *================================================================*
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
 
+       COPY DFHAID.
        COPY MAPREAD.
 
        01  WS-RESPCODE          PIC S9(8) COMP.
@@ -33,7 +28,6 @@
        01  WS-MESSAGE           PIC X(50).
        01  WS-REQID             PIC S9(4) COMP VALUE 1.
        01  WS-COUNT             PIC 9(2) VALUE 0.
-       01  WS-EIBAID            PIC X(1).
 
        01  WS-REC-DATA.
            05  WS-CDECLT        PIC 9(3).
@@ -53,6 +47,12 @@
        PROCEDURE DIVISION.
 
        MAIN-PARA.
+
+      *------- Definition des touches de fonction ---------------------
+           EXEC CICS HANDLE AID
+               PF3(FIN-BROWSE)
+               CLEAR(FIN-PROGRAM)
+           END-EXEC.
 
            MOVE 80  TO WS-REC-LEN.
            MOVE 000 TO WS-REC-KEY.
@@ -84,7 +84,7 @@
                    MOVE 'AUCUN ENREGISTREMENT TROUVE POUR CETTE CLE'
                        TO WS-MESSAGE
                ELSE
-                   MOVE 'ERREUR STARTBR - CODE: ' TO WS-MESSAGE
+                   MOVE 'ERREUR STARTBR' TO WS-MESSAGE
                END-IF
                GO TO ERREUR-PARA
            END-IF.
@@ -125,24 +125,13 @@
                MAPSET('MAPREAD') DATAONLY FREEKB
            END-EXEC.
 
-      *------- Attente action utilisateur (ENTER = suivant) -----------
-           EXEC CICS RECEIVE
-               RESP(WS-RESPCODE)
+      *------- Attente ENTER pour continuer (PF3 = quitter) -----------
+           EXEC CICS RECEIVE MAP('MAP2')
+               MAPSET('MAPREAD')
            END-EXEC.
 
-      *------- Verifier si PF3 pour quitter ---------------------------
-           IF EIBAID = DFHPF3
-               MOVE 'ABANDON PAR UTILISATEUR (PF3)' TO WS-MESSAGE
-               GO TO FIN-BROWSE
-           END-IF.
-
-      *------- Continuer si moins de 3 enregistrements lus ------------
-           IF WS-COUNT < 3
-               GO TO BOUCLE-LECTURE
-           END-IF.
-
-           MOVE 'PARCOURS TERMINE - 3 ENREGISTREMENTS AFFICHES'
-               TO WS-MESSAGE.
+      *------- Continuer la lecture -----------------------------------
+           GO TO BOUCLE-LECTURE.
 
       *================================================================*
       *        ENDBR - Fin du browse                                   *

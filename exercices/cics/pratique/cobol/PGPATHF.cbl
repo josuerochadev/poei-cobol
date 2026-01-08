@@ -9,26 +9,21 @@
       *================================================================*
       * Chapitre VIII - Exercice 14 : BROWSE avec cle ALTERNATE        *
       *----------------------------------------------------------------*
-      * Structure du programme :                                       *
-      *   1. Envoi MAP1 pour saisir nom client (cle generique)         *
-      *   2. Reception du nom saisi                                    *
-      *   3. STARTBR avec FILE('PCLIENT') et cle NOMCPT                *
-      *   4. READNEXT pour lire les enregistrements                    *
-      *   5. Affichage des donnees sur MAP2                            *
-      *   6. RECEIVE pour attendre l'utilisateur (ENTER = suivant)     *
-      *   7. ENDBR pour fermer le browse                               *
+      * Touches :                                                      *
+      *   ENTER = Enregistrement suivant                               *
+      *   PF3   = Quitter le browse                                    *
+      *   CLEAR = Annuler                                              *
       *----------------------------------------------------------------*
       * Pre-requis :                                                   *
       *   - AIX defini sur FCLIENT (champ NOMCPT, position 7, lg 10)   *
       *   - PATH defini (FTEST.CICS.FCLIENT.PATH)                      *
       *   - Definition CICS : FILE(PCLIENT) DSN(PATH)                  *
       *================================================================*
-      * Version corrigee : ajout RECEIVE entre chaque affichage        *
-      *================================================================*
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
 
+       COPY DFHAID.
        COPY MAPPATH.
 
        01  WS-RESPCODE          PIC S9(8) COMP.
@@ -58,15 +53,21 @@
 
        MAIN-PARA.
 
-           MOVE 80   TO WS-REC-LEN.
-           MOVE SPACES TO WS-REC-KEY.
-           MOVE 5    TO WS-KEY-LEN.
+      *------- Definition des touches de fonction ---------------------
+           EXEC CICS HANDLE AID
+               PF3(FIN-BROWSE)
+               CLEAR(FIN-PROGRAM)
+           END-EXEC.
 
       *------- Ignorer condition DUPKEY (cle non-unique) --------------
            EXEC CICS IGNORE CONDITION
                DUPKEY
                ENDFILE
            END-EXEC.
+
+           MOVE 80   TO WS-REC-LEN.
+           MOVE SPACES TO WS-REC-KEY.
+           MOVE 5    TO WS-KEY-LEN.
 
       *------- Envoi MAP1 pour saisir le nom client -------------------
            EXEC CICS SEND MAP('MAP1')
@@ -136,24 +137,13 @@
                MAPSET('MAPPATH') DATAONLY FREEKB
            END-EXEC.
 
-      *------- Attente action utilisateur (ENTER = suivant) -----------
-           EXEC CICS RECEIVE
-               RESP(WS-RESPCODE)
+      *------- Attente ENTER pour continuer (PF3 = quitter) -----------
+           EXEC CICS RECEIVE MAP('MAP2')
+               MAPSET('MAPPATH')
            END-EXEC.
 
-      *------- Verifier si PF3 pour quitter ---------------------------
-           IF EIBAID = DFHPF3
-               MOVE 'ABANDON PAR UTILISATEUR (PF3)' TO WS-MESSAGE
-               GO TO FIN-BROWSE
-           END-IF.
-
-      *------- Continuer si moins de 3 enregistrements lus ------------
-           IF WS-COUNT < 3
-               GO TO BOUCLE-LECTURE
-           END-IF.
-
-           MOVE 'PARCOURS AIX TERMINE - CLIENTS AFFICHES'
-               TO WS-MESSAGE.
+      *------- Continuer la lecture -----------------------------------
+           GO TO BOUCLE-LECTURE.
 
       *================================================================*
       *        ENDBR - Fin du browse                                   *
