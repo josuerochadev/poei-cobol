@@ -1,8 +1,3 @@
-***********************************************************************
-*  MAPSET : MAPNAME - Ecran saisie et affichage nom                   *
-*  Transaction : TRNM                                                 *
-*  Description : Saisir un nom et l'afficher avec un message          *
-***********************************************************************
 MAPNAME  DFHMSD TYPE=MAP,                                              X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
@@ -10,28 +5,19 @@ MAPNAME  DFHMSD TYPE=MAP,                                              X
                DSATTS=(COLOR,HILIGHT),                                 X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
-*
-***********************************************************************
-*  MAP1 : Ecran de saisie du nom                                      *
-***********************************************************************
 MAP1     DFHMDI SIZE=(24,80),                                          X
                LINE=1,                                                 X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
-*
-*----------------------- TITRE --------------------------------------
          DFHMDF POS=(3,25),                                            X
                LENGTH=30,                                              X
                ATTRB=(ASKIP,BRT),                                      X
                COLOR=TURQUOISE,                                        X
                INITIAL='=== EXERCICE SAISIE NOM ==='
-*
-*----------------------- ZONE SAISIE --------------------------------
          DFHMDF POS=(10,20),                                           X
                LENGTH=18,                                              X
                ATTRB=ASKIP,                                            X
                INITIAL='TAPER VOTRE NOM :'
-*
 NAMEIN   DFHMDF POS=(10,39),                                           X
                ATTRB=(UNPROT,BRT,IC),                                  X
                LENGTH=20,                                              X
@@ -40,23 +26,17 @@ NAMEIN   DFHMDF POS=(10,39),                                           X
                HILIGHT=REVERSE,                                        X
                CASE=MIXED,                                             X
                INITIAL='____________________'
-*
          DFHMDF POS=(10,60),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
-*
-*----------------------- ZONE AFFICHAGE -----------------------------
 NAMEOUT  DFHMDF POS=(15,20),                                           X
                LENGTH=40,                                              X
                ATTRB=(ASKIP,BRT),                                      X
                COLOR=YELLOW
-*
-*----------------------- INSTRUCTIONS -------------------------------
          DFHMDF POS=(22,20),                                           X
                LENGTH=40,                                              X
                ATTRB=ASKIP,                                            X
                COLOR=TURQUOISE,                                        X
                INITIAL='Saisissez votre nom puis appuyez ENTER'
-*
          DFHMSD TYPE=FINAL
          END

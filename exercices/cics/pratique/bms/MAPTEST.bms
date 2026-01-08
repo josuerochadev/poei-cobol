@@ -1,7 +1,3 @@
-***********************************************************************
-*  MAPSET : MAPTEST - Ecran de bienvenue CICS                         *
-*  Usage  : Exercice d'introduction BMS                               *
-***********************************************************************
 MAPTEST  DFHMSD TYPE=MAP,                                              X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X

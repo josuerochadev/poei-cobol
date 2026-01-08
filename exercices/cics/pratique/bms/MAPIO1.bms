@@ -5,9 +5,6 @@ MAPIO1   DFHMSD TYPE=DSECT,                                            X
                DSATTS=(COLOR,HILIGHT),                                 X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
-*----------------------------------------------------------------------*
-*  MAP1 : Zone SIMPLE (ligne 10) - Champ INPUT texte                   *
-*----------------------------------------------------------------------*
 MAP1     DFHMDI SIZE=(01,80),                                          X
                LINE=10,                                                X
                COLUMN=01,                                              X
@@ -25,9 +22,6 @@ SIMPLE   DFHMDF POS=(01,38),                                           X
          DFHMDF POS=(01,59),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
-*----------------------------------------------------------------------*
-*  MAP2 : Zone CHPOUT (ligne 15) - Champ OUTPUT numerique              *
-*----------------------------------------------------------------------*
 MAP2     DFHMDI SIZE=(01,80),                                          X
                LINE=15,                                                X
                COLUMN=01,                                              X
@@ -43,9 +37,6 @@ CHPOUT   DFHMDF POS=(01,38),                                           X
          DFHMDF POS=(01,50),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
-*----------------------------------------------------------------------*
-*  MAP3 : Zone CHPIO (ligne 17) - Champ INPUT/OUTPUT numerique         *
-*----------------------------------------------------------------------*
 MAP3     DFHMDI SIZE=(01,80),                                          X
                LINE=17,                                                X
                COLUMN=01,                                              X
