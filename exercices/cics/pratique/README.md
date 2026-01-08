@@ -8,6 +8,8 @@ Ce dossier contient les exercices pratiques CICS alignes avec le support de form
 pratique/
 ├── bms/            # Ecrans BMS (MAPs)
 │   ├── MAPTEST.bms    # Ecran de bienvenue (Couche Presentation)
+│   ├── MAPREAD.bms    # MAP pour BROWSE basique (PGSTART)
+│   ├── MAPPATH.bms    # MAP pour BROWSE avec AIX (PGPATHF)
 │   └── TESTSET.bms    # Mapset pour les exercices VSAM
 │
 ├── cobol/          # Programmes COBOL-CICS
@@ -15,7 +17,9 @@ pratique/
 │   ├── PROGREAD.cbl   # Programme READ (lecture)
 │   ├── PROGWRIT.cbl   # Programme WRITE (creation)
 │   ├── PROGREWT.cbl   # Programme REWRITE (mise a jour)
-│   └── PROGDELT.cbl   # Programme DELETE (suppression)
+│   ├── PROGDELT.cbl   # Programme DELETE (suppression)
+│   ├── PGSTART.cbl    # BROWSE basique (STARTBR/READNEXT)
+│   └── PGPATHF.cbl    # BROWSE avec AIX (Alternate Index)
 │
 ├── copybooks/      # Copybooks COBOL
 │   └── MAPTEST.cpy    # DSECT genere par BMS
@@ -24,6 +28,7 @@ pratique/
     ├── ASSBLMAP.jcl   # Assemblage des MAPs BMS
     ├── COMPPGR.jcl    # Compilation programme COBOL-CICS
     ├── DEFVSAM.jcl    # Definition fichier VSAM
+    ├── DEFPATH.jcl    # Definition AIX et PATH pour PGPATHF
     └── LOADDATA.jcl   # Chargement donnees initiales
 ```
 
@@ -58,7 +63,7 @@ pratique/
 
 | Programme | Transaction | Description | Fichiers |
 |-----------|-------------|-------------|----------|
-| PGSTART | TSRT | BROWSE avec STARTBR/READNEXT/ENDBR (cle primaire) | `cobol/PGSTART.cbl` |
+| PGSTART | TSRT | BROWSE avec STARTBR/READNEXT/ENDBR (cle primaire) | `cobol/PGSTART.cbl`, `bms/MAPREAD.bms` |
 | PGPATHF | TPTH | BROWSE avec ALTERNATE INDEX (cle NOMCPT) | `cobol/PGPATHF.cbl`, `bms/MAPPATH.bms` |
 
 #### Exercice 13 - BROWSE basique (PGSTART)
@@ -66,7 +71,7 @@ pratique/
 - Commandes : STARTBR, READNEXT, ENDBR
 - Lit 3 enregistrements a partir d'une cle de depart
 
-#### Exercice 14 - BROWSE avec AIX (PRGPATH)
+#### Exercice 14 - BROWSE avec AIX (PGPATHF)
 - Parcours via ALTERNATE INDEX sur le champ NOMCPT
 - Pre-requis : AIX et PATH definis (`jcl/DEFPATH.jcl`)
 - Recherche par nom de client

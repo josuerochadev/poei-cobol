@@ -30,6 +30,8 @@
        01  WS-REC-LEN           PIC S9(4) COMP.
        01  WS-KEY-LEN           PIC S9(4) COMP.
        01  WS-REC-KEY           PIC X(10).
+       01  WS-SEARCH-KEY        PIC X(10).
+       01  WS-SEARCH-LEN        PIC S9(4) COMP.
        01  WS-MESSAGE           PIC X(50).
        01  WS-REQID             PIC S9(4) COMP VALUE 1.
        01  WS-COUNT             PIC 9(2) VALUE 0.
@@ -59,10 +61,11 @@
                CLEAR(FIN-PROGRAM)
            END-EXEC.
 
-      *------- Ignorer condition DUPKEY (cle non-unique) --------------
+      *------- Ignorer conditions DUPKEY, ENDFILE, MAPFAIL -----------
            EXEC CICS IGNORE CONDITION
                DUPKEY
                ENDFILE
+               MAPFAIL
            END-EXEC.
 
            MOVE 80   TO WS-REC-LEN.
@@ -80,6 +83,8 @@
            END-EXEC.
 
            MOVE GENNOMI TO WS-REC-KEY.
+           MOVE GENNOMI TO WS-SEARCH-KEY.
+           MOVE WS-KEY-LEN TO WS-SEARCH-LEN.
 
       *================================================================*
       *        STARTBR - Positionnement via AIX (NOMCPT)               *
@@ -121,7 +126,15 @@
            END-IF.
 
            IF WS-RESPCODE NOT = DFHRESP(NORMAL)
+              AND WS-RESPCODE NOT = DFHRESP(DUPKEY)
                MOVE 'ERREUR READNEXT AIX' TO WS-MESSAGE
+               GO TO FIN-BROWSE
+           END-IF.
+
+      *------- Verifier si le nom correspond toujours a la recherche --
+           IF WS-NOMCPT(1:WS-SEARCH-LEN) NOT =
+              WS-SEARCH-KEY(1:WS-SEARCH-LEN)
+               MOVE 'FIN DES CLIENTS CORRESPONDANTS' TO WS-MESSAGE
                GO TO FIN-BROWSE
            END-IF.
 
@@ -130,11 +143,7 @@
 
       *------- Envoi MAP2 avec donnees --------------------------------
            EXEC CICS SEND MAP('MAP2')
-               MAPSET('MAPPATH') MAPONLY FREEKB ERASE
-           END-EXEC.
-
-           EXEC CICS SEND MAP('MAP2')
-               MAPSET('MAPPATH') DATAONLY FREEKB
+               MAPSET('MAPPATH') FREEKB ERASE
            END-EXEC.
 
       *------- Attente ENTER pour continuer (PF3 = quitter) -----------
