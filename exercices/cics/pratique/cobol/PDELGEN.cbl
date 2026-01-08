@@ -15,7 +15,7 @@
        01  WS-REC-LEN           PIC S9(4) COMP.
        01  WS-KEY-LEN           PIC S9(4) COMP.
        01  WS-DEL-REC           PIC S9(4) COMP.
-       01  WS-REC-KEY           PIC 9(3).
+       01  WS-REC-KEY           PIC X(3).
        01  NBR-DELREC           PIC 9(3).
 
        01  WS-REC-DATA.
