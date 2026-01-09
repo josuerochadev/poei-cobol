@@ -1,7 +1,7 @@
 ***********************************************************************
 *  MAPSET : MDELG - SUPPRESSION GENERIQUE DE RECORDS                  *
 *  PROGRAMME : PDELGEN                                                *
-*  TRANSACTION : DELG                                                 *
+*  TRANSACTION : TDLG                                                 *
 *  DESCRIPTION : Suppression par cle generique partielle              *
 ***********************************************************************
 *

@@ -1,7 +1,7 @@
 ***********************************************************************
 *  MAPSET : MAPNAME - ECRAN SAISIE ET AFFICHAGE NOM                   *
 *  PROGRAMME : PROGNAME                                               *
-*  TRANSACTION : NAME                                                 *
+*  TRANSACTION : TRNM                                                 *
 *  DESCRIPTION : Saisir un nom et l'afficher avec un message          *
 ***********************************************************************
 *

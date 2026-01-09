@@ -1,8 +1,8 @@
 ***********************************************************************
-*  MAPSET : MAPREAD - CONSULTATION CLIENT (BROWSE BASIQUE)            *
-*  PROGRAMME : PGSTART                                                *
-*  TRANSACTION : TSRT                                                 *
-*  DESCRIPTION : Parcours sequentiel VSAM avec STARTBR/READNEXT       *
+*  MAPSET : MAPREAD - CONSULTATION ET GESTION CLIENT                  *
+*  PROGRAMMES : PGSTART, PRGRGEN, PRGRDEL, PROGREAD                   *
+*  TRANSACTIONS : TSRT, TGEN, TRDL, TRDF                              *
+*  DESCRIPTION : Ecrans recherche et fiche client                     *
 ***********************************************************************
 *
 MAPREAD  DFHMSD TYPE=DSECT,                                            X

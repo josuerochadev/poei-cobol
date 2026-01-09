@@ -1,7 +1,7 @@
 ***********************************************************************
 *  MAPSET : MAPWRIT - GESTION CLIENT (CREATION/MODIFICATION)          *
-*  PROGRAMME : PRGWRIT                                                *
-*  TRANSACTION : WRIT                                                 *
+*  PROGRAMMES : PRGWRIT, PRGREWR, PRWRSPL                             *
+*  TRANSACTIONS : TWRI, TREW, TWRT                                    *
 *  DESCRIPTION : Ecran de saisie pour creation/modification client    *
 ***********************************************************************
 *
