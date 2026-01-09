@@ -8,13 +8,15 @@ Ce module contient les exercices et travaux pratiques pour CICS.
 cics/
 ├── README.md                  # Ce fichier
 │
-├── theorie/                   # QCM et questions conceptuelles
+├── theorie/                   # QCM et questions conceptuelles (8 QCM)
 │   ├── qcm-01-presentation.md
 │   ├── qcm-02-organisation.md
 │   ├── qcm-03-architecture.md
 │   ├── qcm-04-presentation.md
 │   ├── qcm-05-traitement.md
-│   └── qcm-06-donnees.md
+│   ├── qcm-06-donnees.md
+│   ├── qcm-08-travaux-pratiques.md
+│   └── qcm-09-architecture-tsi.md
 │
 ├── pratique/                  # Exercices pratiques
 │   ├── bms/                   # Ecrans BMS
@@ -23,10 +25,9 @@ cics/
 │   └── jcl/                   # Jobs JCL
 │
 ├── tp-gestion-credits/        # TP complet (Transaction CRED)
-│   ├── cobol/
-│   ├── copybooks/
-│   ├── data/
-│   └── jcl/
+│   ├── bms/                   # Écran CREDSET
+│   ├── cobol/                 # CREDPRES, CREDTRT, CREDDAO
+│   └── jcl/                   # DEFVSAM, LOADDATA
 │
 └── fil-rouge/                 # Projet fil rouge bancaire complet
     ├── cobol/                 # 7 programmes (MENU, CLNT, CPTE)
@@ -51,13 +52,13 @@ cics/
 | [QCM 08](theorie/qcm-08-travaux-pratiques.md) | Travaux Pratiques | 20 |
 | [QCM 09](theorie/qcm-09-architecture-tsi.md) | Architecture et Transactions TSI | 25 |
 
-### Pratique (10 exercices)
+### Pratique (27 fichiers)
 
-| Thème | Exercices | Description |
-|-------|-----------|-------------|
-| BMS | 2 | MAPTEST, TESTSET (écrans) |
-| COBOL | 4 | PROGREAD, PROGWRIT, PROGREWT, PROGDELT |
-| JCL | 4 | Assemblage MAP, Compilation, VSAM |
+| Thème | Fichiers | Description |
+|-------|----------|-------------|
+| BMS | 8 | MAPTEST, MAPREAD, MAPPATH, MAPWRIT, MAPIO, MAPIO1, MAPNAME, MDELG |
+| COBOL | 13 | PROGTEST, PROGREAD, PRGWRIT, PRGREWR, PRGRDEL, PGSTART, PGPATHF, PROGIO, PROGIO1, PROGNAME, PRGRGEN, PDELGEN, PRWRSPL |
+| JCL | 6 | ASSBLMAP, COMPPGR, DEFVSAM, DEFFCLI, DEFPATH, LOADDATA |
 
 Voir [pratique/README.md](pratique/README.md) pour les détails.
 
@@ -112,7 +113,7 @@ Voir [fil-rouge/README.md](fil-rouge/README.md) pour les détails.
    (Maîtriser SEND MAP / RECEIVE MAP)
 
 3. PRATIQUE VSAM
-   PROGREAD → PROGWRIT → PROGREWT → PROGDELT
+   PROGREAD → PRGWRIT → PRGREWR → PRGRDEL
    (Maîtriser les commandes fichier)
 
 4. TP GESTION CRÉDITS + QCM 08
@@ -151,7 +152,7 @@ Voir [fil-rouge/README.md](fil-rouge/README.md) pour les détails.
 ## Total
 
 - **127 questions** théoriques (8 QCM)
-- **10 exercices** pratiques
+- **27 fichiers** pratiques (8 BMS + 13 COBOL + 6 JCL)
 - **1 TP** complet architecture 3 tiers (CRED)
 - **1 Fil Rouge** bancaire multi-transactions (MENU, CLNT, CPTE)
 - **7 programmes COBOL** + **3 mapsets BMS** dans le fil rouge
