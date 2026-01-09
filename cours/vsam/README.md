@@ -87,7 +87,7 @@ Ce module couvre VSAM (Virtual Storage Accèss Method), la méthode d'accès aux
 ## Ressources
 
 - Exercices pratiques : `exercices/vsam/`
-- Projet fil-rouge : `projets/fil-rouge/`
+- Projet fil-rouge : `exercices/cobol/fil-rouge/`
 
 ---
 

@@ -33,8 +33,8 @@ exercices/       # Practical exercises
 ├── zos-tso/     # TSO/ISPF exercises
 └── cics/        # CICS exercises
 
-projets/fil-rouge/   # Capstone project: Financial Management System
-                     # 21 exercises, 19 JCL files, 10 COBOL programs
+exercices/cobol/fil-rouge/  # Capstone project: Financial Management System
+                            # 21 exercises, 19 JCL files, 10 COBOL programs
 
 hercules/        # Hercules/z/OS emulator configuration
 ├── jcl/         # Job Control Language files

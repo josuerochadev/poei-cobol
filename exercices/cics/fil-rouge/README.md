@@ -244,7 +244,7 @@ DEFINE MAPSET(MENUSET,CLNTSET,CPTESET)
 
 ## Relation avec le Fil Rouge COBOL/JCL
 
-Ce projet CICS s'intègre avec le fil-rouge principal (`projets/fil-rouge/`) :
+Ce projet CICS s'intègre avec le fil-rouge principal (`exercices/cobol/fil-rouge/`) :
 
 | Fil Rouge COBOL/JCL | Fil Rouge CICS |
 |---------------------|----------------|

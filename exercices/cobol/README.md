@@ -8,7 +8,7 @@ Les exercices sont organisés en trois parties :
 exercices/cobol/
 ├── theorie/          # QCM pour valider les connaissances
 ├── pratique/         # Exercices hands-on par chapitre
-└── fil-rouge/        # → Voir projets/fil-rouge/ (projet capstone)
+└── fil-rouge/        # Projet fil rouge (21 exercices)
 ```
 
 ---
@@ -162,7 +162,7 @@ Les exercices pratiques sont organisés par chapitre du cours.
 
 Le projet fil rouge est un système de gestion financière complet avec 21 exercices progressifs.
 
-**Emplacement :** [`projets/fil-rouge/`](../../projets/fil-rouge/)
+**Emplacement :** [`fil-rouge/`](fil-rouge/)
 
 Ce projet met en pratique l'ensemble des compétences COBOL et JCL acquises pendant la formation.
 
