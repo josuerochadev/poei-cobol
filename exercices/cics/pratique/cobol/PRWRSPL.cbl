@@ -97,5 +97,3 @@
 
            EXEC CICS RETURN
            END-EXEC.
-
-           STOP RUN.

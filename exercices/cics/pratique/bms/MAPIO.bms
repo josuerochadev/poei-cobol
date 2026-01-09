@@ -1,4 +1,4 @@
-MAPIO    DFHMSD TYPE=MAP,                                              X
+MAPIO    DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
                MAPATTS=(COLOR,HILIGHT,OUTLINE),                        X
@@ -44,5 +44,5 @@ CHPIO    DFHMDF POS=(17,38),                                           X
          DFHMDF POS=(17,45),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
-         DFHMSD TYPE=FINAL
+MAPIO    DFHMSD TYPE=FINAL
          END

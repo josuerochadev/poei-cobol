@@ -1,4 +1,4 @@
-MAPNAME  DFHMSD TYPE=MAP,                                              X
+MAPNAME  DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
                MAPATTS=(COLOR,HILIGHT,OUTLINE),                        X
@@ -38,5 +38,5 @@ NAMEOUT  DFHMDF POS=(15,20),                                           X
                ATTRB=ASKIP,                                            X
                COLOR=TURQUOISE,                                        X
                INITIAL='Saisissez votre nom puis appuyez ENTER'
-         DFHMSD TYPE=FINAL
+MAPNAME  DFHMSD TYPE=FINAL
          END

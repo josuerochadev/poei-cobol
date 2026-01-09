@@ -34,7 +34,7 @@
        01  WS-SEARCH-LEN        PIC S9(4) COMP.
        01  WS-MESSAGE           PIC X(50).
        01  WS-REQID             PIC S9(4) COMP VALUE 1.
-       01  WS-COUNT             PIC 9(2) VALUE 0.
+       01  WS-COUNT             PIC 9(3) VALUE 0.
 
        01  WS-REC-DATA.
            05  WS-CDECLT        PIC 9(3).
@@ -53,34 +53,36 @@
 
        PROCEDURE DIVISION.
 
+      *================================================================*
        MAIN-PARA.
-
-      *------- Definition des touches de fonction ---------------------
-           EXEC CICS HANDLE AID
-               PF3(FIN-BROWSE)
-               CLEAR(FIN-PROGRAM)
-           END-EXEC.
-
-      *------- Ignorer conditions DUPKEY, ENDFILE, MAPFAIL -----------
-           EXEC CICS IGNORE CONDITION
-               DUPKEY
-               ENDFILE
-               MAPFAIL
-           END-EXEC.
+      *================================================================*
 
            MOVE 80   TO WS-REC-LEN.
            MOVE SPACES TO WS-REC-KEY.
            MOVE 5    TO WS-KEY-LEN.
+           MOVE SPACES TO WS-MESSAGE.
 
-      *------- Envoi MAP1 pour saisir le nom client -------------------
+      *--- Envoi MAP1 pour saisir le nom client ---
            EXEC CICS SEND MAP('MAP1')
                MAPSET('MAPPATH') MAPONLY FREEKB ERASE
            END-EXEC.
 
-      *------- Reception du nom saisi ---------------------------------
+      *--- Reception du nom saisi ---
            EXEC CICS RECEIVE MAP('MAP1')
                MAPSET('MAPPATH')
            END-EXEC.
+
+      *--- Gestion des touches ---
+           IF EIBAID = DFHPF3 OR EIBAID = DFHCLEAR
+               GO TO FIN-PROGRAM
+           END-IF.
+
+      *--- Validation de la saisie ---
+           IF GENNOMI = SPACES OR GENNOMI = LOW-VALUES
+               MOVE 'ERREUR: VEUILLEZ SAISIR UN NOM CLIENT'
+                   TO WS-MESSAGE
+               GO TO AFFICHER-MESSAGE
+           END-IF.
 
            MOVE GENNOMI TO WS-REC-KEY.
            MOVE GENNOMI TO WS-SEARCH-KEY.
@@ -95,15 +97,14 @@
                RESP(WS-RESPCODE)
            END-EXEC.
 
+           IF WS-RESPCODE = DFHRESP(NOTFND)
+               MOVE 'AUCUN CLIENT TROUVE POUR CE NOM' TO WS-MESSAGE
+               GO TO AFFICHER-MESSAGE
+           END-IF.
+
            IF WS-RESPCODE NOT = DFHRESP(NORMAL)
-               IF WS-RESPCODE = DFHRESP(NOTFND)
-                   MOVE 'AUCUN CLIENT TROUVE POUR CE NOM'
-                       TO WS-MESSAGE
-               ELSE
-                   MOVE 'ERREUR STARTBR AIX - VERIFIER PATH'
-                       TO WS-MESSAGE
-               END-IF
-               GO TO ERREUR-PARA
+               MOVE 'ERREUR STARTBR AIX - VERIFIER PATH' TO WS-MESSAGE
+               GO TO AFFICHER-MESSAGE
            END-IF.
 
       *================================================================*
@@ -113,7 +114,7 @@
            MOVE 0  TO WS-COUNT.
 
        BOUCLE-LECTURE.
-      *------- READNEXT - Lecture enregistrement suivant via AIX ------
+      *--- READNEXT - Lecture enregistrement suivant via AIX ---
            EXEC CICS READNEXT FILE('PCLIENT') INTO(WS-REC-DATA)
                LENGTH(WS-REC-LEN) RIDFLD(WS-REC-KEY)
                KEYLENGTH(WS-KEY-LEN) REQID(WS-REQID)
@@ -125,13 +126,14 @@
                GO TO FIN-BROWSE
            END-IF.
 
+      *--- Gerer DUPKEY (normal pour AIX avec cles dupliquees) ---
            IF WS-RESPCODE NOT = DFHRESP(NORMAL)
               AND WS-RESPCODE NOT = DFHRESP(DUPKEY)
                MOVE 'ERREUR READNEXT AIX' TO WS-MESSAGE
                GO TO FIN-BROWSE
            END-IF.
 
-      *------- Verifier si le nom correspond toujours a la recherche --
+      *--- Verifier si le nom correspond toujours a la recherche ---
            IF WS-NOMCPT(1:WS-SEARCH-LEN) NOT =
               WS-SEARCH-KEY(1:WS-SEARCH-LEN)
                MOVE 'FIN DES CLIENTS CORRESPONDANTS' TO WS-MESSAGE
@@ -141,17 +143,23 @@
            ADD 1 TO WS-COUNT.
            PERFORM AFFECT-DONNEE.
 
-      *------- Envoi MAP2 avec donnees --------------------------------
+      *--- Envoi MAP2 avec donnees ---
            EXEC CICS SEND MAP('MAP2')
-               MAPSET('MAPPATH') FREEKB ERASE
+               MAPSET('MAPPATH') ERASE FREEKB
            END-EXEC.
 
-      *------- Attente ENTER pour continuer (PF3 = quitter) -----------
+      *--- Attente ENTER pour continuer (PF3 = quitter) ---
            EXEC CICS RECEIVE MAP('MAP2')
                MAPSET('MAPPATH')
            END-EXEC.
 
-      *------- Continuer la lecture -----------------------------------
+      *--- Gestion des touches dans la boucle ---
+           IF EIBAID = DFHPF3 OR EIBAID = DFHCLEAR
+               MOVE 'BROWSE INTERROMPU PAR UTILISATEUR' TO WS-MESSAGE
+               GO TO FIN-BROWSE
+           END-IF.
+
+      *--- Continuer la lecture ---
            GO TO BOUCLE-LECTURE.
 
       *================================================================*
@@ -163,22 +171,24 @@
                RESP(WS-RESPCODE)
            END-EXEC.
 
-           GO TO FIN-PROGRAM.
+           GO TO AFFICHER-MESSAGE.
 
-       ERREUR-PARA.
-           CONTINUE.
-
-       FIN-PROGRAM.
+      *================================================================*
+       AFFICHER-MESSAGE.
+      *================================================================*
            EXEC CICS SEND TEXT
                FROM(WS-MESSAGE)
                LENGTH(50)
                ERASE
            END-EXEC.
 
+           GO TO FIN-PROGRAM.
+
+      *================================================================*
+       FIN-PROGRAM.
+      *================================================================*
            EXEC CICS RETURN
            END-EXEC.
-
-           STOP RUN.
 
       *================================================================*
       *        AFFECT-DONNEE - Transfert donnees vers MAP              *

@@ -37,11 +37,7 @@
            MOVE VAR3 TO CHPOUTO.
 
            EXEC CICS SEND MAP('MAP1')
-               MAPSET('MAPIO') MAPONLY FREEKB
-           END-EXEC.
-
-           EXEC CICS SEND MAP('MAP1')
-               MAPSET('MAPIO')
+               MAPSET('MAPIO') DATAONLY FREEKB
            END-EXEC.
 
       *--- Etape 4 : Attendre saisie champ CHPIO ---
@@ -59,8 +55,5 @@
            END-EXEC.
 
       *--- Fin de transaction ---
-           EXEC CICS
-               RETURN
+           EXEC CICS RETURN
            END-EXEC.
-
-           STOP RUN.

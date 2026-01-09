@@ -54,7 +54,7 @@
                KEYLENGTH(2) GENERIC
            END-EXEC.
 
-           MOVE WS-CDECLT TO CDECLTO.
+           MOVE WS-CDECLT TO CDECLT2O.
            MOVE WS-CODREG TO CODREGO.
            MOVE WS-NATCPT TO NATCPTO.
            MOVE WS-NOMCPT TO NOMCPTO.
@@ -75,8 +75,5 @@
                MAPSET('MAPREAD') DATAONLY FREEKB
            END-EXEC.
 
-           EXEC CICS
-               RETURN
+           EXEC CICS RETURN
            END-EXEC.
-
-           STOP RUN.

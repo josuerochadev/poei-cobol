@@ -66,8 +66,5 @@
            END-EXEC.
 
       *--- Fin de transaction ---
-           EXEC CICS
-               RETURN
+           EXEC CICS RETURN
            END-EXEC.
-
-           STOP RUN.

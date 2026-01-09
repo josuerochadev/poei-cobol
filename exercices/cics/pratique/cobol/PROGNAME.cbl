@@ -49,5 +49,3 @@
       *    5. Terminer la transaction
            EXEC CICS RETURN
            END-EXEC.
-
-           GOBACK.
