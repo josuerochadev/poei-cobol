@@ -38,7 +38,7 @@ poei-cobol/
 │   │   ├── ...
 │   │   └── 12-fichier-impression.md
 │   │
-│   ├── cics/               # Module CICS (8 chapitres)
+│   ├── cics/               # Module CICS (9 chapitres)
 │   │   ├── 01-presentation-generale.md
 │   │   ├── 02-organisation-systeme.md
 │   │   ├── 03-sgbd-ims.md
@@ -46,7 +46,8 @@ poei-cobol/
 │   │   ├── 05-couche-presentation.md
 │   │   ├── 06-couche-traitement.md
 │   │   ├── 07-couche-donnees.md
-│   │   └── 08-travaux-pratiques.md
+│   │   ├── 08-travaux-pratiques.md
+│   │   └── 09-architecture-transactions-tsi.md
 │   │
 │   └── db2/                # Module DB2/SQL (10 chapitres)
 │       ├── 01-fondamentaux-bd.md
@@ -63,11 +64,10 @@ poei-cobol/
 ├── exercices/              # Exercices par module
 │   ├── zos-tso/            # Exercices TSO/ISPF
 │   │
-│   ├── jcl/                # Exercices JCL (24 fichiers .jcl)
-│   │   ├── chapitre-02/
-│   │   ├── chapitre-03/
-│   │   ├── chapitre-04/
-│   │   └── chapitre-05/    # Travaux pratiques + QCM
+│   ├── jcl/                # Exercices JCL
+│   │   ├── theorie/        # QCM (4 fichiers)
+│   │   ├── pratique/       # Exercices par chapitre (02, 03, 04)
+│   │   └── tp/             # Travaux pratiques de synthèse
 │   │
 │   ├── algorithmique/      # Exercices Algorithmique (40 exercices + 9 QCM)
 │   │   ├── theorie/        # QCM par chapitre
@@ -78,8 +78,11 @@ poei-cobol/
 │   │   ├── ...
 │   │   └── chapitre-12/
 │   │
-│   ├── cics/               # Exercices CICS (1 TP)
-│   │   └── tp-gestion-credits/  # TP complet architecture 3 tiers
+│   ├── cics/               # Exercices CICS
+│   │   ├── theorie/            # QCM (8 fichiers)
+│   │   ├── pratique/           # Exercices BMS, COBOL, JCL
+│   │   ├── tp-gestion-credits/ # TP complet architecture 3 tiers
+│   │   └── fil-rouge/          # Application bancaire multi-transactions
 │   │
 │   └── db2/                # Exercices DB2/SQL
 │       ├── theorie/        # QCM (71 questions)
@@ -153,14 +156,15 @@ poei-cobol/
 
 | Chapitre | Sujet | Cours | Exercices |
 |----------|-------|-------|-----------|
-| I | Présentation générale | ✅ | - |
-| II | Organisation du système | ✅ | - |
-| III | SGBD IMS | ✅ | - |
-| IV | Architecture Multicouches | ✅ | - |
-| V | Couche de Présentation | ✅ | - |
-| VI | Couche de Traitement | ✅ | - |
+| I | Présentation générale | ✅ | ✅ QCM |
+| II | Organisation du système | ✅ | ✅ QCM |
+| III | SGBD IMS | ✅ | ✅ QCM |
+| IV | Architecture Multicouches | ✅ | ✅ QCM |
+| V | Couche de Présentation | ✅ | ✅ QCM |
+| VI | Couche de Traitement | ✅ | ✅ QCM |
 | VII | Couche des Données | ✅ | - |
-| VIII | Travaux Pratiques | ✅ | ✅ |
+| VIII | Travaux Pratiques | ✅ | ✅ TP |
+| IX | Architecture et Transactions TSI | ✅ | ✅ QCM |
 
 ### Module DB2/SQL
 

@@ -15,8 +15,8 @@ Les QCM sont organisés par chapitre du cours et permettent de valider la compr�
 | Fichier | Chapitre | Nombre de questions |
 |---------|----------|---------------------|
 | `theorie/qcm-01-cartes-jcl.md` | I - Cartes JOB, EXEC, DD | 30 questions |
-| `theorie/qcm-02-fichiers-paramètres.md` | II - Fichiers et paramètres | 25 questions |
-| `theorie/qcm-03-procédures.md` | III - Procédures JCL | 25 questions |
+| `theorie/qcm-02-fichiers-parametres.md` | II - Fichiers et paramètres | 25 questions |
+| `theorie/qcm-03-procedures.md` | III - Procédures JCL | 25 questions |
 | `theorie/qcm-04-utilitaires.md` | IV - Utilitaires et SORT | 35 questions |
 
 **Total : 115 questions**
@@ -65,23 +65,23 @@ exercices/jcl/
 ├── README.md
 ├── theorie/                        # QCM théoriques
 │   ├── qcm-01-cartes-jcl.md
-│   ├── qcm-02-fichiers-paramètres.md
-│   ├── qcm-03-procédures.md
+│   ├── qcm-02-fichiers-parametres.md
+│   ├── qcm-03-procedures.md
 │   └── qcm-04-utilitaires.md
 ├── pratique/                       # Exercices pratiques par chapitre
 │   ├── chapitre-02/
 │   │   ├── README.md
-│   │   ├── ex01-création-esds.jcl
+│   │   ├── ex01-creation-esds.jcl
 │   │   ├── ex02-copie-iebgener.jcl
 │   │   ├── ex03-fichier-temporaire.jcl
-│   │   ├── ex04-concaténation.jcl
+│   │   ├── ex04-concatenation.jcl
 │   │   ├── ex-bonus-complet.jcl
 │   │   └── cleanup.jcl
 │   ├── chapitre-03/
 │   │   ├── README.md
 │   │   ├── ex01-proc-instream.jcl
 │   │   ├── ex02-deux-procs.jcl
-│   │   ├── ex03-proc-imbriquées.jcl
+│   │   ├── ex03-proc-imbriquees.jcl
 │   │   ├── ex04-param-symboliques.jcl
 │   │   └── cleanup.jcl
 │   └── chapitre-04/
@@ -109,10 +109,10 @@ exercices/jcl/
 
 | Fichier | Description |
 |---------|-------------|
-| `pratique/chapitre-02/ex01-création-esds.jcl` | Création dataset avec données in-stream |
+| `pratique/chapitre-02/ex01-creation-esds.jcl` | Création dataset avec données in-stream |
 | `pratique/chapitre-02/ex02-copie-iebgener.jcl` | Copie dataset avec IEBGENER et DCB=* |
 | `pratique/chapitre-02/ex03-fichier-temporaire.jcl` | Fichier temporaire entre steps |
-| `pratique/chapitre-02/ex04-concaténation.jcl` | Concaténation de datasets |
+| `pratique/chapitre-02/ex04-concatenation.jcl` | Concaténation de datasets |
 | `pratique/chapitre-02/ex-bonus-complet.jcl` | Tous les exercices en un seul job |
 | `pratique/chapitre-02/cleanup.jcl` | Nettoyage des datasets |
 
@@ -130,7 +130,7 @@ exercices/jcl/
 |---------|-------------|
 | `pratique/chapitre-03/ex01-proc-instream.jcl` | Procédure in-stream avec override |
 | `pratique/chapitre-03/ex02-deux-procs.jcl` | Deux procédures successives |
-| `pratique/chapitre-03/ex03-proc-imbriquées.jcl` | Procédures imbriquées |
+| `pratique/chapitre-03/ex03-proc-imbriquees.jcl` | Procédures imbriquées |
 | `pratique/chapitre-03/ex04-param-symboliques.jcl` | Parametrage multiple |
 | `pratique/chapitre-03/cleanup.jcl` | Nettoyage des datasets |
 

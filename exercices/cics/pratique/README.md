@@ -10,24 +10,35 @@ pratique/
 │   ├── MAPTEST.bms    # Écran de bienvenue (Couche Présentation)
 │   ├── MAPREAD.bms    # MAP pour BROWSE basique (PGSTART)
 │   ├── MAPPATH.bms    # MAP pour BROWSE avec AIX (PGPATHF)
-│   └── TESTSET.bms    # Mapset pour les exercices VSAM
+│   ├── MAPWRIT.bms    # MAP pour écriture
+│   ├── MAPIO.bms      # MAP entrées/sorties
+│   ├── MAPIO1.bms     # MAP entrées/sorties (variante)
+│   ├── MAPNAME.bms    # MAP recherche par nom
+│   └── MDELG.bms      # MAP suppression générique
 │
 ├── cobol/          # Programmes COBOL-CICS
 │   ├── PROGTEST.cbl   # Affichage MAPTEST (Couche Présentation)
 │   ├── PROGREAD.cbl   # Programme READ (lecture)
-│   ├── PROGWRIT.cbl   # Programme WRITE (création)
-│   ├── PROGREWT.cbl   # Programme REWRITE (mise à jour)
-│   ├── PROGDELT.cbl   # Programme DELETE (suppression)
+│   ├── PRGWRIT.cbl    # Programme WRITE (création)
+│   ├── PRGREWR.cbl    # Programme REWRITE (mise à jour)
+│   ├── PRGRDEL.cbl    # Programme DELETE (suppression)
 │   ├── PGSTART.cbl    # BROWSE basique (STARTBR/READNEXT)
-│   └── PGPATHF.cbl    # BROWSE avec AIX (Alternate Index)
+│   ├── PGPATHF.cbl    # BROWSE avec AIX (Alternate Index)
+│   ├── PROGIO.cbl     # Programme E/S générique
+│   ├── PROGIO1.cbl    # Programme E/S (variante)
+│   ├── PROGNAME.cbl   # Programme recherche par nom
+│   ├── PRGRGEN.cbl    # Programme lecture générique
+│   ├── PDELGEN.cbl    # Programme suppression générique
+│   └── PRWRSPL.cbl    # Programme écriture spéciale
 │
 ├── copybooks/      # Copybooks COBOL
-│   └── MAPTEST.cpy    # DSECT généré par BMS
+│   └── CLIENT.cpy     # Structure enregistrement client
 │
 └── jcl/            # Jobs JCL
     ├── ASSBLMAP.jcl   # Assemblage des MAPs BMS
     ├── COMPPGR.jcl    # Compilation programme COBOL-CICS
     ├── DEFVSAM.jcl    # Définition fichier VSAM
+    ├── DEFFCLI.jcl    # Définition fichier CLIENT
     ├── DEFPATH.jcl    # Définition AIX et PATH pour PGPATHF
     └── LOADDATA.jcl   # Chargement données initiales
 ```
@@ -55,9 +66,9 @@ pratique/
 | Programme | Transaction | Description |
 |-----------|-------------|-------------|
 | PROGREAD | READ | Lecture d'un enregistrement par clé |
-| PROGWRIT | WRIT | Création d'un nouvel enregistrement |
-| PROGREWT | REWT | Mise à jour (READ UPDATE + REWRITE) |
-| PROGDELT | DELT | Suppression d'un enregistrement |
+| PRGWRIT | WRIT | Création d'un nouvel enregistrement |
+| PRGREWR | REWT | Mise à jour (READ UPDATE + REWRITE) |
+| PRGRDEL | DELT | Suppression d'un enregistrement |
 
 ### 3. Browse VSAM (Chapitre VIII - Exercices 13 et 14)
 
@@ -130,13 +141,13 @@ Voir `jcl/DEFVSAM.jcl` pour la définition et `jcl/LOADDATA.jcl` pour le chargem
    PROGREAD.cbl → Compiler → Transaction READ
 
 3. WRITE - Créer un enregistrement
-   PROGWRIT.cbl → Compiler → Transaction WRIT
+   PRGWRIT.cbl → Compiler → Transaction WRIT
 
 4. REWRITE - Modifier un enregistrement
-   PROGREWT.cbl → Compiler → Transaction REWT
+   PRGREWR.cbl → Compiler → Transaction REWT
 
 5. DELETE - Supprimer un enregistrement
-   PROGDELT.cbl → Compiler → Transaction DELT
+   PRGRDEL.cbl → Compiler → Transaction DELT
 ```
 
 ## Installation CICS
