@@ -8,7 +8,7 @@
 
 ```
 algorithmique/
-├── theorie/               # QCM par chapitre (9 QCM, ~135 questions)
+├── theorie/               # QCM par chapitre (9 QCM, 250 questions)
 │   ├── qcm-01-introduction.md
 │   ├── qcm-02-01-structures-donnees.md
 │   ├── qcm-02-02-pointeurs-listes.md
@@ -34,14 +34,16 @@ algorithmique/
 | Chapitre | QCM | Questions |
 |----------|-----|-----------|
 | 1 - Introduction | [qcm-01-introduction.md](theorie/qcm-01-introduction.md) | 15 questions |
-| 2.1 - Structures de données | [qcm-02-01-structures-donnees.md](theorie/qcm-02-01-structures-donnees.md) | 15 questions |
-| 2.2 - Pointeurs et listes | [qcm-02-02-pointeurs-listes.md](theorie/qcm-02-02-pointeurs-listes.md) | 15 questions |
-| 2.3 - Piles et files | [qcm-02-03-piles-files.md](theorie/qcm-02-03-piles-files.md) | 15 questions |
-| 3 - Récursivité | [qcm-03-recursivite.md](theorie/qcm-03-recursivite.md) | 15 questions |
-| 4 - Algorithmes de tri | [qcm-04-algorithmes-tri.md](theorie/qcm-04-algorithmes-tri.md) | 15 questions |
-| 5 - Complexité | [qcm-05-complexite.md](theorie/qcm-05-complexite.md) | 15 questions |
-| 6 - Fichiers | [qcm-06-fichiers.md](theorie/qcm-06-fichiers.md) | 15 questions |
-| 7 - Modularité | [qcm-07-modularite.md](theorie/qcm-07-modularite.md) | 15 questions |
+| 2.1 - Structures de données | [qcm-02-01-structures-donnees.md](theorie/qcm-02-01-structures-donnees.md) | 25 questions |
+| 2.2 - Pointeurs et listes | [qcm-02-02-pointeurs-listes.md](theorie/qcm-02-02-pointeurs-listes.md) | 25 questions |
+| 2.3 - Piles et files | [qcm-02-03-piles-files.md](theorie/qcm-02-03-piles-files.md) | 30 questions |
+| 3 - Récursivité | [qcm-03-recursivite.md](theorie/qcm-03-recursivite.md) | 30 questions |
+| 4 - Algorithmes de tri | [qcm-04-algorithmes-tri.md](theorie/qcm-04-algorithmes-tri.md) | 35 questions |
+| 5 - Complexité | [qcm-05-complexite.md](theorie/qcm-05-complexite.md) | 30 questions |
+| 6 - Fichiers | [qcm-06-fichiers.md](theorie/qcm-06-fichiers.md) | 30 questions |
+| 7 - Modularité | [qcm-07-modularite.md](theorie/qcm-07-modularite.md) | 30 questions |
+
+**Total : 250 questions**
 
 ---
 
