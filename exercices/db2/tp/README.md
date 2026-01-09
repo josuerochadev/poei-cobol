@@ -15,12 +15,12 @@ Avant de commencer, exécutez le script de création des tables :
 | Activité | Thème | Questions |
 |----------|-------|-----------|
 | [00-schema](00-schema/) | Création des tables | DDL + INSERT |
-| [activité-01-select](activité-01-select/) | SELECT élémentaire | 6 |
-| [activité-02-sélection-tri](activité-02-sélection-tri/) | Sélection et tri (WHERE, ORDER BY) | 12 |
-| [activité-04-jointures](activité-04-jointures/) | Jointures (INNER, LEFT, Self-join) | 11 |
-| [activité-05-operateurs-ensemblistes](activité-05-operateurs-ensemblistes/) | UNION, INTERSECT, EXCEPT | 5 |
-| [activité-06-fonctions-groupe](activité-06-fonctions-groupe/) | COUNT, SUM, AVG, GROUP BY, HAVING | 7 |
-| [activité-07-sous-requêtes](activité-07-sous-requêtes/) | Sous-requêtes, IN, ANY, ALL, EXISTS | 15 |
+| [activite-01-select](activite-01-select/) | SELECT élémentaire | 6 |
+| [activite-02-selection-tri](activite-02-selection-tri/) | Sélection et tri (WHERE, ORDER BY) | 12 |
+| [activite-04-jointures](activite-04-jointures/) | Jointures (INNER, LEFT, Self-join) | 11 |
+| [activite-05-operateurs-ensemblistes](activite-05-operateurs-ensemblistes/) | UNION, INTERSECT, EXCEPT | 5 |
+| [activite-06-fonctions-groupe](activite-06-fonctions-groupe/) | COUNT, SUM, AVG, GROUP BY, HAVING | 7 |
+| [activite-07-sous-requetes](activite-07-sous-requetes/) | Sous-requêtes, IN, ANY, ALL, EXISTS | 15 |
 
 **Total : 56 exercices**
 
@@ -28,7 +28,7 @@ Avant de commencer, exécutez le script de création des tables :
 
 Chaque activité contient :
 ```
-activité-XX/
+activite-XX/
 ├── README.md       # Énoncés des questions
 └── solutions.sql   # Solutions SQL commentées
 ```
