@@ -63,14 +63,6 @@
 
 ---
 
-## Exercice Bonus : Workflow Complet
-
-**Fichier :** `ex-bonus-workflow.jcl`
-
-**Objectif :** Workflow complet de gestion VSAM
-
----
-
 ## Fichier de Nettoyage
 
 **Fichier :** `cleanup.jcl`

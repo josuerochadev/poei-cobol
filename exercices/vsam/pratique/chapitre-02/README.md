@@ -64,21 +64,6 @@
 
 ---
 
-## Exercice Bonus : Multiple AIX
-
-**Fichier :** `ex-bonus-multi-aix.jcl`
-
-**Objectif :** Creer plusieurs AIX sur un meme cluster
-
-**Instructions :**
-1. Creer un KSDS produits
-2. Creer un AIX sur le code categorie
-3. Creer un AIX sur le prix
-4. Definir les PATH pour chaque AIX
-5. Lister avec LISTCAT
-
----
-
 ## Fichier de Nettoyage
 
 **Fichier :** `cleanup.jcl`
