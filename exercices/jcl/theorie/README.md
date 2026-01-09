@@ -8,12 +8,12 @@ Ce dossier contient les QCM (Questionnaires à Choix Multiples) pour valider la 
 
 | QCM | Chapitre | Questions |
 |-----|----------|-----------|
-| [qcm-01-cartes-jcl.md](qcm-01-cartes-jcl.md) | I - Cartes JOB, EXEC, DD | 25 |
+| [qcm-01-cartes-jcl.md](qcm-01-cartes-jcl.md) | I - Cartes JOB, EXEC, DD | 30 |
 | [qcm-02-fichiers-parametres.md](qcm-02-fichiers-parametres.md) | II - Fichiers et Paramètres | 25 |
 | [qcm-03-procedures.md](qcm-03-procedures.md) | III - Procédures | 25 |
-| [qcm-04-utilitaires.md](qcm-04-utilitaires.md) | IV - Utilitaires | 25 |
+| [qcm-04-utilitaires.md](qcm-04-utilitaires.md) | IV - Utilitaires | 35 |
 
-**Total : 100 questions**
+**Total : 115 questions**
 
 ## Utilisation
 

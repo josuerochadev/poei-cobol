@@ -329,11 +329,11 @@ Que font les instructions TYPRUN=SCAN et TYPRUN=HOLD dans une instruction JCL ?
 ## Structure des Fichiers
 
 ```
-exercices/jcl/chapitre-05/
-├── README.md                # Ce fichier (QCM + enonces)
-├── tp01-dataset-ps.jcl      # Creation dataset sequentiel
-├── tp02-dataset-po.jcl      # Creation dataset partitionne
-├── tp03-concatenation.jcl   # Concatenation de datasets
+exercices/jcl/tp/
+├── README.md                # Ce fichier (QCM + énoncés)
+├── tp01-dataset-ps.jcl      # Création dataset séquentiel
+├── tp02-dataset-po.jcl      # Création dataset partitionné
+├── tp03-concatenation.jcl   # Concaténation de datasets
 ├── tp04-utilitaires.jcl     # Utilisation des utilitaires
 ├── tp05-sort.jcl            # Manipulation SORT
 ├── tp06-analyse-erreurs.jcl # Analyse erreurs (avec erreurs volontaires)
