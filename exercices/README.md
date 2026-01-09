@@ -60,7 +60,7 @@ exercices/
 │   ├── theorie/              # QCM (82 questions)
 │   ├── pratique/             # Exercices BMS, COBOL, JCL (10 exercices)
 │   ├── tp-gestion-credits/   # TP complet (transaction CRED)
-│   └── fil-rouge/            # Projet fil rouge (a venir)
+│   └── fil-rouge/            # Projet fil rouge (à venir)
 │
 └── db2/                      # Exercices DB2/SQL
     ├── theorie/              # QCM (71 questions)

@@ -16,7 +16,7 @@ db2/
 │   └── qcm-05-sql.md
 │
 ├── tp/                    # Travaux Pratiques (formatrice)
-│   ├── 00-schema/         # Scripts de creation des tables
+│   ├── 00-schema/         # Scripts de création des tables
 │   ├── activite-01-select/
 │   ├── activite-02-selection-tri/
 │   ├── activite-04-jointures/
@@ -34,32 +34,32 @@ db2/
     └── images-pt*/        # Captures d'écran
 ```
 
-## Contenu detaille
+## Contenu détaillé
 
-### Theorie (71 questions)
+### Théorie (71 questions)
 
 | QCM | Chapitre | Questions |
 |-----|----------|-----------|
 | [QCM 01](theorie/qcm-01-fondamentaux.md) | Fondamentaux BD | 15 |
 | [QCM 02](theorie/qcm-02-architecture.md) | Architecture DB2 | 12 |
-| [QCM 03](theorie/qcm-03-modelisation.md) | Modelisation | 12 |
-| [QCM 04](theorie/qcm-04-modele-relationnel.md) | Modele relationnel | 12 |
+| [QCM 03](theorie/qcm-03-modelisation.md) | Modélisation | 12 |
+| [QCM 04](theorie/qcm-04-modele-relationnel.md) | Modèle relationnel | 12 |
 | [QCM 05](theorie/qcm-05-sql.md) | Langage SQL | 20 |
 
 ### Travaux Pratiques (56 exercices SQL)
 
-| Activite | Theme | Questions |
+| Activité | Thème | Questions |
 |----------|-------|-----------|
-| [Activite 1](tp/activite-01-select/) | SELECT elementaire | 6 |
-| [Activite 2](tp/activite-02-selection-tri/) | WHERE, ORDER BY | 12 |
-| [Activite 4](tp/activite-04-jointures/) | Jointures | 11 |
-| [Activite 5](tp/activite-05-operateurs-ensemblistes/) | UNION, INTERSECT, EXCEPT | 5 |
-| [Activite 6](tp/activite-06-fonctions-groupe/) | GROUP BY, HAVING | 7 |
-| [Activite 7](tp/activite-07-sous-requetes/) | Sous-requetes | 15 |
+| [Activité 1](tp/activite-01-select/) | SELECT élémentaire | 6 |
+| [Activité 2](tp/activite-02-selection-tri/) | WHERE, ORDER BY | 12 |
+| [Activité 4](tp/activite-04-jointures/) | Jointures | 11 |
+| [Activité 5](tp/activite-05-operateurs-ensemblistes/) | UNION, INTERSECT, EXCEPT | 5 |
+| [Activité 6](tp/activite-06-fonctions-groupe/) | GROUP BY, HAVING | 7 |
+| [Activité 7](tp/activite-07-sous-requetes/) | Sous-requêtes | 15 |
 
-### Pratique (17 exercices complementaires)
+### Pratique (17 exercices complémentaires)
 
-| Fichier | Theme | Exercices |
+| Fichier | Thème | Exercices |
 |---------|-------|-----------|
 | [exercices-ddl.sql](pratique/exercices-ddl.sql) | DDL (CREATE, ALTER, DROP) | 7 |
 | [exercices-dml.sql](pratique/exercices-dml.sql) | DML + Transactions | 10 |
@@ -84,7 +84,7 @@ db2/
    → Voir [fil-rouge/RAPPORT-PROJET.pdf](fil-rouge/RAPPORT-PROJET.pdf)
 ```
 
-## Base de donnees de test
+## Base de données de test
 
 Les TP utilisent les tables EMPLOYEE, DEPT et SAL_GRILLE.
 Scripts disponibles dans [tp/00-schema/](tp/00-schema/).
@@ -93,8 +93,8 @@ Scripts disponibles dans [tp/00-schema/](tp/00-schema/).
 
 | Table | Description | Lignes |
 |-------|-------------|--------|
-| DEPT | Departements | 4 |
-| EMPLOYEE | Employes | 14 |
+| DEPT | Départements | 4 |
+| EMPLOYEE | Employés | 14 |
 | SAL_GRILLE | Grille des salaires | 5 |
 
 ## Total

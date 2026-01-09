@@ -8,7 +8,7 @@ Les exercices sont organisés en deux parties :
 
 ---
 
-## Partie Theorique (QCM)
+## Partie Théorique (QCM)
 
 Les QCM sont organisés par chapitre du cours et permettent de valider la compréhension des concepts.
 
@@ -168,23 +168,23 @@ exercices/jcl/
 | Fichier | Description |
 |---------|-------------|
 | `tp/tp01-dataset-ps.jcl` | Création d'un dataset séquentiel (PS) |
-| `tp/tp02-dataset-po.jcl` | Création d'un dataset partitionne (PDS) |
+| `tp/tp02-dataset-po.jcl` | Création d'un dataset partitionné (PDS) |
 | `tp/tp03-concaténation.jcl` | Concaténation de datasets |
 | `tp/tp04-utilitaires.jcl` | Utilisation des utilitaires IBM |
-| `tp/tp05-sort.jcl` | Manipulation SORT complete |
+| `tp/tp05-sort.jcl` | Manipulation SORT complète |
 | `tp/tp06-analyse-erreurs.jcl` | Analyse des erreurs et codes retour |
 | `tp/cleanup.jcl` | Nettoyage des datasets |
 
 **Contenu :**
 - 6 travaux pratiques de synthèse
-- Manipulation complete avec ISPF et TSO
+- Manipulation complète avec ISPF et TSO
 - Exercices couvrant tous les chapitres
 
 ## Prérequis
 
-- Accès a un environnement z/OS (ou émulateur Hercules/TK4-)
+- Accès à un environnement z/OS (ou émulateur Hercules/TK4-)
 - Userid TSO valide
-- Droits de création de datasets
+- Droits de création de Data Sets
 - Connaissance des chapitres du cours JCL
 
 ## Utilisation
@@ -227,7 +227,7 @@ ex-bonus-workflow (tout en un)
 **TP - Synthèse :**
 ```
 tp/tp01 -> tp02 -> tp03 -> tp04 -> tp05 -> tp06
-(Ordre recommandé mais chaque TP peut etre fait independamment)
+(Ordre recommandé mais chaque TP peut être fait indépendamment)
 ```
 
 ### Nettoyage
