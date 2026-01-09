@@ -1,3 +1,10 @@
+***********************************************************************
+*  MAPSET : MAPWRIT - GESTION CLIENT (CREATION/MODIFICATION)          *
+*  PROGRAMME : PRGWRIT                                                *
+*  TRANSACTION : WRIT                                                 *
+*  DESCRIPTION : Ecran de saisie pour creation/modification client    *
+***********************************************************************
+*
 MAPWRIT  DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
@@ -5,15 +12,26 @@ MAPWRIT  DFHMSD TYPE=DSECT,                                            X
                DSATTS=(COLOR,HILIGHT),                                 X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
+*
+***********************************************************************
+*  MAP1 - ZONE RECHERCHE                                              *
+***********************************************************************
+*
 MAP1     DFHMDI SIZE=(05,80),                                          X
                LINE=01,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- TITRE ----------------------------------------
+*
          DFHMDF POS=(01,25),                                           X
                ATTRB=(ASKIP,BRT),                                      X
                LENGTH=30,                                              X
                COLOR=TURQUOISE,                                        X
                INITIAL='=== GESTION CLIENT ==='
+*
+*----------------------- ZONE SAISIE CLE ------------------------------
+*
          DFHMDF POS=(03,20),                                           X
                LENGTH=20,                                              X
                INITIAL='CODE CLIENT       : '
@@ -26,20 +44,34 @@ CDECLT   DFHMDF POS=(03,42),                                           X
          DFHMDF POS=(03,46),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+*----------------------- AIDE -----------------------------------------
+*
          DFHMDF POS=(05,18),                                           X
                ATTRB=(ASKIP,NORM),                                     X
                LENGTH=45,                                              X
                COLOR=BLUE,                                             X
                INITIAL='ENTER=Valider | PF3=Quitter | CLEAR=Annuler'
+*
+***********************************************************************
+*  MAP2 - DONNEES CLIENT                                              *
+***********************************************************************
+*
 MAP2     DFHMDI SIZE=(12,80),                                          X
                LINE=06,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- TITRE ----------------------------------------
+*
          DFHMDF POS=(01,28),                                           X
                ATTRB=(ASKIP,BRT),                                      X
                LENGTH=24,                                              X
                COLOR=TURQUOISE,                                        X
                INITIAL='=== DONNEES CLIENT ==='
+*
+*----------------------- CHAMPS SAISIE --------------------------------
+*
          DFHMDF POS=(02,10),                                           X
                LENGTH=16,                                              X
                INITIAL='CODE REGION   : '
@@ -152,10 +184,18 @@ POSCPT   DFHMDF POS=(07,28),                                           X
          DFHMDF POS=(07,31),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+***********************************************************************
+*  MAP3 - ZONE MESSAGE ET CONFIRMATION                                *
+***********************************************************************
+*
 MAP3     DFHMDI SIZE=(03,80),                                          X
                LINE=19,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- ZONE MESSAGE ---------------------------------
+*
          DFHMDF POS=(01,05),                                           X
                LENGTH=10,                                              X
                INITIAL='MESSAGE : '
@@ -163,6 +203,9 @@ MSGINF   DFHMDF POS=(01,16),                                           X
                ATTRB=(PROT,BRT),                                       X
                LENGTH=40,                                              X
                COLOR=RED
+*
+*----------------------- ZONE CONFIRMATION ----------------------------
+*
          DFHMDF POS=(01,58),                                           X
                LENGTH=10,                                              X
                INITIAL='Reponse : '
@@ -174,10 +217,18 @@ FLAGERR  DFHMDF POS=(01,69),                                           X
          DFHMDF POS=(01,71),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+*----------------------- AIDE -----------------------------------------
+*
          DFHMDF POS=(03,18),                                           X
                ATTRB=(ASKIP,NORM),                                     X
                LENGTH=45,                                              X
                COLOR=BLUE,                                             X
                INITIAL='ENTER=Valider | PF3=Quitter | CLEAR=Annuler'
+*
+***********************************************************************
+*  FIN DU MAPSET                                                      *
+***********************************************************************
+*
 MAPWRIT  DFHMSD TYPE=FINAL
          END

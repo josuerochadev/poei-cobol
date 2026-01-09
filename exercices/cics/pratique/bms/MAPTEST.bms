@@ -1,3 +1,10 @@
+***********************************************************************
+*  MAPSET : MAPTEST - ECRAN DE BIENVENUE CICS                         *
+*  PROGRAMME : PROGTEST                                               *
+*  TRANSACTION : TR01                                                 *
+*  DESCRIPTION : Ecran d'accueil avec messages de bienvenue           *
+***********************************************************************
+*
 MAPTEST  DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
@@ -5,10 +12,18 @@ MAPTEST  DFHMSD TYPE=DSECT,                                            X
                DSATTS=(COLOR,HILIGHT),                                 X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
+*
+***********************************************************************
+*  MAP1 - ECRAN PRINCIPAL                                             *
+***********************************************************************
+*
 MAP1     DFHMDI SIZE=(24,80),                                          X
                LINE=01,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- MESSAGES BIENVENUE ---------------------------
+*
          DFHMDF POS=(09,21),                                           X
                ATTRB=(ASKIP,BRT),                                      X
                LENGTH=38,                                              X
@@ -19,6 +34,9 @@ MAP1     DFHMDI SIZE=(24,80),                                          X
                LENGTH=26,                                              X
                COLOR=TURQUOISE,                                        X
                INITIAL='MAY THE FORCE BE WITH YOU'
+*
+*----------------------- ZONE MESSAGE ---------------------------------
+*
          DFHMDF POS=(20,05),                                           X
                LENGTH=10,                                              X
                INITIAL='MESSAGE : '
@@ -26,10 +44,18 @@ MSGOUT   DFHMDF POS=(20,16),                                           X
                ATTRB=(PROT,BRT),                                       X
                LENGTH=60,                                              X
                COLOR=RED
+*
+*----------------------- AIDE -----------------------------------------
+*
          DFHMDF POS=(23,25),                                           X
                ATTRB=(ASKIP,NORM),                                     X
                LENGTH=30,                                              X
                COLOR=BLUE,                                             X
                INITIAL='Appuyez sur CLEAR pour quitter'
+*
+***********************************************************************
+*  FIN DU MAPSET                                                      *
+***********************************************************************
+*
 MAPTEST  DFHMSD TYPE=FINAL
          END

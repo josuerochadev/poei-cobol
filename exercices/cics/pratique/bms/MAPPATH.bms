@@ -1,3 +1,10 @@
+***********************************************************************
+*  MAPSET : MAPPATH - RECHERCHE PAR NOM (ALTERNATE INDEX)             *
+*  PROGRAMME : PGPATHF                                                *
+*  TRANSACTION : TPTH                                                 *
+*  DESCRIPTION : Parcours VSAM via AIX sur le champ NOM               *
+***********************************************************************
+*
 MAPPATH  DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
@@ -5,15 +12,26 @@ MAPPATH  DFHMSD TYPE=DSECT,                                            X
                DSATTS=(COLOR,HILIGHT,OUTLINE),                         X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
+*
+***********************************************************************
+*  MAP1 - ZONE RECHERCHE                                              *
+***********************************************************************
+*
 MAP1     DFHMDI SIZE=(05,80),                                          X
                LINE=01,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- TITRE ----------------------------------------
+*
          DFHMDF POS=(01,22),                                           X
                ATTRB=(ASKIP,BRT),                                      X
                LENGTH=36,                                              X
                COLOR=TURQUOISE,                                        X
                INITIAL='=== RECHERCHE PAR NOM (INDEX ALT) ==='
+*
+*----------------------- ZONE SAISIE CLE ------------------------------
+*
          DFHMDF POS=(03,20),                                           X
                LENGTH=19,                                              X
                INITIAL='NOM CLIENT (deb) : '
@@ -27,20 +45,34 @@ GENNOM   DFHMDF POS=(03,40),                                           X
          DFHMDF POS=(03,51),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+*----------------------- AIDE -----------------------------------------
+*
          DFHMDF POS=(05,15),                                           X
                ATTRB=(ASKIP,NORM),                                     X
                LENGTH=50,                                              X
                COLOR=BLUE,                                             X
                INITIAL='ENTER=Rechercher | PF3=Quitter | CLEAR=Annuler'
+*
+***********************************************************************
+*  MAP2 - FICHE CLIENT                                                *
+***********************************************************************
+*
 MAP2     DFHMDI SIZE=(14,80),                                          X
                LINE=06,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- TITRE ----------------------------------------
+*
          DFHMDF POS=(01,28),                                           X
                ATTRB=(ASKIP,BRT),                                      X
                LENGTH=24,                                              X
                COLOR=TURQUOISE,                                        X
                INITIAL='=== FICHE CLIENT ==='
+*
+*----------------------- DONNEES CLIENT -------------------------------
+*
          DFHMDF POS=(03,10),                                           X
                LENGTH=16,                                              X
                INITIAL='CODE REGION   : '
@@ -118,6 +150,9 @@ POSCPT   DFHMDF POS=(08,28),                                           X
                ATTRB=(PROT,BRT),                                       X
                LENGTH=02,                                              X
                COLOR=BLUE
+*
+*----------------------- ZONE MESSAGE ---------------------------------
+*
          DFHMDF POS=(10,05),                                           X
                LENGTH=10,                                              X
                INITIAL='MESSAGE : '
@@ -125,10 +160,18 @@ MSGOUT   DFHMDF POS=(10,16),                                           X
                ATTRB=(PROT,BRT),                                       X
                LENGTH=60,                                              X
                COLOR=RED
+*
+*----------------------- AIDE -----------------------------------------
+*
          DFHMDF POS=(12,15),                                           X
                ATTRB=(ASKIP,NORM),                                     X
                LENGTH=50,                                              X
                COLOR=BLUE,                                             X
                INITIAL='ENTER=Suivant | PF3=Quitter | CLEAR=Annuler'
+*
+***********************************************************************
+*  FIN DU MAPSET                                                      *
+***********************************************************************
+*
 MAPPATH  DFHMSD TYPE=FINAL
          END

@@ -1,3 +1,10 @@
+***********************************************************************
+*  MAPSET : MAPNAME - ECRAN SAISIE ET AFFICHAGE NOM                   *
+*  PROGRAMME : PROGNAME                                               *
+*  TRANSACTION : NAME                                                 *
+*  DESCRIPTION : Saisir un nom et l'afficher avec un message          *
+***********************************************************************
+*
 MAPNAME  DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
@@ -5,15 +12,26 @@ MAPNAME  DFHMSD TYPE=DSECT,                                            X
                DSATTS=(COLOR,HILIGHT,OUTLINE),                         X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
+*
+***********************************************************************
+*  MAP1 - ECRAN PRINCIPAL                                             *
+***********************************************************************
+*
 MAP1     DFHMDI SIZE=(24,80),                                          X
                LINE=1,                                                 X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- TITRE ----------------------------------------
+*
          DFHMDF POS=(3,25),                                            X
                LENGTH=30,                                              X
                ATTRB=(ASKIP,BRT),                                      X
                COLOR=TURQUOISE,                                        X
                INITIAL='=== EXERCICE SAISIE NOM ==='
+*
+*----------------------- ZONE SAISIE ----------------------------------
+*
          DFHMDF POS=(10,20),                                           X
                LENGTH=18,                                              X
                ATTRB=ASKIP,                                            X
@@ -29,6 +47,9 @@ NAMEIN   DFHMDF POS=(10,39),                                           X
          DFHMDF POS=(10,60),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+*----------------------- ZONE AFFICHAGE -------------------------------
+*
 NAMEOUT  DFHMDF POS=(15,20),                                           X
                LENGTH=40,                                              X
                ATTRB=(ASKIP,BRT),                                      X
@@ -36,6 +57,9 @@ NAMEOUT  DFHMDF POS=(15,20),                                           X
          DFHMDF POS=(15,61),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+*----------------------- ZONE MESSAGE ---------------------------------
+*
          DFHMDF POS=(20,05),                                           X
                LENGTH=10,                                              X
                INITIAL='MESSAGE : '
@@ -43,10 +67,18 @@ MSGOUT   DFHMDF POS=(20,16),                                           X
                ATTRB=(PROT,BRT),                                       X
                LENGTH=60,                                              X
                COLOR=RED
+*
+*----------------------- AIDE -----------------------------------------
+*
          DFHMDF POS=(22,20),                                           X
                LENGTH=40,                                              X
                ATTRB=ASKIP,                                            X
                COLOR=TURQUOISE,                                        X
                INITIAL='Saisissez votre nom puis appuyez ENTER'
+*
+***********************************************************************
+*  FIN DU MAPSET                                                      *
+***********************************************************************
+*
 MAPNAME  DFHMSD TYPE=FINAL
          END

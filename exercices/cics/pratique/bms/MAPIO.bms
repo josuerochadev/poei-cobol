@@ -1,3 +1,10 @@
+***********************************************************************
+*  MAPSET : MAPIO - DEMONSTRATION ENTREES/SORTIES                     *
+*  PROGRAMME : PROGIO                                                 *
+*  TRANSACTION : TRIO                                                 *
+*  DESCRIPTION : Exemple champs avec/sans PICTURE (PIC)               *
+***********************************************************************
+*
 MAPIO    DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
@@ -5,10 +12,18 @@ MAPIO    DFHMSD TYPE=DSECT,                                            X
                DSATTS=(COLOR,HILIGHT,OUTLINE),                         X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
+*
+***********************************************************************
+*  MAP1 - ECRAN PRINCIPAL                                             *
+***********************************************************************
+*
 MAP1     DFHMDI SIZE=(24,80),                                          X
                LINE=01,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- CHAMP SIMPLE (SANS PIC) ----------------------
+*
          DFHMDF POS=(10,20),                                           X
                LENGTH=16,                                              X
                INITIAL='CHAMPS SANS PIC'
@@ -23,6 +38,9 @@ SIMPLE   DFHMDF POS=(10,38),                                           X
          DFHMDF POS=(10,59),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+*----------------------- CHAMP OUTPUT (PICOUT) ------------------------
+*
          DFHMDF POS=(15,20),                                           X
                LENGTH=16,                                              X
                INITIAL='CHAMP OUT PIC :     '
@@ -33,6 +51,9 @@ CHPOUT   DFHMDF POS=(15,38),                                           X
          DFHMDF POS=(15,50),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+*----------------------- CHAMP I/O (PICIN + PICOUT) -------------------
+*
          DFHMDF POS=(17,20),                                           X
                LENGTH=16,                                              X
                INITIAL='CHAMP I/O :    '
@@ -44,6 +65,9 @@ CHPIO    DFHMDF POS=(17,38),                                           X
          DFHMDF POS=(17,45),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+*----------------------- ZONE MESSAGE ---------------------------------
+*
          DFHMDF POS=(22,05),                                           X
                LENGTH=10,                                              X
                INITIAL='MESSAGE : '
@@ -51,5 +75,10 @@ MSGOUT   DFHMDF POS=(22,16),                                           X
                ATTRB=(PROT,BRT),                                       X
                LENGTH=60,                                              X
                COLOR=RED
+*
+***********************************************************************
+*  FIN DU MAPSET                                                      *
+***********************************************************************
+*
 MAPIO    DFHMSD TYPE=FINAL
          END

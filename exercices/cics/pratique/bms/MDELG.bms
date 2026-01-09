@@ -1,3 +1,10 @@
+***********************************************************************
+*  MAPSET : MDELG - SUPPRESSION GENERIQUE DE RECORDS                  *
+*  PROGRAMME : PDELGEN                                                *
+*  TRANSACTION : DELG                                                 *
+*  DESCRIPTION : Suppression par cle generique partielle              *
+***********************************************************************
+*
 MDELG    DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
@@ -5,15 +12,26 @@ MDELG    DFHMSD TYPE=DSECT,                                            X
                DSATTS=(COLOR,HILIGHT),                                 X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
+*
+***********************************************************************
+*  MAPDEL - ECRAN PRINCIPAL                                           *
+***********************************************************************
+*
 MAPDEL   DFHMDI SIZE=(24,80),                                          X
                LINE=01,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- TITRE ----------------------------------------
+*
          DFHMDF POS=(03,22),                                           X
                ATTRB=(ASKIP,BRT),                                      X
                LENGTH=36,                                              X
                COLOR=TURQUOISE,                                        X
                INITIAL='=== SUPPRESSION GENERIQUE DE RECORD ==='
+*
+*----------------------- ZONE SAISIE ----------------------------------
+*
          DFHMDF POS=(12,16),                                           X
                ATTRB=(PROT,NORM),                                      X
                COLOR=GREEN,                                            X
@@ -40,14 +58,25 @@ LENKEY   DFHMDF POS=(14,42),                                           X
          DFHMDF POS=(14,45),                                           X
                ATTRB=PROT,                                             X
                LENGTH=01
+*
+*----------------------- ZONE RESULTAT --------------------------------
+*
 NBRDEL   DFHMDF POS=(16,16),                                           X
                ATTRB=(PROT,BRT),                                       X
                COLOR=YELLOW,                                           X
                LENGTH=40
+*
+*----------------------- AIDE -----------------------------------------
+*
          DFHMDF POS=(20,15),                                           X
                ATTRB=(ASKIP,NORM),                                     X
                LENGTH=50,                                              X
                COLOR=BLUE,                                             X
                INITIAL='ENTER=Supprimer | PF3=Quitter | CLEAR=Annuler'
+*
+***********************************************************************
+*  FIN DU MAPSET                                                      *
+***********************************************************************
+*
 MDELG    DFHMSD TYPE=FINAL
          END

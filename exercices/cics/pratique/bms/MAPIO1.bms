@@ -1,3 +1,10 @@
+***********************************************************************
+*  MAPSET : MAPIO1 - DEMONSTRATION ENTREES/SORTIES (MULTI-MAP)        *
+*  PROGRAMME : PROGIO1                                                *
+*  TRANSACTION : TRI1                                                 *
+*  DESCRIPTION : Exemple avec plusieurs MAPs independantes            *
+***********************************************************************
+*
 MAPIO1   DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
@@ -5,10 +12,18 @@ MAPIO1   DFHMSD TYPE=DSECT,                                            X
                DSATTS=(COLOR,HILIGHT,OUTLINE),                         X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
+*
+***********************************************************************
+*  MAP1 - CHAMP SIMPLE (LIGNE 10)                                     *
+***********************************************************************
+*
 MAP1     DFHMDI SIZE=(01,80),                                          X
                LINE=10,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- CHAMP SANS PIC -------------------------------
+*
          DFHMDF POS=(01,20),                                           X
                LENGTH=16,                                              X
                INITIAL='CHAMPS SANS PIC'
@@ -22,10 +37,18 @@ SIMPLE   DFHMDF POS=(01,38),                                           X
          DFHMDF POS=(01,59),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+***********************************************************************
+*  MAP2 - CHAMP OUTPUT (LIGNE 15)                                     *
+***********************************************************************
+*
 MAP2     DFHMDI SIZE=(01,80),                                          X
                LINE=15,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- CHAMP PICOUT ---------------------------------
+*
          DFHMDF POS=(01,20),                                           X
                LENGTH=15,                                              X
                INITIAL='CHAMP OUTPUT : '
@@ -37,10 +60,18 @@ CHPOUT   DFHMDF POS=(01,38),                                           X
          DFHMDF POS=(01,50),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+***********************************************************************
+*  MAP3 - CHAMP I/O (LIGNE 17)                                        *
+***********************************************************************
+*
 MAP3     DFHMDI SIZE=(01,80),                                          X
                LINE=17,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- CHAMP PICIN/PICOUT ---------------------------
+*
          DFHMDF POS=(01,20),                                           X
                LENGTH=16,                                              X
                INITIAL='CHAMP I/O :    '
@@ -55,10 +86,18 @@ CHPIO    DFHMDF POS=(01,38),                                           X
          DFHMDF POS=(01,45),                                           X
                LENGTH=1,                                               X
                ATTRB=PROT
+*
+***********************************************************************
+*  MAP4 - ZONE MESSAGE (LIGNE 22)                                     *
+***********************************************************************
+*
 MAP4     DFHMDI SIZE=(01,80),                                          X
                LINE=22,                                                X
                COLUMN=01,                                              X
                CTRL=(PRINT,FREEKB)
+*
+*----------------------- ZONE MESSAGE ---------------------------------
+*
          DFHMDF POS=(01,05),                                           X
                LENGTH=10,                                              X
                INITIAL='MESSAGE : '
@@ -66,5 +105,10 @@ MSGOUT   DFHMDF POS=(01,16),                                           X
                ATTRB=(PROT,BRT),                                       X
                LENGTH=60,                                              X
                COLOR=RED
+*
+***********************************************************************
+*  FIN DU MAPSET                                                      *
+***********************************************************************
+*
 MAPIO1   DFHMSD TYPE=FINAL
          END
