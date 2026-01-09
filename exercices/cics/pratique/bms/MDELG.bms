@@ -1,7 +1,8 @@
 MDELG    DFHMSD TYPE=DSECT,                                            X
                MODE=INOUT,                                             X
                LANG=COBOL,                                             X
-               DSATTS=(COLOR),MAPATTS=(COLOR,HILIGHT),                 X
+               MAPATTS=(COLOR,HILIGHT),                                X
+               DSATTS=(COLOR,HILIGHT),                                 X
                STORAGE=AUTO,                                           X
                TIOAPFX=YES
 MAPDEL   DFHMDI SIZE=(24,80),                                          X
