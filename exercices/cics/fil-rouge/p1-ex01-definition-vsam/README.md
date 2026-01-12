@@ -14,8 +14,9 @@ Executer le JCL `DEFVSAM.jcl` pour creer le cluster VSAM KSDS.
 
 | Parametre | Valeur | Description |
 |-----------|--------|-------------|
-| NAME | ROCHA.FINANCE.CLIENT | Nom du cluster |
+| NAME | ROCHA.CICS.CLIENT | Nom du cluster |
 | INDEXED | - | Type KSDS (Key Sequenced) |
+| VOLUMES(FDDBAS) | - | Volume DASD cible (TK4-) |
 | KEYS(6 0) | 6 octets, position 0 | Cle = numero compte |
 | RECORDSIZE(64 64) | 64 octets fixe | Longueur enregistrement |
 | TRACKS(5 5) | 5 prim, 5 sec | Espace alloue |
@@ -30,7 +31,7 @@ Pour que CICS puisse acceder au fichier VSAM, il faut le declarer dans la **FCT 
 
 ```
 CEDA DEFINE FILE(FCLIENT) GROUP(CLIGROUP)
-     DSNAME(ROCHA.FINANCE.CLIENT)
+     DSNAME(ROCHA.CICS.CLIENT)
      ADD(YES)
      BROWSE(YES)
      DELETE(YES)
@@ -50,7 +51,7 @@ CEDA INSTALL FILE(FCLIENT) GROUP(CLIGROUP)
 | Parametre | Valeur | Description |
 |-----------|--------|-------------|
 | FILE | FCLIENT | Nom logique dans CICS (8 car max) |
-| DSNAME | ROCHA.FINANCE.CLIENT | Nom physique du dataset |
+| DSNAME | ROCHA.CICS.CLIENT | Nom physique du dataset |
 | ADD(YES) | - | Autoriser WRITE (ajout) |
 | BROWSE(YES) | - | Autoriser STARTBR/READNEXT |
 | DELETE(YES) | - | Autoriser DELETE |
@@ -67,7 +68,7 @@ CEDA INSTALL FILE(FCLIENT) GROUP(CLIGROUP)
 ```
 DFHFCT TYPE=FILE,
        FILE=FCLIENT,
-       DATASET=ROCHA.FINANCE.CLIENT,
+       DATASET=ROCHA.CICS.CLIENT,
        ACCMETH=VSAM,
        SERVREQ=(READ,UPDATE,DELETE,ADD,BROWSE),
        RECFORM=FIXED,
@@ -86,7 +87,7 @@ CEMT INQUIRE FILE(FCLIENT)
 
 Resultat attendu :
 ```
-FILE(FCLIENT)   Dsn(ROCHA.FINANCE.CLIENT)
+FILE(FCLIENT)   Dsn(ROCHA.CICS.CLIENT)
                 Ena Ope Rea Upd Add Bro Del
                 Vsam Ksds
 ```

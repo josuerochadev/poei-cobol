@@ -24,7 +24,7 @@
 //STEP1    EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
-  DELETE ROCHA.FINANCE.CLIENT CLUSTER
+  DELETE ROCHA.CICS.CLIENT CLUSTER
   SET MAXCC = 0
 /*
 //*
@@ -34,16 +34,17 @@
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
   DEFINE CLUSTER (                                    -
-         NAME(ROCHA.FINANCE.CLIENT)                   -
+         NAME(ROCHA.CICS.CLIENT)                   -
          INDEXED                                      -
+         VOLUMES(FDDBAS)                              -
          KEYS(6 0)                                    -
          RECORDSIZE(64 64)                            -
          TRACKS(5 5)                                  -
          FREESPACE(20 10)                             -
          SHAREOPTIONS(2 3)                            -
          )                                            -
-         DATA (NAME(ROCHA.FINANCE.CLIENT.DATA))       -
-         INDEX (NAME(ROCHA.FINANCE.CLIENT.INDEX))
+         DATA (NAME(ROCHA.CICS.CLIENT.DATA))       -
+         INDEX (NAME(ROCHA.CICS.CLIENT.INDEX))
 /*
 //*
 //* ETAPE 3 : VERIFICATION DE LA CREATION
@@ -51,6 +52,6 @@
 //STEP3    EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
-  LISTCAT ENTRIES(ROCHA.FINANCE.CLIENT) ALL
+  LISTCAT ENTRIES(ROCHA.CICS.CLIENT) ALL
 /*
 //

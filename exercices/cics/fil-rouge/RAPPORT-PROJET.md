@@ -240,7 +240,7 @@ Cet exercice comporte deux etapes principales :
 //STEP1    EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
-  DELETE ROCHA.FINANCE.CLIENT CLUSTER
+  DELETE ROCHA.CICS.CLIENT CLUSTER
   SET MAXCC = 0
 /*
 //*
@@ -250,16 +250,17 @@ Cet exercice comporte deux etapes principales :
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
   DEFINE CLUSTER (                                    -
-         NAME(ROCHA.FINANCE.CLIENT)                   -
+         NAME(ROCHA.CICS.CLIENT)                   -
          INDEXED                                      -
+         VOLUMES(FDDBAS)                              -
          KEYS(6 0)                                    -
          RECORDSIZE(64 64)                            -
          TRACKS(5 5)                                  -
          FREESPACE(20 10)                             -
          SHAREOPTIONS(2 3)                            -
          )                                            -
-         DATA (NAME(ROCHA.FINANCE.CLIENT.DATA))       -
-         INDEX (NAME(ROCHA.FINANCE.CLIENT.INDEX))
+         DATA (NAME(ROCHA.CICS.CLIENT.DATA))       -
+         INDEX (NAME(ROCHA.CICS.CLIENT.INDEX))
 /*
 //*
 //* ETAPE 3 : VERIFICATION DE LA CREATION
@@ -267,7 +268,7 @@ Cet exercice comporte deux etapes principales :
 //STEP3    EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
-  LISTCAT ENTRIES(ROCHA.FINANCE.CLIENT) ALL
+  LISTCAT ENTRIES(ROCHA.CICS.CLIENT) ALL
 /*
 ```
 
@@ -275,7 +276,7 @@ Cet exercice comporte deux etapes principales :
 
 ```
 CEDA DEFINE FILE(FCLIENT) GROUP(CLIGROUP)
-     DSNAME(ROCHA.FINANCE.CLIENT)
+     DSNAME(ROCHA.CICS.CLIENT)
      ADD(YES)
      BROWSE(YES)
      DELETE(YES)
@@ -293,7 +294,7 @@ CEDA INSTALL FILE(FCLIENT) GROUP(CLIGROUP)
 | Parametre | Valeur | Description |
 |-----------|--------|-------------|
 | FILE | FCLIENT | Nom logique dans CICS (8 car max) |
-| DSNAME | ROCHA.FINANCE.CLIENT | Nom physique du dataset |
+| DSNAME | ROCHA.CICS.CLIENT | Nom physique du dataset |
 | ADD(YES) | - | Autoriser WRITE (ajout) |
 | BROWSE(YES) | - | Autoriser STARTBR/READNEXT |
 | DELETE(YES) | - | Autoriser DELETE |
@@ -308,7 +309,7 @@ CEMT INQUIRE FILE(FCLIENT)
 
 Resultat attendu :
 ```
-FILE(FCLIENT)   Dsn(ROCHA.FINANCE.CLIENT)
+FILE(FCLIENT)   Dsn(ROCHA.CICS.CLIENT)
                 Ena Ope Rea Upd Add Bro Del
                 Vsam Ksds
 ```
@@ -337,7 +338,7 @@ FILE(FCLIENT)   Dsn(ROCHA.FINANCE.CLIENT)
 2220050420MOREL     PHILIPPE  19840111M30DPARIS     0000156000CR
 /*
 //SYSIN    DD *
-  REPRO INFILE(INFILE) OUTDATASET(ROCHA.FINANCE.CLIENT)
+  REPRO INFILE(INFILE) OUTDATASET(ROCHA.CICS.CLIENT)
 /*
 ```
 
