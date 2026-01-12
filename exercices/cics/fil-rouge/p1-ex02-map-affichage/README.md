@@ -59,26 +59,39 @@ TIOAPFX=YES      : Reserve 12 octets pour prefixe TIOA
 
 ## Assemblage de la MAP
 
-### Etape 1 : Generer la MAP physique
+### JCL d'assemblage : ASMCLAF.jcl
+
+Ce JCL utilise la procedure DFHMAPS qui genere automatiquement :
+- Le module MAP physique dans ROCHA.CICS.LOAD
+- Le copybook DSECT dans ROCHA.CICS.SOURCE
 
 ```jcl
-//ASMMAP   EXEC PGM=DFHASM
-//SYSIN    DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
+//ROCHA03 JOB (ACCT),'ASSEMBL BMS CLIAFF',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* ASSEMBLAGE DE LA MAP BMS CLIAFF (AFFICHAGE CLIENT)
+//*****************************************************************
+//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
+//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
+//*
+//ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
+//          MAPLIB='ROCHA.CICS.LOAD',
+//          DSCTLIB='ROCHA.CICS.SOURCE',
+//          MAPNAME='CLIAFF',RMODE=24
 //SYSPRINT DD SYSOUT=*
-//SYSLIN   DD DSN=ROCHA.CICS.LINK(CLIAFF),DISP=SHR
+//SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
+/*
 ```
 
-Avec `SYSPARM=MAP` pour generer le module physique.
+### Parametres de la procedure DFHMAPS
 
-### Etape 2 : Generer le copybook DSECT
-
-```jcl
-//ASMDSCT  EXEC PGM=DFHASM
-//SYSIN    DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
-//SYSPRINT DD DSN=ROCHA.CICS.SOURCE(CLICOPY),DISP=SHR
-```
-
-Avec `SYSPARM=DSECT` pour generer le copybook COBOL.
+| Parametre | Valeur | Description |
+|-----------|--------|-------------|
+| INDEX | DFH510.CICS | Prefixe des libraries CICS |
+| MAPLIB | ROCHA.CICS.LOAD | Destination du module MAP |
+| DSCTLIB | ROCHA.CICS.SOURCE | Destination du copybook DSECT |
+| MAPNAME | CLIAFF | Nom du mapset |
+| RMODE | 24 | Mode d'adressage (below the line) |
 
 ## Copybook genere (structure)
 
@@ -126,6 +139,7 @@ Exemple pour NUMCPT :
 ## Fichiers
 
 - `CLIAFF.bms` : Source BMS de la MAP
+- `ASMCLAF.jcl` : JCL d'assemblage de la MAP
 
 ## Verification
 

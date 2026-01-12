@@ -535,6 +535,32 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 | POSIT | 2 | ASKIP,BRT | Position (DB/CR) |
 | MSG | 60 | ASKIP,BRT | Zone message |
 
+**JCL d'assemblage : ASMCLAF.jcl**
+
+```jcl
+//ROCHA03 JOB (ACCT),'ASSEMBL BMS CLIAFF',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* ASSEMBLAGE DE LA MAP BMS CLIAFF (AFFICHAGE CLIENT)
+//*
+//* Ce JCL assemble le source BMS et genere :
+//*   - Le module MAP physique dans ROCHA.CICS.LOAD
+//*   - Le copybook DSECT dans ROCHA.CICS.SOURCE
+//*****************************************************************
+//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
+//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
+//*
+//ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
+//          MAPLIB='ROCHA.CICS.LOAD',
+//          DSCTLIB='ROCHA.CICS.SOURCE',
+//          MAPNAME='CLIAFF',RMODE=24
+//SYSPRINT DD SYSOUT=*
+//SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
+/*
+```
+
+> **Note** : La procedure DFHMAPS genere automatiquement le module physique (MAP) et le copybook COBOL (DSECT). Le copybook sera stocke dans ROCHA.CICS.SOURCE avec le nom du mapset.
+
 ### Captures d'ecran
 
 <!-- ![pt1ex02-1](images-pt1/pt1ex02-1.png) -->
