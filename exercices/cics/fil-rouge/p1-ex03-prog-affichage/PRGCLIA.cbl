@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. CLIAFF.
+       PROGRAM-ID. PRGCLIA.
       ******************************************************************
-      * PROGRAMME : CLIAFF
+      * PROGRAMME : PRGCLIA
       * FONCTION  : Affichage d'un client par numero de compte
       * TRANSACTION : AFFI
       * FICHIER   : FCLIENT (VSAM KSDS)

@@ -116,10 +116,10 @@ RETURN TRANSID('AFFI')
 //          AD370HLQ='IGY420',
 //          DSCTLIB='ROCHA.CICS.LINK',
 //          LE370HLQ='CEE'
-//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGCLIA),DISP=SHR
 //LKED.SYSIN DD *
      INCLUDE SYSLIB(DFHELII)
-     NAME CLIAFF(R)
+     NAME PRGCLIA(R)
 /*
 ```
 
@@ -135,7 +135,7 @@ RETURN TRANSID('AFFI')
 
 ## Fichiers
 
-- `CLIAFF.cbl` : Source COBOL-CICS
+- `PRGCLIA.cbl` : Source COBOL-CICS
 - `CMPCLAF.jcl` : JCL de compilation
 
 ## Messages du programme

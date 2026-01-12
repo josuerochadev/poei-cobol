@@ -587,13 +587,13 @@ J'ai developpe un programme COBOL-CICS qui :
 
 ### Resolution
 
-**Programme : CLIAFF.cbl** (extraits principaux)
+**Programme : PRGCLIA.cbl** (extraits principaux)
 
 ```cobol
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. CLIAFF.
+       PROGRAM-ID. PRGCLIA.
       ******************************************************************
-      * PROGRAMME : CLIAFF - Affichage client
+      * PROGRAMME : PRGCLIA - Affichage client
       * TRANSACTION : AFFI
       * MODE : Pseudo-conversationnel
       ******************************************************************
@@ -711,10 +711,10 @@ J'ai developpe un programme COBOL-CICS qui :
 **JCL de compilation : CMPCLAF.jcl**
 
 ```jcl
-//ROCHA04 JOB (ACCT),'COMPILE CLIAFF',CLASS=A,MSGCLASS=X,
+//ROCHA04 JOB (ACCT),'COMPILE PRGCLIA',CLASS=A,MSGCLASS=X,
 //             MSGLEVEL=(1,1),NOTIFY=&SYSUID
 //*****************************************************************
-//* COMPILATION DU PROGRAMME COBOL-CICS CLIAFF
+//* COMPILATION DU PROGRAMME COBOL-CICS PRGCLIA
 //*****************************************************************
 //PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
 //          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
@@ -725,10 +725,10 @@ J'ai developpe un programme COBOL-CICS qui :
 //          AD370HLQ='IGY420',
 //          DSCTLIB='ROCHA.CICS.LINK',
 //          LE370HLQ='CEE'
-//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGCLIA),DISP=SHR
 //LKED.SYSIN DD *
      INCLUDE SYSLIB(DFHELII)
-     NAME CLIAFF(R)
+     NAME PRGCLIA(R)
 /*
 ```
 
@@ -1501,7 +1501,7 @@ CEDA DEFINE TRANSACTION(STAT) GROUP(CLIGROUP)
 
 | Programme | Transaction | Description |
 |-----------|-------------|-------------|
-| CLIAFF | AFFI | Affichage d'un client |
+| PRGCLIA | AFFI | Affichage d'un client |
 | CLIAJT | AJOU | Ajout d'un nouveau client |
 | CLIMAJ | MAJO | Mise a jour d'un client |
 | CLISUP | SUPP | Suppression d'un client |
@@ -1514,7 +1514,7 @@ CEDA DEFINE TRANSACTION(STAT) GROUP(CLIGROUP)
 
 | Mapset | Map | Description |
 |--------|-----|-------------|
-| CLIAFF | MAPAFFI | Ecran d'affichage client |
+| CLIAFF | MAPAFF | Ecran d'affichage client |
 | CLIAJT | MAPAJT | Ecran d'ajout client |
 | CLIMAJ | MAPMAJ | Ecran de mise a jour |
 | CLISUP | MAPSUP | Ecran de suppression |
