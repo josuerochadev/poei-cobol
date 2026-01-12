@@ -552,14 +552,14 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 //*
 //ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
 //          MAPLIB='ROCHA.CICS.LOAD',
-//          DSCTLIB='ROCHA.CICS.SOURCE',
+//          DSCTLIB='ROCHA.CICS.LINK',
 //          MAPNAME='CLIAFF',RMODE=24
 //SYSPRINT DD SYSOUT=*
 //SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
 /*
 ```
 
-> **Note** : La procedure DFHMAPS genere automatiquement le module physique (MAP) et le copybook COBOL (DSECT). Le copybook sera stocke dans ROCHA.CICS.SOURCE avec le nom du mapset.
+> **Note** : La procedure DFHMAPS genere automatiquement le module physique (MAP) et le copybook COBOL (DSECT). Le copybook sera stocke dans ROCHA.CICS.LINK avec le nom du mapset. Attention a ne pas utiliser la meme library pour le source et le DSECT, sinon le source sera ecrase!
 
 ### Captures d'ecran
 

@@ -76,7 +76,7 @@ Ce JCL utilise la procedure DFHMAPS qui genere automatiquement :
 //*
 //ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
 //          MAPLIB='ROCHA.CICS.LOAD',
-//          DSCTLIB='ROCHA.CICS.SOURCE',
+//          DSCTLIB='ROCHA.CICS.LINK',
 //          MAPNAME='CLIAFF',RMODE=24
 //SYSPRINT DD SYSOUT=*
 //SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
@@ -89,7 +89,7 @@ Ce JCL utilise la procedure DFHMAPS qui genere automatiquement :
 |-----------|--------|-------------|
 | INDEX | DFH510.CICS | Prefixe des libraries CICS |
 | MAPLIB | ROCHA.CICS.LOAD | Destination du module MAP |
-| DSCTLIB | ROCHA.CICS.SOURCE | Destination du copybook DSECT |
+| DSCTLIB | ROCHA.CICS.LINK | Destination du copybook DSECT |
 | MAPNAME | CLIAFF | Nom du mapset |
 | RMODE | 24 | Mode d'adressage (below the line) |
 
