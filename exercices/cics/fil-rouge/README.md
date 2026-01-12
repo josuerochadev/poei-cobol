@@ -1,286 +1,120 @@
-# Fil Rouge CICS - Application Bancaire
+# Fil Rouge CICS-VSAM : Gestion Clientele Financiere
 
-## Description
+Mini-projet COBOL-CICS sous environnement z/OS pour l'alimentation du Data Set CLIENT d'une institution financiere.
 
-Application CICS complète de gestion bancaire en **architecture 3 tiers**, intégrée avec le projet fil-rouge COBOL/JCL existant. Cette application fournit une interface transactionnelle temps réel pour consulter et gérer les données clients et comptes.
+## Objectifs
 
-## Contexte fonctionnel
+- Creer et gerer un fichier VSAM CLIENT via transactions CICS
+- Implementer les operations CRUD (Create, Read, Update, Delete)
+- Utiliser les commandes CICS : READ, WRITE, REWRITE, DELETE, STARTBR, READNEXT, ENDBR
+- Maitriser les MAPs BMS et la validation des donnees
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    APPLICATION BANCAIRE CICS                            │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  FONCTIONNALITÉS :                                                      │
-│  ─────────────────                                                      │
-│  • Menu principal avec navigation                                       │
-│  • Consultation des informations client                                 │
-│  • Consultation et gestion des comptes                                  │
-│  • Recherche par numéro client ou numéro de compte                      │
-│  • Affichage des soldes et dernières opérations                         │
-│                                                                         │
-│  TRANSACTIONS :                                                         │
-│  ──────────────                                                         │
-│  • MENU : Menu principal de l'application                               │
-│  • CLNT : Consultation client                                           │
-│  • CPTE : Gestion des comptes                                           │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+## Structure du fichier CLIENT
 
-## Architecture
+| Champ | Type | Longueur | Description |
+|-------|------|----------|-------------|
+| Numero de compte | NUM | 6 | Cle unique |
+| Code region | NUM | 2 | Code region |
+| Nature compte | NUM | 2 | Type de compte |
+| Nom client | ALPHA | 10 | Nom |
+| Prenom client | ALPHA | 10 | Prenom |
+| Date naissance | NUM | 8 | Format AAAAMMJJ |
+| Sexe | ALPHA | 1 | M ou F |
+| Activite professionnelle | NUM | 2 | Code profession |
+| Situation sociale | ALPHA | 1 | C, M, D ou V |
+| Adresse | ALPHA | 10 | Adresse |
+| Solde | NUM | 10 | Montant |
+| Position | ALPHA | 2 | DB ou CR |
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    ARCHITECTURE 3 TIERS                                 │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  TRANSACTION MENU                                                       │
-│  ┌───────────────────────────────────────────────────────────────────┐  │
-│  │  MENUPRES.cbl - Écran menu principal                              │  │
-│  │  → Choix 1 : Consultation Client (CLNT)                           │  │
-│  │  → Choix 2 : Gestion Comptes (CPTE)                               │  │
-│  │  → PF3 : Quitter                                                  │  │
-│  └───────────────────────────────────────────────────────────────────┘  │
-│                                │                                        │
-│                 ┌──────────────┴──────────────┐                         │
-│                 ▼                              ▼                         │
-│  TRANSACTION CLNT                  TRANSACTION CPTE                     │
-│  ┌─────────────────────────┐      ┌─────────────────────────┐          │
-│  │ CLNTPRES (Présentation) │      │ CPTEPRES (Présentation) │          │
-│  │ CLNTTRT  (Traitement)   │      │ CPTETRT  (Traitement)   │          │
-│  │ CLNTDAO  (Données)      │      │ CPTEDAO  (Données)      │          │
-│  └───────────┬─────────────┘      └───────────┬─────────────┘          │
-│              │                                │                         │
-│              ▼                                ▼                         │
-│  ┌────────────────────┐           ┌────────────────────┐               │
-│  │  VSAM CLIENT       │           │  VSAM COMPTE       │               │
-│  │  (KSDS)            │           │  (KSDS)            │               │
-│  └────────────────────┘           └────────────────────┘               │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+**Longueur totale : 64 octets**
 
-## Structure des fichiers
+## Organisation des exercices
 
-### Fichier CLIENT (KSDS)
+### Partie 0 : Preparation de l'environnement (1 exercice)
 
-| Champ | Type | Description |
-|-------|------|-------------|
-| CLI-NUM | X(6) | Numéro client (clé primaire) |
-| CLI-NOM | X(25) | Nom du client |
-| CLI-PRENOM | X(20) | Prénom |
-| CLI-ADRESSE | X(30) | Adresse |
-| CLI-VILLE | X(20) | Ville |
-| CLI-CODEPOST | X(5) | Code postal |
-| CLI-TEL | X(10) | Téléphone |
-| CLI-DATEOUV | X(8) | Date ouverture (AAAAMMJJ) |
-| CLI-REGION | X(2) | Code région |
+| Ex | Dossier | Description |
+|----|---------|-------------|
+| 0 | `p0-ex00-creation-libraries/` | Creation des 3 libraries PDS (SOURCE, LINK, LOAD) |
 
-### Fichier COMPTE (KSDS)
+### Partie 1 : Creation du Data Set et Affichage (5 exercices)
 
-| Champ | Type | Description |
-|-------|------|-------------|
-| CPT-NUM | X(11) | Numéro de compte (clé primaire) |
-| CPT-CLIENT | X(6) | Numéro client (FK) |
-| CPT-TYPE | X(1) | Type (C=Courant, E=Épargne, T=Titre) |
-| CPT-LIBELLE | X(20) | Libellé du compte |
-| CPT-SOLDE | S9(9)V99 COMP-3 | Solde actuel |
-| CPT-DATEOUV | X(8) | Date ouverture |
-| CPT-DATEDER | X(8) | Date dernière opération |
+| Ex | Dossier | Description |
+|----|---------|-------------|
+| 1 | `p1-ex01-definition-vsam/` | Definition du Data Set CLIENT dans CICS (FCT) |
+| 2 | `p1-ex02-map-affichage/` | Creation de la MAP BMS pour affichage |
+| 3 | `p1-ex03-prog-affichage/` | Programme COBOL-CICS d'affichage client |
+| 4 | `p1-ex04-transaction-ceda/` | Creation transaction via CEDA |
+| 5 | `p1-ex05-test-cedf/` | Test avec debugger CEDF |
 
-## Contenu du projet
+### Partie 2 : Operations CRUD (10 exercices)
+
+| Ex | Dossier | Description |
+|----|---------|-------------|
+| 6 | `p2-ex06-map-ajout/` | MAP pour ajout de client |
+| 7 | `p2-ex07-prog-ajout/` | Programme d'ajout (WRITE) |
+| 8 | `p2-ex08-transaction-ajout/` | Transaction d'ajout |
+| 9 | `p2-ex09-map-maj/` | MAP pour mise a jour |
+| 10 | `p2-ex10-prog-maj/` | Programme de mise a jour (REWRITE) |
+| 11 | `p2-ex11-transaction-maj/` | Transaction de mise a jour |
+| 12 | `p2-ex12-map-suppression/` | MAP pour suppression |
+| 13 | `p2-ex13-prog-suppression/` | Programme de suppression (DELETE) |
+| 14 | `p2-ex14-transaction-suppression/` | Transaction de suppression |
+| 15 | `p2-ex15-suppression-avec-lecture/` | Suppression precedee de lecture |
+
+### Partie 3 : Operations avancees (4 exercices)
+
+| Ex | Dossier | Description |
+|----|---------|-------------|
+| 16 | `p3-ex16-clients-generiques/` | Creation clients avec codes 111xxx, 444xxx, 777xxx |
+| 17 | `p3-ex17-suppression-generique/` | Suppression par code generique (STARTBR) |
+| 18 | `p3-ex18-lecture-readnext/` | Lecture successive (READNEXT, ENDBR) |
+| 19 | `p3-ex19-statistiques-region/` | Statistiques par region (DB/CR) |
+
+## Messages d'erreur standards
 
 ```
-fil-rouge/
-├── README.md               # Ce fichier
-├── copybooks/
-│   ├── CLIENT.cpy          # Structure client
-│   └── COMPTE.cpy          # Structure compte
-├── cobol/
-│   ├── MENUPRES.cbl        # Menu - Présentation
-│   ├── CLNTPRES.cbl        # Client - Présentation
-│   ├── CLNTTRT.cbl         # Client - Traitement
-│   ├── CLNTDAO.cbl         # Client - Données
-│   ├── CPTEPRES.cbl        # Compte - Présentation
-│   ├── CPTETRT.cbl         # Compte - Traitement
-│   └── CPTEDAO.cbl         # Compte - Données
-├── bms/
-│   ├── MENUSET.bms         # Écran menu
-│   ├── CLNTSET.bms         # Écran client
-│   └── CPTESET.bms         # Écran compte
-├── jcl/
-│   ├── DEFVSAM.jcl         # Définition fichiers VSAM
-│   └── LOADDATA.jcl        # Chargement données test
-└── data/
-    ├── CLIENT.dat          # Données test clients
-    └── COMPTE.dat          # Données test comptes
+'ENREGISTREMENT EN DOUBLE'
+'ZONE NUMERIQUE, RESAISIR CE CHAMP'
+'SAISIE CORRECTE, CONTINUER LA SAISIE (O/N) : '
+'REGION INEXISTANTE, SAISIR CODE REGION'
+'CLIENT INEXISTANT'
+'SUPPRESSION EFFECTUEE'
+'MISE A JOUR EFFECTUEE'
 ```
 
 ## Transactions
 
-### MENU - Menu Principal
+| Code | Description | Programme |
+|------|-------------|-----------|
+| AFFI | Affichage client | CLIAFF |
+| AJOU | Ajout client | CLIAJT |
+| MAJO | Mise a jour client | CLIMAJ |
+| SUPP | Suppression client | CLISUP |
+| SULE | Suppression avec lecture | CLISUL |
+| STAT | Statistiques region | CLISTAT |
 
-| Élément | Description |
-|---------|-------------|
-| Transaction | MENU |
-| Programme | MENUPRES |
-| Écran | MENUSET/MENUMAP |
-| Fonction | Navigation vers les autres transactions |
-
-**Touches :**
-- 1 + ENTER : Consultation Client
-- 2 + ENTER : Gestion Comptes
-- PF3 : Quitter l'application
-
-### CLNT - Consultation Client
-
-| Élément | Description |
-|---------|-------------|
-| Transaction | CLNT |
-| Programmes | CLNTPRES → CLNTTRT → CLNTDAO |
-| Écran | CLNTSET/CLNTMAP |
-| Fichier | CLIENT (KSDS) |
-
-**Fonctions :**
-- Recherche par numéro client
-- Affichage des informations complètes
-- Liste des comptes associés
-
-**Touches :**
-- ENTER : Rechercher
-- PF3 : Retour menu
-- PF5 : Afficher comptes du client
-
-### CPTE - Gestion Comptes
-
-| Élément | Description |
-|---------|-------------|
-| Transaction | CPTE |
-| Programmes | CPTEPRES → CPTETRT → CPTEDAO |
-| Écran | CPTESET/CPTEMAP |
-| Fichier | COMPTE (KSDS) |
-
-**Fonctions :**
-- Recherche par numéro de compte
-- Affichage solde et détails
-- Consultation historique simplifié
-
-**Touches :**
-- ENTER : Rechercher
-- PF3 : Retour menu
-- PF7 : Client précédent (browse)
-- PF8 : Client suivant (browse)
-
-## Données de test
-
-### Clients (10 enregistrements)
-
-| N° Client | Nom | Ville | Région |
-|-----------|-----|-------|--------|
-| CLI001 | MARTIN | PARIS | 75 |
-| CLI002 | DUPONT | LYON | 69 |
-| CLI003 | DURAND | MARSEILLE | 13 |
-| CLI004 | LEROY | TOULOUSE | 31 |
-| CLI005 | MOREAU | NICE | 06 |
-| CLI006 | SIMON | NANTES | 44 |
-| CLI007 | LAURENT | STRASBOURG | 67 |
-| CLI008 | LEFEBVRE | BORDEAUX | 33 |
-| CLI009 | MICHEL | LILLE | 59 |
-| CLI010 | GARCIA | MONTPELLIER | 34 |
-
-### Comptes (15 enregistrements)
-
-| N° Compte | Client | Type | Solde |
-|-----------|--------|------|-------|
-| 00001CLI001 | CLI001 | C | 2 500,00 € |
-| 00002CLI001 | CLI001 | E | 15 000,00 € |
-| 00003CLI002 | CLI002 | C | 1 200,00 € |
-| ... | ... | ... | ... |
-
-## Installation
-
-### Étape 1 : Définition des fichiers VSAM
+## Arborescence
 
 ```
-SUBMIT jcl/DEFVSAM.jcl
+fil-rouge/
+├── README.md
+├── RAPPORT-PROJET.md
+├── data/
+├── images-pt1/
+├── images-pt2/
+├── images-pt3/
+├── p0-ex00-creation-libraries/
+├── p1-ex01-definition-vsam/
+├── p1-ex02-map-affichage/
+├── ...
+└── p3-ex19-statistiques-region/
 ```
 
-### Étape 2 : Chargement des données
+> **Note** : Les copybooks sont generes automatiquement dans l'emulateur lors de l'assemblage des MAPs BMS.
 
-```
-SUBMIT jcl/LOADDATA.jcl
-```
+## Environnement
 
-### Étape 3 : Compilation
-
-```
-// EXEC DFHMAPS pour MENUSET, CLNTSET, CPTESET
-// EXEC DFHYITVL pour tous les programmes COBOL
-```
-
-### Étape 4 : Définition ressources CICS
-
-```
-DEFINE TRANSACTION(MENU) PROGRAM(MENUPRES)
-DEFINE TRANSACTION(CLNT) PROGRAM(CLNTPRES)
-DEFINE TRANSACTION(CPTE) PROGRAM(CPTEPRES)
-DEFINE PROGRAM(MENUPRES,CLNTPRES,CLNTTRT,CLNTDAO,CPTEPRES,CPTETRT,CPTEDAO)
-DEFINE FILE(CLIENT,COMPTE)
-DEFINE MAPSET(MENUSET,CLNTSET,CPTESET)
-```
-
-## Concepts CICS illustrés
-
-| Concept | Utilisation |
-|---------|-------------|
-| Navigation multi-transactions | XCTL entre MENU et transactions |
-| Architecture 3 tiers | Présentation/Traitement/Données |
-| Mode pseudo-conversationnel | RETURN TRANSID avec COMMAREA |
-| BMS multi-écrans | 3 mapsets distincts |
-| Accès VSAM | READ, STARTBR, READNEXT, ENDBR |
-| Gestion erreurs | RESP, HANDLE CONDITION |
-| Communication inter-programmes | LINK avec COMMAREA |
-
-## Relation avec le Fil Rouge COBOL/JCL
-
-Ce projet CICS s'intègre avec le fil-rouge principal (`exercices/cobol/fil-rouge/`) :
-
-| Fil Rouge COBOL/JCL | Fil Rouge CICS |
-|---------------------|----------------|
-| Batch - création fichiers | Temps réel - consultation |
-| JCL + COBOL batch | CICS transactionnel |
-| IDCAMS, SORT, MERGE | SEND MAP, READ, STARTBR |
-| Traitements de masse | Interactions utilisateur |
-
-## Exercices suggérés
-
-### Exercice 1 : Navigation
-1. Lancez MENU
-2. Naviguez vers CLNT, puis retournez au menu
-3. Naviguez vers CPTE, puis retournez au menu
-
-### Exercice 2 : Consultation Client
-1. Recherchez le client CLI001
-2. Affichez ses comptes (PF5)
-3. Analysez le flux CLNTPRES → CLNTTRT → CLNTDAO
-
-### Exercice 3 : Browse Comptes
-1. Recherchez un compte
-2. Utilisez PF7/PF8 pour naviguer
-3. Comprenez STARTBR/READNEXT/ENDBR
-
-### Exercice 4 : Extension
-Ajoutez une nouvelle fonctionnalité :
-- Création d'un nouveau client
-- Modification du solde d'un compte
-- Recherche par nom de client
-
-## Navigation
-
-| Retour |
-|--------|
-| [Exercices CICS](../README.md) |
-
----
-*Formation CICS - M2i Formation*
+- **Systeme** : z/OS sous Hercules (TK4-/TK5)
+- **Interface** : TSO/ISPF, CICS
+- **Fichier** : VSAM KSDS
+- **Commandes CICS** : READ, WRITE, REWRITE, DELETE, STARTBR, READNEXT, ENDBR
