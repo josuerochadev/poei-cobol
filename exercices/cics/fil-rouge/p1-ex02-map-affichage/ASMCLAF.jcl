@@ -6,7 +6,7 @@
 //*
 //* Ce JCL assemble le source BMS et genere :
 //*   - Le module MAP physique dans ROCHA.CICS.LOAD
-//*   - Le copybook DSECT dans ROCHA.CICS.SOURCE
+//*   - Le copybook DSECT dans ROCHA.CICS.LINK
 //*
 //* Prerequis :
 //*   - Source BMS copie dans ROCHA.CICS.SOURCE(CLIAFF)

@@ -545,7 +545,7 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 //*
 //* Ce JCL assemble le source BMS et genere :
 //*   - Le module MAP physique dans ROCHA.CICS.LOAD
-//*   - Le copybook DSECT dans ROCHA.CICS.SOURCE
+//*   - Le copybook DSECT dans ROCHA.CICS.LINK
 //*****************************************************************
 //PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
 //          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)

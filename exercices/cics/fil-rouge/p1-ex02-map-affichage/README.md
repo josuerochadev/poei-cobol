@@ -63,7 +63,7 @@ TIOAPFX=YES      : Reserve 12 octets pour prefixe TIOA
 
 Ce JCL utilise la procedure DFHMAPS qui genere automatiquement :
 - Le module MAP physique dans ROCHA.CICS.LOAD
-- Le copybook DSECT dans ROCHA.CICS.SOURCE
+- Le copybook DSECT dans ROCHA.CICS.LINK
 
 ```jcl
 //ROCHA03 JOB (ACCT),'ASSEMBL BMS CLIAFF',CLASS=A,MSGCLASS=X,
