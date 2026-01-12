@@ -585,6 +585,11 @@ J'ai developpe un programme COBOL-CICS qui :
 
 **Gestion pseudo-conversationnelle** : Le programme utilise RETURN TRANSID pour revenir au debut apres chaque interaction, avec une COMMAREA pour conserver l'etat.
 
+**Points techniques importants** :
+- Le copybook `DFHAID` est requis pour les constantes de touches (DFHPF3, DFHCLEAR, DFHENTER, etc.)
+- La commande `SEND TEXT FROM(...)` necessite une reference de donnee (variable), pas une constante litterale
+- Le copybook BMS (CLIAFF) est genere par l'assemblage de la MAP et contient les structures MAPAFFI/MAPAFFO
+
 ### Resolution
 
 **Programme : PRGCLIA.cbl** (extraits principaux)
@@ -603,6 +608,8 @@ J'ai developpe un programme COBOL-CICS qui :
        01  WS-COMMAREA.
            05 WS-FLAG-INIT         PIC X(01) VALUE 'N'.
 
+      * Copybooks CICS
+       COPY DFHAID.
        COPY CLIAFF.
 
        01  ENR-CLIENT.
@@ -622,6 +629,8 @@ J'ai developpe un programme COBOL-CICS qui :
 
        01  WS-RESP                 PIC S9(08) COMP VALUE 0.
        01  WS-NUMCPT               PIC X(06) VALUE SPACES.
+       01  WS-MSG-FIN              PIC X(40)
+           VALUE 'TRANSACTION AFFI TERMINEE - AU REVOIR'.
 
        PROCEDURE DIVISION.
 
@@ -702,7 +711,8 @@ J'ai developpe un programme COBOL-CICS qui :
 
        9000-FIN-PROGRAMME.
            EXEC CICS SEND TEXT
-               FROM('TRANSACTION AFFI TERMINEE')
+               FROM(WS-MSG-FIN)
+               LENGTH(40)
                ERASE
            END-EXEC
            EXEC CICS RETURN END-EXEC.
@@ -756,7 +766,7 @@ Creer la transaction correspondante a l'operation d'affichage des donnees de CLI
 
 ### Mon travail
 
-J'ai utilise CEDA pour definir la transaction AFFI qui appelle le programme CLIAFF.
+J'ai utilise CEDA pour definir la transaction AFFI qui appelle le programme PRGCLIA.
 
 ### Resolution
 
@@ -764,9 +774,9 @@ J'ai utilise CEDA pour definir la transaction AFFI qui appelle le programme CLIA
 
 ```
 CEDA DEFINE TRANSACTION(AFFI) GROUP(CLIGROUP)
-     PROGRAM(CLIAFF)
+     PROGRAM(PRGCLIA)
 
-CEDA DEFINE PROGRAM(CLIAFF) GROUP(CLIGROUP)
+CEDA DEFINE PROGRAM(PRGCLIA) GROUP(CLIGROUP)
      LANGUAGE(COBOL)
 
 CEDA INSTALL GROUP(CLIGROUP)
@@ -776,7 +786,7 @@ CEDA INSTALL GROUP(CLIGROUP)
 
 ```
 CEMT INQUIRE TRANSACTION(AFFI)
-CEMT INQUIRE PROGRAM(CLIAFF)
+CEMT INQUIRE PROGRAM(PRGCLIA)
 ```
 
 ### Captures d'ecran
