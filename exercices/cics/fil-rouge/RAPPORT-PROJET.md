@@ -576,62 +576,67 @@ Creer le PROGRAMME necessaire pour l'affichage des donnees pour un code CLIENT s
 ### Mon travail
 
 J'ai developpe un programme COBOL-CICS qui :
-1. Envoie la MAP vide au premier appel
-2. Recoit le numero de compte saisi par l'utilisateur
-3. Lit l'enregistrement VSAM avec la commande READ
-4. Affiche les donnees ou un message d'erreur
-5. Permet de continuer ou quitter (O/N)
+1. Envoie la MAP vide au premier appel (EIBCALEN = 0)
+2. Gere les touches PF3 (quitter) et CLEAR (reinitialiser)
+3. Recoit le numero de compte saisi par l'utilisateur
+4. Lit l'enregistrement VSAM avec la commande READ
+5. Affiche les donnees avec les libelles (region, sexe, situation, position)
+6. Affiche un message d'erreur si client non trouve
 
-**Gestion pseudo-conversationnelle** : Le programme utilise RETURN TRANSID pour revenir au debut apres chaque interaction.
+**Gestion pseudo-conversationnelle** : Le programme utilise RETURN TRANSID pour revenir au debut apres chaque interaction, avec une COMMAREA pour conserver l'etat.
 
 ### Resolution
 
-**Programme : CLIAFF.cbl**
+**Programme : CLIAFF.cbl** (extraits principaux)
 
 ```cobol
        IDENTIFICATION DIVISION.
        PROGRAM-ID. CLIAFF.
       ******************************************************************
-      * Programme d'affichage d'un client
-      * Transaction : AFFI
+      * PROGRAMME : CLIAFF - Affichage client
+      * TRANSACTION : AFFI
+      * MODE : Pseudo-conversationnel
       ******************************************************************
-
        DATA DIVISION.
        WORKING-STORAGE SECTION.
 
-       01 WS-COMMAREA.
-          05 WS-FLAG-PREMIER     PIC X(01) VALUE 'O'.
+       01  WS-COMMAREA.
+           05 WS-FLAG-INIT         PIC X(01) VALUE 'N'.
 
-      * Copybook genere par assemblage BMS (TYPE=DSECT)
        COPY CLIAFF.
 
-      * Structure enregistrement CLIENT (80 octets)
-       01 ENR-CLIENT.
-          05 CLI-NUMCPT           PIC 9(06).
-          05 CLI-CODREG           PIC 9(02).
-          05 CLI-NATCPT           PIC 9(02).
-          05 CLI-NOM              PIC X(10).
-          05 CLI-PRENOM           PIC X(10).
-          05 CLI-DATNAISS         PIC 9(08).
-          05 CLI-SEXE             PIC X(01).
-          05 CLI-ACTPRO           PIC 9(02).
-          05 CLI-SITSO            PIC X(01).
-          05 CLI-ADRESSE          PIC X(10).
-          05 CLI-SOLDE            PIC 9(10).
-          05 CLI-POSITION         PIC X(02).
-          05 FILLER               PIC X(16).
+       01  ENR-CLIENT.
+           05 CLI-NUMCPT           PIC X(06).
+           05 CLI-CODREG           PIC X(02).
+           05 CLI-NATCPT           PIC X(02).
+           05 CLI-NOM              PIC X(10).
+           05 CLI-PRENOM           PIC X(10).
+           05 CLI-DATNAISS         PIC X(08).
+           05 CLI-SEXE             PIC X(01).
+           05 CLI-ACTPRO           PIC X(02).
+           05 CLI-SITSO            PIC X(01).
+           05 CLI-ADRESSE          PIC X(10).
+           05 CLI-SOLDE            PIC X(10).
+           05 CLI-POSITION         PIC X(02).
+           05 FILLER               PIC X(16).
 
-       01 WS-RESP                PIC S9(08) COMP.
-       01 WS-MESSAGE             PIC X(40).
+       01  WS-RESP                 PIC S9(08) COMP VALUE 0.
+       01  WS-NUMCPT               PIC X(06) VALUE SPACES.
 
        PROCEDURE DIVISION.
 
        0000-PRINCIPAL.
-           IF EIBCALEN = 0
-               PERFORM 1000-PREMIER-PASSAGE
-           ELSE
-               PERFORM 2000-TRAITEMENT
-           END-IF
+           EVALUATE TRUE
+               WHEN EIBCALEN = 0
+                   PERFORM 1000-PREMIER-PASSAGE
+               WHEN EIBAID = DFHPF3
+                   PERFORM 9000-FIN-PROGRAMME
+               WHEN EIBAID = DFHCLEAR
+                   PERFORM 1000-PREMIER-PASSAGE
+               WHEN OTHER
+                   PERFORM 2000-TRAITEMENT
+           END-EVALUATE
+
            EXEC CICS RETURN
                TRANSID('AFFI')
                COMMAREA(WS-COMMAREA)
@@ -639,54 +644,103 @@ J'ai developpe un programme COBOL-CICS qui :
            END-EXEC.
 
        1000-PREMIER-PASSAGE.
-           MOVE LOW-VALUES TO MAPAFFII
-           MOVE 'SAISIR LE NUMERO DE COMPTE' TO MSGO
-           EXEC CICS SEND MAP('MAPAFFI')
+           MOVE LOW-VALUES TO MAPAFFO
+           MOVE 'SAISIR LE NUMERO DE COMPTE ET APPUYER SUR ENTREE'
+               TO MSGO
+           EXEC CICS SEND MAP('MAPAFF')
                MAPSET('CLIAFF')
                ERASE
            END-EXEC.
 
        2000-TRAITEMENT.
-           EXEC CICS RECEIVE MAP('MAPAFFI')
+           EXEC CICS RECEIVE MAP('MAPAFF')
                MAPSET('CLIAFF')
            END-EXEC
 
-           MOVE NUMCPTI TO CLI-NUMCPT
+           IF NUMCPTL = 0 OR NUMCPTI = SPACES
+               MOVE 'VEUILLEZ SAISIR UN NUMERO DE COMPTE' TO MSGO
+               GO TO 2000-FIN
+           END-IF
+
+           MOVE NUMCPTI TO WS-NUMCPT
 
            EXEC CICS READ
                FILE('FCLIENT')
                INTO(ENR-CLIENT)
-               RIDFLD(CLI-NUMCPT)
+               RIDFLD(WS-NUMCPT)
                RESP(WS-RESP)
            END-EXEC
 
-           IF WS-RESP = DFHRESP(NORMAL)
-               PERFORM 3000-AFFICHER-CLIENT
-           ELSE IF WS-RESP = DFHRESP(NOTFND)
-               MOVE 'CLIENT INEXISTANT' TO MSGO
-           ELSE
-               MOVE 'ERREUR LECTURE FICHIER' TO MSGO
-           END-IF
+           EVALUATE WS-RESP
+               WHEN DFHRESP(NORMAL)
+                   PERFORM 3000-AFFICHER-CLIENT
+               WHEN DFHRESP(NOTFND)
+                   MOVE 'CLIENT INEXISTANT - VERIFIEZ LE NUMERO' TO MSGO
+               WHEN OTHER
+                   MOVE 'ERREUR LECTURE FICHIER' TO MSGO
+           END-EVALUATE
 
-           EXEC CICS SEND MAP('MAPAFFI')
+           EXEC CICS SEND MAP('MAPAFF')
                MAPSET('CLIAFF')
            END-EXEC.
 
+       2000-FIN.
+           EXIT.
+
        3000-AFFICHER-CLIENT.
+           MOVE LOW-VALUES TO MAPAFFO
            MOVE CLI-NUMCPT   TO NUMCPTO
            MOVE CLI-CODREG   TO CODREGO
-           MOVE CLI-NATCPT   TO NATCPTO
            MOVE CLI-NOM      TO NOMO
            MOVE CLI-PRENOM   TO PRENOMO
-           MOVE CLI-DATNAISS TO DATNAISO
+           MOVE CLI-DATNAISS TO DATNAO
            MOVE CLI-SEXE     TO SEXEO
-           MOVE CLI-ACTPRO   TO ACTPROO
-           MOVE CLI-SITSO    TO SITSOO
-           MOVE CLI-ADRESSE  TO ADRESSEO
            MOVE CLI-SOLDE    TO SOLDEO
-           MOVE CLI-POSITION TO POSITIONO
-           MOVE 'CLIENT TROUVE - CONTINUER (O/N) ?' TO MSGO.
+           MOVE CLI-POSITION TO POSITO
+      * ... (conversion des libelles region, sexe, situation, position)
+           MOVE 'CLIENT TROUVE - PF3=QUITTER' TO MSGO.
+
+       9000-FIN-PROGRAMME.
+           EXEC CICS SEND TEXT
+               FROM('TRANSACTION AFFI TERMINEE')
+               ERASE
+           END-EXEC
+           EXEC CICS RETURN END-EXEC.
 ```
+
+**JCL de compilation : CMPCLAF.jcl**
+
+```jcl
+//ROCHA04 JOB (ACCT),'COMPILE CLIAFF',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* COMPILATION DU PROGRAMME COBOL-CICS CLIAFF
+//*****************************************************************
+//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
+//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
+//*
+//COMPIL   EXEC PROC=DFHYITVL,
+//          INDEX='DFH510.CICS',
+//          PROGLIB='ROCHA.CICS.LOAD',
+//          AD370HLQ='IGY420',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          LE370HLQ='CEE'
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(CLIAFF),DISP=SHR
+//LKED.SYSIN DD *
+     INCLUDE SYSLIB(DFHELII)
+     NAME CLIAFF(R)
+/*
+```
+
+**Commandes CICS utilisees :**
+
+| Commande | Usage |
+|----------|-------|
+| SEND MAP | Envoyer l'ecran |
+| RECEIVE MAP | Recevoir la saisie |
+| READ FILE | Lire VSAM par cle |
+| RETURN TRANSID | Retour pseudo-conversationnel |
+| SEND TEXT | Message de fin |
 
 ### Captures d'ecran
 
