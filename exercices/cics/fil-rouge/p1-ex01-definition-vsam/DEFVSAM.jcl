@@ -38,7 +38,7 @@
          INDEXED                                      -
          VOLUMES(FDDBAS)                              -
          KEYS(6 0)                                    -
-         RECORDSIZE(64 64)                            -
+         RECORDSIZE(80 80)                            -
          TRACKS(5 5)                                  -
          FREESPACE(20 10)                             -
          SHAREOPTIONS(2 3)                            -

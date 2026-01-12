@@ -34,7 +34,9 @@ Ce projet a ete realise dans le cadre de la formation POEI Developpeur Mainframe
 
 | Probleme | Solution |
 |----------|----------|
-| ... | ... |
+| Erreur VSAM 108 au chargement (longueur incorrecte) | Le DD * du JCL lit en LRECL=80 par defaut. Solution : definir RECORDSIZE(80 80) et utiliser un FILLER de 16 octets dans les programmes |
+| Volume non specifie (TK4-) | Ajouter VOLUMES(FDDBAS) dans la definition du cluster VSAM |
+| Fichier VSAM vide apres REPRO avec RC=00 | Probleme de LRECL incompatible. Resolu en passant a 80 octets |
 
 ### Competences mises en oeuvre
 
@@ -220,9 +222,11 @@ Cet exercice comporte deux etapes principales :
 
 **Choix des parametres VSAM :**
 - `KEYS(6 0)` : Cle de 6 caracteres en debut d'enregistrement (numero compte)
-- `RECORDSIZE(64 64)` : Enregistrements de taille fixe (64 octets)
+- `RECORDSIZE(80 80)` : Enregistrements de taille fixe (80 octets) - compatible avec LRECL=80 par defaut du JCL
 - `FREESPACE(20 10)` : Reserve de l'espace pour les insertions futures
 - `SHAREOPTIONS(2 3)` : Permet le partage entre regions CICS
+
+> **Note technique** : Les enregistrements font 80 octets (64 donnees + 16 filler) pour etre compatibles avec le LRECL=80 par defaut des DD * en JCL. Les programmes COBOL utiliseront un FILLER de 16 caracteres en fin d'enregistrement.
 
 ### Resolution
 
@@ -254,7 +258,7 @@ Cet exercice comporte deux etapes principales :
          INDEXED                                      -
          VOLUMES(FDDBAS)                              -
          KEYS(6 0)                                    -
-         RECORDSIZE(64 64)                            -
+         RECORDSIZE(80 80)                            -
          TRACKS(5 5)                                  -
          FREESPACE(20 10)                             -
          SHAREOPTIONS(2 3)                            -
@@ -283,7 +287,7 @@ CEDA DEFINE FILE(FCLIENT) GROUP(CLIGROUP)
      READ(YES)
      UPDATE(YES)
      RECORDFORMAT(F)
-     RECORDSIZE(64)
+     RECORDSIZE(80)
      KEYLENGTH(6)
      STATUS(ENABLED)
      OPENTIME(FIRSTREF)
@@ -316,31 +320,69 @@ FILE(FCLIENT)   Dsn(ROCHA.CICS.CLIENT)
 
 **Etape 4 : Chargement des donnees initiales**
 
+Le chargement utilise directement IDCAMS REPRO avec des enregistrements de 80 octets (64 donnees + 16 espaces en filler). Le DD * lit par defaut en LRECL=80, ce qui est maintenant compatible avec notre definition VSAM.
+
 ```jcl
-//ROCHA02 JOB (ACCT),'LOAD VSAM CLIENT',CLASS=A,MSGCLASS=X
+//ROCHA02 JOB (ACCT),'LOAD VSAM CLIENT',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* CHARGEMENT DES DONNEES INITIALES DANS LE FICHIER CLIENT
+//*
+//* Structure enregistrement (80 octets) :
+//*   Pos 01-06 : Numero compte (cle)
+//*   Pos 07-08 : Code region
+//*   Pos 09-10 : Nature compte
+//*   Pos 11-20 : Nom client (10 car)
+//*   Pos 21-30 : Prenom client (10 car)
+//*   Pos 31-38 : Date naissance (AAAAMMJJ)
+//*   Pos 39    : Sexe (M/F)
+//*   Pos 40-41 : Activite professionnelle
+//*   Pos 42    : Situation sociale (C/M/D/V)
+//*   Pos 43-52 : Adresse (10 car)
+//*   Pos 53-62 : Solde (10 car)
+//*   Pos 63-64 : Position (DB/CR)
+//*   Pos 65-80 : Filler (16 espaces)
+//*****************************************************************
+//*
 //STEP1    EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //INFILE   DD *
 0000010120DUPONT    JEAN      19850315M10CPARIS     0000150000CR
 0000020125MARTIN    MARIE     19900622F15MPARIS     0000080000DB
-0000030220BERNARD   PIERRE    19780410M20CMARSEILLE0000250000CR
-0000040225PETIT     SOPHIE    19880912F05MMARSEILLE0000045000DB
+0000030220BERNARD   PIERRE    19780410M20CMARSEILLE 0000250000CR
+0000040225PETIT     SOPHIE    19880912F05MMARSEILLE 0000045000DB
 0000050330ROBERT    ALAIN     19750520M10CLYON      0000320000CR
 0000060335RICHARD   CLAIRE    19920805F25VLYON      0000012000DB
 0000070420DURAND    PAUL      19820718M30DLILLE     0000180000CR
 0000080425MOREAU    ANNE      19950303F15CLILLE     0000095000DB
 0000090130LAURENT   MARC      19800125M20MPARIS     0000420000CR
-0000100235SIMON     JULIE     19870930F10CMARSEILLE0000067000DB
+0000100235SIMON     JULIE     19870930F10CMARSEILLE 0000067000DB
 2220010120LEROY     MICHEL    19830214M05CPARIS     0000145000CR
-2220020125ROUX      NATHALIE  19910607F15MMARSEILLE0000032000DB
+2220020125ROUX      NATHALIE  19910607F15MMARSEILLE 0000032000DB
 2220030230DAVID     FRANCOIS  19760819M20CLYON      0000278000CR
 2220040335BERTRAND  ISABELLE  19890423F25VLILLE     0000089000DB
 2220050420MOREL     PHILIPPE  19840111M30DPARIS     0000156000CR
 /*
 //SYSIN    DD *
-  REPRO INFILE(INFILE) OUTDATASET(ROCHA.CICS.CLIENT)
+ REPRO INFILE(INFILE) -
+       OUTDATASET(ROCHA.CICS.CLIENT)
+/*
+//*
+//STEP2    EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+ PRINT INDATASET(ROCHA.CICS.CLIENT) -
+       CHARACTER
+/*
+//*
+//STEP3    EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+ LISTCAT ENTRIES(ROCHA.CICS.CLIENT) ALL
 /*
 ```
+
+> **Note technique** : Les donnees font 64 caracteres et sont automatiquement completees a 80 caracteres (padding avec des espaces) par le JCL. Le VSAM etant defini avec RECORDSIZE(80 80), les enregistrements sont compatibles.
 
 **Donnees chargees :**
 
@@ -481,7 +523,7 @@ J'ai developpe un programme COBOL-CICS qui :
       * Copybook genere par assemblage BMS (TYPE=DSECT)
        COPY CLIAFF.
 
-      * Structure enregistrement CLIENT (64 octets)
+      * Structure enregistrement CLIENT (80 octets)
        01 ENR-CLIENT.
           05 CLI-NUMCPT           PIC 9(06).
           05 CLI-CODREG           PIC 9(02).
@@ -495,6 +537,7 @@ J'ai developpe un programme COBOL-CICS qui :
           05 CLI-ADRESSE          PIC X(10).
           05 CLI-SOLDE            PIC 9(10).
           05 CLI-POSITION         PIC X(02).
+          05 FILLER               PIC X(16).
 
        01 WS-RESP                PIC S9(08) COMP.
        01 WS-MESSAGE             PIC X(40).

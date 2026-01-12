@@ -18,7 +18,7 @@ Executer le JCL `DEFVSAM.jcl` pour creer le cluster VSAM KSDS.
 | INDEXED | - | Type KSDS (Key Sequenced) |
 | VOLUMES(FDDBAS) | - | Volume DASD cible (TK4-) |
 | KEYS(6 0) | 6 octets, position 0 | Cle = numero compte |
-| RECORDSIZE(64 64) | 64 octets fixe | Longueur enregistrement |
+| RECORDSIZE(80 80) | 80 octets fixe | Longueur enregistrement (64 donnees + 16 filler) |
 | TRACKS(5 5) | 5 prim, 5 sec | Espace alloue |
 | FREESPACE(20 10) | 20% CI, 10% CA | Espace libre pour insertions |
 | SHAREOPTIONS(2 3) | - | Partage cross-region/system |
@@ -38,7 +38,7 @@ CEDA DEFINE FILE(FCLIENT) GROUP(CLIGROUP)
      READ(YES)
      UPDATE(YES)
      RECORDFORMAT(F)
-     RECORDSIZE(64)
+     RECORDSIZE(80)
      KEYLENGTH(6)
      STATUS(ENABLED)
      OPENTIME(FIRSTREF)
@@ -58,7 +58,7 @@ CEDA INSTALL FILE(FCLIENT) GROUP(CLIGROUP)
 | READ(YES) | - | Autoriser READ |
 | UPDATE(YES) | - | Autoriser REWRITE |
 | RECORDFORMAT(F) | - | Enregistrements fixes |
-| RECORDSIZE(64) | - | Taille enregistrement |
+| RECORDSIZE(80) | - | Taille enregistrement (64 donnees + 16 filler) |
 | KEYLENGTH(6) | - | Longueur de la cle |
 | STATUS(ENABLED) | - | Fichier actif |
 | OPENTIME(FIRSTREF) | - | Ouverture au premier acces |
@@ -72,7 +72,7 @@ DFHFCT TYPE=FILE,
        ACCMETH=VSAM,
        SERVREQ=(READ,UPDATE,DELETE,ADD,BROWSE),
        RECFORM=FIXED,
-       LRECL=64,
+       LRECL=80,
        KEYLEN=6,
        FILSTAT=(ENABLED,OPENED)
 ```
