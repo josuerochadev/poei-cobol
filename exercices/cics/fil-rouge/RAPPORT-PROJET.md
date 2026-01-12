@@ -773,6 +773,9 @@ J'ai utilise CEDA pour definir la transaction AFFI qui appelle le programme PRGC
 **Commandes CEDA :**
 
 ```
+CEDA DEFINE PROGRAM(CLIAFF) GROUP(CLIGROUP)
+     LANGUAGE(ASSEMBLER)
+
 CEDA DEFINE PROGRAM(PRGCLIA) GROUP(CLIGROUP)
      LANGUAGE(COBOL)
 
@@ -782,13 +785,14 @@ CEDA DEFINE TRANSACTION(AFFI) GROUP(CLIGROUP)
 CEDA INSTALL GROUP(CLIGROUP)
 ```
 
-> **Note** : Le programme doit etre defini avant la transaction car celle-ci le reference.
+> **Note** : Le mapset BMS (CLIAFF) doit etre defini comme programme avec LANGUAGE(ASSEMBLER) car c'est un module assemble. Le programme COBOL et la transaction sont definis ensuite.
 
 **Verification :**
 
 ```
-CEMT INQUIRE PROGRAM(PRGCLIA)
-CEMT INQUIRE TRANSACTION(AFFI)
+CEMT INQ PROG(CLIAFF)
+CEMT INQ PROG(PRGCLIA)
+CEMT INQ TRAN(AFFI)
 ```
 
 ### Captures d'ecran
