@@ -773,20 +773,22 @@ J'ai utilise CEDA pour definir la transaction AFFI qui appelle le programme PRGC
 **Commandes CEDA :**
 
 ```
-CEDA DEFINE TRANSACTION(AFFI) GROUP(CLIGROUP)
-     PROGRAM(PRGCLIA)
-
 CEDA DEFINE PROGRAM(PRGCLIA) GROUP(CLIGROUP)
      LANGUAGE(COBOL)
+
+CEDA DEFINE TRANSACTION(AFFI) GROUP(CLIGROUP)
+     PROGRAM(PRGCLIA)
 
 CEDA INSTALL GROUP(CLIGROUP)
 ```
 
+> **Note** : Le programme doit etre defini avant la transaction car celle-ci le reference.
+
 **Verification :**
 
 ```
-CEMT INQUIRE TRANSACTION(AFFI)
 CEMT INQUIRE PROGRAM(PRGCLIA)
+CEMT INQUIRE TRANSACTION(AFFI)
 ```
 
 ### Captures d'ecran
