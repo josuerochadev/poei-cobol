@@ -422,62 +422,118 @@ Creer la MAP conformement a la structure du Data Set CLIENT permettant l'afficha
 
 J'ai cree une MAP BMS avec tous les champs du fichier CLIENT. La MAP comprend :
 - Un titre en haut de l'ecran
-- Les 12 champs de saisie/affichage avec leurs libelles
-- Une zone de message de 40 caracteres en bas
-- Les attributs DSATTS et MAPATTS pour gerer les couleurs et attributs dynamiquement
+- Une zone de saisie pour le numero de compte (cle de recherche)
+- Les 12 champs d'affichage avec leurs libelles
+- Des zones libelles pour afficher les descriptions (region, sexe, situation, position)
+- Une zone de message de 60 caracteres en bas
+- Les touches fonction en bas de l'ecran
+
+**Choix de conception :**
+- `CTRL=(FREEKB,FRSET)` : Clavier debloque et MDT remis a zero
+- `TIOAPFX=YES` : Reserve 12 octets pour le prefixe TIOA (requis pour CICS)
+- Seul le champ NUMCPT est saisissable (UNPROT), les autres sont en affichage (ASKIP)
 
 ### Resolution
 
 **MAP BMS : CLIAFF.bms**
 
 ```
-CLIAFF   DFHMSD TYPE=&SYSPARM,                                         X
-               MODE=INOUT,                                             X
-               LANG=COBOL,                                             X
-               STORAGE=AUTO,                                           X
-               CTRL=FREEKB,                                            X
-               TIOAPFX=YES
-
-MAPAFFI  DFHMDI SIZE=(24,80),                                          X
-               LINE=1,                                                 X
-               COLUMN=1
-
-         DFHMDF POS=(1,25),LENGTH=30,                                  X
-               ATTRB=(ASKIP,BRT),                                      X
+***********************************************************************
+*  MAPSET : CLIAFF - Affichage Client
+*  Transaction : AFFI
+***********************************************************************
+CLIAFF   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPAFF   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* TITRE
+*----------------------------------------------------------------------
+         DFHMDF POS=(1,25),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
                INITIAL='*** AFFICHAGE CLIENT ***'
-
-* Numero de compte (cle)
-         DFHMDF POS=(3,2),LENGTH=15,                                   X
-               ATTRB=(ASKIP),                                          X
+         DFHMDF POS=(2,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+*----------------------------------------------------------------------
+* ZONE DE SAISIE - NUMERO DE COMPTE (CLE)
+*----------------------------------------------------------------------
+         DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='NUMERO COMPTE :'
-NUMCPT   DFHMDF POS=(3,18),LENGTH=6,                                   X
-               ATTRB=(UNPROT,NUM,IC),                                  X
-               DSATTS=(COLOR,HILIGHT),                                 X
-               COLOR=GREEN
-
-* Code region
-         DFHMDF POS=(4,2),LENGTH=15,                                   X
-               ATTRB=(ASKIP),                                          X
+NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+         DFHMDF POS=(4,26),LENGTH=1,ATTRB=ASKIP
+*----------------------------------------------------------------------
+* ZONES D'AFFICHAGE - DONNEES CLIENT
+*----------------------------------------------------------------------
+         DFHMDF POS=(6,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='CODE REGION   :'
-CODREG   DFHMDF POS=(4,18),LENGTH=2,                                   X
-               ATTRB=(ASKIP),                                          X
-               DSATTS=(COLOR),                                         X
-               COLOR=TURQUOISE
-
-* ... autres champs ...
-
-* Zone message
-         DFHMDF POS=(22,2),LENGTH=8,                                   X
-               ATTRB=(ASKIP),                                          X
-               INITIAL='MESSAGE:'
-MSG      DFHMDF POS=(22,11),LENGTH=40,                                 X
-               ATTRB=(ASKIP,BRT),                                      X
-               DSATTS=(COLOR),                                         X
-               COLOR=YELLOW
-
+CODREG   DFHMDF POS=(6,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+LIBREG   DFHMDF POS=(6,46),LENGTH=15,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(7,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NATURE COMPTE :'
+NATCPT   DFHMDF POS=(7,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+LIBNAT   DFHMDF POS=(7,46),LENGTH=15,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(8,2),LENGTH=16,ATTRB=ASKIP,INITIAL='NOM           :'
+NOM      DFHMDF POS=(8,19),LENGTH=10,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(9,2),LENGTH=16,ATTRB=ASKIP,INITIAL='PRENOM        :'
+PRENOM   DFHMDF POS=(9,19),LENGTH=10,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(10,2),LENGTH=16,ATTRB=ASKIP,INITIAL='DATE NAISSANCE:'
+DATNA    DFHMDF POS=(10,19),LENGTH=10,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(11,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SEXE          :'
+SEXE     DFHMDF POS=(11,19),LENGTH=1,ATTRB=(ASKIP,BRT)
+LIBSEX   DFHMDF POS=(11,35),LENGTH=8,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(12,2),LENGTH=16,ATTRB=ASKIP,INITIAL='ACTIVITE PRO  :'
+ACTPRO   DFHMDF POS=(12,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(13,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SITUATION SOC :'
+SITSO    DFHMDF POS=(13,19),LENGTH=1,ATTRB=(ASKIP,BRT)
+LIBSIT   DFHMDF POS=(13,35),LENGTH=12,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(14,2),LENGTH=16,ATTRB=ASKIP,INITIAL='ADRESSE       :'
+ADRESSE  DFHMDF POS=(14,19),LENGTH=10,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(15,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SOLDE         :'
+SOLDE    DFHMDF POS=(15,19),LENGTH=12,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(16,2),LENGTH=16,ATTRB=ASKIP,INITIAL='POSITION      :'
+POSIT    DFHMDF POS=(16,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+LIBPOS   DFHMDF POS=(16,36),LENGTH=10,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* ZONE MESSAGE ET TOUCHES FONCTION
+*----------------------------------------------------------------------
+         DFHMDF POS=(20,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
+MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(23,2),LENGTH=70,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Rechercher  PF3=Quitter  CLEAR=Effacer'
+***********************************************************************
          DFHMSD TYPE=FINAL
          END
 ```
+
+**Zones de la MAP :**
+
+| Zone | Longueur | Attribut | Description |
+|------|----------|----------|-------------|
+| NUMCPT | 6 | UNPROT,NUM,IC | Numero compte (saisie) |
+| CODREG | 2 | ASKIP,BRT | Code region |
+| LIBREG | 15 | ASKIP,BRT | Libelle region |
+| NATCPT | 2 | ASKIP,BRT | Nature compte |
+| NOM | 10 | ASKIP,BRT | Nom client |
+| PRENOM | 10 | ASKIP,BRT | Prenom client |
+| DATNA | 10 | ASKIP,BRT | Date naissance |
+| SEXE | 1 | ASKIP,BRT | Sexe |
+| ACTPRO | 2 | ASKIP,BRT | Activite professionnelle |
+| SITSO | 1 | ASKIP,BRT | Situation sociale |
+| ADRESSE | 10 | ASKIP,BRT | Adresse |
+| SOLDE | 12 | ASKIP,BRT | Solde |
+| POSIT | 2 | ASKIP,BRT | Position (DB/CR) |
+| MSG | 60 | ASKIP,BRT | Zone message |
 
 ### Captures d'ecran
 
