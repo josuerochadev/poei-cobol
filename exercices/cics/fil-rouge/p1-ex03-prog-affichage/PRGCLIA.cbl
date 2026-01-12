@@ -57,6 +57,8 @@
       *-----------------------------------------------------------------
        01  WS-RESP                 PIC S9(08) COMP VALUE 0.
        01  WS-NUMCPT               PIC X(06) VALUE SPACES.
+       01  WS-MSG-FIN              PIC X(40)
+           VALUE 'TRANSACTION AFFI TERMINEE - AU REVOIR'.
 
       *-----------------------------------------------------------------
       * LIBELLES POUR AFFICHAGE
@@ -248,7 +250,8 @@
       * Fin de la transaction
       *-----------------------------------------------------------------
            EXEC CICS SEND TEXT
-               FROM('TRANSACTION AFFI TERMINEE - AU REVOIR')
+               FROM(WS-MSG-FIN)
+               LENGTH(40)
                ERASE
            END-EXEC
 
