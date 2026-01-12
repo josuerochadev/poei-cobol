@@ -29,6 +29,10 @@
               88 PASSAGE-SUIVANT   VALUE 'O'.
 
       *-----------------------------------------------------------------
+      * COPYBOOKS CICS
+      *-----------------------------------------------------------------
+       COPY DFHAID.
+      *-----------------------------------------------------------------
       * COPYBOOK GENERE PAR ASSEMBLAGE BMS (DSECT)
       * Stocke dans ROCHA.CICS.LINK(CLIAFF)
       *-----------------------------------------------------------------
@@ -200,12 +204,18 @@
            MOVE CLI-POSITION TO POSITO
 
       * Libelle region
-           IF CLI-CODREG >= '01' AND CLI-CODREG <= '04'
-               MOVE FUNCTION NUMVAL(CLI-CODREG) TO WS-IDX
-               MOVE WS-REGION(WS-IDX) TO LIBREGO
-           ELSE
-               MOVE 'REGION INCONNUE' TO LIBREGO
-           END-IF
+           EVALUATE CLI-CODREG
+               WHEN '01'
+                   MOVE '01 - PARIS' TO LIBREGO
+               WHEN '02'
+                   MOVE '02 - MARSEILLE' TO LIBREGO
+               WHEN '03'
+                   MOVE '03 - LYON' TO LIBREGO
+               WHEN '04'
+                   MOVE '04 - LILLE' TO LIBREGO
+               WHEN OTHER
+                   MOVE 'REGION INCONNUE' TO LIBREGO
+           END-EVALUATE
 
       * Libelle sexe
            EVALUATE CLI-SEXE
