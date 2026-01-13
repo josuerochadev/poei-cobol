@@ -1566,11 +1566,6 @@ CEDA INSTALL GROUP(CLIGROUP)
 **Etape 3 : Verification avec CEMT**
 
 ```
-CEMT INQ MAPSET(CLIAJT)
-```
-Resultat attendu : `Map(CLIAJT) Ins Ena`
-
-```
 CEMT INQ PROG(PRGAJT)
 ```
 Resultat attendu : `Pro(PRGAJT) Len(...) Cob Ena Pri`
@@ -1579,6 +1574,8 @@ Resultat attendu : `Pro(PRGAJT) Len(...) Cob Ena Pri`
 CEMT INQ TRAN(AJOU)
 ```
 Resultat attendu : `Tra(AJOU) Pro(PRGAJT) Ena`
+
+> **Note** : `CEMT INQ MAPSET` n'existe pas dans CICS. Pour verifier qu'un mapset est installe, on teste directement la transaction. Si le mapset est absent, CICS affichera une erreur lors du SEND MAP.
 
 **Tableau recapitulatif du groupe CLIGROUP apres exercice 8 :**
 
