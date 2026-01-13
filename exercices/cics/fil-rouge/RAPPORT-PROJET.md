@@ -173,14 +173,14 @@ Command - Enter "/" to select action
 Au cours du projet, les membres suivants seront crees dans `ROCHA.CICS.SOURCE` :
 
 **Programmes COBOL :**
-- CLIAFF : Affichage client
-- CLIAJT : Ajout client
-- CLIMAJ : Mise a jour client
-- CLISUP : Suppression client
-- CLISUL : Suppression avec lecture
-- CLISDEL : Suppression generique
-- CLILGEN : Liste generique
-- CLISTAT : Statistiques region
+- PRGCLIA : Affichage client
+- PRGAJT : Ajout client
+- PRGMAJ : Mise a jour client
+- PRGSUP : Suppression client
+- PRGSUL : Suppression avec lecture
+- PRGSDEL : Suppression generique
+- PRGLGEN : Liste generique
+- PRGSTAT : Statistiques region
 
 **MAPs BMS :**
 - MAPAFF : Ecran affichage
@@ -404,11 +404,17 @@ Le chargement utilise directement IDCAMS REPRO avec des enregistrements de 80 oc
 
 ### Captures d'ecran
 
-<!-- ![pt1ex01-1](images-pt1/pt1ex01-1.png) -->
-<!-- ![pt1ex01-2](images-pt1/pt1ex01-2.png) -->
-<!-- ![pt1ex01-3](images-pt1/pt1ex01-3.png) -->
-<!-- ![pt1ex01-4](images-pt1/pt1ex01-4.png) -->
-<!-- ![pt1ex01-5](images-pt1/pt1ex01-5.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt1ex01-1 : Soumission JCL DEFVSAM - ISPF EDIT avec SUB
+2. pt1ex01-2 : SDSF - Job output avec RC=0000 pour IDCAMS DEFINE
+3. pt1ex01-3 : CEDA DEFINE FILE(FCLIENT) - ecran de definition
+4. pt1ex01-4 : CEDA INSTALL FILE(FCLIENT) - message INSTALL SUCCESSFUL
+5. pt1ex01-5 : CEMT INQ FILE(FCLIENT) - verification statut Ena Ope
+6. pt1ex01-6 : Soumission JCL LOADVSAM - chargement des donnees
+7. pt1ex01-7 : SDSF - Output PRINT montrant les 15 enregistrements charges
+-->
 
 ---
 
@@ -561,9 +567,46 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 
 > **Note** : La procedure DFHMAPS genere automatiquement le module physique (MAP) et le copybook COBOL (DSECT). Le copybook sera stocke dans ROCHA.CICS.LINK avec le nom du mapset. Attention a ne pas utiliser la meme library pour le source et le DSECT, sinon le source sera ecrase!
 
+**Apercu de l'ecran MAPAFF :**
+
+```
++------------------------------------------------------------------------------+
+|                         *** AFFICHAGE CLIENT ***                             |
+|------------------------------------------------------------------------------|
+|                                                                              |
+|  NUMERO COMPTE : ______                                                      |
+|                                                                              |
+|  CODE REGION   : __                            _______________               |
+|  NATURE COMPTE : __                            _______________               |
+|  NOM           : __________                                                  |
+|  PRENOM        : __________                                                  |
+|  DATE NAISSANCE: __________                                                  |
+|  SEXE          : _               ________                                    |
+|  ACTIVITE PRO  : __                                                          |
+|  SITUATION SOC : _               ____________                                |
+|  ADRESSE       : __________                                                  |
+|  SOLDE         : ____________                                                |
+|  POSITION      : __              __________                                  |
+|                                                                              |
+|                                                                              |
+|  MESSAGE : ____________________________________________________________      |
+|                                                                              |
+|                                                                              |
+|  ENTER=Rechercher  PF3=Quitter  CLEAR=Effacer                                |
++------------------------------------------------------------------------------+
+```
+
 ### Captures d'ecran
 
-<!-- ![pt1ex02-1](images-pt1/pt1ex02-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt1ex02-1 : Source BMS dans ISPF EDIT - ROCHA.CICS.SOURCE(CLIAFF)
+2. pt1ex02-2 : Soumission JCL ASMCLAF - assemblage de la MAP
+3. pt1ex02-3 : SDSF - Job output avec RC=0000 pour assemblage
+4. pt1ex02-4 : Verification ROCHA.CICS.LOAD - membre CLIAFF present
+5. pt1ex02-5 : Verification ROCHA.CICS.LINK - copybook CLIAFF genere
+-->
 
 ---
 
@@ -592,7 +635,9 @@ J'ai developpe un programme COBOL-CICS qui :
 
 ### Resolution
 
-**Programme : PRGCLIA.cbl** (extraits principaux)
+**Programme : PRGCLIA.cbl**
+
+Le code complet se trouve dans le fichier `p1-ex03-prog-affichage/PRGCLIA.cbl`. Voici les extraits principaux :
 
 ```cobol
        IDENTIFICATION DIVISION.
@@ -752,9 +797,29 @@ J'ai developpe un programme COBOL-CICS qui :
 | RETURN TRANSID | Retour pseudo-conversationnel |
 | SEND TEXT | Message de fin |
 
+**Structure du programme :**
+
+| Paragraphe | Fonction |
+|------------|----------|
+| 0000-PRINCIPAL | Point d'entree, aiguillage selon EIBCALEN et EIBAID |
+| 1000-PREMIER-PASSAGE | Affichage de l'ecran vide |
+| 2000-TRAITEMENT | Reception saisie, lecture VSAM, affichage resultat |
+| 3000-AFFICHER-CLIENT | Transfert donnees vers MAP avec conversion libelles |
+| 9000-FIN-PROGRAMME | Message de fin et RETURN sans TRANSID |
+
 ### Captures d'ecran
 
-<!-- ![pt1ex03-1](images-pt1/pt1ex03-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt1ex03-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGCLIA)
+2. pt1ex03-2 : Soumission JCL CMPCLAF - compilation du programme
+3. pt1ex03-3 : SDSF - Job output avec RC=0000 pour compilation
+4. pt1ex03-4 : Verification ROCHA.CICS.LOAD - membre PRGCLIA present
+5. pt1ex03-5 : Ecran MAPAFF vide - premier passage (message "SAISIR LE NUMERO...")
+6. pt1ex03-6 : Ecran avec client affiche - apres saisie numero valide
+7. pt1ex03-7 : Ecran avec message erreur - client inexistant
+-->
 
 ---
 
@@ -766,11 +831,20 @@ Creer la transaction correspondante a l'operation d'affichage des donnees de CLI
 
 ### Mon travail
 
-J'ai utilise CEDA pour definir la transaction AFFI qui appelle le programme PRGCLIA.
+Pour qu'une transaction CICS fonctionne, plusieurs ressources doivent etre definies et liees :
+
+1. **FILE** : Le fichier VSAM (deja defini dans l'exercice 1)
+2. **MAPSET** : Le module BMS compile (ecran physique)
+3. **PROGRAM** : Le programme COBOL-CICS compile
+4. **TRANSACTION** : Le code de 4 caracteres qui lance le programme
+
+Ces ressources sont regroupees dans un GROUP (ici CLIGROUP) qui permet de les gerer ensemble. L'ordre de definition est important car la transaction reference le programme.
 
 ### Resolution
 
-**Commandes CEDA :**
+**Etape 1 : Definition des nouvelles ressources**
+
+Le fichier FCLIENT etant deja defini et installe (exercice 1), je definis uniquement les nouvelles ressources :
 
 ```
 CEDA DEFINE MAPSET(CLIAFF) GROUP(CLIGROUP)
@@ -780,23 +854,71 @@ CEDA DEFINE PROGRAM(PRGCLIA) GROUP(CLIGROUP)
 
 CEDA DEFINE TRANSACTION(AFFI) GROUP(CLIGROUP)
      PROGRAM(PRGCLIA)
+```
 
+**Etape 2 : Installation des ressources**
+
+*Option A : Installation individuelle (recommandee)*
+
+Cette methode evite les erreurs si certaines ressources sont deja installees :
+
+```
+CEDA INSTALL MAPSET(CLIAFF) GROUP(CLIGROUP)
+CEDA INSTALL PROGRAM(PRGCLIA) GROUP(CLIGROUP)
+CEDA INSTALL TRANSACTION(AFFI) GROUP(CLIGROUP)
+```
+
+*Option B : Installation du groupe complet*
+
+```
 CEDA INSTALL GROUP(CLIGROUP)
 ```
 
-> **Note** : Le mapset BMS (CLIAFF) doit etre defini avec CEDA DEFINE MAPSET, pas comme PROGRAM. Le programme COBOL et la transaction sont definis ensuite.
+> **Note** : Si FCLIENT est deja installe (exercice 1), cette commande affichera une erreur "ALREADY INSTALLED" pour le fichier. C'est normal et les autres ressources seront quand meme installees.
 
-**Verification :**
+**Tableau recapitulatif des ressources du groupe CLIGROUP :**
+
+| Ressource | Nom | Defini dans | Description |
+|-----------|-----|-------------|-------------|
+| FILE | FCLIENT | Exercice 1 | Fichier VSAM CLIENT |
+| MAPSET | CLIAFF | Exercice 4 | Ecran BMS d'affichage |
+| PROGRAM | PRGCLIA | Exercice 4 | Programme COBOL-CICS |
+| TRANSACTION | AFFI | Exercice 4 | Code transaction (4 car) |
+
+**Etape 3 : Verification avec CEMT**
+
+```
+CEMT INQ FILE(FCLIENT)
+```
+Resultat attendu : `Fil(FCLIENT) Dsn(ROCHA.CICS.CLIENT) Ena Ope Rea Upd Add Bro Del Vsam Ksds`
 
 ```
 CEMT INQ MAPSET(CLIAFF)
+```
+Resultat attendu : `Map(CLIAFF) Ins Ena`
+
+```
 CEMT INQ PROG(PRGCLIA)
+```
+Resultat attendu : `Pro(PRGCLIA) Len(...) Cob Ena Pri`
+
+```
 CEMT INQ TRAN(AFFI)
 ```
+Resultat attendu : `Tra(AFFI) Pro(PRGCLIA) Ena`
 
 ### Captures d'ecran
 
-<!-- ![pt1ex04-1](images-pt1/pt1ex04-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt1ex04-1 : Ecran CEDA DEFINE MAPSET(CLIAFF) - definition du mapset
+2. pt1ex04-2 : Ecran CEDA DEFINE PROGRAM(PRGCLIA) - definition du programme
+3. pt1ex04-3 : Ecran CEDA DEFINE TRANSACTION(AFFI) - definition de la transaction
+4. pt1ex04-4 : Ecran CEDA INSTALL avec message de succes (ou erreur ALREADY INSTALLED)
+5. pt1ex04-5 : Ecran CEMT INQ TRAN(AFFI) - verification que la transaction est active
+6. pt1ex04-6 : Test de la transaction AFFI - ecran d'affichage vide
+-->
 
 ---
 
@@ -808,25 +930,124 @@ Activer la transaction en mode debugger avec la commande CEDF et par suite sans 
 
 ### Mon travail
 
-J'ai teste la transaction en mode debug pour verifier le bon fonctionnement :
-1. Activation CEDF depuis le terminal
-2. Execution de la transaction AFFI
-3. Verification des commandes CICS etape par etape
-4. Test sans debugger pour valider le fonctionnement normal
+J'ai teste la transaction AFFI en mode debug avec CEDF pour :
+1. Verifier le bon enchainement des commandes CICS
+2. Comprendre le fonctionnement pseudo-conversationnel
+3. Observer les valeurs des variables (EIBCALEN, EIBAID, RESP)
+4. Valider le fonctionnement sans debugger
+
+### Comprendre le mode pseudo-conversationnel
+
+Le programme PRGCLIA fonctionne en mode **pseudo-conversationnel**. Cela signifie que le programme se termine reellement entre chaque interaction utilisateur, puis est relance par CICS.
+
+**Deroulement observe dans CEDF :**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  PREMIER PASSAGE (EIBCALEN = 0)                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  1. SEND MAP('MAPAFF') MAPSET('CLIAFF') ERASE                   │
+│     → L'ecran vide s'affiche                                    │
+│  2. RETURN TRANSID('AFFI') COMMAREA(WS-COMMAREA)                │
+│     → Le programme se termine                                   │
+│  3. TASK TERMINATION (normal)                                   │
+│     → CEDF demande YES/NO pour continuer                        │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            │ L'utilisateur saisit un numero et appuie ENTER
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  PASSAGES SUIVANTS (EIBCALEN > 0)                               │
+├─────────────────────────────────────────────────────────────────┤
+│  1. RECEIVE MAP('MAPAFF') MAPSET('CLIAFF')                      │
+│     → Reception du numero de compte saisi                       │
+│  2. READ FILE('FCLIENT') INTO(ENR-CLIENT) RIDFLD(WS-NUMCPT)     │
+│     → Lecture du fichier VSAM                                   │
+│  3. SEND MAP('MAPAFF') MAPSET('CLIAFF')                         │
+│     → Affichage des donnees client                              │
+│  4. RETURN TRANSID('AFFI') COMMAREA(...)                        │
+│     → Le programme se termine a nouveau                         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+> **Note importante** : Le "TASK TERMINATION" affiche dans CEDF est le comportement normal du mode pseudo-conversationnel. Le programme se termine pour liberer les ressources pendant que l'utilisateur reflechit, puis CICS le relance quand l'utilisateur appuie sur une touche.
 
 ### Resolution
 
-**Commandes de test :**
+**Etape 1 : Activation du debugger et lancement de la transaction**
 
 ```
-CEDF              (activation du debugger)
-AFFI              (execution de la transaction)
-CEDF OFF          (desactivation du debugger)
+CEDF
 ```
+
+L'ecran se vide et le curseur se positionne en haut. Le mode EDF est active mais aucun message ne s'affiche. Il faut maintenant lancer la transaction a deboguer :
+
+```
+AFFI
+```
+
+CEDF intercepte alors la transaction et affiche le premier point d'arret.
+
+> **Note** : Sur TK4-, CEDF n'affiche pas de message de confirmation. Le debugger est actif des que la commande est saisie.
+
+**Etape 2 : Navigation dans CEDF**
+
+| Touche | Action |
+|--------|--------|
+| ENTER | Passer a l'etape suivante |
+| PF5 | Afficher la WORKING-STORAGE |
+| PF4 | Afficher l'EIB (Exec Interface Block) |
+| PF3 | Terminer le debug et continuer l'execution |
+
+**Etape 4 : Points d'arret observes**
+
+| Etape | Commande CICS | RESP attendu |
+|-------|---------------|--------------|
+| 1 | SEND MAP | NORMAL |
+| 2 | RETURN TRANSID | - |
+| 3 | TASK TERMINATION | - |
+| 4 | RECEIVE MAP | NORMAL |
+| 5 | READ FILE | NORMAL ou NOTFND |
+| 6 | SEND MAP | NORMAL |
+| 7 | RETURN TRANSID | - |
+
+**Etape 5 : Test sans debugger**
+
+Pour tester la transaction sans le debugger CEDF, il suffit de lancer directement la transaction depuis un ecran CICS vierge (sans avoir active CEDF au prealable) :
+
+```
+AFFI
+```
+
+La transaction s'execute normalement sans interruption, affichant directement l'ecran de saisie.
+
+> **Note TK4-** : La commande `CEDF OFF` n'est pas toujours disponible sur l'emulateur TK4-. Pour desactiver le mode debug, il suffit de se deconnecter du terminal CICS (CSSF LOGOFF) puis de se reconnecter, ou simplement d'ouvrir un nouveau terminal.
+
+### Variables cles a observer dans CEDF
+
+| Variable | Premier passage | Passages suivants |
+|----------|-----------------|-------------------|
+| EIBCALEN | 0 | 1 (longueur COMMAREA) |
+| EIBAID | X'00' | DFHENTER (X'7D') ou DFHPF3 (X'F3') |
+| EIBTRNID | 'AFFI' | 'AFFI' |
+| EIBRESP | 0 (NORMAL) | 0 ou 13 (NOTFND) |
 
 ### Captures d'ecran
 
-<!-- ![pt1ex05-1](images-pt1/pt1ex05-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt1ex05-1 : Premier arret CEDF - SEND MAP (avant execution)
+2. pt1ex05-2 : SEND MAP (apres execution) - RESPONSE: NORMAL
+3. pt1ex05-3 : RETURN TRANSID - affichage de la COMMAREA
+4. pt1ex05-4 : TASK TERMINATION - fin du premier passage
+5. pt1ex05-5 : Ecran d'affichage vide (MAP envoyee) - saisie numero
+6. pt1ex05-6 : RECEIVE MAP - reception des donnees saisies
+7. pt1ex05-7 : READ FILE - lecture VSAM avec RESP visible
+8. pt1ex05-8 : Affichage PF5 - WORKING-STORAGE avec donnees client
+9. pt1ex05-9 : SEND MAP final - affichage du client trouve
+10. pt1ex05-10 : Test sans debugger - transaction AFFI directe (ecran fonctionnel)
+-->
 
 ---
 
@@ -840,32 +1061,156 @@ Creer ou adapter la MAP precedente pour une operation d'ajout de CLIENT dans le 
 
 ### Mon travail
 
-J'ai adapte la MAP d'affichage pour permettre la saisie de tous les champs. Les champs qui etaient en ASKIP (affichage seul) sont maintenant en UNPROT (saisissables).
+J'ai adapte la MAP d'affichage (CLIAFF) pour creer une nouvelle MAP de saisie (CLIAJT). La principale difference est que tous les champs sont maintenant saisissables (UNPROT) au lieu d'etre en affichage seul (ASKIP).
+
+**Differences entre CLIAFF et CLIAJT :**
+
+| Aspect | CLIAFF (Affichage) | CLIAJT (Ajout) |
+|--------|-------------------|----------------|
+| NUMCPT | UNPROT (saisie cle) | UNPROT (saisie) |
+| Autres champs | ASKIP (affichage) | UNPROT (saisie) |
+| Libelles (region, sexe...) | Affiches | Non affiches |
+| Titre | "AFFICHAGE CLIENT" | "AJOUT CLIENT" |
+| Touches | ENTER=Rechercher | ENTER=Valider |
 
 ### Resolution
 
 **MAP BMS : CLIAJT.bms**
 
+Le code source complet se trouve dans le fichier `p2-ex06-map-ajout/CLIAJT.bms`. Voici les extraits principaux :
+
 ```
-* Tous les champs sont maintenant saisissables (UNPROT)
-* Le numero de compte reste le premier champ avec IC (Initial Cursor)
-
-NUMCPT   DFHMDF POS=(3,18),LENGTH=6,                                   X
-               ATTRB=(UNPROT,NUM,IC),                                  X
-               DSATTS=(COLOR,HILIGHT),                                 X
-               COLOR=GREEN
-
-CODREG   DFHMDF POS=(4,18),LENGTH=2,                                   X
-               ATTRB=(UNPROT,NUM),                                     X
-               DSATTS=(COLOR),                                         X
-               COLOR=GREEN
-
-* ... tous les autres champs en UNPROT ...
+***********************************************************************
+*  MAPSET : CLIAJT - Ajout Client
+*  Transaction : AJOU
+*  Fil Rouge CICS - Exercice 6
+***********************************************************************
+CLIAJT   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPAJT   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* TITRE
+*----------------------------------------------------------------------
+         DFHMDF POS=(1,28),LENGTH=24,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='*** AJOUT CLIENT ***'
+*----------------------------------------------------------------------
+* ZONES DE SAISIE - TOUS LES CHAMPS EN UNPROT
+*----------------------------------------------------------------------
+         DFHMDF POS=(3,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NUMERO COMPTE :'
+NUMCPT   DFHMDF POS=(3,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+         DFHMDF POS=(3,26),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='CODE REGION   :'
+CODREG   DFHMDF POS=(4,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+         DFHMDF POS=(4,22),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='(01=Paris,02=Mars...)'
+*
+         DFHMDF POS=(5,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NATURE COMPTE :'
+NATCPT   DFHMDF POS=(5,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+*
+         DFHMDF POS=(6,2),LENGTH=16,ATTRB=ASKIP,INITIAL='NOM           :'
+NOM      DFHMDF POS=(6,19),LENGTH=10,ATTRB=UNPROT
+*
+         DFHMDF POS=(7,2),LENGTH=16,ATTRB=ASKIP,INITIAL='PRENOM        :'
+PRENOM   DFHMDF POS=(7,19),LENGTH=10,ATTRB=UNPROT
+*
+         DFHMDF POS=(8,2),LENGTH=16,ATTRB=ASKIP,INITIAL='DATE NAISSANCE:'
+DATNA    DFHMDF POS=(8,19),LENGTH=8,ATTRB=(UNPROT,NUM)
+         DFHMDF POS=(8,28),LENGTH=10,ATTRB=ASKIP,INITIAL='(AAAAMMJJ)'
+*
+         DFHMDF POS=(9,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SEXE          :'
+SEXE     DFHMDF POS=(9,19),LENGTH=1,ATTRB=UNPROT
+         DFHMDF POS=(9,21),LENGTH=8,ATTRB=ASKIP,INITIAL='(M ou F)'
+*
+         DFHMDF POS=(10,2),LENGTH=16,ATTRB=ASKIP,INITIAL='ACTIVITE PRO  :'
+ACTPRO   DFHMDF POS=(10,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+*
+         DFHMDF POS=(11,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SITUATION SOC :'
+SITSO    DFHMDF POS=(11,19),LENGTH=1,ATTRB=UNPROT
+         DFHMDF POS=(11,21),LENGTH=12,ATTRB=ASKIP,INITIAL='(C/M/D/V)'
+*
+         DFHMDF POS=(12,2),LENGTH=16,ATTRB=ASKIP,INITIAL='ADRESSE       :'
+ADRESSE  DFHMDF POS=(12,19),LENGTH=10,ATTRB=UNPROT
+*
+         DFHMDF POS=(13,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SOLDE         :'
+SOLDE    DFHMDF POS=(13,19),LENGTH=10,ATTRB=(UNPROT,NUM)
+*
+         DFHMDF POS=(14,2),LENGTH=16,ATTRB=ASKIP,INITIAL='POSITION      :'
+POSIT    DFHMDF POS=(14,19),LENGTH=2,ATTRB=UNPROT
+         DFHMDF POS=(14,22),LENGTH=10,ATTRB=ASKIP,INITIAL='(DB ou CR)'
+*----------------------------------------------------------------------
+* ZONE MESSAGE ET TOUCHES FONCTION
+*----------------------------------------------------------------------
+         DFHMDF POS=(18,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
+MSG      DFHMDF POS=(18,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(22,2),LENGTH=70,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Valider  PF3=Quitter  CLEAR=Effacer'
+***********************************************************************
+         DFHMSD TYPE=FINAL
+         END
 ```
+
+**Apercu de l'ecran MAPAJT :**
+
+```
++------------------------------------------------------------------------------+
+|                         *** AJOUT CLIENT ***                                 |
+|                                                                              |
+|  NUMERO COMPTE : ______                                                      |
+|  CODE REGION   : __     (01=Paris,02=Mars...)                                |
+|  NATURE COMPTE : __                                                          |
+|  NOM           : __________                                                  |
+|  PRENOM        : __________                                                  |
+|  DATE NAISSANCE: ________  (AAAAMMJJ)                                        |
+|  SEXE          : _  (M ou F)                                                 |
+|  ACTIVITE PRO  : __                                                          |
+|  SITUATION SOC : _  (C/M/D/V)                                                |
+|  ADRESSE       : __________                                                  |
+|  SOLDE         : __________                                                  |
+|  POSITION      : __  (DB ou CR)                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|  MESSAGE : ____________________________________________________________      |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|  ENTER=Valider  PF3=Quitter  CLEAR=Effacer                                   |
++------------------------------------------------------------------------------+
+```
+
+**Zones de saisie :**
+
+| Zone | Longueur | Attribut | Aide affichee |
+|------|----------|----------|---------------|
+| NUMCPT | 6 | UNPROT,NUM,IC | - |
+| CODREG | 2 | UNPROT,NUM | (01=Paris,02=Mars...) |
+| NATCPT | 2 | UNPROT,NUM | - |
+| NOM | 10 | UNPROT | - |
+| PRENOM | 10 | UNPROT | - |
+| DATNA | 8 | UNPROT,NUM | (AAAAMMJJ) |
+| SEXE | 1 | UNPROT | (M ou F) |
+| ACTPRO | 2 | UNPROT,NUM | - |
+| SITSO | 1 | UNPROT | (C/M/D/V) |
+| ADRESSE | 10 | UNPROT | - |
+| SOLDE | 10 | UNPROT,NUM | - |
+| POSIT | 2 | UNPROT | (DB ou CR) |
 
 ### Captures d'ecran
 
-<!-- ![pt2ex06-1](images-pt2/pt2ex06-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt2ex06-1 : Source BMS dans ISPF EDIT - ROCHA.CICS.SOURCE(CLIAJT)
+2. pt2ex06-2 : Soumission JCL assemblage BMS
+3. pt2ex06-3 : SDSF - Job output avec RC=0000
+4. pt2ex06-4 : Ecran MAPAJT vide - pret pour saisie
+-->
 
 ---
 
@@ -888,7 +1233,7 @@ En cas d'erreur, un message explicite est affiche.
 
 ### Resolution
 
-**Programme : CLIAJT.cbl**
+**Programme : PRGAJT.cbl**
 
 ```cobol
        2000-TRAITEMENT.
@@ -975,9 +1320,9 @@ Suivre cette operation par l'ajout d'une nouvelle Transaction dans le GROUP et a
 
 ```
 CEDA DEFINE TRANSACTION(AJOU) GROUP(CLIGROUP)
-     PROGRAM(CLIAJT)
+     PROGRAM(PRGAJT)
 
-CEDA DEFINE PROGRAM(CLIAJT) GROUP(CLIGROUP)
+CEDA DEFINE PROGRAM(PRGAJT) GROUP(CLIGROUP)
      LANGUAGE(COBOL)
 
 CEDA INSTALL GROUP(CLIGROUP)
@@ -1033,7 +1378,7 @@ Le programme effectue :
 
 ### Resolution
 
-**Programme : CLIMAJ.cbl**
+**Programme : PRGMAJ.cbl**
 
 ```cobol
        2000-LIRE-CLIENT.
@@ -1087,7 +1432,7 @@ Le programme effectue :
 
 ```
 CEDA DEFINE TRANSACTION(MAJO) GROUP(CLIGROUP)
-     PROGRAM(CLIMAJ)
+     PROGRAM(PRGMAJ)
 
 CEDA INSTALL GROUP(CLIGROUP)
 ```
@@ -1122,7 +1467,7 @@ Creer le PROGRAMME pour une operation de suppression d'un CLIENT dans le Data Se
 
 ### Resolution
 
-**Programme : CLISUP.cbl**
+**Programme : PRGSUP.cbl**
 
 ```cobol
        2000-SUPPRIMER-CLIENT.
@@ -1167,7 +1512,7 @@ Creer le PROGRAMME pour une operation de suppression d'un CLIENT dans le Data Se
 
 ```
 CEDA DEFINE TRANSACTION(SUPP) GROUP(CLIGROUP)
-     PROGRAM(CLISUP)
+     PROGRAM(PRGSUP)
 
 CEDA INSTALL GROUP(CLIGROUP)
 ```
@@ -1190,7 +1535,7 @@ Cette version affiche d'abord les donnees du client avant de demander confirmati
 
 ### Resolution
 
-**Programme : CLISUL.cbl** (Suppression avec Lecture)
+**Programme : PRGSUL.cbl** (Suppression avec Lecture)
 
 ```cobol
        01 WS-PHASE             PIC X(01).
@@ -1236,7 +1581,7 @@ Cette version affiche d'abord les donnees du client avant de demander confirmati
 
 ```
 CEDA DEFINE TRANSACTION(SULE) GROUP(CLIGROUP)
-     PROGRAM(CLISUL)
+     PROGRAM(PRGSUL)
 ```
 
 ### Captures d'ecran
@@ -1284,7 +1629,7 @@ J'ai utilise STARTBR pour positionner le curseur sur le premier client '111', pu
 
 ### Resolution
 
-**Programme : CLISDEL.cbl** (Suppression Generique)
+**Programme : PRGSDEL.cbl** (Suppression Generique)
 
 ```cobol
        2000-SUPPRIMER-GENERIQUE.
@@ -1348,7 +1693,7 @@ Ce programme illustre le parcours sequentiel d'un fichier VSAM avec positionneme
 
 ### Resolution
 
-**Programme : CLILGEN.cbl** (Liste Generique)
+**Programme : PRGLGEN.cbl** (Liste Generique)
 
 ```cobol
        2000-LISTER-GENERIQUE.
@@ -1434,7 +1779,7 @@ NBCR     DFHMDF POS=(10,28),LENGTH=5,ATTRB=(ASKIP)
 MTCR     DFHMDF POS=(10,35),LENGTH=12,ATTRB=(ASKIP)
 ```
 
-**Programme : CLISTAT.cbl**
+**Programme : PRGSTAT.cbl**
 
 ```cobol
        WORKING-STORAGE SECTION.
@@ -1501,7 +1846,7 @@ MTCR     DFHMDF POS=(10,35),LENGTH=12,ATTRB=(ASKIP)
 
 ```
 CEDA DEFINE TRANSACTION(STAT) GROUP(CLIGROUP)
-     PROGRAM(CLISTAT)
+     PROGRAM(PRGSTAT)
 ```
 
 ### Captures d'ecran
@@ -1517,13 +1862,13 @@ CEDA DEFINE TRANSACTION(STAT) GROUP(CLIGROUP)
 | Programme | Transaction | Description |
 |-----------|-------------|-------------|
 | PRGCLIA | AFFI | Affichage d'un client |
-| CLIAJT | AJOU | Ajout d'un nouveau client |
-| CLIMAJ | MAJO | Mise a jour d'un client |
-| CLISUP | SUPP | Suppression d'un client |
-| CLISUL | SULE | Suppression avec lecture prealable |
-| CLISDEL | SDEL | Suppression par code generique |
-| CLILGEN | LGEN | Liste par code generique (READNEXT) |
-| CLISTAT | STAT | Statistiques par region |
+| PRGAJT | AJOU | Ajout d'un nouveau client |
+| PRGMAJ | MAJO | Mise a jour d'un client |
+| PRGSUP | SUPP | Suppression d'un client |
+| PRGSUL | SULE | Suppression avec lecture prealable |
+| PRGSDEL | SDEL | Suppression par code generique |
+| PRGLGEN | LGEN | Liste par code generique (READNEXT) |
+| PRGSTAT | STAT | Statistiques par region |
 
 ## Liste des MAPs BMS
 
