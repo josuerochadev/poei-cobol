@@ -9,6 +9,7 @@ Creer une MAP BMS permettant la saisie de tous les champs pour ajouter un nouvea
 | Fichier | Description |
 |---------|-------------|
 | `CLIAJT.bms` | Source BMS de la MAP d'ajout |
+| `ASMAJT.jcl` | JCL d'assemblage de la MAP |
 
 ## Differences avec CLIAFF (affichage)
 
@@ -18,19 +19,41 @@ Creer une MAP BMS permettant la saisie de tous les champs pour ajouter un nouvea
 | Libelles calcules | Oui (region, sexe...) | Non |
 | Aide contextuelle | Non | Oui (formats attendus) |
 
-## Assemblage
+## Utilisation
 
-```jcl
-//ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
-//          MAPLIB='ROCHA.CICS.LOAD',
-//          DSCTLIB='ROCHA.CICS.LINK',
-//          MAPNAME='CLIAJT',RMODE=24
-//SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLIAJT),DISP=SHR
+### 1. Copier le source BMS dans la library
+
+```
+ISPF 3.4 > ROCHA.CICS.SOURCE
+Edit member CLIAJT
+Copier le contenu de CLIAJT.bms
 ```
 
-## Definition CICS
+### 2. Soumettre le JCL d'assemblage
+
+```
+ISPF 3.4 > ROCHA.CICS.SOURCE
+Edit member ASMAJT (copier ASMAJT.jcl)
+SUB (submit)
+```
+
+### 3. Verifier le resultat
+
+- RC=0000 dans SDSF
+- Membre CLIAJT present dans ROCHA.CICS.LOAD
+- Copybook CLIAJT genere dans ROCHA.CICS.LINK
+
+### 4. Definir dans CICS
 
 ```
 CEDA DEFINE MAPSET(CLIAJT) GROUP(CLIGROUP)
 CEDA INSTALL MAPSET(CLIAJT) GROUP(CLIGROUP)
 ```
+
+## Verification
+
+```
+CEMT INQ MAPSET(CLIAJT)
+```
+
+Resultat attendu : `Map(CLIAJT) Ins Ena`
