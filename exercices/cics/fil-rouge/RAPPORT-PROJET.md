@@ -1521,21 +1521,123 @@ Suggestions de captures d'ecran pour cet exercice :
 
 Suivre cette operation par l'ajout d'une nouvelle Transaction dans le GROUP et activer la transaction en mode debugger CEDF et sans debugger.
 
+### Mon travail
+
+Pour que la transaction AJOU fonctionne, je dois definir et installer trois ressources CICS :
+
+1. **MAPSET CLIAJT** : L'ecran BMS compile (exercice 6)
+2. **PROGRAM PRGAJT** : Le programme COBOL-CICS compile (exercice 7)
+3. **TRANSACTION AJOU** : Le code de 4 caracteres qui lance le programme
+
+L'ordre de definition est important : le programme doit etre defini avant la transaction (car TRANSACTION reference PROGRAM).
+
 ### Resolution
 
+**Etape 1 : Definition des ressources**
+
 ```
-CEDA DEFINE TRANSACTION(AJOU) GROUP(CLIGROUP)
-     PROGRAM(PRGAJT)
+CEDA DEFINE MAPSET(CLIAJT) GROUP(CLIGROUP)
 
 CEDA DEFINE PROGRAM(PRGAJT) GROUP(CLIGROUP)
      LANGUAGE(COBOL)
 
+CEDA DEFINE TRANSACTION(AJOU) GROUP(CLIGROUP)
+     PROGRAM(PRGAJT)
+```
+
+**Etape 2 : Installation des ressources**
+
+*Option A : Installation individuelle (recommandee)*
+
+```
+CEDA INSTALL MAPSET(CLIAJT) GROUP(CLIGROUP)
+CEDA INSTALL PROGRAM(PRGAJT) GROUP(CLIGROUP)
+CEDA INSTALL TRANSACTION(AJOU) GROUP(CLIGROUP)
+```
+
+*Option B : Installation du groupe complet*
+
+```
 CEDA INSTALL GROUP(CLIGROUP)
 ```
 
+> **Note** : Si certaines ressources sont deja installees (FCLIENT, CLIAFF, PRGCLIA, AFFI), des erreurs "ALREADY INSTALLED" apparaitront. C'est normal et les nouvelles ressources seront quand meme installees.
+
+**Etape 3 : Verification avec CEMT**
+
+```
+CEMT INQ MAPSET(CLIAJT)
+```
+Resultat attendu : `Map(CLIAJT) Ins Ena`
+
+```
+CEMT INQ PROG(PRGAJT)
+```
+Resultat attendu : `Pro(PRGAJT) Len(...) Cob Ena Pri`
+
+```
+CEMT INQ TRAN(AJOU)
+```
+Resultat attendu : `Tra(AJOU) Pro(PRGAJT) Ena`
+
+**Tableau recapitulatif du groupe CLIGROUP apres exercice 8 :**
+
+| Ressource | Nom | Defini dans | Description |
+|-----------|-----|-------------|-------------|
+| FILE | FCLIENT | Exercice 1 | Fichier VSAM CLIENT |
+| MAPSET | CLIAFF | Exercice 4 | Ecran d'affichage |
+| PROGRAM | PRGCLIA | Exercice 4 | Programme d'affichage |
+| TRANSACTION | AFFI | Exercice 4 | Transaction d'affichage |
+| MAPSET | CLIAJT | Exercice 8 | Ecran d'ajout |
+| PROGRAM | PRGAJT | Exercice 8 | Programme d'ajout |
+| TRANSACTION | AJOU | Exercice 8 | Transaction d'ajout |
+
+**Etape 4 : Test avec CEDF**
+
+```
+CEDF
+AJOU
+```
+
+Observer les points d'arret :
+1. SEND MAP (ecran vide)
+2. RETURN TRANSID (fin premier passage)
+3. RECEIVE MAP (reception saisie)
+4. READ FILE (verification doublure)
+5. WRITE FILE (ecriture client)
+6. SEND MAP (message succes)
+7. RETURN TRANSID (fin traitement)
+
+**Etape 5 : Test sans debugger**
+
+Depuis un ecran CICS vierge (sans CEDF actif) :
+
+```
+AJOU
+```
+
+Tester les scenarios suivants :
+- Saisir un nouveau client complet et valider → message "CLIENT AJOUTE AVEC SUCCES"
+- Ressaisir le meme numero → message "ENREGISTREMENT EN DOUBLE"
+- Saisir un sexe invalide → message "SEXE INVALIDE"
+- Appuyer ENTER sans rien saisir → message "AUCUNE DONNEE SAISIE"
+- Appuyer PF3 → fin de la transaction
+
 ### Captures d'ecran
 
-<!-- ![pt2ex08-1](images-pt2/pt2ex08-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt2ex08-1 : CEDA DEFINE MAPSET(CLIAJT) - definition du mapset
+2. pt2ex08-2 : CEDA DEFINE PROGRAM(PRGAJT) - definition du programme
+3. pt2ex08-3 : CEDA DEFINE TRANSACTION(AJOU) - definition de la transaction
+4. pt2ex08-4 : CEDA INSTALL avec message de succes
+5. pt2ex08-5 : CEMT INQ TRAN(AJOU) - verification transaction active
+6. pt2ex08-6 : Test CEDF - point d'arret sur WRITE FILE
+7. pt2ex08-7 : Ecran MAPAJT - saisie d'un nouveau client
+8. pt2ex08-8 : Message "CLIENT AJOUTE AVEC SUCCES" apres ajout
+9. pt2ex08-9 : Verification avec AFFI - le nouveau client existe
+-->
 
 ---
 
