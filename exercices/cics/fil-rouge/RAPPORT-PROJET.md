@@ -893,9 +893,9 @@ CEMT INQ FILE(FCLIENT)
 Resultat attendu : `Fil(FCLIENT) Dsn(ROCHA.CICS.CLIENT) Ena Ope Rea Upd Add Bro Del Vsam Ksds`
 
 ```
-CEMT INQ MAPSET(CLIAFF)
+CEDA VIEW MAPSET(CLIAFF) GROUP(CLIGROUP)
 ```
-Resultat attendu : `Map(CLIAFF) Ins Ena`
+Resultat attendu : Affichage de la definition du mapset (DEFINITION SIGNATURE, RESIDENT, etc.)
 
 ```
 CEMT INQ PROG(PRGCLIA)
@@ -1563,7 +1563,12 @@ CEDA INSTALL GROUP(CLIGROUP)
 
 > **Note** : Si certaines ressources sont deja installees (FCLIENT, CLIAFF, PRGCLIA, AFFI), des erreurs "ALREADY INSTALLED" apparaitront. C'est normal et les nouvelles ressources seront quand meme installees.
 
-**Etape 3 : Verification avec CEMT**
+**Etape 3 : Verification avec CEMT et CEDA**
+
+```
+CEDA VIEW MAPSET(CLIAJT) GROUP(CLIGROUP)
+```
+Resultat attendu : Affichage de la definition du mapset
 
 ```
 CEMT INQ PROG(PRGAJT)
@@ -1575,7 +1580,7 @@ CEMT INQ TRAN(AJOU)
 ```
 Resultat attendu : `Tra(AJOU) Pro(PRGAJT) Ena`
 
-> **Note** : `CEMT INQ MAPSET` n'existe pas dans CICS. Pour verifier qu'un mapset est installe, on teste directement la transaction. Si le mapset est absent, CICS affichera une erreur lors du SEND MAP.
+> **Note** : `CEMT INQ MAPSET` n'existe pas dans CICS. Pour verifier un mapset, utiliser `CEDA VIEW MAPSET(nom) GROUP(groupe)`.
 
 **Tableau recapitulatif du groupe CLIGROUP apres exercice 8 :**
 
