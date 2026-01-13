@@ -637,7 +637,7 @@ J'ai developpe un programme COBOL-CICS qui :
 
 **Programme : PRGCLIA.cbl**
 
-Le code complet se trouve dans le fichier `p1-ex03-prog-affichage/PRGCLIA.cbl`. Voici les extraits principaux :
+Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGCLIA)`. Voici les extraits principaux :
 
 ```cobol
        IDENTIFICATION DIVISION.
@@ -1077,7 +1077,7 @@ J'ai adapte la MAP d'affichage (CLIAFF) pour creer une nouvelle MAP de saisie (C
 
 **MAP BMS : CLIAJT.bms**
 
-Le code source complet se trouve dans le fichier `p2-ex06-map-ajout/CLIAJT.bms`. Voici les extraits principaux :
+Le code source est stocke dans `ROCHA.CICS.SOURCE(CLIAJT)`. Voici le code complet :
 
 ```
 ***********************************************************************

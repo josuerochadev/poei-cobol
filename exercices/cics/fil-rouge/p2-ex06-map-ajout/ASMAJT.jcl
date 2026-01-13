@@ -1,4 +1,4 @@
-//ROCHA06 JOB (ACCT),'ASSEMBL BMS CLIAJT',CLASS=A,MSGCLASS=X,
+//ROCHA05 JOB (ACCT),'ASSEMBL BMS CLIAJT',CLASS=A,MSGCLASS=X,
 //             MSGLEVEL=(1,1),NOTIFY=&SYSUID
 //*****************************************************************
 //* PROJET FIL ROUGE CICS - EXERCICE 6
