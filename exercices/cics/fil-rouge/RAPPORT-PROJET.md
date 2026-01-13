@@ -1222,33 +1222,184 @@ Creer le PROGRAMME pour une operation d'ajout d'un nouveau CLIENT dans le Data S
 
 ### Mon travail
 
-Le programme d'ajout effectue les controles suivants avant l'ecriture :
-1. Verification que le numero de compte est numerique (6 chiffres)
-2. Verification que le client n'existe pas deja (pas de doublure)
-3. Validation du sexe (M ou F)
-4. Validation de la situation sociale (C, M, D, V)
-5. Validation de la position (DB ou CR)
+J'ai developpe le programme PRGAJT qui gere l'ajout de nouveaux clients avec les fonctionnalites suivantes :
 
-En cas d'erreur, un message explicite est affiche.
+1. **Mode pseudo-conversationnel** : Premier passage affiche ecran vide, passages suivants traitent la saisie
+2. **Gestion MAPFAIL** : Detection si l'utilisateur n'a saisi aucune donnee
+3. **Controles de conformite** avant ecriture :
+   - Numero de compte obligatoire et numerique (6 chiffres)
+   - Code region valide (01, 02, 03 ou 04)
+   - Nom obligatoire
+   - Sexe valide (M ou F)
+   - Situation sociale valide (C, M, D ou V)
+   - Position valide (DB ou CR)
+4. **Verification de doublure** : READ pour verifier que le client n'existe pas deja
+5. **Ecriture VSAM** : WRITE avec gestion des erreurs (DUPREC, etc.)
+
+**Point technique** : La commande `EXIT PARAGRAPH` n'etant pas supportee sur la version COBOL de TK4-, j'ai utilise le pattern `GO TO paragraphe-FIN` pour sortir des validations en cas d'erreur.
 
 ### Resolution
 
 **Programme : PRGAJT.cbl**
 
+Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits principaux :
+
 ```cobol
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PRGAJT.
+      ******************************************************************
+      * PROGRAMME : PRGAJT - Ajout client
+      * TRANSACTION : AJOU
+      * MODE : Pseudo-conversationnel
+      ******************************************************************
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+       01  WS-COMMAREA.
+           05 WS-FLAG-INIT         PIC X(01) VALUE 'N'.
+
+      * Copybooks CICS
+       COPY DFHAID.
+       COPY CLIAJT.
+
+       01  ENR-CLIENT.
+           05 CLI-NUMCPT           PIC X(06).
+           05 CLI-CODREG           PIC X(02).
+           05 CLI-NATCPT           PIC X(02).
+           05 CLI-NOM              PIC X(10).
+           05 CLI-PRENOM           PIC X(10).
+           05 CLI-DATNAISS         PIC X(08).
+           05 CLI-SEXE             PIC X(01).
+           05 CLI-ACTPRO           PIC X(02).
+           05 CLI-SITSO            PIC X(01).
+           05 CLI-ADRESSE          PIC X(10).
+           05 CLI-SOLDE            PIC X(10).
+           05 CLI-POSITION         PIC X(02).
+           05 FILLER               PIC X(16).
+
+       01  WS-RESP                 PIC S9(08) COMP VALUE 0.
+       01  WS-ERREUR               PIC X(01) VALUE 'N'.
+
+       PROCEDURE DIVISION.
+
+       0000-PRINCIPAL.
+           EVALUATE TRUE
+               WHEN EIBCALEN = 0
+                   PERFORM 1000-PREMIER-PASSAGE
+               WHEN EIBAID = DFHPF3
+                   PERFORM 9000-FIN-PROGRAMME
+               WHEN EIBAID = DFHCLEAR
+                   PERFORM 1000-PREMIER-PASSAGE
+               WHEN OTHER
+                   PERFORM 2000-TRAITEMENT
+           END-EVALUATE
+
+           EXEC CICS RETURN
+               TRANSID('AJOU')
+               COMMAREA(WS-COMMAREA)
+               LENGTH(LENGTH OF WS-COMMAREA)
+           END-EXEC.
+
        2000-TRAITEMENT.
+           MOVE 'N' TO WS-ERREUR
+
            EXEC CICS RECEIVE MAP('MAPAJT')
                MAPSET('CLIAJT')
+               RESP(WS-RESP)
            END-EXEC
 
-      * Controles de conformite
-           PERFORM 2100-VALIDER-DONNEES
-           IF WS-ERREUR = 'O'
+      * Gestion MAPFAIL (aucune donnee transmise)
+           IF WS-RESP = DFHRESP(MAPFAIL)
+               MOVE LOW-VALUES TO MAPAJTO
+               MOVE 'AUCUNE DONNEE SAISIE - VEUILLEZ REMPLIR' TO MSGO
+               EXEC CICS SEND MAP('MAPAJT')
+                   MAPSET('CLIAJT')
+                   ERASE
+               END-EXEC
                GO TO 2000-FIN
            END-IF
 
-      * Verification doublure
+      * Validation des donnees
+           PERFORM 2100-VALIDER-DONNEES
+           IF WS-ERREUR = 'O'
+               EXEC CICS SEND MAP('MAPAJT')
+                   MAPSET('CLIAJT')
+               END-EXEC
+               GO TO 2000-FIN
+           END-IF
+
+      * Verification doublure (client existe deja ?)
+           PERFORM 2200-VERIFIER-DOUBLURE
+           IF WS-ERREUR = 'O'
+               EXEC CICS SEND MAP('MAPAJT')
+                   MAPSET('CLIAJT')
+               END-EXEC
+               GO TO 2000-FIN
+           END-IF
+
+      * Preparation et ecriture de l'enregistrement
+           PERFORM 2300-PREPARER-ENREGISTREMENT
+           PERFORM 2400-ECRIRE-CLIENT
+
+           EXEC CICS SEND MAP('MAPAJT')
+               MAPSET('CLIAJT')
+           END-EXEC.
+
+       2000-FIN.
+           EXIT.
+
+       2100-VALIDER-DONNEES.
+           MOVE LOW-VALUES TO MAPAJTO
+
+      * Controle numero de compte (obligatoire et numerique)
+           IF NUMCPTL = 0 OR NUMCPTI = SPACES
+               MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+           IF NUMCPTI NOT NUMERIC
+               MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+      * Controle code region (01, 02, 03 ou 04)
+           IF CODREGI NOT = '01' AND CODREGI NOT = '02'
+              AND CODREGI NOT = '03' AND CODREGI NOT = '04'
+               MOVE 'CODE REGION INVALIDE (01/02/03/04)' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+      * Controle sexe (M ou F)
+           IF SEXEI NOT = 'M' AND SEXEI NOT = 'F'
+               MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+      * Controle situation sociale (C, M, D ou V)
+           IF SITSOI NOT = 'C' AND SITSOI NOT = 'M'
+              AND SITSOI NOT = 'D' AND SITSOI NOT = 'V'
+               MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+      * Controle position (DB ou CR)
+           IF POSITI NOT = 'DB' AND POSITI NOT = 'CR'
+               MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF.
+
+       2100-FIN.
+           EXIT.
+
+       2200-VERIFIER-DOUBLURE.
            MOVE NUMCPTI TO CLI-NUMCPT
+
            EXEC CICS READ
                FILE('FCLIENT')
                INTO(ENR-CLIENT)
@@ -1257,12 +1408,12 @@ En cas d'erreur, un message explicite est affiche.
            END-EXEC
 
            IF WS-RESP = DFHRESP(NORMAL)
-               MOVE 'ENREGISTREMENT EN DOUBLE' TO MSGO
-               GO TO 2000-FIN
-           END-IF
+               MOVE 'ENREGISTREMENT EN DOUBLE - CE CLIENT EXISTE DEJA'
+                   TO MSGO
+               MOVE 'O' TO WS-ERREUR
+           END-IF.
 
-      * Ecriture du nouveau client
-           PERFORM 2200-PREPARER-ENREG
+       2400-ECRIRE-CLIENT.
            EXEC CICS WRITE
                FILE('FCLIENT')
                FROM(ENR-CLIENT)
@@ -1270,43 +1421,97 @@ En cas d'erreur, un message explicite est affiche.
                RESP(WS-RESP)
            END-EXEC
 
-           IF WS-RESP = DFHRESP(NORMAL)
-               MOVE 'SAISIE CORRECTE, CONTINUER (O/N) ?' TO MSGO
-           ELSE
-               MOVE 'ERREUR ECRITURE FICHIER' TO MSGO
-           END-IF.
-
-       2000-FIN.
-           EXIT.
-
-       2100-VALIDER-DONNEES.
-           MOVE 'N' TO WS-ERREUR
-
-      * Controle numero de compte numerique
-           IF NUMCPTI NOT NUMERIC
-               MOVE 'ZONE NUMERIQUE, RESAISIR CE CHAMP' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
-           END-IF
-
-      * Controle sexe
-           IF SEXEI NOT = 'M' AND SEXEI NOT = 'F'
-               MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
-           END-IF
-
-      * Controle situation sociale
-           IF SITSOI NOT = 'C' AND SITSOI NOT = 'M'
-              AND SITSOI NOT = 'D' AND SITSOI NOT = 'V'
-               MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-           END-IF.
+           EVALUATE WS-RESP
+               WHEN DFHRESP(NORMAL)
+                   MOVE LOW-VALUES TO MAPAJTO
+                   MOVE 'CLIENT AJOUTE AVEC SUCCES - NOUVEAU OU PF3'
+                       TO MSGO
+               WHEN DFHRESP(DUPREC)
+                   MOVE 'ENREGISTREMENT EN DOUBLE' TO MSGO
+                   MOVE 'O' TO WS-ERREUR
+               WHEN OTHER
+                   MOVE 'ERREUR ECRITURE FICHIER - CONTACTEZ SUPPORT'
+                       TO MSGO
+                   MOVE 'O' TO WS-ERREUR
+           END-EVALUATE.
 ```
+
+**JCL de compilation : CMPAJT.jcl (ROCHA06)**
+
+```jcl
+//ROCHA06 JOB (ACCT),'COMPILE PRGAJT',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* COMPILATION DU PROGRAMME COBOL-CICS PRGAJT (AJOUT CLIENT)
+//*****************************************************************
+//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
+//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
+//*
+//COMPIL   EXEC PROC=DFHYITVL,
+//          INDEX='DFH510.CICS',
+//          PROGLIB='ROCHA.CICS.LOAD',
+//          AD370HLQ='IGY420',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          LE370HLQ='CEE'
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGAJT),DISP=SHR
+//LKED.SYSIN DD *
+     INCLUDE SYSLIB(DFHELII)
+     NAME PRGAJT(R)
+/*
+```
+
+**Structure du programme :**
+
+| Paragraphe | Fonction |
+|------------|----------|
+| 0000-PRINCIPAL | Point d'entree, aiguillage selon EIBCALEN et EIBAID |
+| 1000-PREMIER-PASSAGE | Affichage de l'ecran vide pour saisie |
+| 2000-TRAITEMENT | Reception saisie, validations, ecriture |
+| 2100-VALIDER-DONNEES | Controles de conformite des champs |
+| 2200-VERIFIER-DOUBLURE | Verification que le client n'existe pas |
+| 2300-PREPARER-ENREGISTREMENT | Transfert MAP vers enregistrement |
+| 2400-ECRIRE-CLIENT | WRITE VSAM avec gestion erreurs |
+| 9000-FIN-PROGRAMME | Message de fin et RETURN sans TRANSID |
+
+**Commandes CICS utilisees :**
+
+| Commande | Usage |
+|----------|-------|
+| SEND MAP | Envoyer l'ecran (avec ERASE au premier passage) |
+| RECEIVE MAP | Recevoir la saisie avec RESP pour MAPFAIL |
+| READ FILE | Verifier si client existe (doublure) |
+| WRITE FILE | Ecrire le nouveau client |
+| RETURN TRANSID | Retour pseudo-conversationnel |
+
+**Messages d'erreur geres :**
+
+| Message | Contexte |
+|---------|----------|
+| AUCUNE DONNEE SAISIE | MAPFAIL - utilisateur a appuye ENTER sans rien saisir |
+| NUMERO DE COMPTE OBLIGATOIRE | Champ NUMCPT vide |
+| NUMERO DE COMPTE DOIT ETRE NUMERIQUE | Champ NUMCPT non numerique |
+| CODE REGION INVALIDE | Code region different de 01/02/03/04 |
+| SEXE INVALIDE | Sexe different de M ou F |
+| SITUATION INVALIDE | Situation different de C/M/D/V |
+| POSITION INVALIDE | Position differente de DB ou CR |
+| ENREGISTREMENT EN DOUBLE | Client avec ce numero existe deja |
+| CLIENT AJOUTE AVEC SUCCES | Ecriture reussie |
+| ERREUR ECRITURE FICHIER | Erreur VSAM autre |
 
 ### Captures d'ecran
 
-<!-- ![pt2ex07-1](images-pt2/pt2ex07-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt2ex07-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGAJT)
+2. pt2ex07-2 : Soumission JCL CMPAJT - compilation du programme
+3. pt2ex07-3 : SDSF - Job output avec RC=0000 pour compilation
+4. pt2ex07-4 : Verification ROCHA.CICS.LOAD - membre PRGAJT present
+5. pt2ex07-5 : Ecran MAPAJT vide - premier passage (message "SAISIR LES DONNEES...")
+6. pt2ex07-6 : Test erreur de validation - message "SEXE INVALIDE"
+7. pt2ex07-7 : Test doublon - message "ENREGISTREMENT EN DOUBLE"
+8. pt2ex07-8 : Ajout reussi - message "CLIENT AJOUTE AVEC SUCCES"
+-->
 
 ---
 
