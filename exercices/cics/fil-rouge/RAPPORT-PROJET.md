@@ -1610,6 +1610,8 @@ Observer les points d'arret :
 6. SEND MAP (message succes)
 7. RETURN TRANSID (fin traitement)
 
+> **Note importante sur NOTFND** : Lors du point d'arret 4 (READ FILE), CEDF affiche souvent une reponse `NOTFND`. C'est le comportement **attendu et normal** ! Ce READ sert a verifier que le client n'existe pas deja (controle de doublure). Si NOTFND est retourne, cela signifie que le numero de compte est disponible et que le programme peut proceder au WRITE. Ce n'est pas une erreur mais une verification reussie.
+
 **Etape 5 : Test sans debugger**
 
 Depuis un ecran CICS vierge (sans CEDF actif) :
