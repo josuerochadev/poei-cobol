@@ -137,7 +137,19 @@
       *-----------------------------------------------------------------
            EXEC CICS RECEIVE MAP('MAPAFF')
                MAPSET('CLIAFF')
+               RESP(WS-RESP)
            END-EXEC
+
+      * Gestion MAPFAIL (aucune donnee transmise)
+           IF WS-RESP = DFHRESP(MAPFAIL)
+               MOVE LOW-VALUES TO MAPAFFO
+               MOVE 'ERREUR RECEPTION - RESSAISIR' TO MSGO
+               EXEC CICS SEND MAP('MAPAFF')
+                   MAPSET('CLIAFF')
+                   ERASE
+               END-EXEC
+               GO TO 2000-FIN
+           END-IF
 
       * Verifier que le numero de compte est saisi
            IF NUMCPTL = 0 OR NUMCPTI = SPACES
