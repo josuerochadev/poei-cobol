@@ -178,75 +178,78 @@
            IF NUMCPTL = 0 OR NUMCPTI = SPACES
                MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
            IF NUMCPTI NOT NUMERIC
                MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
       * Controle code region (01, 02, 03 ou 04)
            IF CODREGL = 0 OR CODREGI = SPACES
                MOVE 'CODE REGION OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
            IF CODREGI NOT = '01' AND CODREGI NOT = '02'
               AND CODREGI NOT = '03' AND CODREGI NOT = '04'
                MOVE 'CODE REGION INVALIDE (01/02/03/04)' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
       * Controle nom (obligatoire)
            IF NOML = 0 OR NOMI = SPACES
                MOVE 'NOM OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
       * Controle sexe (M ou F)
            IF SEXEL = 0 OR SEXEI = SPACES
                MOVE 'SEXE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
            IF SEXEI NOT = 'M' AND SEXEI NOT = 'F'
                MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
       * Controle situation sociale (C, M, D ou V)
            IF SITSOL = 0 OR SITSOI = SPACES
                MOVE 'SITUATION SOCIALE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
            IF SITSOI NOT = 'C' AND SITSOI NOT = 'M'
               AND SITSOI NOT = 'D' AND SITSOI NOT = 'V'
                MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
       * Controle position (DB ou CR)
            IF POSITL = 0 OR POSITI = SPACES
                MOVE 'POSITION OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF
 
            IF POSITI NOT = 'DB' AND POSITI NOT = 'CR'
                MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
                MOVE 'O' TO WS-ERREUR
-               EXIT PARAGRAPH
+               GO TO 2100-FIN
            END-IF.
+
+       2100-FIN.
+           EXIT.
 
       *-----------------------------------------------------------------
        2200-VERIFIER-DOUBLURE.
@@ -267,6 +270,9 @@
                    TO MSGO
                MOVE 'O' TO WS-ERREUR
            END-IF.
+
+       2200-FIN.
+           EXIT.
 
       *-----------------------------------------------------------------
        2300-PREPARER-ENREGISTREMENT.
