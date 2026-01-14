@@ -182,6 +182,21 @@
 
       * Validation des donnees
            PERFORM 2100-VALIDER-DONNEES
+
+      **** DEBUG - VOIR VALEUR WS-ERREUR ****
+           STRING 'WS-ERREUR=[' DELIMITED SIZE
+                  WS-ERREUR DELIMITED SIZE
+                  '] MSG=[' DELIMITED SIZE
+                  MSGO DELIMITED SIZE
+                  ']' DELIMITED SIZE
+                  INTO MSGO
+           EXEC CICS SEND MAP('MAPAJT')
+               MAPSET('CLIAJT')
+               ERASE
+           END-EXEC
+           EXEC CICS RETURN END-EXEC
+      **** FIN DEBUG ****
+
            IF ERREUR-DETECTEE
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
