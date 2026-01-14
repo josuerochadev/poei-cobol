@@ -73,6 +73,28 @@
            88 PAS-ERREUR           VALUE 'N'.
        01  WS-MSG-FIN              PIC X(40)
            VALUE 'TRANSACTION AJOU TERMINEE - AU REVOIR'.
+      *-----------------------------------------------------------------
+      * SAUVEGARDE DES DONNEES SAISIES (EVITE ECRASEMENT PAR LOW-VALUES)
+      *-----------------------------------------------------------------
+       01  WS-SAISIE.
+           05 WS-NUMCPT            PIC X(06).
+           05 WS-NUMCPTL           PIC S9(04) COMP.
+           05 WS-CODREG            PIC X(02).
+           05 WS-CODREGL           PIC S9(04) COMP.
+           05 WS-NATCPT            PIC X(02).
+           05 WS-NOM               PIC X(10).
+           05 WS-NOML              PIC S9(04) COMP.
+           05 WS-PRENOM            PIC X(10).
+           05 WS-DATNAISS          PIC X(08).
+           05 WS-SEXE              PIC X(01).
+           05 WS-SEXEL             PIC S9(04) COMP.
+           05 WS-ACTPRO            PIC X(02).
+           05 WS-SITSO             PIC X(01).
+           05 WS-SITSOL            PIC S9(04) COMP.
+           05 WS-ADRESSE           PIC X(10).
+           05 WS-SOLDE             PIC X(10).
+           05 WS-POSITION          PIC X(02).
+           05 WS-POSITL            PIC S9(04) COMP.
 
       ******************************************************************
        PROCEDURE DIVISION.
@@ -138,6 +160,26 @@
                GO TO 2000-FIN
            END-IF
 
+      * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
+           MOVE NUMCPTI   TO WS-NUMCPT
+           MOVE NUMCPTL   TO WS-NUMCPTL
+           MOVE CODREGI   TO WS-CODREG
+           MOVE CODREGL   TO WS-CODREGL
+           MOVE NATCPTI   TO WS-NATCPT
+           MOVE NOMI      TO WS-NOM
+           MOVE NOML      TO WS-NOML
+           MOVE PRENOMI   TO WS-PRENOM
+           MOVE DATNAI    TO WS-DATNAISS
+           MOVE SEXEI     TO WS-SEXE
+           MOVE SEXEL     TO WS-SEXEL
+           MOVE ACTPROI   TO WS-ACTPRO
+           MOVE SITSOI    TO WS-SITSO
+           MOVE SITSOL    TO WS-SITSOL
+           MOVE ADRESSEI  TO WS-ADRESSE
+           MOVE SOLDEI    TO WS-SOLDE
+           MOVE POSITI    TO WS-POSITION
+           MOVE POSITL    TO WS-POSITL
+
       * Validation des donnees
            PERFORM 2100-VALIDER-DONNEES
            IF ERREUR-DETECTEE
@@ -171,78 +213,79 @@
        2100-VALIDER-DONNEES.
       *-----------------------------------------------------------------
       * Controles de conformite des donnees saisies
+      * Utilise les variables WS- sauvegardees (pas MAPAJTI)
       *-----------------------------------------------------------------
            MOVE LOW-VALUES TO MAPAJTO
 
       * Controle numero de compte (obligatoire et numerique)
-           IF NUMCPTL = 0 OR NUMCPTI = SPACES
+           IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
                MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-           IF NUMCPTI NOT NUMERIC
+           IF WS-NUMCPT NOT NUMERIC
                MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
       * Controle code region (01, 02, 03 ou 04)
-           IF CODREGL = 0 OR CODREGI = SPACES
+           IF WS-CODREGL = 0 OR WS-CODREG = SPACES
                MOVE 'CODE REGION OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-           IF CODREGI NOT = '01' AND CODREGI NOT = '02'
-              AND CODREGI NOT = '03' AND CODREGI NOT = '04'
+           IF WS-CODREG NOT = '01' AND WS-CODREG NOT = '02'
+              AND WS-CODREG NOT = '03' AND WS-CODREG NOT = '04'
                MOVE 'CODE REGION INVALIDE (01/02/03/04)' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
       * Controle nom (obligatoire)
-           IF NOML = 0 OR NOMI = SPACES
+           IF WS-NOML = 0 OR WS-NOM = SPACES
                MOVE 'NOM OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
       * Controle sexe (M ou F)
-           IF SEXEL = 0 OR SEXEI = SPACES
+           IF WS-SEXEL = 0 OR WS-SEXE = SPACES
                MOVE 'SEXE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-           IF SEXEI NOT = 'M' AND SEXEI NOT = 'F'
+           IF WS-SEXE NOT = 'M' AND WS-SEXE NOT = 'F'
                MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
       * Controle situation sociale (C, M, D ou V)
-           IF SITSOL = 0 OR SITSOI = SPACES
+           IF WS-SITSOL = 0 OR WS-SITSO = SPACES
                MOVE 'SITUATION SOCIALE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-           IF SITSOI NOT = 'C' AND SITSOI NOT = 'M'
-              AND SITSOI NOT = 'D' AND SITSOI NOT = 'V'
+           IF WS-SITSO NOT = 'C' AND WS-SITSO NOT = 'M'
+              AND WS-SITSO NOT = 'D' AND WS-SITSO NOT = 'V'
                MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
       * Controle position (DB ou CR)
-           IF POSITL = 0 OR POSITI = SPACES
+           IF WS-POSITL = 0 OR WS-POSITION = SPACES
                MOVE 'POSITION OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-           IF POSITI NOT = 'DB' AND POSITI NOT = 'CR'
+           IF WS-POSITION NOT = 'DB' AND WS-POSITION NOT = 'CR'
                MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
@@ -255,8 +298,9 @@
        2200-VERIFIER-DOUBLURE.
       *-----------------------------------------------------------------
       * Verification que le client n'existe pas deja
+      * Note: NOTFND est attendu (client nouveau), NORMAL = doublure
       *-----------------------------------------------------------------
-           MOVE NUMCPTI TO CLI-NUMCPT
+           MOVE WS-NUMCPT TO CLI-NUMCPT
 
            EXEC CICS READ
                FILE('FCLIENT')
@@ -277,22 +321,22 @@
       *-----------------------------------------------------------------
        2300-PREPARER-ENREGISTREMENT.
       *-----------------------------------------------------------------
-      * Transfert des donnees de la MAP vers l'enregistrement
+      * Transfert des donnees sauvegardees vers l'enregistrement
       *-----------------------------------------------------------------
            INITIALIZE ENR-CLIENT
 
-           MOVE NUMCPTI   TO CLI-NUMCPT
-           MOVE CODREGI   TO CLI-CODREG
-           MOVE NATCPTI   TO CLI-NATCPT
-           MOVE NOMI      TO CLI-NOM
-           MOVE PRENOMI   TO CLI-PRENOM
-           MOVE DATNAI    TO CLI-DATNAISS
-           MOVE SEXEI     TO CLI-SEXE
-           MOVE ACTPROI   TO CLI-ACTPRO
-           MOVE SITSOI    TO CLI-SITSO
-           MOVE ADRESSEI  TO CLI-ADRESSE
-           MOVE SOLDEI    TO CLI-SOLDE
-           MOVE POSITI    TO CLI-POSITION.
+           MOVE WS-NUMCPT    TO CLI-NUMCPT
+           MOVE WS-CODREG    TO CLI-CODREG
+           MOVE WS-NATCPT    TO CLI-NATCPT
+           MOVE WS-NOM       TO CLI-NOM
+           MOVE WS-PRENOM    TO CLI-PRENOM
+           MOVE WS-DATNAISS  TO CLI-DATNAISS
+           MOVE WS-SEXE      TO CLI-SEXE
+           MOVE WS-ACTPRO    TO CLI-ACTPRO
+           MOVE WS-SITSO     TO CLI-SITSO
+           MOVE WS-ADRESSE   TO CLI-ADRESSE
+           MOVE WS-SOLDE     TO CLI-SOLDE
+           MOVE WS-POSITION  TO CLI-POSITION.
 
       *-----------------------------------------------------------------
        2400-ECRIRE-CLIENT.
