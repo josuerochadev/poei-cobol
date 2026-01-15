@@ -2459,11 +2459,13 @@ CEDA DEFINE TRANSACTION(MAJO) GROUP(CLIGROUP) PROGRAM(PRGMAJ)
 | GROUP | CLIGROUP | Groupe de ressources du projet |
 | PROGRAM | PRGMAJ | Programme COBOL a executer |
 
-**Installation du groupe :**
+**Installation de la transaction :**
 
 ```
-CEDA INSTALL GROUP(CLIGROUP)
+CEDA INSTALL TRANSACTION(MAJO) GROUP(CLIGROUP)
 ```
+
+> **Bonne pratique** : Installer uniquement la ressource ajoutee plutot que tout le groupe. Reinstaller le groupe peut causer des problemes si FCLIENT est ouvert.
 
 ### Verification
 
