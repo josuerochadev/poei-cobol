@@ -4,7 +4,7 @@
 
 ---
 
-Cette section couvre les exercices 12 a 15 : MAP de suppression, programme de suppression avec la commande DELETE, et deux variantes de transaction.
+Cette section couvre les exercices 12 a 15 : MAP de suppression, programme de suppression avec la commande DELETE, et definition de transaction.
 
 ## Comparaison des commandes CICS pour suppression
 
@@ -12,6 +12,19 @@ Cette section couvre les exercices 12 a 15 : MAP de suppression, programme de su
 |----------|-------|-----------|
 | **DELETE** simple | Supprime directement par la cle | Aucun |
 | **READ + DELETE** | Affiche avant suppression | READ pour confirmation visuelle |
+
+## Deux approches possibles pour la suppression
+
+L'enonce original prevoyait deux variantes de programme :
+
+| Approche | Description | Avantage | Inconvenient |
+|----------|-------------|----------|--------------|
+| **DELETE direct** | Saisie numero → DELETE immediat | Simple, rapide | Risque d'erreur (pas de verification visuelle) |
+| **READ + DELETE** | Saisie numero → READ → Affichage → Confirmation → DELETE | Securise, l'utilisateur voit ce qu'il supprime | Plus d'interactions |
+
+**Choix d'implementation :** J'ai directement implemente la version complete (READ + DELETE avec affichage) dans l'exercice 13, car c'est la bonne pratique en production. On ne supprime jamais de donnees sans confirmation visuelle.
+
+> **Note pedagogique** : Un DELETE "direct" (sans affichage prealable) aurait ete techniquement plus simple mais moins securise. Dans un contexte reel, on privilegie toujours la confirmation visuelle avant suppression de donnees.
 
 ---
 
@@ -325,10 +338,12 @@ Creer le PROGRAMME pour une operation de suppression d'un CLIENT dans le Data Se
 
 ### Mon travail
 
+> **Note** : J'ai directement implemente la version complete avec lecture prealable et affichage des donnees (prevue initialement pour l'exercice 15). Cette approche est la bonne pratique en production car elle permet a l'utilisateur de verifier visuellement les donnees avant suppression.
+
 J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les fonctionnalites suivantes :
 
 1. **Mode pseudo-conversationnel a 2 phases** :
-   - Phase 1 (RECHERCHE) : Saisie du numero de compte
+   - Phase 1 (RECHERCHE) : Saisie du numero de compte + READ pour affichage
    - Phase 2 (CONFIRMATION) : Affichage des donnees et confirmation O/N
 
 2. **Controles de conformite** :
@@ -336,7 +351,7 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
    - Verification de l'existence du client (READ)
    - Validation de la reponse O/N
 
-3. **Suppression avec confirmation** :
+3. **Suppression avec confirmation visuelle** :
    - Les donnees du client sont affichees avant suppression
    - L'utilisateur confirme avec O ou annule avec N
    - La commande DELETE supprime l'enregistrement
@@ -372,6 +387,8 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
 
 **Programme complet : PRGSUP.cbl**
 
+Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGSUP)`. Voici le code complet :
+
 ```cobol
        IDENTIFICATION DIVISION.
        PROGRAM-ID. PRGSUP.
@@ -387,6 +404,7 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
       * Phase 1 (RECHERCHE) :
       *   - Affiche ecran vide pour saisie numero compte
       *   - NUMCPT en UNPROT (saisissable)
+      *   - Autres champs vides
       *
       * Phase 2 (CONFIRMATION) :
       *   - Lit le client et affiche ses donnees
@@ -394,15 +412,22 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
       *   - Si O : DELETE pour supprimer l'enregistrement
       *   - Si N : Retour en phase recherche
       *
+      * COMMANDE CICS DELETE :
+      * - Ne necessite PAS de READ UPDATE prealable
+      * - Supprime directement par la cle (RIDFLD)
+      * - Erreur NOTFND si le client n'existe pas
+      *
       * FIL ROUGE CICS - EXERCICE 13
       ******************************************************************
        ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
        DATA DIVISION.
       ******************************************************************
        WORKING-STORAGE SECTION.
       ******************************************************************
       *-----------------------------------------------------------------
       * ZONE DE COMMUNICATION (COMMAREA)
+      * Sauvegarde la phase et le numero de compte entre passages
       *-----------------------------------------------------------------
        01  WS-COMMAREA.
            05 WS-PHASE            PIC X(01) VALUE '1'.
@@ -410,12 +435,21 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
               88 PHASE-CONFIRM    VALUE '2'.
            05 WS-NUMCPT-SAVED     PIC X(06) VALUE SPACES.
 
-      * Copybooks CICS
+      *-----------------------------------------------------------------
+      * COPYBOOKS CICS
+      *-----------------------------------------------------------------
        COPY DFHAID.
        COPY DFHBMSCA.
+
+      *-----------------------------------------------------------------
+      * COPYBOOK GENERE PAR ASSEMBLAGE BMS (DSECT)
+      * Stocke dans ROCHA.CICS.LINK(CLISUP)
+      *-----------------------------------------------------------------
        COPY CLISUP.
 
-      * Structure enregistrement client (80 octets)
+      *-----------------------------------------------------------------
+      * STRUCTURE ENREGISTREMENT CLIENT (80 OCTETS)
+      *-----------------------------------------------------------------
        01  ENR-CLIENT.
            05 CLI-NUMCPT          PIC X(06).
            05 CLI-CODREG          PIC X(02).
@@ -431,10 +465,16 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
            05 CLI-POSITION        PIC X(02).
            05 FILLER              PIC X(16).
 
+      *-----------------------------------------------------------------
+      * VARIABLES DE TRAVAIL
+      *-----------------------------------------------------------------
        01  WS-RESP                PIC S9(08) COMP VALUE 0.
        01  WS-MSG-FIN             PIC X(40)
            VALUE 'TRANSACTION SUPP TERMINEE - AU REVOIR'.
 
+      *-----------------------------------------------------------------
+      * SAUVEGARDE DES DONNEES SAISIES
+      *-----------------------------------------------------------------
        01  WS-SAISIE.
            05 WS-NUMCPT           PIC X(06).
            05 WS-NUMCPTL          PIC S9(04) COMP.
@@ -444,6 +484,9 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
       ******************************************************************
        LINKAGE SECTION.
       ******************************************************************
+      *-----------------------------------------------------------------
+      * ZONE COMMAREA PASSEE PAR CICS
+      *-----------------------------------------------------------------
        01  DFHCOMMAREA.
            05 LS-PHASE            PIC X(01).
            05 LS-NUMCPT-SAVED     PIC X(06).
@@ -452,26 +495,40 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
        PROCEDURE DIVISION.
       ******************************************************************
 
+      *-----------------------------------------------------------------
        0000-PRINCIPAL.
+      *-----------------------------------------------------------------
+      * Point d'entree du programme
+      * Gestion du mode pseudo-conversationnel
+      *-----------------------------------------------------------------
            EVALUATE TRUE
                WHEN EIBCALEN = 0
+      *            Premier appel - Phase recherche
                    PERFORM 1000-INIT-RECHERCHE
                WHEN EIBAID = DFHPF3
+      *            PF3 - Fin de transaction
                    PERFORM 9000-FIN-PROGRAMME
                WHEN EIBAID = DFHCLEAR
+      *            CLEAR - Reinitialiser
                    PERFORM 1000-INIT-RECHERCHE
                WHEN OTHER
+      *            Traitement selon la phase en cours
                    MOVE DFHCOMMAREA TO WS-COMMAREA
                    PERFORM 2000-TRAITEMENT THRU 2000-FIN
            END-EVALUATE
 
+      *    Retour pseudo-conversationnel
            EXEC CICS RETURN
                TRANSID('SUPP')
                COMMAREA(WS-COMMAREA)
                LENGTH(LENGTH OF WS-COMMAREA)
            END-EXEC.
 
+      *-----------------------------------------------------------------
        1000-INIT-RECHERCHE.
+      *-----------------------------------------------------------------
+      * Affichage ecran initial pour saisie numero compte
+      *-----------------------------------------------------------------
            MOVE LOW-VALUES TO MAPSUPO
            MOVE 'SAISIR LE NUMERO DE COMPTE A SUPPRIMER' TO MSGO
            MOVE '1' TO WS-PHASE
@@ -482,7 +539,11 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                ERASE
            END-EXEC.
 
+      *-----------------------------------------------------------------
        2000-TRAITEMENT.
+      *-----------------------------------------------------------------
+      * Aiguillage selon la phase en cours
+      *-----------------------------------------------------------------
            EVALUATE TRUE
                WHEN PHASE-RECHERCHE
                    PERFORM 3000-RECHERCHER-CLIENT THRU 3000-FIN
@@ -493,8 +554,11 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
        2000-FIN.
            EXIT.
 
+      *-----------------------------------------------------------------
        3000-RECHERCHER-CLIENT.
-      * Reception du numero de compte
+      *-----------------------------------------------------------------
+      * Phase 1 -> 2 : Recherche du client par son numero
+      *-----------------------------------------------------------------
            EXEC CICS RECEIVE MAP('MAPSUP')
                MAPSET('CLISUP')
                RESP(WS-RESP)
@@ -510,10 +574,11 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                GO TO 3000-FIN
            END-IF
 
-      * Sauvegarde et controles
+      *    Sauvegarde du numero saisi
            MOVE NUMCPTI TO WS-NUMCPT
            MOVE NUMCPTL TO WS-NUMCPTL
 
+      *    Controle numero de compte
            IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
                MOVE LOW-VALUES TO MAPSUPO
                MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
@@ -534,7 +599,7 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                GO TO 3000-FIN
            END-IF
 
-      * Lecture du client pour affichage
+      *    Lecture du client pour affichage
            MOVE WS-NUMCPT TO CLI-NUMCPT
 
            EXEC CICS READ
@@ -554,19 +619,35 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                GO TO 3000-FIN
            END-IF
 
-      * Client trouve - Affichage des donnees
+           IF WS-RESP NOT = DFHRESP(NORMAL)
+               MOVE LOW-VALUES TO MAPSUPO
+               MOVE 'ERREUR LECTURE FICHIER - CONTACTEZ SUPPORT' TO MSGO
+               EXEC CICS SEND MAP('MAPSUP')
+                   MAPSET('CLISUP')
+                   ERASE
+               END-EXEC
+               GO TO 3000-FIN
+           END-IF
+
+      *    Client trouve - Affichage des donnees
            PERFORM 3100-AFFICHER-CLIENT
 
-      * Passage en phase CONFIRMATION
+      *    Passage en phase CONFIRMATION
            MOVE '2' TO WS-PHASE
            MOVE WS-NUMCPT TO WS-NUMCPT-SAVED.
 
        3000-FIN.
            EXIT.
 
+      *-----------------------------------------------------------------
        3100-AFFICHER-CLIENT.
-      * Transfert des donnees vers la MAP
+      *-----------------------------------------------------------------
+      * Affiche les donnees du client dans la MAP pour confirmation
+      * Tous les champs en ASKIP (lecture seule)
+      *-----------------------------------------------------------------
            MOVE LOW-VALUES TO MAPSUPO
+
+      *    Transfert des donnees vers la MAP
            MOVE CLI-NUMCPT   TO NUMCPTO
            MOVE CLI-CODREG   TO CODREGO
            MOVE CLI-NATCPT   TO NATCPTO
@@ -580,36 +661,67 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
            MOVE CLI-SOLDE    TO SOLDEO
            MOVE CLI-POSITION TO POSITO
 
-      * Libelles (region, sexe, situation, position)
+      *    Libelle region
            EVALUATE CLI-CODREG
-               WHEN '01' MOVE 'PARIS' TO LIBREGO
-               WHEN '02' MOVE 'MARSEILLE' TO LIBREGO
-               WHEN '03' MOVE 'LYON' TO LIBREGO
-               WHEN '04' MOVE 'LILLE' TO LIBREGO
-               WHEN OTHER MOVE 'INCONNU' TO LIBREGO
+               WHEN '01'
+                   MOVE 'PARIS' TO LIBREGO
+               WHEN '02'
+                   MOVE 'MARSEILLE' TO LIBREGO
+               WHEN '03'
+                   MOVE 'LYON' TO LIBREGO
+               WHEN '04'
+                   MOVE 'LILLE' TO LIBREGO
+               WHEN OTHER
+                   MOVE 'INCONNU' TO LIBREGO
            END-EVALUATE
 
+      *    Libelle nature compte
+           EVALUATE CLI-NATCPT
+               WHEN '01'
+                   MOVE 'COURANT' TO LIBNATO
+               WHEN '02'
+                   MOVE 'EPARGNE' TO LIBNATO
+               WHEN '03'
+                   MOVE 'PROFESSIONNEL' TO LIBNATO
+               WHEN OTHER
+                   MOVE 'AUTRE' TO LIBNATO
+           END-EVALUATE
+
+      *    Libelle sexe
            EVALUATE CLI-SEXE
-               WHEN 'M' MOVE 'MASCULIN' TO LIBSEXO
-               WHEN 'F' MOVE 'FEMININ' TO LIBSEXO
-               WHEN OTHER MOVE 'INCONNU' TO LIBSEXO
+               WHEN 'M'
+                   MOVE 'MASCULIN' TO LIBSEXO
+               WHEN 'F'
+                   MOVE 'FEMININ' TO LIBSEXO
+               WHEN OTHER
+                   MOVE 'INCONNU' TO LIBSEXO
            END-EVALUATE
 
+      *    Libelle situation sociale
            EVALUATE CLI-SITSO
-               WHEN 'C' MOVE 'CELIBATAIRE' TO LIBSITO
-               WHEN 'M' MOVE 'MARIE(E)' TO LIBSITO
-               WHEN 'D' MOVE 'DIVORCE(E)' TO LIBSITO
-               WHEN 'V' MOVE 'VEUF(VE)' TO LIBSITO
-               WHEN OTHER MOVE 'INCONNU' TO LIBSITO
+               WHEN 'C'
+                   MOVE 'CELIBATAIRE' TO LIBSITO
+               WHEN 'M'
+                   MOVE 'MARIE(E)' TO LIBSITO
+               WHEN 'D'
+                   MOVE 'DIVORCE(E)' TO LIBSITO
+               WHEN 'V'
+                   MOVE 'VEUF(VE)' TO LIBSITO
+               WHEN OTHER
+                   MOVE 'INCONNU' TO LIBSITO
            END-EVALUATE
 
+      *    Libelle position
            EVALUATE CLI-POSITION
-               WHEN 'CR' MOVE 'CREDITEUR' TO LIBPOSO
-               WHEN 'DB' MOVE 'DEBITEUR' TO LIBPOSO
-               WHEN OTHER MOVE 'INCONNU' TO LIBPOSO
+               WHEN 'CR'
+                   MOVE 'CREDITEUR' TO LIBPOSO
+               WHEN 'DB'
+                   MOVE 'DEBITEUR' TO LIBPOSO
+               WHEN OTHER
+                   MOVE 'INCONNU' TO LIBPOSO
            END-EVALUATE
 
-      * Proteger le numero de compte
+      *    Proteger le numero de compte
            MOVE DFHBMASK TO NUMCPTA
 
            MOVE 'CLIENT TROUVE - CONFIRMER SUPPRESSION (O/N) ?' TO MSGO
@@ -619,8 +731,11 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                ERASE
            END-EXEC.
 
+      *-----------------------------------------------------------------
        4000-CONFIRMER-SUPPRESSION.
-      * Reception de la confirmation
+      *-----------------------------------------------------------------
+      * Phase 2 : Reception de la confirmation et suppression
+      *-----------------------------------------------------------------
            EXEC CICS RECEIVE MAP('MAPSUP')
                MAPSET('CLISUP')
                RESP(WS-RESP)
@@ -638,9 +753,11 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                GO TO 4000-FIN
            END-IF
 
-      * Validation de la reponse
+      *    Sauvegarde de la confirmation
            MOVE CONFIRMI TO WS-CONFIRM
+           MOVE CONFIRML TO WS-CONFIRML
 
+      *    Verification de la reponse
            IF WS-CONFIRM NOT = 'O' AND WS-CONFIRM NOT = 'N'
               AND WS-CONFIRM NOT = 'o' AND WS-CONFIRM NOT = 'n'
                MOVE LOW-VALUES TO MAPSUPO
@@ -654,7 +771,7 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                GO TO 4000-FIN
            END-IF
 
-      * Si N : Annulation
+      *    Si N ou n : Annulation
            IF WS-CONFIRM = 'N' OR WS-CONFIRM = 'n'
                MOVE LOW-VALUES TO MAPSUPO
                MOVE 'SUPPRESSION ANNULEE - NOUVEAU NUMERO OU PF3' TO MSGO
@@ -667,14 +784,18 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                GO TO 4000-FIN
            END-IF
 
-      * Si O : Suppression
+      *    Si O ou o : Suppression
            PERFORM 4100-SUPPRIMER-CLIENT THRU 4100-FIN.
 
        4000-FIN.
            EXIT.
 
+      *-----------------------------------------------------------------
        4100-SUPPRIMER-CLIENT.
-      * DELETE ne necessite PAS de READ UPDATE prealable
+      *-----------------------------------------------------------------
+      * Suppression effective de l'enregistrement
+      * La commande DELETE ne necessite PAS de READ UPDATE prealable
+      *-----------------------------------------------------------------
            MOVE WS-NUMCPT-SAVED TO CLI-NUMCPT
 
            EXEC CICS DELETE
@@ -687,14 +808,18 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
                WHEN DFHRESP(NORMAL)
                    MOVE LOW-VALUES TO MAPSUPO
                    MOVE 'CLIENT SUPPRIME - NOUVEAU NUMERO OU PF3' TO MSGO
+      *            Retour en phase recherche
                    MOVE '1' TO WS-PHASE
                    MOVE SPACES TO WS-NUMCPT-SAVED
                WHEN DFHRESP(NOTFND)
                    MOVE LOW-VALUES TO MAPSUPO
                    MOVE 'ERREUR : CLIENT DEJA SUPPRIME' TO MSGO
                    MOVE '1' TO WS-PHASE
+                   MOVE SPACES TO WS-NUMCPT-SAVED
                WHEN OTHER
                    MOVE LOW-VALUES TO MAPSUPO
+                   MOVE WS-NUMCPT-SAVED TO NUMCPTO
+                   MOVE DFHBMASK TO NUMCPTA
                    MOVE 'ERREUR SUPPRESSION - CONTACTEZ SUPPORT' TO MSGO
            END-EVALUATE
 
@@ -706,7 +831,11 @@ J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les f
        4100-FIN.
            EXIT.
 
+      *-----------------------------------------------------------------
        9000-FIN-PROGRAMME.
+      *-----------------------------------------------------------------
+      * Fin de la transaction
+      *-----------------------------------------------------------------
            EXEC CICS SEND TEXT
                FROM(WS-MSG-FIN)
                LENGTH(40)
@@ -844,18 +973,108 @@ Suggestions de captures d'ecran pour cet exercice :
 
 ## Exercice 14 : Transaction de suppression
 
+### Enonce
+
+Definir une transaction independante des precedentes pour appeler le programme de suppression.
+
+### Mon travail
+
+La transaction SUPP est le point d'entree utilisateur pour la suppression de clients.
+
+**Architecture CICS - Liaison Transaction/Programme/MAP/Fichier :**
+
+```
++-------------+     +-------------+     +-------------+
+| TRANSACTION | --> | PROGRAMME   | --> | MAPSET      |
+|    SUPP     |     |   PRGSUP    |     |   CLISUP    |
++-------------+     +-------------+     +-------------+
+                           |
+                           v
+                    +-------------+
+                    |   FICHIER   |
+                    |   FCLIENT   |
+                    +-------------+
+```
+
+Une transaction CICS est le point d'entree utilisateur. Elle fait le lien entre :
+- Le code transaction saisi par l'utilisateur (SUPP)
+- Le programme COBOL-CICS a executer (PRGSUP)
+
+Le programme utilise ensuite le mapset (CLISUP) pour l'interface et le fichier (FCLIENT) pour les donnees.
+
 ### Resolution
 
-```
-CEDA DEFINE TRANSACTION(SUPP) GROUP(CLIGROUP)
-     PROGRAM(PRGSUP)
+**Definition de la transaction :**
 
-CEDA INSTALL GROUP(CLIGROUP)
 ```
+CEDA DEFINE TRANSACTION(SUPP) GROUP(CLIGROUP) PROGRAM(PRGSUP)
+```
+
+| Parametre | Valeur | Description |
+|-----------|--------|-------------|
+| TRANSACTION | SUPP | Code transaction (4 caracteres max) |
+| GROUP | CLIGROUP | Groupe de ressources du projet |
+| PROGRAM | PRGSUP | Programme COBOL a executer |
+
+**Installation de la transaction :**
+
+```
+CEDA INSTALL TRANSACTION(SUPP) GROUP(CLIGROUP)
+```
+
+> **Bonne pratique** : Installer uniquement la ressource ajoutee plutot que tout le groupe. Reinstaller le groupe peut causer des problemes si FCLIENT est ouvert.
+
+### Verification
+
+```
+CEDA VIEW TRANSACTION(SUPP) GROUP(CLIGROUP)
+CEMT INQ TRANSACTION(SUPP)
+```
+
+### Test
+
+```
+SUPP
+```
+
+Comportement attendu :
+1. Ecran de saisie du numero de compte
+2. Saisir un numero existant (ex: 100005)
+3. Affichage des donnees du client avec demande de confirmation
+4. Saisir O pour confirmer ou N pour annuler
+5. Si O : Message "CLIENT SUPPRIME"
+6. Si N : Message "SUPPRESSION ANNULEE"
+
+### Ressources du groupe CLIGROUP apres exercice 14
+
+| Type | Nom | Description |
+|------|-----|-------------|
+| FILE | FCLIENT | Fichier VSAM clients |
+| MAPSET | CLIAFF | Ecran affichage |
+| MAPSET | CLIAJT | Ecran ajout |
+| MAPSET | CLIMAJ | Ecran mise a jour |
+| MAPSET | CLISUP | Ecran suppression |
+| PROGRAM | PRGCLIA | Programme affichage |
+| PROGRAM | PRGAJT | Programme ajout |
+| PROGRAM | PRGMAJ | Programme mise a jour |
+| PROGRAM | PRGSUP | Programme suppression |
+| TRANSACTION | AFFI | Transaction affichage |
+| TRANSACTION | AJOU | Transaction ajout |
+| TRANSACTION | MAJO | Transaction mise a jour |
+| TRANSACTION | SUPP | Transaction suppression |
 
 ### Captures d'ecran
 
-<!-- ![pt2ex14-1](images-pt2/pt2ex14-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt2ex14-1 : CEDA DEFINE TRANSACTION(SUPP)
+2. pt2ex14-2 : CEDA VIEW TRANSACTION(SUPP) - verification definition
+3. pt2ex14-3 : Ecran MAPSUP - saisie du numero a supprimer
+4. pt2ex14-4 : Affichage client avec demande confirmation
+5. pt2ex14-5 : Message "CLIENT SUPPRIME" apres confirmation O
+6. pt2ex14-6 : Message "SUPPRESSION ANNULEE" apres confirmation N
+-->
 
 ---
 
@@ -867,62 +1086,50 @@ Reprendre cette operation de suppression en la precedant par une operation de le
 
 ### Mon travail
 
-Cette version affiche d'abord les donnees du client avant de demander confirmation pour la suppression. Cela permet a l'utilisateur de verifier qu'il supprime le bon client.
+> **Exercice deja couvert** : Le programme PRGSUP (exercice 13) implemente deja la suppression avec lecture prealable. J'ai anticipe cette fonctionnalite en developpant directement la version complete.
+
+Le programme PRGSUP realise exactement ce que demande l'exercice 15 :
+1. **READ** pour verifier l'existence et recuperer les donnees
+2. **Affichage** des donnees du client pour confirmation visuelle
+3. **Confirmation O/N** avant suppression
+4. **DELETE** uniquement si l'utilisateur confirme
+
+### Comparaison : Ce qui etait prevu vs ce qui a ete fait
+
+| Element | Prevu (Ex 13 + Ex 15) | Realise |
+|---------|----------------------|---------|
+| Ex 13 | DELETE direct (sans affichage) | DELETE avec READ + affichage |
+| Ex 15 | READ + DELETE (avec affichage) | Deja couvert par Ex 13 |
+| Transaction SUPP | Programme simple | Programme complet |
+| Transaction SULE | Programme avec lecture | Non necessaire (alias possible) |
 
 ### Resolution
 
-**Programme : PRGSUL.cbl** (Suppression avec Lecture)
+**Option 1 : Ne rien faire** - L'exercice est deja couvert par PRGSUP.
 
-```cobol
-       01 WS-PHASE             PIC X(01).
-          88 PHASE-SAISIE      VALUE '1'.
-          88 PHASE-CONFIRM     VALUE '2'.
+**Option 2 : Creer une transaction alias** (optionnel)
 
-       2000-TRAITEMENT.
-           EVALUATE TRUE
-               WHEN PHASE-SAISIE
-                   PERFORM 3000-RECHERCHER-CLIENT
-               WHEN PHASE-CONFIRM
-                   PERFORM 4000-CONFIRMER-SUPPRESSION
-           END-EVALUATE.
-
-       3000-RECHERCHER-CLIENT.
-      * Lecture et affichage du client
-           EXEC CICS READ FILE('FCLIENT')
-               INTO(ENR-CLIENT)
-               RIDFLD(CLI-NUMCPT)
-               RESP(WS-RESP)
-           END-EXEC
-           IF WS-RESP = DFHRESP(NORMAL)
-               PERFORM AFFICHER-DONNEES
-               MOVE 'CONFIRMER SUPPRESSION (O/N) ?' TO MSGO
-               MOVE '2' TO WS-PHASE
-           END-IF.
-
-       4000-CONFIRMER-SUPPRESSION.
-      * Si confirmation, suppression
-           IF CONFIRMI = 'O'
-               EXEC CICS DELETE FILE('FCLIENT')
-                   RIDFLD(CLI-NUMCPT)
-                   RESP(WS-RESP)
-               END-EXEC
-               MOVE 'SUPPRESSION EFFECTUEE' TO MSGO
-           ELSE
-               MOVE 'SUPPRESSION ANNULEE' TO MSGO
-           END-IF
-           MOVE '1' TO WS-PHASE.
-```
-
-**Transaction independante :**
+Si on souhaite avoir les deux codes transaction (SUPP et SULE) pointant vers le meme programme :
 
 ```
-CEDA DEFINE TRANSACTION(SULE) GROUP(CLIGROUP)
-     PROGRAM(PRGSUL)
+CEDA DEFINE TRANSACTION(SULE) GROUP(CLIGROUP) PROGRAM(PRGSUP)
+CEDA INSTALL TRANSACTION(SULE) GROUP(CLIGROUP)
 ```
+
+Cela permet d'utiliser indifferemment `SUPP` ou `SULE` pour acceder a la suppression avec confirmation visuelle.
+
+### Conclusion
+
+En implementant directement la version securisee (avec lecture prealable) dans l'exercice 13, j'ai :
+- Applique les bonnes pratiques de developpement mainframe
+- Evite la creation d'un programme moins securise (DELETE sans verification)
+- Couvert les objectifs des exercices 13 et 15 en une seule implementation
 
 ### Captures d'ecran
 
-<!-- ![pt2ex15-1](images-pt2/pt2ex15-1.png) -->
+<!--
+Pas de captures supplementaires necessaires - voir exercices 13 et 14.
+-->
 
 ---
 
