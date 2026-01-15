@@ -53,7 +53,7 @@ CEDA INSTALL MAPSET(CLIAJT) GROUP(CLIGROUP)
 ## Verification
 
 ```
-CEMT INQ MAPSET(CLIAJT)
+CEDA VIEW MAPSET(CLIAJT) GROUP(CLIGROUP)
 ```
 
-Resultat attendu : `Map(CLIAJT) Ins Ena`
+> **Note** : `CEMT INQ MAPSET` n'existe pas dans CICS. Pour verifier un mapset, utiliser `CEDA VIEW`.

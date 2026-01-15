@@ -85,10 +85,10 @@ CEDA INSTALL MAPSET(CLIMAJ) GROUP(CLIGROUP)
 ## Verification
 
 ```
-CEMT INQ MAPSET(CLIMAJ)
+CEDA VIEW MAPSET(CLIMAJ) GROUP(CLIGROUP)
 ```
 
-Resultat attendu : `Map(CLIMAJ) Ins Ena`
+> **Note** : `CEMT INQ MAPSET` n'existe pas dans CICS. Pour verifier un mapset, utiliser `CEDA VIEW`.
 
 ## Flux de la transaction MAJO
 
