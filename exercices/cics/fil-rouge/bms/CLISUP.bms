@@ -1,0 +1,114 @@
+***********************************************************************
+*  MAPSET : CLISUP - Suppression Client
+*  Transaction : SUPP / SULE
+*  Fil Rouge CICS - Exercice 12
+*
+*  PARTICULARITE SUPPRESSION :
+*  ---------------------------
+*  Le numero de compte est saisi pour rechercher le client.
+*  Les donnees sont affichees en lecture seule pour confirmation.
+*  Un champ CONFIRM (O/N) permet de valider la suppression.
+*
+*  Deux modes d'utilisation :
+*  - SUPP : Suppression directe (Ex 13-14)
+*  - SULE : Suppression avec lecture prealable (Ex 15)
+***********************************************************************
+CLISUP   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPSUP   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* TITRE
+*----------------------------------------------------------------------
+         DFHMDF POS=(1,25),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='*** SUPPRESSION CLIENT ***'
+         DFHMDF POS=(2,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+*----------------------------------------------------------------------
+* ZONE DE SAISIE - NUMERO DE COMPTE (CLE)
+*----------------------------------------------------------------------
+         DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NUMERO COMPTE :'
+NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+         DFHMDF POS=(4,26),LENGTH=1,ATTRB=ASKIP
+*----------------------------------------------------------------------
+* ZONES D'AFFICHAGE - DONNEES CLIENT (LECTURE SEULE)
+*----------------------------------------------------------------------
+         DFHMDF POS=(6,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='CODE REGION   :'
+CODREG   DFHMDF POS=(6,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(6,25),LENGTH=20,ATTRB=ASKIP
+LIBREG   DFHMDF POS=(6,46),LENGTH=15,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(7,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NATURE COMPTE :'
+NATCPT   DFHMDF POS=(7,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(7,25),LENGTH=20,ATTRB=ASKIP
+LIBNAT   DFHMDF POS=(7,46),LENGTH=15,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(8,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NOM           :'
+NOM      DFHMDF POS=(8,19),LENGTH=10,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(9,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='PRENOM        :'
+PRENOM   DFHMDF POS=(9,19),LENGTH=10,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(10,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='DATE NAISSANCE:'
+DATNA    DFHMDF POS=(10,19),LENGTH=10,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(11,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='SEXE          :'
+SEXE     DFHMDF POS=(11,19),LENGTH=1,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(11,24),LENGTH=10,ATTRB=ASKIP
+LIBSEX   DFHMDF POS=(11,35),LENGTH=8,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(12,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='ACTIVITE PRO  :'
+ACTPRO   DFHMDF POS=(12,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(13,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='SITUATION SOC :'
+SITSO    DFHMDF POS=(13,19),LENGTH=1,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(13,24),LENGTH=10,ATTRB=ASKIP
+LIBSIT   DFHMDF POS=(13,35),LENGTH=12,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(14,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='ADRESSE       :'
+ADRESSE  DFHMDF POS=(14,19),LENGTH=10,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(15,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='SOLDE         :'
+SOLDE    DFHMDF POS=(15,19),LENGTH=12,ATTRB=(ASKIP,BRT)
+*
+         DFHMDF POS=(16,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='POSITION      :'
+POSIT    DFHMDF POS=(16,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(16,25),LENGTH=10,ATTRB=ASKIP
+LIBPOS   DFHMDF POS=(16,36),LENGTH=10,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* ZONE DE CONFIRMATION
+*----------------------------------------------------------------------
+         DFHMDF POS=(18,2),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='CONFIRMER SUPPRESSION (O/N) :'
+CONFIRM  DFHMDF POS=(18,33),LENGTH=1,ATTRB=UNPROT
+         DFHMDF POS=(18,35),LENGTH=1,ATTRB=ASKIP
+*----------------------------------------------------------------------
+* ZONE MESSAGE
+*----------------------------------------------------------------------
+         DFHMDF POS=(20,1),LENGTH=78,ATTRB=ASKIP,                       X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+         DFHMDF POS=(21,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
+MSG      DFHMDF POS=(21,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* TOUCHES FONCTION
+*----------------------------------------------------------------------
+         DFHMDF POS=(23,2),LENGTH=70,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Rechercher/Confirmer  PF3=Quitter  CLEAR=X
+               Effacer'
+***********************************************************************
+         DFHMSD TYPE=FINAL
+         END
