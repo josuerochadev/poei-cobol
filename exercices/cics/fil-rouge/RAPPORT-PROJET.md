@@ -168,33 +168,47 @@ Command - Enter "/" to select action
 | ROCHA.CICS.LINK | Modules objets apres compilation | FB | 80 |
 | ROCHA.CICS.LOAD | Modules executables (load modules) | U | - |
 
-### Membres a creer dans SOURCE
+### Membres crees dans SOURCE
 
-Au cours du projet, les membres suivants seront crees dans `ROCHA.CICS.SOURCE` :
+Au cours du projet, les membres suivants ont ete crees dans `ROCHA.CICS.SOURCE` :
 
 **Programmes COBOL :**
-- PRGCLIA : Affichage client
-- PRGAJT : Ajout client
-- PRGMAJ : Mise a jour client
-- PRGSUP : Suppression client
-- PRGSUL : Suppression avec lecture
-- PRGSDEL : Suppression generique
-- PRGLGEN : Liste generique
-- PRGSTAT : Statistiques region
+
+| Membre | Transaction | Description |
+|--------|-------------|-------------|
+| PRGCLIA | AFFI | Affichage client (READ) |
+| PRGAJT | AJOU | Ajout client (WRITE) |
+| PRGMAJ | MAJO | Mise a jour client (REWRITE) |
+| PRGSUP | SUPP | Suppression client (DELETE) |
+| PRGLGEN | LGEN | Liste generique (STARTBR/READNEXT) |
+| PRGSTAT | STAT | Statistiques par region |
 
 **MAPs BMS :**
-- MAPAFF : Ecran affichage
-- MAPAJT : Ecran ajout
-- MAPMAJ : Ecran mise a jour
-- MAPSUP : Ecran suppression
-- MAPSTAT : Ecran statistiques
+
+| Membre | Programme | Description |
+|--------|-----------|-------------|
+| CLIAFF | PRGCLIA | Ecran affichage client |
+| CLIAJT | PRGAJT | Ecran ajout client |
+| CLIMAJ | PRGMAJ | Ecran mise a jour client |
+| CLISUP | PRGSUP | Ecran suppression client |
+| CLISTAT | PRGSTAT | Ecran statistiques |
 
 **JCL :**
-- DEFVSAM : Definition fichier VSAM
-- COMPBMS : Compilation MAP BMS
-- COMPCOB : Compilation programme COBOL-CICS
 
-> **Note sur les copybooks** : Les copybooks pour les MAPs BMS sont generes automatiquement lors de l'assemblage avec l'option TYPE=DSECT. Ils contiennent les structures DFHBMSCA et les zones de la MAP (suffixes I pour input, O pour output, L pour longueur, etc.).
+| Membre | Usage | Exercice |
+|--------|-------|----------|
+| DEFVSAM | Definition cluster VSAM | Ex 1 |
+| LOADVSAM | Chargement donnees initiales | Ex 1 |
+| ASMCLAF | Assemblage MAP CLIAFF | Ex 2 |
+| CMPCLAF | Compilation PRGCLIA | Ex 3 |
+| ASMAJT | Assemblage MAP CLIAJT | Ex 6 |
+| CMPAJT | Compilation PRGAJT | Ex 7 |
+
+> **Note sur les copybooks** : Les copybooks pour les MAPs BMS sont generes automatiquement lors de l'assemblage avec l'option `TYPE=DSECT`. Ils contiennent les structures de donnees avec les suffixes :
+> - `I` : Zone input (donnees recues de l'ecran)
+> - `O` : Zone output (donnees a envoyer)
+> - `L` : Longueur du champ saisi
+> - `A` : Attribut du champ (couleur, intensite, etc.)
 
 ### Captures d'ecran
 
@@ -435,9 +449,23 @@ J'ai cree une MAP BMS avec tous les champs du fichier CLIENT. La MAP comprend :
 - Les touches fonction en bas de l'ecran
 
 **Choix de conception :**
+
 - `CTRL=(FREEKB,FRSET)` : Clavier debloque et MDT remis a zero
 - `TIOAPFX=YES` : Reserve 12 octets pour le prefixe TIOA (requis pour CICS)
 - Seul le champ NUMCPT est saisissable (UNPROT), les autres sont en affichage (ASKIP)
+
+**Comprendre les concepts BMS :**
+
+| Option | Signification | Role |
+|--------|---------------|------|
+| **FREEKB** | Free Keyboard | Debloque le clavier apres l'envoi de la MAP, permettant a l'utilisateur de saisir |
+| **FRSET** | Flag Reset | Remet le MDT a zero pour tous les champs |
+| **MDT** | Modified Data Tag | Bit qui indique si un champ a ete modifie par l'utilisateur |
+| **TIOAPFX** | TIOA Prefix | Reserve 12 octets au debut de la zone MAP pour le prefixe CICS |
+| **UNPROT** | Unprotected | Champ saisissable par l'utilisateur |
+| **ASKIP** | Auto-skip | Champ en affichage seul, le curseur le saute |
+
+> **Le MDT (Modified Data Tag)** : Chaque champ de l'ecran possede un bit MDT. Quand l'utilisateur modifie un champ, le MDT passe a 1. Lors du RECEIVE MAP, seuls les champs avec MDT=1 sont transmis au programme. L'option FRSET remet tous les MDT a 0 au SEND MAP, permettant de detecter les nouvelles modifications.
 
 ### Resolution
 
@@ -618,20 +646,77 @@ Creer le PROGRAMME necessaire pour l'affichage des donnees pour un code CLIENT s
 
 ### Mon travail
 
-J'ai developpe un programme COBOL-CICS qui :
-1. Envoie la MAP vide au premier appel (EIBCALEN = 0)
-2. Gere les touches PF3 (quitter) et CLEAR (reinitialiser)
-3. Recoit le numero de compte saisi par l'utilisateur
-4. Lit l'enregistrement VSAM avec la commande READ
-5. Affiche les donnees avec les libelles (region, sexe, situation, position)
-6. Affiche un message d'erreur si client non trouve
+J'ai developpe un programme COBOL-CICS en mode **pseudo-conversationnel**.
 
-**Gestion pseudo-conversationnelle** : Le programme utilise RETURN TRANSID pour revenir au debut apres chaque interaction, avec une COMMAREA pour conserver l'etat.
+#### Comprendre le mode pseudo-conversationnel
 
-**Points techniques importants** :
-- Le copybook `DFHAID` est requis pour les constantes de touches (DFHPF3, DFHCLEAR, DFHENTER, etc.)
-- La commande `SEND TEXT FROM(...)` necessite une reference de donnee (variable), pas une constante litterale
-- Le copybook BMS (CLIAFF) est genere par l'assemblage de la MAP et contient les structures MAPAFFI/MAPAFFO
+En CICS, un programme ne reste pas en memoire pendant que l'utilisateur reflechit. Au lieu de cela :
+
+1. **Le programme s'execute** : traite les donnees, affiche un ecran
+2. **Le programme se TERMINE** : libere la memoire et les ressources
+3. **L'utilisateur saisit** : pendant ce temps, le programme n'existe plus
+4. **CICS relance le programme** : quand l'utilisateur appuie sur une touche
+
+C'est le mode **pseudo-conversationnel** : l'utilisateur a l'impression d'une conversation continue, mais en realite le programme est relance a chaque interaction.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ LANCEMENT TRANSACTION "AFFI"                                    │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PREMIER PASSAGE (EIBCALEN = 0)                                  │
+│ ──────────────────────────────────────────────────────────────  │
+│ → CICS lance le programme pour la premiere fois                 │
+│ → EIBCALEN = 0 (pas de COMMAREA, c'est un nouveau contexte)     │
+│ → Le programme affiche l'ecran vide (SEND MAP)                  │
+│ → Le programme se TERMINE (RETURN TRANSID)                      │
+│ → Memoire liberee, ressources liberees                          │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+        L'utilisateur saisit un numero et appuie sur ENTREE
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PASSAGES SUIVANTS (EIBCALEN > 0)                                │
+│ ──────────────────────────────────────────────────────────────  │
+│ → CICS relance le programme (nouveau processus)                 │
+│ → EIBCALEN > 0 (la COMMAREA indique un contexte existant)       │
+│ → Le programme recoit la saisie (RECEIVE MAP)                   │
+│ → Le programme lit le fichier (READ FILE)                       │
+│ → Le programme affiche le resultat (SEND MAP)                   │
+│ → Le programme se TERMINE a nouveau (RETURN TRANSID)            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Variables cles du EIB (Exec Interface Block)
+
+CICS fournit un bloc de donnees appele EIB contenant des informations sur le contexte :
+
+| Variable | Description | Valeurs typiques |
+|----------|-------------|------------------|
+| **EIBCALEN** | Longueur de la COMMAREA | 0 = premier passage, >0 = passage suivant |
+| **EIBAID** | Touche appuyee | DFHENTER, DFHPF3, DFHCLEAR |
+| **EIBTRNID** | Code transaction | 'AFFI' |
+| **EIBRESP** | Code reponse derniere commande | 0=OK, 13=NOTFND |
+
+#### Logique du programme
+
+Le programme utilise un `EVALUATE` pour aiguiller selon le contexte :
+
+| Condition | Action | Paragraphe |
+|-----------|--------|------------|
+| EIBCALEN = 0 | Premier passage, afficher ecran vide | 1000-PREMIER-PASSAGE |
+| EIBAID = DFHPF3 | Touche PF3, quitter | 9000-FIN-PROGRAMME |
+| EIBAID = DFHCLEAR | Touche CLEAR, reinitialiser | 1000-PREMIER-PASSAGE |
+| Autre (ENTER) | Traiter la saisie | 2000-TRAITEMENT |
+
+#### Points techniques importants
+
+- **DFHAID** : Copybook contenant les constantes des touches (DFHPF3, DFHCLEAR, DFHENTER)
+- **SEND TEXT** : Necessite une variable, pas une constante litterale (`FROM(WS-MSG)` pas `FROM('texte')`)
+- **Copybook BMS** : Genere par l'assemblage, contient MAPAFFI (input) et MAPAFFO (output)
 
 ### Resolution
 
@@ -930,47 +1015,7 @@ Activer la transaction en mode debugger avec la commande CEDF et par suite sans 
 
 ### Mon travail
 
-J'ai teste la transaction AFFI en mode debug avec CEDF pour :
-1. Verifier le bon enchainement des commandes CICS
-2. Comprendre le fonctionnement pseudo-conversationnel
-3. Observer les valeurs des variables (EIBCALEN, EIBAID, RESP)
-4. Valider le fonctionnement sans debugger
-
-### Comprendre le mode pseudo-conversationnel
-
-Le programme PRGCLIA fonctionne en mode **pseudo-conversationnel**. Cela signifie que le programme se termine reellement entre chaque interaction utilisateur, puis est relance par CICS.
-
-**Deroulement observe dans CEDF :**
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  PREMIER PASSAGE (EIBCALEN = 0)                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  1. SEND MAP('MAPAFF') MAPSET('CLIAFF') ERASE                   │
-│     → L'ecran vide s'affiche                                    │
-│  2. RETURN TRANSID('AFFI') COMMAREA(WS-COMMAREA)                │
-│     → Le programme se termine                                   │
-│  3. TASK TERMINATION (normal)                                   │
-│     → CEDF demande YES/NO pour continuer                        │
-└─────────────────────────────────────────────────────────────────┘
-                            │
-                            │ L'utilisateur saisit un numero et appuie ENTER
-                            ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  PASSAGES SUIVANTS (EIBCALEN > 0)                               │
-├─────────────────────────────────────────────────────────────────┤
-│  1. RECEIVE MAP('MAPAFF') MAPSET('CLIAFF')                      │
-│     → Reception du numero de compte saisi                       │
-│  2. READ FILE('FCLIENT') INTO(ENR-CLIENT) RIDFLD(WS-NUMCPT)     │
-│     → Lecture du fichier VSAM                                   │
-│  3. SEND MAP('MAPAFF') MAPSET('CLIAFF')                         │
-│     → Affichage des donnees client                              │
-│  4. RETURN TRANSID('AFFI') COMMAREA(...)                        │
-│     → Le programme se termine a nouveau                         │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-> **Note importante** : Le "TASK TERMINATION" affiche dans CEDF est le comportement normal du mode pseudo-conversationnel. Le programme se termine pour liberer les ressources pendant que l'utilisateur reflechit, puis CICS le relance quand l'utilisateur appuie sur une touche.
+J'ai teste la transaction AFFI en mode debug avec CEDF pour verifier le bon enchainement des commandes CICS et observer les valeurs des variables EIB (voir Exercice 3 pour les explications sur le mode pseudo-conversationnel et les variables EIB).
 
 ### Resolution
 
@@ -1021,16 +1066,7 @@ AFFI
 
 La transaction s'execute normalement sans interruption, affichant directement l'ecran de saisie.
 
-> **Note TK4-** : La commande `CEDF OFF` n'est pas toujours disponible sur l'emulateur TK4-. Pour desactiver le mode debug, il suffit de se deconnecter du terminal CICS (CSSF LOGOFF) puis de se reconnecter, ou simplement d'ouvrir un nouveau terminal.
-
-### Variables cles a observer dans CEDF
-
-| Variable | Premier passage | Passages suivants |
-|----------|-----------------|-------------------|
-| EIBCALEN | 0 | 1 (longueur COMMAREA) |
-| EIBAID | X'00' | DFHENTER (X'7D') ou DFHPF3 (X'F3') |
-| EIBTRNID | 'AFFI' | 'AFFI' |
-| EIBRESP | 0 (NORMAL) | 0 ou 13 (NOTFND) |
+> **Desactiver CEDF** : Pour sortir du mode debug, appuyer sur PF3 pendant un point d'arret, ou simplement lancer une nouvelle transaction sans avoir tape CEDF.
 
 ### Captures d'ecran
 
@@ -1320,13 +1356,19 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
            END-IF
 
       * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
+      * Important : sauvegarder aussi les champs longueur (L) pour les validations
            MOVE NUMCPTI   TO WS-NUMCPT
            MOVE NUMCPTL   TO WS-NUMCPTL
            MOVE CODREGI   TO WS-CODREG
+           MOVE CODREGL   TO WS-CODREGL
+           MOVE NOMI      TO WS-NOM
+           MOVE NOML      TO WS-NOML
            MOVE SEXEI     TO WS-SEXE
            MOVE SEXEL     TO WS-SEXEL
            MOVE SITSOI    TO WS-SITSO
+           MOVE SITSOL    TO WS-SITSOL
            MOVE POSITI    TO WS-POSITION
+           MOVE POSITL    TO WS-POSITL
            ...
 
       * Validation des donnees
@@ -1376,31 +1418,62 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
                GO TO 2100-FIN
            END-IF
 
-      * Controle code region (01, 02, 03 ou 04)
-           IF CODREGI NOT = '01' AND CODREGI NOT = '02'
-              AND CODREGI NOT = '03' AND CODREGI NOT = '04'
+      * Controle code region (utilise WS-CODREG sauvegardee)
+           IF WS-CODREGL = 0 OR WS-CODREG = SPACES
+               MOVE 'CODE REGION OBLIGATOIRE' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+           IF WS-CODREG NOT = '01' AND WS-CODREG NOT = '02'
+              AND WS-CODREG NOT = '03' AND WS-CODREG NOT = '04'
                MOVE 'CODE REGION INVALIDE (01/02/03/04)' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-      * Controle sexe (M ou F)
-           IF SEXEI NOT = 'M' AND SEXEI NOT = 'F'
+      * Controle nom (obligatoire)
+           IF WS-NOML = 0 OR WS-NOM = SPACES
+               MOVE 'NOM OBLIGATOIRE' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+      * Controle sexe (utilise WS-SEXE sauvegardee)
+           IF WS-SEXEL = 0 OR WS-SEXE = SPACES
+               MOVE 'SEXE OBLIGATOIRE' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+           IF WS-SEXE NOT = 'M' AND WS-SEXE NOT = 'F'
                MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-      * Controle situation sociale (C, M, D ou V)
-           IF SITSOI NOT = 'C' AND SITSOI NOT = 'M'
-              AND SITSOI NOT = 'D' AND SITSOI NOT = 'V'
+      * Controle situation sociale (utilise WS-SITSO sauvegardee)
+           IF WS-SITSOL = 0 OR WS-SITSO = SPACES
+               MOVE 'SITUATION SOCIALE OBLIGATOIRE' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+           IF WS-SITSO NOT = 'C' AND WS-SITSO NOT = 'M'
+              AND WS-SITSO NOT = 'D' AND WS-SITSO NOT = 'V'
                MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-      * Controle position (DB ou CR)
-           IF POSITI NOT = 'DB' AND POSITI NOT = 'CR'
+      * Controle position (utilise WS-POSITION sauvegardee)
+           IF WS-POSITL = 0 OR WS-POSITION = SPACES
+               MOVE 'POSITION OBLIGATOIRE' TO MSGO
+               MOVE 'O' TO WS-ERREUR
+               GO TO 2100-FIN
+           END-IF
+
+           IF WS-POSITION NOT = 'DB' AND WS-POSITION NOT = 'CR'
                MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
@@ -1410,7 +1483,7 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
            EXIT.
 
        2200-VERIFIER-DOUBLURE.
-           MOVE NUMCPTI TO CLI-NUMCPT
+           MOVE WS-NUMCPT TO CLI-NUMCPT
 
            EXEC CICS READ
                FILE('FCLIENT')
@@ -1500,15 +1573,20 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
 | Message | Contexte |
 |---------|----------|
 | AUCUNE DONNEE SAISIE | MAPFAIL - utilisateur a appuye ENTER sans rien saisir |
-| NUMERO DE COMPTE OBLIGATOIRE | Champ NUMCPT vide |
-| NUMERO DE COMPTE DOIT ETRE NUMERIQUE | Champ NUMCPT non numerique |
+| NUMERO DE COMPTE OBLIGATOIRE | Champ NUMCPT vide (longueur = 0) |
+| NUMERO DE COMPTE DOIT ETRE NUMERIQUE | Champ NUMCPT contient des caracteres non numeriques |
+| CODE REGION OBLIGATOIRE | Champ CODREG vide |
 | CODE REGION INVALIDE | Code region different de 01/02/03/04 |
+| NOM OBLIGATOIRE | Champ NOM vide |
+| SEXE OBLIGATOIRE | Champ SEXE vide |
 | SEXE INVALIDE | Sexe different de M ou F |
-| SITUATION INVALIDE | Situation different de C/M/D/V |
+| SITUATION SOCIALE OBLIGATOIRE | Champ SITSO vide |
+| SITUATION INVALIDE | Situation differente de C/M/D/V |
+| POSITION OBLIGATOIRE | Champ POSIT vide |
 | POSITION INVALIDE | Position differente de DB ou CR |
-| ENREGISTREMENT EN DOUBLE | Client avec ce numero existe deja |
-| CLIENT AJOUTE AVEC SUCCES | Ecriture reussie |
-| ERREUR ECRITURE FICHIER | Erreur VSAM autre |
+| ENREGISTREMENT EN DOUBLE | Client avec ce numero existe deja (READ a trouve un enregistrement) |
+| CLIENT AJOUTE AVEC SUCCES | WRITE VSAM reussi |
+| ERREUR ECRITURE FICHIER | Erreur VSAM inattendue (ni NORMAL ni DUPREC) |
 
 ### Difficultes rencontrees et solutions
 
@@ -1522,11 +1600,19 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
 
 ```cobol
       * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
+      * Sauvegarder aussi les champs longueur (suffixe L) pour les validations
            MOVE NUMCPTI   TO WS-NUMCPT
+           MOVE NUMCPTL   TO WS-NUMCPTL
+           MOVE CODREGI   TO WS-CODREG
+           MOVE CODREGL   TO WS-CODREGL
+           MOVE NOMI      TO WS-NOM
+           MOVE NOML      TO WS-NOML
            MOVE SEXEI     TO WS-SEXE
+           MOVE SEXEL     TO WS-SEXEL
            MOVE SITSOI    TO WS-SITSO
+           MOVE SITSOL    TO WS-SITSOL
            MOVE POSITI    TO WS-POSITION
-           ...
+           MOVE POSITL    TO WS-POSITL
 ```
 
 #### Probleme 2 : Validations ignorees - le client etait ajoute malgre les erreurs
@@ -1732,18 +1818,195 @@ Creer ou adapter la MAP precedente pour une operation de mise a jour de CLIENT d
 
 ### Mon travail
 
-La MAP de mise a jour permet de :
-1. Saisir le numero de compte (pour recherche)
-2. Afficher les donnees existantes
-3. Modifier les champs souhaites
+La MAP de mise a jour differe de celle d'ajout par la **gestion dynamique des attributs** :
 
-Le numero de compte reste en lecture seule apres l'affichage (cle non modifiable).
+1. **Phase 1 (Recherche)** : Le numero de compte est saisissable (UNPROT) pour permettre la recherche du client
+2. **Phase 2 (Affichage)** : Apres lecture du client, le numero de compte passe en lecture seule (ASKIP) car la cle d'un enregistrement VSAM ne peut pas etre modifiee
+3. **Phase 3 (Modification)** : L'utilisateur modifie les autres champs et valide
+
+Cette gestion dynamique se fait dans le programme COBOL via le **suffixe 'A'** (Attribut) du copybook genere :
+
+```cobol
+* Proteger le numero de compte apres affichage
+MOVE DFHBMASK TO NUMCPTA
+```
 
 ### Resolution
 
 **MAP BMS : CLIMAJ.bms**
 
-Similaire a la MAP d'ajout, avec gestion dynamique des attributs pour passer le numero de compte en ASKIP apres affichage.
+```
+***********************************************************************
+*  MAPSET : CLIMAJ - Mise a jour Client
+*  Transaction : MAJO
+*  Fil Rouge CICS - Exercice 9
+*
+*  PARTICULARITE MISE A JOUR :
+*  ---------------------------
+*  Le numero de compte est d'abord saisissable (recherche),
+*  puis passe en lecture seule apres affichage des donnees.
+*  Cette gestion dynamique des attributs se fait dans le programme
+*  COBOL via le suffixe 'A' (ex: NUMCPTA pour modifier l'attribut).
+***********************************************************************
+CLIMAJ   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPMAJ   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* TITRE
+*----------------------------------------------------------------------
+         DFHMDF POS=(1,25),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='*** MISE A JOUR CLIENT ***'
+         DFHMDF POS=(2,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+*----------------------------------------------------------------------
+* NUMERO DE COMPTE - CHAMP CLE
+* Commence en UNPROT pour la saisie initiale (recherche)
+* Le programme passera l'attribut a ASKIP apres affichage
+*----------------------------------------------------------------------
+         DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NUMERO COMPTE :'
+NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+         DFHMDF POS=(4,26),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='(Cle - non modifiable)'
+*----------------------------------------------------------------------
+* ZONES DE SAISIE/MODIFICATION (meme structure que CLIAJT)
+*----------------------------------------------------------------------
+         DFHMDF POS=(5,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='CODE REGION   :'
+CODREG   DFHMDF POS=(5,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+         DFHMDF POS=(5,22),LENGTH=25,ATTRB=ASKIP,                       X
+               INITIAL='(01=PAR,02=MAR,03=LYO,04=LIL)'
+*
+         DFHMDF POS=(6,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NATURE COMPTE :'
+NATCPT   DFHMDF POS=(6,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+         DFHMDF POS=(6,22),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(7,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NOM           :'
+NOM      DFHMDF POS=(7,19),LENGTH=10,ATTRB=UNPROT
+         DFHMDF POS=(7,30),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(8,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='PRENOM        :'
+PRENOM   DFHMDF POS=(8,19),LENGTH=10,ATTRB=UNPROT
+         DFHMDF POS=(8,30),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(9,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='DATE NAISSANCE:'
+DATNA    DFHMDF POS=(9,19),LENGTH=8,ATTRB=(UNPROT,NUM)
+         DFHMDF POS=(9,28),LENGTH=12,ATTRB=ASKIP,                       X
+               INITIAL='(AAAAMMJJ)'
+*
+         DFHMDF POS=(10,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='SEXE          :'
+SEXE     DFHMDF POS=(10,19),LENGTH=1,ATTRB=UNPROT
+         DFHMDF POS=(10,21),LENGTH=10,ATTRB=ASKIP,                      X
+               INITIAL='(M ou F)'
+*
+         DFHMDF POS=(11,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='ACTIVITE PRO  :'
+ACTPRO   DFHMDF POS=(11,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+         DFHMDF POS=(11,22),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(12,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='SITUATION SOC :'
+SITSO    DFHMDF POS=(12,19),LENGTH=1,ATTRB=UNPROT
+         DFHMDF POS=(12,21),LENGTH=15,ATTRB=ASKIP,                      X
+               INITIAL='(C/M/D/V)'
+*
+         DFHMDF POS=(13,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='ADRESSE       :'
+ADRESSE  DFHMDF POS=(13,19),LENGTH=10,ATTRB=UNPROT
+         DFHMDF POS=(13,30),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(14,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='SOLDE         :'
+SOLDE    DFHMDF POS=(14,19),LENGTH=10,ATTRB=(UNPROT,NUM)
+         DFHMDF POS=(14,30),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(15,2),LENGTH=16,ATTRB=ASKIP,                       X
+               INITIAL='POSITION      :'
+POSIT    DFHMDF POS=(15,19),LENGTH=2,ATTRB=UNPROT
+         DFHMDF POS=(15,22),LENGTH=12,ATTRB=ASKIP,                      X
+               INITIAL='(DB ou CR)'
+*----------------------------------------------------------------------
+* ZONE MESSAGE
+*----------------------------------------------------------------------
+         DFHMDF POS=(18,1),LENGTH=78,ATTRB=ASKIP,                       X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+         DFHMDF POS=(19,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
+MSG      DFHMDF POS=(19,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* TOUCHES FONCTION
+*----------------------------------------------------------------------
+         DFHMDF POS=(22,2),LENGTH=70,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Valider  PF3=Quitter  CLEAR=Reinitialiser'
+***********************************************************************
+         DFHMSD TYPE=FINAL
+         END
+```
+
+**JCL d'assemblage : ASMMAJ.jcl**
+
+```jcl
+//ROCHA09 JOB (ACCT),'ASSEMBL BMS CLIMAJ',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* PROJET FIL ROUGE CICS - EXERCICE 9
+//* ASSEMBLAGE DE LA MAP BMS CLIMAJ (MISE A JOUR CLIENT)
+//*
+//* Ce JCL assemble le source BMS et genere :
+//*   - Le module MAP physique dans ROCHA.CICS.LOAD
+//*   - Le copybook DSECT dans ROCHA.CICS.LINK
+//*
+//* Le copybook genere contiendra pour chaque champ :
+//*   - NOMCPTx  ou x = I (input), O (output), L (longueur), A (attr)
+//*   - Le suffixe 'A' permet de modifier l'attribut dynamiquement
+//*****************************************************************
+//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
+//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
+//*
+//* ASSEMBLAGE DE LA MAP BMS
+//*
+//ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
+//          MAPLIB='ROCHA.CICS.LOAD',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          MAPNAME='CLIMAJ',RMODE=24
+//SYSPRINT DD SYSOUT=*
+//SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLIMAJ),DISP=SHR
+/*
+//
+```
+
+### Concept cle : Attributs dynamiques BMS
+
+Le copybook genere par l'assemblage BMS contient pour chaque champ un suffixe `A` permettant de modifier l'attribut a l'execution :
+
+| Constante CICS | Valeur | Description |
+|----------------|--------|-------------|
+| DFHBMASK | X'20' | ASKIP - Protege, intensite normale |
+| DFHBMPRF | X'28' | ASKIP - Protege, brillant |
+| DFHBMUNN | X'4C' | UNPROT + NUM - Saisie numerique |
+| DFHBMUNP | X'40' | UNPROT - Saisie alphanumerique |
+
+### Definition CICS
+
+```
+CEDA DEFINE MAPSET(CLIMAJ) GROUP(CLIGROUP)
+CEDA INSTALL MAPSET(CLIMAJ) GROUP(CLIGROUP)
+```
+
+### Verification
+
+```
+CEMT INQ MAPSET(CLIMAJ)
+```
+
+Resultat attendu : `Map(CLIMAJ) Ins Ena`
 
 ### Captures d'ecran
 
