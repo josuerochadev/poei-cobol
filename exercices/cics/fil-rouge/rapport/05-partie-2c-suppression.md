@@ -323,15 +323,220 @@ Suggestions de captures d'ecran pour cet exercice :
 
 Creer le PROGRAMME pour une operation de suppression d'un CLIENT dans le Data Set CLIENT en precisant le code CLIENT. Un controle de conformite de donnee et d'existence doit etre effectue.
 
+### Mon travail
+
+J'ai developpe le programme PRGSUP qui gere la suppression de clients avec les fonctionnalites suivantes :
+
+1. **Mode pseudo-conversationnel a 2 phases** :
+   - Phase 1 (RECHERCHE) : Saisie du numero de compte
+   - Phase 2 (CONFIRMATION) : Affichage des donnees et confirmation O/N
+
+2. **Controles de conformite** :
+   - Numero de compte obligatoire et numerique
+   - Verification de l'existence du client (READ)
+   - Validation de la reponse O/N
+
+3. **Suppression avec confirmation** :
+   - Les donnees du client sont affichees avant suppression
+   - L'utilisateur confirme avec O ou annule avec N
+   - La commande DELETE supprime l'enregistrement
+
+**Commande CICS DELETE vs REWRITE :**
+
+| Aspect | DELETE | REWRITE |
+|--------|--------|---------|
+| Prerequis | Aucun | READ UPDATE obligatoire |
+| Action | Supprime l'enregistrement | Modifie l'enregistrement |
+| Erreur si inexistant | NOTFND | NOTFND |
+| Verrouillage | Non necessaire | Oui (UPDATE) |
+
+### Mode pseudo-conversationnel a 2 phases
+
+```
++------------------------+     +------------------------+
+|   PHASE 1              |     |   PHASE 2              |
+|   RECHERCHE            | --> |   CONFIRMATION         |
++------------------------+     +------------------------+
+|                        |     |                        |
+| NUMCPT: ______ [saisie]|     | NUMCPT: 100001         |
+| Autres: vides          |     | NOM: DUPONT            |
+|                        |     | ...                    |
+| Action: Saisie         |     | CONFIRM: _ [O/N]       |
+| du numero              |     |                        |
++------------------------+     | Si O: DELETE           |
+                               | Si N: Retour phase 1   |
+                               +------------------------+
+```
+
 ### Resolution
 
-**Programme : PRGSUP.cbl**
+**Programme complet : PRGSUP.cbl**
 
 ```cobol
-       2000-SUPPRIMER-CLIENT.
-           MOVE NUMCPTI TO CLI-NUMCPT
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PRGSUP.
+      ******************************************************************
+      * PROGRAMME : PRGSUP
+      * FONCTION  : Suppression d'un client existant
+      * TRANSACTION : SUPP
+      * FICHIER   : FCLIENT (VSAM KSDS)
+      * MAP       : MAPSUP (MAPSET CLISUP)
+      *
+      * MODE PSEUDO-CONVERSATIONNEL A 2 PHASES :
+      * ----------------------------------------
+      * Phase 1 (RECHERCHE) :
+      *   - Affiche ecran vide pour saisie numero compte
+      *   - NUMCPT en UNPROT (saisissable)
+      *
+      * Phase 2 (CONFIRMATION) :
+      *   - Lit le client et affiche ses donnees
+      *   - L'utilisateur confirme avec O ou annule avec N
+      *   - Si O : DELETE pour supprimer l'enregistrement
+      *   - Si N : Retour en phase recherche
+      *
+      * FIL ROUGE CICS - EXERCICE 13
+      ******************************************************************
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+      ******************************************************************
+       WORKING-STORAGE SECTION.
+      ******************************************************************
+      *-----------------------------------------------------------------
+      * ZONE DE COMMUNICATION (COMMAREA)
+      *-----------------------------------------------------------------
+       01  WS-COMMAREA.
+           05 WS-PHASE            PIC X(01) VALUE '1'.
+              88 PHASE-RECHERCHE  VALUE '1'.
+              88 PHASE-CONFIRM    VALUE '2'.
+           05 WS-NUMCPT-SAVED     PIC X(06) VALUE SPACES.
 
-      * Verification existence
+      * Copybooks CICS
+       COPY DFHAID.
+       COPY DFHBMSCA.
+       COPY CLISUP.
+
+      * Structure enregistrement client (80 octets)
+       01  ENR-CLIENT.
+           05 CLI-NUMCPT          PIC X(06).
+           05 CLI-CODREG          PIC X(02).
+           05 CLI-NATCPT          PIC X(02).
+           05 CLI-NOM             PIC X(10).
+           05 CLI-PRENOM          PIC X(10).
+           05 CLI-DATNAISS        PIC X(08).
+           05 CLI-SEXE            PIC X(01).
+           05 CLI-ACTPRO          PIC X(02).
+           05 CLI-SITSO           PIC X(01).
+           05 CLI-ADRESSE         PIC X(10).
+           05 CLI-SOLDE           PIC X(10).
+           05 CLI-POSITION        PIC X(02).
+           05 FILLER              PIC X(16).
+
+       01  WS-RESP                PIC S9(08) COMP VALUE 0.
+       01  WS-MSG-FIN             PIC X(40)
+           VALUE 'TRANSACTION SUPP TERMINEE - AU REVOIR'.
+
+       01  WS-SAISIE.
+           05 WS-NUMCPT           PIC X(06).
+           05 WS-NUMCPTL          PIC S9(04) COMP.
+           05 WS-CONFIRM          PIC X(01).
+           05 WS-CONFIRML         PIC S9(04) COMP.
+
+      ******************************************************************
+       LINKAGE SECTION.
+      ******************************************************************
+       01  DFHCOMMAREA.
+           05 LS-PHASE            PIC X(01).
+           05 LS-NUMCPT-SAVED     PIC X(06).
+
+      ******************************************************************
+       PROCEDURE DIVISION.
+      ******************************************************************
+
+       0000-PRINCIPAL.
+           EVALUATE TRUE
+               WHEN EIBCALEN = 0
+                   PERFORM 1000-INIT-RECHERCHE
+               WHEN EIBAID = DFHPF3
+                   PERFORM 9000-FIN-PROGRAMME
+               WHEN EIBAID = DFHCLEAR
+                   PERFORM 1000-INIT-RECHERCHE
+               WHEN OTHER
+                   MOVE DFHCOMMAREA TO WS-COMMAREA
+                   PERFORM 2000-TRAITEMENT THRU 2000-FIN
+           END-EVALUATE
+
+           EXEC CICS RETURN
+               TRANSID('SUPP')
+               COMMAREA(WS-COMMAREA)
+               LENGTH(LENGTH OF WS-COMMAREA)
+           END-EXEC.
+
+       1000-INIT-RECHERCHE.
+           MOVE LOW-VALUES TO MAPSUPO
+           MOVE 'SAISIR LE NUMERO DE COMPTE A SUPPRIMER' TO MSGO
+           MOVE '1' TO WS-PHASE
+           MOVE SPACES TO WS-NUMCPT-SAVED
+
+           EXEC CICS SEND MAP('MAPSUP')
+               MAPSET('CLISUP')
+               ERASE
+           END-EXEC.
+
+       2000-TRAITEMENT.
+           EVALUATE TRUE
+               WHEN PHASE-RECHERCHE
+                   PERFORM 3000-RECHERCHER-CLIENT THRU 3000-FIN
+               WHEN PHASE-CONFIRM
+                   PERFORM 4000-CONFIRMER-SUPPRESSION THRU 4000-FIN
+           END-EVALUATE.
+
+       2000-FIN.
+           EXIT.
+
+       3000-RECHERCHER-CLIENT.
+      * Reception du numero de compte
+           EXEC CICS RECEIVE MAP('MAPSUP')
+               MAPSET('CLISUP')
+               RESP(WS-RESP)
+           END-EXEC
+
+           IF WS-RESP = DFHRESP(MAPFAIL)
+               MOVE LOW-VALUES TO MAPSUPO
+               MOVE 'VEUILLEZ SAISIR UN NUMERO DE COMPTE' TO MSGO
+               EXEC CICS SEND MAP('MAPSUP')
+                   MAPSET('CLISUP')
+                   ERASE
+               END-EXEC
+               GO TO 3000-FIN
+           END-IF
+
+      * Sauvegarde et controles
+           MOVE NUMCPTI TO WS-NUMCPT
+           MOVE NUMCPTL TO WS-NUMCPTL
+
+           IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
+               MOVE LOW-VALUES TO MAPSUPO
+               MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
+               EXEC CICS SEND MAP('MAPSUP')
+                   MAPSET('CLISUP')
+                   ERASE
+               END-EXEC
+               GO TO 3000-FIN
+           END-IF
+
+           IF WS-NUMCPT NOT NUMERIC
+               MOVE LOW-VALUES TO MAPSUPO
+               MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
+               EXEC CICS SEND MAP('MAPSUP')
+                   MAPSET('CLISUP')
+                   ERASE
+               END-EXEC
+               GO TO 3000-FIN
+           END-IF
+
+      * Lecture du client pour affichage
+           MOVE WS-NUMCPT TO CLI-NUMCPT
+
            EXEC CICS READ
                FILE('FCLIENT')
                INTO(ENR-CLIENT)
@@ -340,27 +545,300 @@ Creer le PROGRAMME pour une operation de suppression d'un CLIENT dans le Data Se
            END-EXEC
 
            IF WS-RESP = DFHRESP(NOTFND)
-               MOVE 'CLIENT INEXISTANT' TO MSGO
-               EXIT PARAGRAPH
+               MOVE LOW-VALUES TO MAPSUPO
+               MOVE 'CLIENT INEXISTANT - VERIFIEZ LE NUMERO' TO MSGO
+               EXEC CICS SEND MAP('MAPSUP')
+                   MAPSET('CLISUP')
+                   ERASE
+               END-EXEC
+               GO TO 3000-FIN
            END-IF
 
-      * Suppression
+      * Client trouve - Affichage des donnees
+           PERFORM 3100-AFFICHER-CLIENT
+
+      * Passage en phase CONFIRMATION
+           MOVE '2' TO WS-PHASE
+           MOVE WS-NUMCPT TO WS-NUMCPT-SAVED.
+
+       3000-FIN.
+           EXIT.
+
+       3100-AFFICHER-CLIENT.
+      * Transfert des donnees vers la MAP
+           MOVE LOW-VALUES TO MAPSUPO
+           MOVE CLI-NUMCPT   TO NUMCPTO
+           MOVE CLI-CODREG   TO CODREGO
+           MOVE CLI-NATCPT   TO NATCPTO
+           MOVE CLI-NOM      TO NOMO
+           MOVE CLI-PRENOM   TO PRENOMO
+           MOVE CLI-DATNAISS TO DATNAO
+           MOVE CLI-SEXE     TO SEXEO
+           MOVE CLI-ACTPRO   TO ACTPROO
+           MOVE CLI-SITSO    TO SITSOO
+           MOVE CLI-ADRESSE  TO ADRESSEO
+           MOVE CLI-SOLDE    TO SOLDEO
+           MOVE CLI-POSITION TO POSITO
+
+      * Libelles (region, sexe, situation, position)
+           EVALUATE CLI-CODREG
+               WHEN '01' MOVE 'PARIS' TO LIBREGO
+               WHEN '02' MOVE 'MARSEILLE' TO LIBREGO
+               WHEN '03' MOVE 'LYON' TO LIBREGO
+               WHEN '04' MOVE 'LILLE' TO LIBREGO
+               WHEN OTHER MOVE 'INCONNU' TO LIBREGO
+           END-EVALUATE
+
+           EVALUATE CLI-SEXE
+               WHEN 'M' MOVE 'MASCULIN' TO LIBSEXO
+               WHEN 'F' MOVE 'FEMININ' TO LIBSEXO
+               WHEN OTHER MOVE 'INCONNU' TO LIBSEXO
+           END-EVALUATE
+
+           EVALUATE CLI-SITSO
+               WHEN 'C' MOVE 'CELIBATAIRE' TO LIBSITO
+               WHEN 'M' MOVE 'MARIE(E)' TO LIBSITO
+               WHEN 'D' MOVE 'DIVORCE(E)' TO LIBSITO
+               WHEN 'V' MOVE 'VEUF(VE)' TO LIBSITO
+               WHEN OTHER MOVE 'INCONNU' TO LIBSITO
+           END-EVALUATE
+
+           EVALUATE CLI-POSITION
+               WHEN 'CR' MOVE 'CREDITEUR' TO LIBPOSO
+               WHEN 'DB' MOVE 'DEBITEUR' TO LIBPOSO
+               WHEN OTHER MOVE 'INCONNU' TO LIBPOSO
+           END-EVALUATE
+
+      * Proteger le numero de compte
+           MOVE DFHBMASK TO NUMCPTA
+
+           MOVE 'CLIENT TROUVE - CONFIRMER SUPPRESSION (O/N) ?' TO MSGO
+
+           EXEC CICS SEND MAP('MAPSUP')
+               MAPSET('CLISUP')
+               ERASE
+           END-EXEC.
+
+       4000-CONFIRMER-SUPPRESSION.
+      * Reception de la confirmation
+           EXEC CICS RECEIVE MAP('MAPSUP')
+               MAPSET('CLISUP')
+               RESP(WS-RESP)
+           END-EXEC
+
+           IF WS-RESP = DFHRESP(MAPFAIL)
+               MOVE LOW-VALUES TO MAPSUPO
+               MOVE WS-NUMCPT-SAVED TO NUMCPTO
+               MOVE DFHBMASK TO NUMCPTA
+               MOVE 'VEUILLEZ REPONDRE O OU N' TO MSGO
+               EXEC CICS SEND MAP('MAPSUP')
+                   MAPSET('CLISUP')
+                   ERASE
+               END-EXEC
+               GO TO 4000-FIN
+           END-IF
+
+      * Validation de la reponse
+           MOVE CONFIRMI TO WS-CONFIRM
+
+           IF WS-CONFIRM NOT = 'O' AND WS-CONFIRM NOT = 'N'
+              AND WS-CONFIRM NOT = 'o' AND WS-CONFIRM NOT = 'n'
+               MOVE LOW-VALUES TO MAPSUPO
+               MOVE WS-NUMCPT-SAVED TO NUMCPTO
+               MOVE DFHBMASK TO NUMCPTA
+               MOVE 'REPONSE INVALIDE - SAISIR O OU N' TO MSGO
+               EXEC CICS SEND MAP('MAPSUP')
+                   MAPSET('CLISUP')
+                   ERASE
+               END-EXEC
+               GO TO 4000-FIN
+           END-IF
+
+      * Si N : Annulation
+           IF WS-CONFIRM = 'N' OR WS-CONFIRM = 'n'
+               MOVE LOW-VALUES TO MAPSUPO
+               MOVE 'SUPPRESSION ANNULEE - NOUVEAU NUMERO OU PF3' TO MSGO
+               MOVE '1' TO WS-PHASE
+               MOVE SPACES TO WS-NUMCPT-SAVED
+               EXEC CICS SEND MAP('MAPSUP')
+                   MAPSET('CLISUP')
+                   ERASE
+               END-EXEC
+               GO TO 4000-FIN
+           END-IF
+
+      * Si O : Suppression
+           PERFORM 4100-SUPPRIMER-CLIENT THRU 4100-FIN.
+
+       4000-FIN.
+           EXIT.
+
+       4100-SUPPRIMER-CLIENT.
+      * DELETE ne necessite PAS de READ UPDATE prealable
+           MOVE WS-NUMCPT-SAVED TO CLI-NUMCPT
+
            EXEC CICS DELETE
                FILE('FCLIENT')
                RIDFLD(CLI-NUMCPT)
                RESP(WS-RESP)
            END-EXEC
 
-           IF WS-RESP = DFHRESP(NORMAL)
-               MOVE 'SUPPRESSION EFFECTUEE' TO MSGO
-           ELSE
-               MOVE 'ERREUR SUPPRESSION' TO MSGO
-           END-IF.
+           EVALUATE WS-RESP
+               WHEN DFHRESP(NORMAL)
+                   MOVE LOW-VALUES TO MAPSUPO
+                   MOVE 'CLIENT SUPPRIME - NOUVEAU NUMERO OU PF3' TO MSGO
+                   MOVE '1' TO WS-PHASE
+                   MOVE SPACES TO WS-NUMCPT-SAVED
+               WHEN DFHRESP(NOTFND)
+                   MOVE LOW-VALUES TO MAPSUPO
+                   MOVE 'ERREUR : CLIENT DEJA SUPPRIME' TO MSGO
+                   MOVE '1' TO WS-PHASE
+               WHEN OTHER
+                   MOVE LOW-VALUES TO MAPSUPO
+                   MOVE 'ERREUR SUPPRESSION - CONTACTEZ SUPPORT' TO MSGO
+           END-EVALUATE
+
+           EXEC CICS SEND MAP('MAPSUP')
+               MAPSET('CLISUP')
+               ERASE
+           END-EXEC.
+
+       4100-FIN.
+           EXIT.
+
+       9000-FIN-PROGRAMME.
+           EXEC CICS SEND TEXT
+               FROM(WS-MSG-FIN)
+               LENGTH(40)
+               ERASE
+           END-EXEC
+
+           EXEC CICS RETURN
+           END-EXEC.
 ```
+
+**JCL de compilation : CMPSUP.jcl**
+
+```jcl
+//ROCHA13 JOB (ACCT),'COMPILE PRGSUP',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* PROJET FIL ROUGE CICS - EXERCICE 13
+//* COMPILATION DU PROGRAMME COBOL-CICS PRGSUP (SUPPRESSION CLIENT)
+//*
+//* Prerequis :
+//*   - Source COBOL copie dans ROCHA.CICS.SOURCE(PRGSUP)
+//*   - Copybook BMS dans ROCHA.CICS.LINK(CLISUP)
+//*   - MAP assemblee dans ROCHA.CICS.LOAD(CLISUP)
+//*****************************************************************
+//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
+//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
+//*
+//COMPIL   EXEC PROC=DFHYITVL,
+//          INDEX='DFH510.CICS',
+//          PROGLIB='ROCHA.CICS.LOAD',
+//          AD370HLQ='IGY420',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          LE370HLQ='CEE'
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGSUP),DISP=SHR
+//LKED.SYSIN DD *
+     INCLUDE SYSLIB(DFHELII)
+     NAME PRGSUP(R)
+/*
+//
+```
+
+### Structure du programme
+
+| Paragraphe | Fonction |
+|------------|----------|
+| 0000-PRINCIPAL | Point d'entree, aiguillage pseudo-conversationnel |
+| 1000-INIT-RECHERCHE | Affichage ecran vide |
+| 2000-TRAITEMENT | Aiguillage selon la phase |
+| 3000-RECHERCHER-CLIENT | Phase 1 : Saisie et lecture du client |
+| 3100-AFFICHER-CLIENT | Affichage des donnees avec libelles |
+| 4000-CONFIRMER-SUPPRESSION | Phase 2 : Reception confirmation O/N |
+| 4100-SUPPRIMER-CLIENT | Execution de la commande DELETE |
+| 9000-FIN-PROGRAMME | Fin de transaction (PF3) |
+
+### Commandes CICS utilisees
+
+| Commande | Usage |
+|----------|-------|
+| SEND MAP | Envoyer l'ecran (avec ERASE) |
+| RECEIVE MAP | Recevoir la saisie avec RESP pour MAPFAIL |
+| READ FILE | Verifier existence et afficher les donnees |
+| DELETE FILE | Supprimer l'enregistrement (sans READ UPDATE) |
+| RETURN TRANSID | Retour pseudo-conversationnel |
+
+### Messages geres
+
+| Message | Contexte |
+|---------|----------|
+| VEUILLEZ SAISIR UN NUMERO DE COMPTE | MAPFAIL ou champ vide |
+| NUMERO DE COMPTE OBLIGATOIRE | Longueur = 0 |
+| NUMERO DE COMPTE DOIT ETRE NUMERIQUE | Caracteres non numeriques |
+| CLIENT INEXISTANT | READ retourne NOTFND |
+| CLIENT TROUVE - CONFIRMER (O/N) ? | Client affiche, attente confirmation |
+| REPONSE INVALIDE - SAISIR O OU N | Confirmation differente de O/N |
+| SUPPRESSION ANNULEE | Utilisateur a saisi N |
+| CLIENT SUPPRIME | DELETE reussi |
+| ERREUR : CLIENT DEJA SUPPRIME | DELETE retourne NOTFND |
+| ERREUR SUPPRESSION | Autre erreur DELETE |
+
+### Definition CICS
+
+```
+CEDA DEFINE PROGRAM(PRGSUP) GROUP(CLIGROUP) LANGUAGE(COBOL)
+CEDA INSTALL PROGRAM(PRGSUP) GROUP(CLIGROUP)
+```
+
+### Verification
+
+```
+CEMT INQ PROGRAM(PRGSUP)
+```
+
+Resultat attendu : `Prog(PRGSUP) Cob Ena`
+
+### Utilisation
+
+#### 1. Copier le source COBOL dans la library
+
+```
+ISPF 3.4 > ROCHA.CICS.SOURCE
+Edit member PRGSUP
+Copier le contenu de PRGSUP.cbl
+```
+
+#### 2. Soumettre le JCL de compilation
+
+```
+ISPF 3.4 > ROCHA.CICS.JCL (ou ROCHA.CICS.SOURCE)
+Edit member CMPSUP (copier CMPSUP.jcl)
+SUB (submit)
+```
+
+#### 3. Verifier le resultat
+
+- RC=0000 dans SDSF
+- Membre PRGSUP present dans ROCHA.CICS.LOAD
 
 ### Captures d'ecran
 
-<!-- ![pt2ex13-1](images-pt2/pt2ex13-1.png) -->
+<!--
+Suggestions de captures d'ecran pour cet exercice :
+
+1. pt2ex13-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGSUP)
+2. pt2ex13-2 : Soumission JCL CMPSUP - compilation du programme
+3. pt2ex13-3 : SDSF - Job output avec RC=0000
+4. pt2ex13-4 : CEDA DEFINE PROGRAM(PRGSUP)
+5. pt2ex13-5 : CEMT INQ PROGRAM(PRGSUP) - verification
+6. pt2ex13-6 : Ecran MAPSUP - saisie du numero a supprimer
+7. pt2ex13-7 : Affichage client avec demande confirmation
+8. pt2ex13-8 : Message "CLIENT SUPPRIME" apres confirmation O
+9. pt2ex13-9 : Message "SUPPRESSION ANNULEE" apres confirmation N
+-->
 
 ---
 
