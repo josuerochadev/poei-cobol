@@ -79,3 +79,42 @@ SUB (submit)
 | 2300-PREPARER-ENREGISTREMENT | Transfert MAP vers ENR |
 | 2400-ECRIRE-CLIENT | WRITE VSAM |
 | 9000-FIN-PROGRAMME | Message fin et RETURN |
+
+## Points techniques importants
+
+### 1. Sauvegarde des donnees MAP (MODE=INOUT)
+
+Avec `MODE=INOUT` et `STORAGE=AUTO` dans BMS, les zones input (I) et output (O) partagent la meme memoire. Il faut sauvegarder les donnees dans des variables WS- apres le `RECEIVE MAP` :
+
+```cobol
+      * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
+           MOVE NUMCPTI   TO WS-NUMCPT
+           MOVE SEXEI     TO WS-SEXE
+           MOVE POSITI    TO WS-POSITION
+```
+
+### 2. PERFORM THRU pour les GO TO
+
+Quand un paragraphe utilise `GO TO paragraphe-FIN`, il faut inclure le paragraphe FIN dans la plage du PERFORM avec `THRU` :
+
+```cobol
+           PERFORM 2000-TRAITEMENT THRU 2000-FIN
+           PERFORM 2100-VALIDER-DONNEES THRU 2100-FIN
+           PERFORM 2200-VERIFIER-DOUBLURE THRU 2200-FIN
+```
+
+Sans `THRU`, le `GO TO` sort du PERFORM et le programme continue sequentiellement au lieu de retourner a l'appelant.
+
+### 3. ERASE sur les SEND MAP d'erreur
+
+Pour que le message d'erreur s'affiche correctement, ajouter `ERASE` au SEND MAP :
+
+```cobol
+           IF ERREUR-DETECTEE
+               EXEC CICS SEND MAP('MAPAJT')
+                   MAPSET('CLIAJT')
+                   ERASE
+               END-EXEC
+               GO TO 2000-FIN
+           END-IF
+```

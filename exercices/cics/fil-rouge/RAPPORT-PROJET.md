@@ -1291,7 +1291,7 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
                WHEN EIBAID = DFHCLEAR
                    PERFORM 1000-PREMIER-PASSAGE
                WHEN OTHER
-                   PERFORM 2000-TRAITEMENT
+                   PERFORM 2000-TRAITEMENT THRU 2000-FIN
            END-EVALUATE
 
            EXEC CICS RETURN
@@ -1319,20 +1319,32 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
                GO TO 2000-FIN
            END-IF
 
+      * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
+           MOVE NUMCPTI   TO WS-NUMCPT
+           MOVE NUMCPTL   TO WS-NUMCPTL
+           MOVE CODREGI   TO WS-CODREG
+           MOVE SEXEI     TO WS-SEXE
+           MOVE SEXEL     TO WS-SEXEL
+           MOVE SITSOI    TO WS-SITSO
+           MOVE POSITI    TO WS-POSITION
+           ...
+
       * Validation des donnees
-           PERFORM 2100-VALIDER-DONNEES
-           IF WS-ERREUR = 'O'
+           PERFORM 2100-VALIDER-DONNEES THRU 2100-FIN
+           IF ERREUR-DETECTEE
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
+                   ERASE
                END-EXEC
                GO TO 2000-FIN
            END-IF
 
       * Verification doublure (client existe deja ?)
-           PERFORM 2200-VERIFIER-DOUBLURE
-           IF WS-ERREUR = 'O'
+           PERFORM 2200-VERIFIER-DOUBLURE THRU 2200-FIN
+           IF ERREUR-DETECTEE
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
+                   ERASE
                END-EXEC
                GO TO 2000-FIN
            END-IF
@@ -1351,14 +1363,14 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
        2100-VALIDER-DONNEES.
            MOVE LOW-VALUES TO MAPAJTO
 
-      * Controle numero de compte (obligatoire et numerique)
-           IF NUMCPTL = 0 OR NUMCPTI = SPACES
+      * Controle numero de compte (utilise variables WS- sauvegardees)
+           IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
                MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-           IF NUMCPTI NOT NUMERIC
+           IF WS-NUMCPT NOT NUMERIC
                MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
@@ -1497,6 +1509,73 @@ Le code source est stocke dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits p
 | ENREGISTREMENT EN DOUBLE | Client avec ce numero existe deja |
 | CLIENT AJOUTE AVEC SUCCES | Ecriture reussie |
 | ERREUR ECRITURE FICHIER | Erreur VSAM autre |
+
+### Difficultes rencontrees et solutions
+
+#### Probleme 1 : Ecrasement des donnees saisies par LOW-VALUES
+
+**Symptome** : Apres le `RECEIVE MAP`, les donnees saisies etaient perdues lors du `MOVE LOW-VALUES TO MAPAJTO` dans le paragraphe de validation.
+
+**Cause** : Avec `MODE=INOUT` et `STORAGE=AUTO` dans la definition BMS, les zones input (suffixe I) et output (suffixe O) partagent la meme zone memoire. Le `MOVE LOW-VALUES TO MAPAJTO` ecrasait donc les donnees recues.
+
+**Solution** : Sauvegarder les donnees saisies dans des variables Working-Storage (prefixe WS-) immediatement apres le `RECEIVE MAP`, avant tout `MOVE LOW-VALUES`.
+
+```cobol
+      * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
+           MOVE NUMCPTI   TO WS-NUMCPT
+           MOVE SEXEI     TO WS-SEXE
+           MOVE SITSOI    TO WS-SITSO
+           MOVE POSITI    TO WS-POSITION
+           ...
+```
+
+#### Probleme 2 : Validations ignorees - le client etait ajoute malgre les erreurs
+
+**Symptome** : Meme avec des donnees invalides (sexe = 'X'), le client etait ajoute dans le fichier. Les messages d'erreur s'affichaient dans CEDF mais le programme continuait jusqu'au WRITE.
+
+**Cause** : Le `GO TO paragraphe-FIN` dans les validations sortait de la plage du `PERFORM`, ce qui faisait continuer le programme sequentiellement vers les paragraphes suivants (2200, 2300, 2400...) au lieu de retourner a l'appelant.
+
+En COBOL, quand on fait :
+```cobol
+       PERFORM 2100-VALIDER-DONNEES
+```
+
+Et dans 2100-VALIDER-DONNEES on fait :
+```cobol
+       GO TO 2100-FIN
+```
+
+Le `GO TO` sort du PERFORM car `2100-FIN` est un paragraphe separe. Le programme continue alors sequentiellement apres 2100-FIN.
+
+**Solution** : Utiliser la clause `THRU` pour inclure le paragraphe FIN dans la plage du PERFORM :
+
+```cobol
+       PERFORM 2000-TRAITEMENT THRU 2000-FIN
+       ...
+       PERFORM 2100-VALIDER-DONNEES THRU 2100-FIN
+       ...
+       PERFORM 2200-VERIFIER-DOUBLURE THRU 2200-FIN
+```
+
+Avec `THRU`, le `GO TO 2100-FIN` reste dans la plage du PERFORM, et apres le `EXIT` de 2100-FIN, le controle retourne correctement a l'appelant.
+
+#### Probleme 3 : Message d'erreur non visible sans CEDF
+
+**Symptome** : Le message d'erreur de validation s'affichait dans CEDF mais pas sur l'ecran normal.
+
+**Cause** : Le `SEND MAP` apres detection d'erreur n'avait pas l'option `ERASE`, donc l'ecran precedent restait visible.
+
+**Solution** : Ajouter `ERASE` au `SEND MAP` d'erreur :
+
+```cobol
+           IF ERREUR-DETECTEE
+               EXEC CICS SEND MAP('MAPAJT')
+                   MAPSET('CLIAJT')
+                   ERASE
+               END-EXEC
+               GO TO 2000-FIN
+           END-IF
+```
 
 ### Captures d'ecran
 
