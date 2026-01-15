@@ -113,7 +113,7 @@
                WHEN EIBAID = DFHCLEAR
                    PERFORM 1000-PREMIER-PASSAGE
                WHEN OTHER
-                   PERFORM 2000-TRAITEMENT
+                   PERFORM 2000-TRAITEMENT THRU 2000-FIN
            END-EVALUATE
 
            EXEC CICS RETURN
@@ -181,34 +181,22 @@
            MOVE POSITL    TO WS-POSITL
 
       * Validation des donnees
-           PERFORM 2100-VALIDER-DONNEES
-
-      **** DEBUG - VOIR VALEUR WS-ERREUR ****
-           STRING 'WS-ERREUR=[' DELIMITED SIZE
-                  WS-ERREUR DELIMITED SIZE
-                  '] MSG=[' DELIMITED SIZE
-                  MSGO DELIMITED SIZE
-                  ']' DELIMITED SIZE
-                  INTO MSGO
-           EXEC CICS SEND MAP('MAPAJT')
-               MAPSET('CLIAJT')
-               ERASE
-           END-EXEC
-           EXEC CICS RETURN END-EXEC
-      **** FIN DEBUG ****
+           PERFORM 2100-VALIDER-DONNEES THRU 2100-FIN
 
            IF ERREUR-DETECTEE
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
+                   ERASE
                END-EXEC
                GO TO 2000-FIN
            END-IF
 
       * Verification doublure (client existe deja ?)
-           PERFORM 2200-VERIFIER-DOUBLURE
+           PERFORM 2200-VERIFIER-DOUBLURE THRU 2200-FIN
            IF ERREUR-DETECTEE
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
+                   ERASE
                END-EXEC
                GO TO 2000-FIN
            END-IF
@@ -392,4 +380,3 @@
 
            EXEC CICS RETURN
            END-EXEC.
-
