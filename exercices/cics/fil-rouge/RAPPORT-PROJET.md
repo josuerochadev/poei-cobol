@@ -2435,14 +2435,55 @@ Resultat attendu : `Prog(PRGMAJ) Cob Ena`
 
 ## Exercice 11 : Transaction de mise a jour
 
+### Enonce
+
+Definir une transaction independante de la precedente pour appeler le programme de mise a jour.
+
+### Mon travail
+
+La transaction MAJO est le point d'entree utilisateur pour la mise a jour. Elle associe :
+- Le code transaction `MAJO` (saisi par l'utilisateur)
+- Le programme `PRGMAJ` (execute automatiquement)
+
 ### Resolution
 
-```
-CEDA DEFINE TRANSACTION(MAJO) GROUP(CLIGROUP)
-     PROGRAM(PRGMAJ)
+**Definition de la transaction :**
 
+```
+CEDA DEFINE TRANSACTION(MAJO) GROUP(CLIGROUP) PROGRAM(PRGMAJ)
+```
+
+| Parametre | Valeur | Description |
+|-----------|--------|-------------|
+| TRANSACTION | MAJO | Code transaction (4 caracteres max) |
+| GROUP | CLIGROUP | Groupe de ressources du projet |
+| PROGRAM | PRGMAJ | Programme COBOL a executer |
+
+**Installation du groupe :**
+
+```
 CEDA INSTALL GROUP(CLIGROUP)
 ```
+
+### Verification
+
+```
+CEDA VIEW TRANSACTION(MAJO) GROUP(CLIGROUP)
+CEMT INQ PROGRAM(PRGMAJ)
+```
+
+### Test
+
+```
+MAJO
+```
+
+Comportement attendu :
+1. Ecran de saisie du numero de compte
+2. Saisir un numero existant (ex: 100001)
+3. Affichage des donnees du client (NUMCPT protege)
+4. Modifier les champs souhaites
+5. ENTER pour valider -> Message "MISE A JOUR EFFECTUEE"
 
 ### Captures d'ecran
 
