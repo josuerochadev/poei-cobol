@@ -1,31 +1,31 @@
-# Partie 0 : Preparation de l'environnement
+# Partie 0 : Préparation de l'environnement
 
 [< Introduction](00-introduction.md) | [Partie 1 : Affichage >](02-partie-1-affichage.md)
 
 ---
 
-## Exercice 0 : Creation des Libraries
+## Exercice 0 : Création des Libraries
 
-### Enonce
+### Énoncé
 
-Ce travail necessite la creation de trois Library pour stocker les membres a creer au cours de sa realisation. Les Library a definir doivent porter le nom sous la forme suivante :
+Ce travail nécessite la création de trois Library pour stocker les membres à créer au cours de sa réalisation. Les Library à définir doivent porter le nom sous la forme suivante :
 - **ROCHA.CICS.SOURCE** : Programmes COBOL et JCL
-- **ROCHA.CICS.LINK** : Programmes objets (apres compilation)
-- **ROCHA.CICS.LOAD** : Programmes executables (apres link-edit)
+- **ROCHA.CICS.LINK** : Programmes objets (après compilation)
+- **ROCHA.CICS.LOAD** : Programmes exécutables (après link-edit)
 
 ### Mon travail
 
-Avant de commencer le developpement des programmes CICS, j'ai cree les trois libraries necessaires via ISPF option 3.2 (Data Set Utility). Ces libraries sont des PDS (Partitioned Data Sets) qui contiendront tous les membres du projet.
+Avant de commencer le développement des programmes CICS, j'ai créé les trois libraries nécessaires via ISPF option 3.2 (Data Set Utility). Ces libraries sont des PDS (Partitioned Data Sets) qui contiendront tous les membres du projet.
 
-**Choix des caracteristiques :**
+**Choix des caractéristiques :**
 - **Organisation** : PO (Partitioned Organization) pour stocker plusieurs membres
 - **Format d'enregistrement** : FB (Fixed Block) avec LRECL=80 pour les sources
 - **Taille** : 10 tracks primaires, 5 secondaires (suffisant pour le projet)
 - **Directory blocks** : 10 blocs pour l'index des membres
 
-### Resolution
+### Résolution
 
-**Methode 1 : Via ISPF 3.2 (Data Set Utility)**
+**Méthode 1 : Via ISPF 3.2 (Data Set Utility)**
 
 ```
 Option ===> 3.2
@@ -52,9 +52,9 @@ Allocation Parameters:
   Data set name type  . PDS
 ```
 
-Repeter l'operation pour `ROCHA.CICS.LINK` et `ROCHA.CICS.LOAD`.
+Répéter l'opération pour `ROCHA.CICS.LINK` et `ROCHA.CICS.LOAD`.
 
-**Methode 2 : Via JCL (IEFBR14)**
+**Méthode 2 : Via JCL (IEFBR14)**
 
 ```jcl
 //CREATLIB JOB (ACCT),'CREATE LIBRARIES',CLASS=A,MSGCLASS=X
@@ -86,9 +86,9 @@ Repeter l'operation pour `ROCHA.CICS.LINK` et `ROCHA.CICS.LOAD`.
 //            UNIT=SYSDA
 ```
 
-> **Note** : La library LOAD utilise RECFM=U (Undefined) car elle contient des modules executables (load modules) et non du texte source.
+> **Note** : La library LOAD utilise RECFM=U (Undefined) car elle contient des modules exécutables (load modules) et non du texte source.
 
-**Verification des libraries creees :**
+**Vérification des libraries créées :**
 
 ```
 Option ===> 3.4
@@ -107,12 +107,12 @@ Command - Enter "/" to select action
 | Library | Contenu | RECFM | LRECL |
 |---------|---------|-------|-------|
 | ROCHA.CICS.SOURCE | Programmes COBOL (.cbl), MAPs BMS (.bms), JCL, Copybooks | FB | 80 |
-| ROCHA.CICS.LINK | Modules objets apres compilation | FB | 80 |
-| ROCHA.CICS.LOAD | Modules executables (load modules) | U | - |
+| ROCHA.CICS.LINK | Modules objets après compilation | FB | 80 |
+| ROCHA.CICS.LOAD | Modules exécutables (load modules) | U | - |
 
-### Membres crees dans SOURCE
+### Membres créés dans SOURCE
 
-Au cours du projet, les membres suivants ont ete crees dans `ROCHA.CICS.SOURCE` :
+Au cours du projet, les membres suivants ont été créés dans `ROCHA.CICS.SOURCE` :
 
 **Programmes COBOL :**
 
@@ -120,37 +120,41 @@ Au cours du projet, les membres suivants ont ete crees dans `ROCHA.CICS.SOURCE` 
 |--------|-------------|-------------|
 | PRGCLIA | AFFI | Affichage client (READ) |
 | PRGAJT | AJOU | Ajout client (WRITE) |
-| PRGMAJ | MAJO | Mise a jour client (REWRITE) |
+| PRGMAJ | MAJO | Mise à jour client (REWRITE) |
 | PRGSUP | SUPP | Suppression client (DELETE) |
-| PRGLGEN | LGEN | Liste generique (STARTBR/READNEXT) |
-| PRGSTAT | STAT | Statistiques par region |
+| PRGLGEN | LGEN | Liste générique (STARTBR/READNEXT) |
+| PRGSTAT | STAT | Statistiques par région |
 
 **MAPs BMS :**
 
 | Membre | Programme | Description |
 |--------|-----------|-------------|
-| CLIAFF | PRGCLIA | Ecran affichage client |
-| CLIAJT | PRGAJT | Ecran ajout client |
-| CLIMAJ | PRGMAJ | Ecran mise a jour client |
-| CLISUP | PRGSUP | Ecran suppression client |
-| CLISTAT | PRGSTAT | Ecran statistiques |
+| CLIAFF | PRGCLIA | Écran affichage client |
+| CLIAJT | PRGAJT | Écran ajout client |
+| CLIMAJ | PRGMAJ | Écran mise à jour client |
+| CLISUP | PRGSUP | Écran suppression client |
+| CLISTAT | PRGSTAT | Écran statistiques |
 
 **JCL :**
 
 | Membre | Usage | Exercice |
 |--------|-------|----------|
-| DEFVSAM | Definition cluster VSAM | Ex 1 |
-| LOADVSAM | Chargement donnees initiales | Ex 1 |
+| DEFVSAM | Définition cluster VSAM | Ex 1 |
+| LOADVSAM | Chargement données initiales | Ex 1 |
 | ASMCLAF | Assemblage MAP CLIAFF | Ex 2 |
 | CMPCLAF | Compilation PRGCLIA | Ex 3 |
 | ASMAJT | Assemblage MAP CLIAJT | Ex 6 |
 | CMPAJT | Compilation PRGAJT | Ex 7 |
+| ASMMAJ | Assemblage MAP CLIMAJ | Ex 9 |
+| CMPMAJ | Compilation PRGMAJ | Ex 10 |
+| ASMSUP | Assemblage MAP CLISUP | Ex 12 |
+| CMPSUP | Compilation PRGSUP | Ex 13 |
 
-> **Note sur les copybooks** : Les copybooks pour les MAPs BMS sont generes automatiquement lors de l'assemblage avec l'option `TYPE=DSECT`. Ils contiennent les structures de donnees avec les suffixes :
-> - `I` : Zone input (donnees recues de l'ecran)
-> - `O` : Zone output (donnees a envoyer)
+> **Note sur les copybooks** : Les copybooks pour les MAPs BMS sont générés automatiquement lors de l'assemblage avec l'option `TYPE=DSECT`. Ils contiennent les structures de données avec les suffixes :
+> - `I` : Zone input (données reçues de l'écran)
+> - `O` : Zone output (données à envoyer)
 > - `L` : Longueur du champ saisi
-> - `A` : Attribut du champ (couleur, intensite, etc.)
+> - `A` : Attribut du champ (couleur, intensité, etc.)
 
 ---
 

@@ -1,69 +1,114 @@
 # Rapport de Projet - Mini-Projet CICS-VSAM
 
-**Theme** : Developpement d'un mini-projet COBOL-CICS sous z/OS pour l'alimentation du Data Set CLIENT d'une institution financiere.
+---
 
-**Candidat** : Josue ROCHA
-**Date** : 19 Decembre 2025 - 22 Janvier 2026
-**Formation** : POEI Developpeur Mainframe COBOL - M2i Formation, Strasbourg
+## Identification
+
+| | |
+|---|---|
+| **Candidat** | Josué ROCHA |
+| **Formation** | POEI Développeur Mainframe COBOL |
+| **Organisme** | M2i Formation, Strasbourg |
+| **Période** | 19 Décembre 2025 - 22 Janvier 2026 |
+
+---
+
+## Thème
+
+Développement d'un mini-projet COBOL-CICS sous z/OS pour l'alimentation du Data Set CLIENT d'une institution financière.
 
 ---
 
 ## Introduction
 
-Ce projet a ete realise dans le cadre de la formation POEI Developpeur Mainframe COBOL. L'objectif est de mettre en pratique les competences acquises en programmation COBOL-CICS et en gestion de fichiers VSAM en mode transactionnel.
+Ce projet a été réalisé dans le cadre de la formation POEI Développeur Mainframe COBOL. L'objectif est de mettre en pratique les compétences acquises en programmation COBOL-CICS et en gestion de fichiers VSAM en mode transactionnel.
 
-Le projet consiste a developper un systeme de gestion de clientele pour une institution financiere, permettant :
+Le projet consiste à développer un système de gestion de clientèle pour une institution financière, permettant :
 - La consultation des informations client
 - L'ajout de nouveaux clients
-- La modification des donnees existantes
+- La modification des données existantes
 - La suppression de clients
-- La navigation et les statistiques par region
+- La navigation et les statistiques par région
 
 ---
 
 ## Environnement de travail
 
-| Element | Description |
-|---------|-------------|
-| **Systeme** | z/OS sous emulateur Hercules (TK4-) |
-| **Interface** | TSO/ISPF, CICS |
-| **Fichiers** | VSAM KSDS |
-| **Langage** | COBOL avec commandes CICS |
+### Système et interface
 
-**Libraries utilisees** :
+| Élément | Description |
+|---------|-------------|
+| **Système d'exploitation** | z/OS sous émulateur Hercules (TK4-) |
+| **Interface utilisateur** | TSO/ISPF pour le développement, CICS pour l'exécution |
+| **Gestionnaire transactionnel** | CICS Transaction Server |
+| **Type de fichier** | VSAM KSDS (Key-Sequenced Data Set) |
+
+### Langages et technologies
+
+| Langage/Technologie | Usage |
+|---------------------|-------|
+| **COBOL** | Programmation des traitements métier |
+| **CICS (commandes)** | Gestion transactionnelle (SEND, RECEIVE, READ, WRITE, etc.) |
+| **BMS (Assembleur)** | Définition des écrans (MAPs) |
+| **JCL** | Compilation des programmes et assemblage des MAPs |
+| **VSAM** | Stockage et accès aux données |
+
+### Libraries utilisées
 
 | Library | Contenu |
 |---------|---------|
-| `ROCHA.CICS.SOURCE` | Programmes COBOL, MAPs BMS, JCL |
-| `ROCHA.CICS.LINK` | Programmes objets (copybooks) |
-| `ROCHA.CICS.LOAD` | Programmes executables |
+| `ROCHA.CICS.SOURCE` | Sources COBOL, MAPs BMS, JCL de compilation |
+| `ROCHA.CICS.LINK` | Copybooks générés (DSECT des MAPs) |
+| `ROCHA.CICS.LOAD` | Modules exécutables (programmes et MAPs) |
 
 ---
 
-## Demarche suivie
+## Organisation du rapport
 
-Le projet est organise en 3 parties et 19 exercices :
+> **Note** : Le document fourni présente les exercices de manière linéaire (exercices 1 à 19). J'ai choisi d'organiser ce rapport en parties thématiques pour une meilleure lisibilité et compréhension de la progression pédagogique.
+
+Le projet est organisé en **4 parties** regroupant **19 exercices** :
 
 ```
-Partie 0 : Preparation
-    └── Creation des libraries
+Partie 0 : Préparation
+    └── Exercice 0 : Création des libraries CICS
 
 Partie 1 : Affichage (READ)
-    ├── Definition VSAM et integration CICS
-    ├── MAP BMS d'affichage
-    ├── Programme COBOL-CICS
-    ├── Transaction CEDA
-    └── Tests CEDF
+    ├── Exercice 1 : Définition VSAM et intégration CICS
+    ├── Exercice 2 : MAP BMS d'affichage
+    ├── Exercice 3 : Programme COBOL-CICS (READ)
+    ├── Exercice 4 : Définition de la transaction
+    └── Exercice 5 : Tests et débogage (CEDF)
 
-Partie 2 : Operations CRUD
-    ├── 2a : Ajout (WRITE)
-    ├── 2b : Mise a jour (REWRITE)
-    └── 2c : Suppression (DELETE)
+Partie 2 : Opérations CRUD
+    ├── 2a - Ajout (WRITE)
+    │   ├── Exercice 6 : MAP BMS d'ajout
+    │   ├── Exercice 7 : Programme COBOL-CICS (WRITE)
+    │   └── Exercice 8 : Transaction d'ajout
+    │
+    ├── 2b - Mise à jour (REWRITE)
+    │   ├── Exercice 9 : MAP BMS de mise à jour
+    │   ├── Exercice 10 : Programme COBOL-CICS (REWRITE)
+    │   └── Exercice 11 : Transaction de mise à jour
+    │
+    └── 2c - Suppression (DELETE)
+        ├── Exercice 12 : MAP BMS de suppression
+        ├── Exercice 13 : Programme COBOL-CICS (DELETE)
+        ├── Exercice 14 : Transaction de suppression
+        └── Exercice 15 : Variante avec lecture préalable
 
-Partie 3 : Operations avancees
-    ├── Navigation VSAM (STARTBR, READNEXT)
-    └── Statistiques par region
+Partie 3 : Opérations avancées
+    ├── Exercice 16 : Navigation VSAM (STARTBR, READNEXT)
+    ├── Exercice 17 : Affichage liste de clients
+    ├── Exercice 18 : Statistiques par région
+    └── Exercice 19 : Menu principal
 ```
+
+**Justification de ce découpage :**
+- **Partie 0** : Prérequis techniques avant de commencer
+- **Partie 1** : Introduction aux concepts CICS avec une opération simple (lecture)
+- **Partie 2** : Complète le CRUD avec les opérations d'écriture
+- **Partie 3** : Techniques avancées de navigation et agrégation
 
 ---
 
@@ -71,15 +116,15 @@ Partie 3 : Operations avancees
 
 | # | Fichier | Contenu |
 |---|---------|---------|
-| 00 | [Introduction](00-introduction.md) | Presentation du projet |
-| 01 | [Partie 0 - Preparation](01-partie-0-preparation.md) | Exercice 0 : Creation des Libraries |
+| 00 | [Introduction](00-introduction.md) | Présentation du projet |
+| 01 | [Partie 0 - Préparation](01-partie-0-preparation.md) | Exercice 0 : Création des Libraries |
 | 02 | [Partie 1 - Affichage](02-partie-1-affichage.md) | Exercices 1-5 : VSAM, MAP, READ |
 | 03 | [Partie 2a - Ajout](03-partie-2a-ajout.md) | Exercices 6-8 : WRITE |
-| 04 | [Partie 2b - Mise a jour](04-partie-2b-maj.md) | Exercices 9-11 : REWRITE |
+| 04 | [Partie 2b - Mise à jour](04-partie-2b-maj.md) | Exercices 9-11 : REWRITE |
 | 05 | [Partie 2c - Suppression](05-partie-2c-suppression.md) | Exercices 12-15 : DELETE |
-| 06 | [Partie 3 - Avancees](06-partie-3-avancees.md) | Exercices 16-19 : STARTBR, READNEXT |
-| 07 | [Conclusion](07-conclusion.md) | Bilan, annexes, references |
+| 06 | [Partie 3 - Avancées](06-partie-3-avancees.md) | Exercices 16-19 : STARTBR, READNEXT |
+| 07 | [Conclusion](07-conclusion.md) | Bilan, annexes, références |
 
 ---
 
-[Partie 0 : Preparation >](01-partie-0-preparation.md)
+[Partie 0 : Préparation >](01-partie-0-preparation.md)
