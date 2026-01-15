@@ -102,6 +102,7 @@
            05 WS-NOML             PIC S9(04) COMP.
            05 WS-PRENOM           PIC X(10).
            05 WS-DATNAISS         PIC X(08).
+           05 WS-DATNAISSL        PIC S9(04) COMP.
            05 WS-SEXE             PIC X(01).
            05 WS-SEXEL            PIC S9(04) COMP.
            05 WS-ACTPRO           PIC X(02).
@@ -301,6 +302,13 @@
        4000-VALIDER-MODIFICATION.
       *-----------------------------------------------------------------
       * Phase 2/3 : Reception et validation des modifications
+      *
+      * IMPORTANT - MISE A JOUR vs AJOUT :
+      * En mise a jour, l'utilisateur ne modifie que certains champs.
+      * Les champs non modifies ont une longueur = 0 (terminal n'envoie
+      * que les champs modifies). On doit donc :
+      *   1. Relire le client pour avoir ses donnees actuelles
+      *   2. Ne remplacer que les champs modifies (longueur > 0)
       *-----------------------------------------------------------------
            EXEC CICS RECEIVE MAP('MAPMAJ')
                MAPSET('CLIMAJ')
@@ -319,7 +327,7 @@
                GO TO 4000-FIN
            END-IF
 
-      *    SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
+      *    SAUVEGARDE DES DONNEES MAP AVANT ECRASEMENT PAR LOW-VALUES
            MOVE WS-NUMCPT-SAVED TO WS-NUMCPT
            MOVE CODREGI   TO WS-CODREG
            MOVE CODREGL   TO WS-CODREGL
@@ -328,6 +336,7 @@
            MOVE NOML      TO WS-NOML
            MOVE PRENOMI   TO WS-PRENOM
            MOVE DATNAI    TO WS-DATNAISS
+           MOVE DATNAL    TO WS-DATNAISSL
            MOVE SEXEI     TO WS-SEXE
            MOVE SEXEL     TO WS-SEXEL
            MOVE ACTPROI   TO WS-ACTPRO
@@ -338,7 +347,32 @@
            MOVE POSITI    TO WS-POSITION
            MOVE POSITL    TO WS-POSITL
 
-      *    Validation des donnees
+      *    RELECTURE DU CLIENT POUR AVOIR LES DONNEES ACTUELLES
+           MOVE WS-NUMCPT TO CLI-NUMCPT
+           EXEC CICS READ
+               FILE('FCLIENT')
+               INTO(ENR-CLIENT)
+               RIDFLD(CLI-NUMCPT)
+               RESP(WS-RESP)
+           END-EXEC
+
+           IF WS-RESP NOT = DFHRESP(NORMAL)
+               MOVE LOW-VALUES TO MAPMAJO
+               MOVE WS-NUMCPT TO NUMCPTO
+               MOVE DFHBMASK TO NUMCPTA
+               MOVE 'ERREUR RELECTURE CLIENT - REESSAYEZ' TO MSGO
+               EXEC CICS SEND MAP('MAPMAJ')
+                   MAPSET('CLIMAJ')
+                   ERASE
+               END-EXEC
+               GO TO 4000-FIN
+           END-IF
+
+      *    FUSION : Ne remplacer que les champs modifies (longueur > 0)
+      *    Les champs non modifies gardent leur valeur actuelle (CLI-*)
+           PERFORM 4050-FUSIONNER-MODIFICATIONS
+
+      *    Validation des donnees finales
            PERFORM 4100-VALIDER-DONNEES THRU 4100-FIN
 
            IF ERREUR-DETECTEE
@@ -350,8 +384,7 @@
                GO TO 4000-FIN
            END-IF
 
-      *    Preparation et ecriture de l'enregistrement
-           PERFORM 4200-PREPARER-ENREGISTREMENT
+      *    Ecriture de l'enregistrement
            PERFORM 4300-ECRIRE-MODIFICATION THRU 4300-FIN
 
            MOVE DFHBMASK TO NUMCPTA
@@ -364,20 +397,91 @@
            EXIT.
 
       *-----------------------------------------------------------------
+       4050-FUSIONNER-MODIFICATIONS.
+      *-----------------------------------------------------------------
+      * Fusionne les modifications de l'utilisateur avec les donnees
+      * actuelles du client. Seuls les champs modifies (longueur > 0)
+      * remplacent les valeurs existantes.
+      *-----------------------------------------------------------------
+      *    Code region : si modifie, prendre la nouvelle valeur
+           IF WS-CODREGL > 0
+               MOVE WS-CODREG TO CLI-CODREG
+           ELSE
+               MOVE CLI-CODREG TO WS-CODREG
+           END-IF
+
+      *    Nature compte : pas de longueur, on prend si non vide
+           IF WS-NATCPT NOT = SPACES AND WS-NATCPT NOT = LOW-VALUES
+               MOVE WS-NATCPT TO CLI-NATCPT
+           END-IF
+
+      *    Nom
+           IF WS-NOML > 0
+               MOVE WS-NOM TO CLI-NOM
+           ELSE
+               MOVE CLI-NOM TO WS-NOM
+           END-IF
+
+      *    Prenom : pas de longueur obligatoire
+           IF WS-PRENOM NOT = SPACES AND WS-PRENOM NOT = LOW-VALUES
+               MOVE WS-PRENOM TO CLI-PRENOM
+           END-IF
+
+      *    Date naissance
+           IF WS-DATNAISSL > 0
+               MOVE WS-DATNAISS TO CLI-DATNAISS
+           ELSE
+               MOVE CLI-DATNAISS TO WS-DATNAISS
+           END-IF
+
+      *    Sexe
+           IF WS-SEXEL > 0
+               MOVE WS-SEXE TO CLI-SEXE
+           ELSE
+               MOVE CLI-SEXE TO WS-SEXE
+           END-IF
+
+      *    Activite pro : pas de longueur obligatoire
+           IF WS-ACTPRO NOT = SPACES AND WS-ACTPRO NOT = LOW-VALUES
+               MOVE WS-ACTPRO TO CLI-ACTPRO
+           END-IF
+
+      *    Situation sociale
+           IF WS-SITSOL > 0
+               MOVE WS-SITSO TO CLI-SITSO
+           ELSE
+               MOVE CLI-SITSO TO WS-SITSO
+           END-IF
+
+      *    Adresse : pas de longueur obligatoire
+           IF WS-ADRESSE NOT = SPACES AND WS-ADRESSE NOT = LOW-VALUES
+               MOVE WS-ADRESSE TO CLI-ADRESSE
+           END-IF
+
+      *    Solde : pas de longueur obligatoire
+           IF WS-SOLDE NOT = SPACES AND WS-SOLDE NOT = LOW-VALUES
+               MOVE WS-SOLDE TO CLI-SOLDE
+           END-IF
+
+      *    Position
+           IF WS-POSITL > 0
+               MOVE WS-POSITION TO CLI-POSITION
+           ELSE
+               MOVE CLI-POSITION TO WS-POSITION
+           END-IF.
+
+      *-----------------------------------------------------------------
        4100-VALIDER-DONNEES.
       *-----------------------------------------------------------------
-      * Controles de conformite des donnees modifiees
+      * Controles de conformite des donnees finales (apres fusion)
+      * Note: Les variables WS-* contiennent soit la modification de
+      * l'utilisateur, soit la valeur actuelle du client (via fusion)
+      * Donc on ne verifie plus les longueurs, seulement les valeurs.
       *-----------------------------------------------------------------
            MOVE LOW-VALUES TO MAPMAJO
            MOVE WS-NUMCPT TO NUMCPTO
 
       *    Controle code region (01, 02, 03 ou 04)
-           IF WS-CODREGL = 0 OR WS-CODREG = SPACES
-               MOVE 'CODE REGION OBLIGATOIRE' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF
-
            IF WS-CODREG NOT = '01' AND WS-CODREG NOT = '02'
               AND WS-CODREG NOT = '03' AND WS-CODREG NOT = '04'
                MOVE 'CODE REGION INVALIDE (01/02/03/04)' TO MSGO
@@ -386,19 +490,13 @@
            END-IF
 
       *    Controle nom (obligatoire)
-           IF WS-NOML = 0 OR WS-NOM = SPACES
+           IF WS-NOM = SPACES
                MOVE 'NOM OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 4100-FIN
            END-IF
 
       *    Controle sexe (M ou F)
-           IF WS-SEXEL = 0 OR WS-SEXE = SPACES
-               MOVE 'SEXE OBLIGATOIRE' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF
-
            IF WS-SEXE NOT = 'M' AND WS-SEXE NOT = 'F'
                MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
                MOVE 'O' TO WS-ERREUR
@@ -406,12 +504,6 @@
            END-IF
 
       *    Controle situation sociale (C, M, D ou V)
-           IF WS-SITSOL = 0 OR WS-SITSO = SPACES
-               MOVE 'SITUATION SOCIALE OBLIGATOIRE' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF
-
            IF WS-SITSO NOT = 'C' AND WS-SITSO NOT = 'M'
               AND WS-SITSO NOT = 'D' AND WS-SITSO NOT = 'V'
                MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
@@ -420,12 +512,6 @@
            END-IF
 
       *    Controle position (DB ou CR)
-           IF WS-POSITL = 0 OR WS-POSITION = SPACES
-               MOVE 'POSITION OBLIGATOIRE' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF
-
            IF WS-POSITION NOT = 'DB' AND WS-POSITION NOT = 'CR'
                MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
                MOVE 'O' TO WS-ERREUR
@@ -436,36 +522,17 @@
            EXIT.
 
       *-----------------------------------------------------------------
-       4200-PREPARER-ENREGISTREMENT.
-      *-----------------------------------------------------------------
-      * Transfert des donnees sauvegardees vers l'enregistrement
-      *-----------------------------------------------------------------
-           INITIALIZE ENR-CLIENT
-
-           MOVE WS-NUMCPT    TO CLI-NUMCPT
-           MOVE WS-CODREG    TO CLI-CODREG
-           MOVE WS-NATCPT    TO CLI-NATCPT
-           MOVE WS-NOM       TO CLI-NOM
-           MOVE WS-PRENOM    TO CLI-PRENOM
-           MOVE WS-DATNAISS  TO CLI-DATNAISS
-           MOVE WS-SEXE      TO CLI-SEXE
-           MOVE WS-ACTPRO    TO CLI-ACTPRO
-           MOVE WS-SITSO     TO CLI-SITSO
-           MOVE WS-ADRESSE   TO CLI-ADRESSE
-           MOVE WS-SOLDE     TO CLI-SOLDE
-           MOVE WS-POSITION  TO CLI-POSITION.
-
-      *-----------------------------------------------------------------
        4300-ECRIRE-MODIFICATION.
       *-----------------------------------------------------------------
       * Mise a jour de l'enregistrement avec READ UPDATE + REWRITE
       *
       * IMPORTANT : Le REWRITE necessite un READ UPDATE prealable
-      * dans la meme unite de travail (UOW). Comme on est en mode
-      * pseudo-conversationnel, on doit refaire le READ UPDATE
-      * juste avant le REWRITE.
+      * dans la meme unite de travail (UOW).
+      *
+      * Les variables WS-* contiennent les donnees finales (apres fusion
+      * des modifications utilisateur avec les donnees actuelles).
       *-----------------------------------------------------------------
-      *    Relecture avec UPDATE (verrouillage pour REWRITE)
+      *    READ UPDATE pour verrouiller l'enregistrement
            EXEC CICS READ
                FILE('FCLIENT')
                INTO(ENR-CLIENT)
