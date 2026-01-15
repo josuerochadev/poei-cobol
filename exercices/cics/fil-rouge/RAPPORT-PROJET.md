@@ -2022,21 +2022,302 @@ Creer le PROGRAMME pour une operation de mise a jour d'un CLIENT dans le Data Se
 
 ### Mon travail
 
-Le programme effectue :
-1. Lecture du client avec READ UPDATE (verrouillage)
-2. Affichage des donnees actuelles
-3. Reception des modifications
-4. Validation des donnees modifiees
-5. REWRITE pour sauvegarder
+Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
+
+1. **Phase RECHERCHE** : Saisie du numero de compte, verification existence
+2. **Phase AFFICHAGE** : Affichage des donnees actuelles, NUMCPT protege (ASKIP)
+3. **Phase VALIDATION** : Reception modifications, validation, READ UPDATE + REWRITE
+
+**Points techniques importants :**
+
+| Aspect | Explication |
+|--------|-------------|
+| COPY DFHBMSCA | Copybook pour les constantes d'attribut (DFHBMASK, etc.) |
+| COMMAREA etendue | Sauvegarde la phase ET le numero de compte |
+| READ UPDATE atomique | Le READ UPDATE et REWRITE doivent etre dans la meme UOW |
+| NUMCPT sauvegarde | Necessaire car un champ ASKIP n'est pas transmis par le terminal |
 
 ### Resolution
 
 **Programme : PRGMAJ.cbl**
 
 ```cobol
-       2000-LIRE-CLIENT.
-           MOVE NUMCPTI TO CLI-NUMCPT
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PRGMAJ.
+      ******************************************************************
+      * PROGRAMME : PRGMAJ
+      * FONCTION  : Mise a jour d'un client existant
+      * TRANSACTION : MAJO
+      * FICHIER   : FCLIENT (VSAM KSDS)
+      * MAP       : MAPMAJ (MAPSET CLIMAJ)
+      *
+      * MODE PSEUDO-CONVERSATIONNEL A 3 PHASES :
+      * ----------------------------------------
+      * Phase 1 (RECHERCHE) : Saisie numero, verification existence
+      * Phase 2 (AFFICHAGE) : Affichage donnees, NUMCPT en ASKIP
+      * Phase 3 (VALIDATION) : Modifications, READ UPDATE + REWRITE
+      *
+      * FIL ROUGE CICS - EXERCICE 10
+      ******************************************************************
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       DATA DIVISION.
+      ******************************************************************
+       WORKING-STORAGE SECTION.
+      ******************************************************************
+      *-----------------------------------------------------------------
+      * ZONE DE COMMUNICATION (COMMAREA)
+      * Sauvegarde la phase et le numero de compte entre passages
+      *-----------------------------------------------------------------
+       01  WS-COMMAREA.
+           05 WS-PHASE            PIC X(01) VALUE '1'.
+              88 PHASE-RECHERCHE  VALUE '1'.
+              88 PHASE-AFFICHAGE  VALUE '2'.
+              88 PHASE-VALIDATION VALUE '3'.
+           05 WS-NUMCPT-SAVED     PIC X(06) VALUE SPACES.
 
+      *-----------------------------------------------------------------
+      * COPYBOOKS CICS
+      *-----------------------------------------------------------------
+       COPY DFHAID.
+       COPY DFHBMSCA.
+
+      *-----------------------------------------------------------------
+      * COPYBOOK GENERE PAR ASSEMBLAGE BMS (DSECT)
+      *-----------------------------------------------------------------
+       COPY CLIMAJ.
+
+      *-----------------------------------------------------------------
+      * STRUCTURE ENREGISTREMENT CLIENT (80 OCTETS)
+      *-----------------------------------------------------------------
+       01  ENR-CLIENT.
+           05 CLI-NUMCPT          PIC X(06).
+           05 CLI-CODREG          PIC X(02).
+           05 CLI-NATCPT          PIC X(02).
+           05 CLI-NOM             PIC X(10).
+           05 CLI-PRENOM          PIC X(10).
+           05 CLI-DATNAISS        PIC X(08).
+           05 CLI-SEXE            PIC X(01).
+           05 CLI-ACTPRO          PIC X(02).
+           05 CLI-SITSO           PIC X(01).
+           05 CLI-ADRESSE         PIC X(10).
+           05 CLI-SOLDE           PIC X(10).
+           05 CLI-POSITION        PIC X(02).
+           05 FILLER              PIC X(16).
+
+      *-----------------------------------------------------------------
+      * VARIABLES DE TRAVAIL
+      *-----------------------------------------------------------------
+       01  WS-RESP                PIC S9(08) COMP VALUE 0.
+       01  WS-ERREUR              PIC X(01) VALUE 'N'.
+       01  WS-MSG-FIN             PIC X(40)
+           VALUE 'TRANSACTION MAJO TERMINEE - AU REVOIR'.
+
+      *-----------------------------------------------------------------
+      * SAUVEGARDE DES DONNEES SAISIES
+      *-----------------------------------------------------------------
+       01  WS-SAISIE.
+           05 WS-NUMCPT           PIC X(06).
+           05 WS-NUMCPTL          PIC S9(04) COMP.
+           05 WS-CODREG           PIC X(02).
+           05 WS-CODREGL          PIC S9(04) COMP.
+           05 WS-NATCPT           PIC X(02).
+           05 WS-NOM              PIC X(10).
+           05 WS-NOML             PIC S9(04) COMP.
+           05 WS-PRENOM           PIC X(10).
+           05 WS-DATNAISS         PIC X(08).
+           05 WS-SEXE             PIC X(01).
+           05 WS-SEXEL            PIC S9(04) COMP.
+           05 WS-ACTPRO           PIC X(02).
+           05 WS-SITSO            PIC X(01).
+           05 WS-SITSOL           PIC S9(04) COMP.
+           05 WS-ADRESSE          PIC X(10).
+           05 WS-SOLDE            PIC X(10).
+           05 WS-POSITION         PIC X(02).
+           05 WS-POSITL           PIC S9(04) COMP.
+
+      ******************************************************************
+       PROCEDURE DIVISION.
+      ******************************************************************
+
+      *-----------------------------------------------------------------
+       0000-PRINCIPAL.
+      *-----------------------------------------------------------------
+           EVALUATE TRUE
+               WHEN EIBCALEN = 0
+                   PERFORM 1000-INIT-RECHERCHE
+               WHEN EIBAID = DFHPF3
+                   PERFORM 9000-FIN-PROGRAMME
+               WHEN EIBAID = DFHCLEAR
+                   PERFORM 1000-INIT-RECHERCHE
+               WHEN OTHER
+                   MOVE DFHCOMMAREA TO WS-COMMAREA
+                   PERFORM 2000-TRAITEMENT THRU 2000-FIN
+           END-EVALUATE
+
+           EXEC CICS RETURN
+               TRANSID('MAJO')
+               COMMAREA(WS-COMMAREA)
+               LENGTH(LENGTH OF WS-COMMAREA)
+           END-EXEC.
+
+      *-----------------------------------------------------------------
+       1000-INIT-RECHERCHE.
+      *-----------------------------------------------------------------
+      * Affichage ecran initial - NUMCPT en UNPROT
+      *-----------------------------------------------------------------
+           MOVE LOW-VALUES TO MAPMAJO
+           MOVE 'SAISIR LE NUMERO DE COMPTE A MODIFIER' TO MSGO
+           MOVE '1' TO WS-PHASE
+           MOVE SPACES TO WS-NUMCPT-SAVED
+
+           EXEC CICS SEND MAP('MAPMAJ')
+               MAPSET('CLIMAJ')
+               ERASE
+           END-EXEC.
+
+      *-----------------------------------------------------------------
+       2000-TRAITEMENT.
+      *-----------------------------------------------------------------
+           MOVE 'N' TO WS-ERREUR
+
+           EVALUATE TRUE
+               WHEN PHASE-RECHERCHE
+                   PERFORM 3000-RECHERCHER-CLIENT THRU 3000-FIN
+               WHEN PHASE-AFFICHAGE
+               WHEN PHASE-VALIDATION
+                   PERFORM 4000-VALIDER-MODIFICATION THRU 4000-FIN
+           END-EVALUATE.
+
+       2000-FIN.
+           EXIT.
+
+      *-----------------------------------------------------------------
+       3000-RECHERCHER-CLIENT.
+      *-----------------------------------------------------------------
+      * Phase 1 -> 2 : Recherche du client
+      *-----------------------------------------------------------------
+           EXEC CICS RECEIVE MAP('MAPMAJ')
+               MAPSET('CLIMAJ')
+               RESP(WS-RESP)
+           END-EXEC
+
+           IF WS-RESP = DFHRESP(MAPFAIL)
+               MOVE LOW-VALUES TO MAPMAJO
+               MOVE 'VEUILLEZ SAISIR UN NUMERO DE COMPTE' TO MSGO
+               EXEC CICS SEND MAP('MAPMAJ')
+                   MAPSET('CLIMAJ')
+                   ERASE
+               END-EXEC
+               GO TO 3000-FIN
+           END-IF
+
+           MOVE NUMCPTI TO WS-NUMCPT
+
+      *    Lecture du client
+           MOVE WS-NUMCPT TO CLI-NUMCPT
+
+           EXEC CICS READ
+               FILE('FCLIENT')
+               INTO(ENR-CLIENT)
+               RIDFLD(CLI-NUMCPT)
+               RESP(WS-RESP)
+           END-EXEC
+
+           IF WS-RESP = DFHRESP(NOTFND)
+               MOVE LOW-VALUES TO MAPMAJO
+               MOVE 'CLIENT INEXISTANT - VERIFIEZ LE NUMERO' TO MSGO
+               EXEC CICS SEND MAP('MAPMAJ')
+                   MAPSET('CLIMAJ')
+                   ERASE
+               END-EXEC
+               GO TO 3000-FIN
+           END-IF
+
+      *    Affichage des donnees
+           PERFORM 3100-AFFICHER-CLIENT
+           MOVE '2' TO WS-PHASE
+           MOVE WS-NUMCPT TO WS-NUMCPT-SAVED.
+
+       3000-FIN.
+           EXIT.
+
+      *-----------------------------------------------------------------
+       3100-AFFICHER-CLIENT.
+      *-----------------------------------------------------------------
+      * Affiche les donnees - NUMCPT passe en ASKIP
+      *-----------------------------------------------------------------
+           MOVE LOW-VALUES TO MAPMAJO
+
+           MOVE CLI-NUMCPT   TO NUMCPTO
+           MOVE CLI-CODREG   TO CODREGO
+           MOVE CLI-NATCPT   TO NATCPTO
+           MOVE CLI-NOM      TO NOMO
+           MOVE CLI-PRENOM   TO PRENOMO
+           MOVE CLI-DATNAISS TO DATNAO
+           MOVE CLI-SEXE     TO SEXEO
+           MOVE CLI-ACTPRO   TO ACTPROO
+           MOVE CLI-SITSO    TO SITSOO
+           MOVE CLI-ADRESSE  TO ADRESSEO
+           MOVE CLI-SOLDE    TO SOLDEO
+           MOVE CLI-POSITION TO POSITO
+
+      *    IMPORTANT : Proteger le numero de compte
+           MOVE DFHBMASK TO NUMCPTA
+
+           MOVE 'CLIENT TROUVE - MODIFIER ET VALIDER AVEC ENTER' TO MSGO
+
+           EXEC CICS SEND MAP('MAPMAJ')
+               MAPSET('CLIMAJ')
+               ERASE
+           END-EXEC.
+
+      *-----------------------------------------------------------------
+       4000-VALIDER-MODIFICATION.
+      *-----------------------------------------------------------------
+      * Phase 2/3 : Validation et REWRITE
+      *-----------------------------------------------------------------
+           EXEC CICS RECEIVE MAP('MAPMAJ')
+               MAPSET('CLIMAJ')
+               RESP(WS-RESP)
+           END-EXEC
+
+      *    Sauvegarde des donnees modifiees
+           MOVE WS-NUMCPT-SAVED TO WS-NUMCPT
+           MOVE CODREGI   TO WS-CODREG
+           MOVE NOMI      TO WS-NOM
+      *    ... (autres champs)
+
+      *    Validation
+           PERFORM 4100-VALIDER-DONNEES THRU 4100-FIN
+
+           IF WS-ERREUR = 'O'
+               MOVE DFHBMASK TO NUMCPTA
+               EXEC CICS SEND MAP('MAPMAJ')
+                   MAPSET('CLIMAJ')
+                   ERASE
+               END-EXEC
+               GO TO 4000-FIN
+           END-IF
+
+      *    Mise a jour
+           PERFORM 4300-ECRIRE-MODIFICATION THRU 4300-FIN
+
+           MOVE DFHBMASK TO NUMCPTA
+           EXEC CICS SEND MAP('MAPMAJ')
+               MAPSET('CLIMAJ')
+               ERASE
+           END-EXEC.
+
+       4000-FIN.
+           EXIT.
+
+      *-----------------------------------------------------------------
+       4300-ECRIRE-MODIFICATION.
+      *-----------------------------------------------------------------
+      * READ UPDATE + REWRITE atomique
+      *-----------------------------------------------------------------
+      *    Relecture avec UPDATE (verrouillage)
            EXEC CICS READ
                FILE('FCLIENT')
                INTO(ENR-CLIENT)
@@ -2045,21 +2326,12 @@ Le programme effectue :
                RESP(WS-RESP)
            END-EXEC
 
-           IF WS-RESP = DFHRESP(NOTFND)
-               MOVE 'CLIENT INEXISTANT' TO MSGO
-           ELSE IF WS-RESP = DFHRESP(NORMAL)
-               PERFORM 3000-AFFICHER-CLIENT
-               MOVE 'MODIFIER ET VALIDER' TO MSGO
-           END-IF.
+      *    Application des modifications
+           MOVE WS-CODREG TO CLI-CODREG
+           MOVE WS-NOM    TO CLI-NOM
+      *    ... (autres champs)
 
-       4000-MISE-A-JOUR.
-           PERFORM 2100-VALIDER-DONNEES
-           IF WS-ERREUR = 'O'
-               EXIT PARAGRAPH
-           END-IF
-
-           PERFORM 2200-PREPARER-ENREG
-
+      *    REWRITE - Mise a jour effective
            EXEC CICS REWRITE
                FILE('FCLIENT')
                FROM(ENR-CLIENT)
@@ -2067,11 +2339,93 @@ Le programme effectue :
            END-EXEC
 
            IF WS-RESP = DFHRESP(NORMAL)
-               MOVE 'MISE A JOUR EFFECTUEE' TO MSGO
+               MOVE LOW-VALUES TO MAPMAJO
+               MOVE WS-NUMCPT TO NUMCPTO
+               MOVE 'MISE A JOUR EFFECTUEE - NOUVEAU OU PF3' TO MSGO
+               MOVE '1' TO WS-PHASE
+               MOVE SPACES TO WS-NUMCPT-SAVED
            ELSE
-               MOVE 'ERREUR MISE A JOUR' TO MSGO
+               MOVE 'ERREUR MISE A JOUR - CONTACTEZ SUPPORT' TO MSGO
+               MOVE 'O' TO WS-ERREUR
            END-IF.
+
+       4300-FIN.
+           EXIT.
+
+      *-----------------------------------------------------------------
+       9000-FIN-PROGRAMME.
+      *-----------------------------------------------------------------
+           EXEC CICS SEND TEXT
+               FROM(WS-MSG-FIN)
+               LENGTH(40)
+               ERASE
+           END-EXEC
+
+           EXEC CICS RETURN
+           END-EXEC.
 ```
+
+> **Note** : Le code ci-dessus est une version abregee. Le programme complet inclut tous les paragraphes de validation (4100-VALIDER-DONNEES) et la sauvegarde de tous les champs.
+
+**JCL de compilation : CMPMAJ.jcl**
+
+```jcl
+//ROCHA10 JOB (ACCT),'COMPILE PRGMAJ',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* PROJET FIL ROUGE CICS - EXERCICE 10
+//* COMPILATION DU PROGRAMME COBOL-CICS PRGMAJ (MISE A JOUR CLIENT)
+//*
+//* Copybooks requis :
+//*   - DFHAID   : Codes touches fonction
+//*   - DFHBMSCA : Constantes attributs (DFHBMASK, etc.)
+//*   - CLIMAJ   : Structure MAP generee
+//*****************************************************************
+//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
+//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
+//*
+//COMPIL   EXEC PROC=DFHYITVL,
+//          INDEX='DFH510.CICS',
+//          PROGLIB='ROCHA.CICS.LOAD',
+//          AD370HLQ='IGY420',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          LE370HLQ='CEE'
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGMAJ),DISP=SHR
+//LKED.SYSIN DD *
+     INCLUDE SYSLIB(DFHELII)
+     NAME PRGMAJ(R)
+/*
+//
+```
+
+### Concept cle : READ UPDATE + REWRITE
+
+En mode pseudo-conversationnel, chaque interaction utilisateur termine la tache CICS. Or, REWRITE necessite un READ UPDATE prealable dans la **meme unite de travail (UOW)**.
+
+**Solution :** Faire le READ UPDATE et le REWRITE dans le meme paragraphe, juste avant la mise a jour effective :
+
+```
+Passage 1 (RECHERCHE) : READ simple -> Affichage
+                        (pas de verrouillage car fin de tache)
+
+Passage 2 (VALIDATION) : READ UPDATE -> Modifications -> REWRITE
+                         (atomique, meme UOW)
+```
+
+### Definition CICS
+
+```
+CEDA DEFINE PROGRAM(PRGMAJ) GROUP(CLIGROUP) LANGUAGE(COBOL)
+CEDA INSTALL PROGRAM(PRGMAJ) GROUP(CLIGROUP)
+```
+
+### Verification
+
+```
+CEMT INQ PROGRAM(PRGMAJ)
+```
+
+Resultat attendu : `Prog(PRGMAJ) Cob Ena`
 
 ### Captures d'ecran
 
