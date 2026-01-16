@@ -1,12 +1,28 @@
-//ROCHA17C JOB (ACCT),'COMP PRGLGEN',CLASS=A,MSGCLASS=X,
-//          NOTIFY=&SYSUID
-//*********************************************************************
-//*  JCL : CMPLGEN
-//*  FONCTION : Compilation du programme COBOL PRGLGEN
-//*  PROGRAMME : PRGLGEN (Liste Generique des Clients)
-//*  TRANSACTION : LGEN
-//*  FIL ROUGE CICS - EXERCICE 18
-//*********************************************************************
+//ROCHA18 JOB (ACCT),'COMPILE PRGLGEN',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*****************************************************************
+//* PROJET FIL ROUGE CICS - EXERCICE 18
+//* COMPILATION DU PROGRAMME COBOL-CICS PRGLGEN (LISTE GENERIQUE)
+//*
+//* Ce JCL compile le programme COBOL-CICS et genere :
+//*   - Le module executable dans ROCHA.CICS.LOAD(PRGLGEN)
+//*
+//* Prerequis :
+//*   - Source COBOL copie dans ROCHA.CICS.SOURCE(PRGLGEN)
+//*   - Copybook BMS dans ROCHA.CICS.LINK(CLILIST)
+//*   - MAP assemblee dans ROCHA.CICS.LOAD(CLILIST)
+//*
+//* Copybooks requis :
+//*   - DFHAID   : Codes touches fonction (DFHPF3, DFHCLEAR, etc.)
+//*   - DFHBMSCA : Constantes attributs (DFHBMASK, etc.)
+//*   - CLILIST  : Structure MAP generee par l'assemblage BMS
+//*
+//* Procedure : DFHYITVL (Integrated CICS Translator)
+//*****************************************************************
+//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
+//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
+//*
+//* COMPILATION COBOL-CICS
 //*
 //COMPIL   EXEC PROC=DFHYITVL,
 //          INDEX='DFH510.CICS',
@@ -19,12 +35,4 @@
      INCLUDE SYSLIB(DFHELII)
      NAME PRGLGEN(R)
 /*
-//*
-//*********************************************************************
-//*  SORTIE :
-//*  - ROCHA.CICS.LOAD(PRGLGEN)  : Module load executable
-//*
-//*  PREREQUIS :
-//*  - Le BMS CLILIST doit etre assemble avant (ASMLIST.jcl)
-//*  - Le copybook CLILIST doit exister dans ROCHA.CICS.LINK
-//*********************************************************************
+//
