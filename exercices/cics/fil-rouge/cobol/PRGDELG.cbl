@@ -314,10 +314,11 @@
            MOVE WS-PREFIXE(1:WS-LONGUEUR) TO WS-CLE-DEBUT
 
       *    Completer avec des zeros pour le GTEQ
-           PERFORM VARYING WS-INDEX FROM WS-LONGUEUR BY 1
-               UNTIL WS-INDEX > 5
-               ADD 1 TO WS-INDEX
+           MOVE WS-LONGUEUR TO WS-INDEX
+           ADD 1 TO WS-INDEX
+           PERFORM UNTIL WS-INDEX > 6
                MOVE '0' TO WS-CLE-DEBUT(WS-INDEX:1)
+               ADD 1 TO WS-INDEX
            END-PERFORM
 
       *    Positionnement sur le premier client >= prefixe
@@ -333,6 +334,9 @@
                MOVE 0 TO WS-COMPTEUR
                GO TO 3100-FIN
            END-IF
+
+      *    Initialiser la cle courante pour READNEXT
+           MOVE WS-CLE-DEBUT TO WS-CLE-COURANTE
 
       *    Boucle de lecture
            PERFORM UNTIL FIN-BROWSE
@@ -448,10 +452,11 @@
            MOVE WS-PREFIXE(1:WS-LONGUEUR) TO WS-CLE-DEBUT
 
       *    Completer avec des zeros
-           PERFORM VARYING WS-INDEX FROM WS-LONGUEUR BY 1
-               UNTIL WS-INDEX > 5
-               ADD 1 TO WS-INDEX
+           MOVE WS-LONGUEUR TO WS-INDEX
+           ADD 1 TO WS-INDEX
+           PERFORM UNTIL WS-INDEX > 6
                MOVE '0' TO WS-CLE-DEBUT(WS-INDEX:1)
+               ADD 1 TO WS-INDEX
            END-PERFORM
 
       *    Positionnement sur le premier client >= prefixe
@@ -473,6 +478,9 @@
                END-EXEC
                GO TO 4100-FIN
            END-IF
+
+      *    Initialiser la cle courante pour READNEXT
+           MOVE WS-CLE-DEBUT TO WS-CLE-COURANTE
 
       *    Boucle de lecture et suppression
            PERFORM UNTIL FIN-BROWSE
