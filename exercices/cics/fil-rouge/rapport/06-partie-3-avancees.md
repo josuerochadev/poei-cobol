@@ -1,63 +1,124 @@
-# Partie 3 : Operations Avancees
+# Partie 3 : Opérations Avancées
 
 [< Partie 2c : Suppression](05-partie-2c-suppression.md) | [Sommaire](00-introduction.md) | [Conclusion >](07-conclusion.md)
 
 ---
 
-Cette section couvre les exercices 16 a 19 : creation de clients generiques, navigation VSAM avec STARTBR/READNEXT/ENDBR, et statistiques par region.
+Cette section couvre les exercices 16 à 19 : création de clients génériques, navigation VSAM avec STARTBR/READNEXT/ENDBR, et statistiques par région.
 
 ## Commandes CICS pour navigation VSAM
 
 | Commande | Usage | Description |
 |----------|-------|-------------|
-| **STARTBR** | Positionner le curseur | Demarre un parcours a partir d'une cle partielle |
-| **READNEXT** | Lire l'enregistrement suivant | Lit sequentiellement apres STARTBR |
-| **ENDBR** | Terminer le parcours | Libere les ressources du browse |
+| **STARTBR** | Positionner le curseur | Démarre un parcours à partir d'une clé partielle |
+| **READNEXT** | Lire l'enregistrement suivant | Lit séquentiellement après STARTBR |
+| **ENDBR** | Terminer le parcours | Libère les ressources du browse |
 
-Ces commandes permettent de parcourir un fichier VSAM de maniere sequentielle, contrairement aux commandes READ/WRITE/REWRITE/DELETE qui travaillent sur un enregistrement specifique.
-
----
-
-# Partie 3 : Operations avancees
-
-## Exercice 16 : Creation de clients generiques
-
-### Enonce
-
-Sachant que le CODE CLIENT est sur six caracteres, creer cinq CLIENT avec une partie de leur code generique commencant par '111...', de meme '444...' et '777...'.
-
-### Mon travail
-
-J'ai cree 15 clients de test avec des codes generiques :
-- 111001, 111002, 111003, 111004, 111005
-- 444001, 444002, 444003, 444004, 444005
-- 777001, 777002, 777003, 777004, 777005
-
-Ces clients serviront aux tests des commandes STARTBR et READNEXT.
-
-### Resolution
-
-Utilisation de la transaction AJOU pour creer les 15 clients.
-
-### Captures d'ecran
-
-<!-- ![pt3ex16-1](images-pt3/pt3ex16-1.png) -->
+Ces commandes permettent de parcourir un fichier VSAM de manière séquentielle, contrairement aux commandes READ/WRITE/REWRITE/DELETE qui travaillent sur un enregistrement spécifique.
 
 ---
 
-## Exercice 17 : Suppression par code generique (STARTBR)
+## Exercice 16 : Création de clients génériques
 
-### Enonce
+### Énoncé
 
-En utilisant les commandes adequates, supprimer les CLIENT dont le code generique est '111...'.
+Sachant que le CODE CLIENT est sur six caractères, créer cinq CLIENT avec une partie de leur code générique commençant par '111...', de même '444...' et '777...'.
 
 ### Mon travail
 
-J'ai utilise STARTBR pour positionner le curseur sur le premier client '111', puis READNEXT en boucle pour lire et supprimer chaque client commencant par '111'.
+> **Note** : J'ai anticipé une partie de cet exercice lors des phases précédentes du projet.
 
-### Resolution
+**Clients déjà existants :**
 
-**Programme : PRGSDEL.cbl** (Suppression Generique)
+| Préfixe | Source | Contexte |
+|---------|--------|----------|
+| **222xxx** | LOADVSAM.jcl (Ex 1) | Pré-chargés pour les tests READNEXT |
+| **111xxx** | Transaction AJOU (Ex 7-8) | Créés lors des tests et debug de la fonction WRITE |
+
+En lisant l'ensemble du projet avant de commencer, j'ai identifié le besoin de clients avec des clés génériques pour les exercices de navigation VSAM. J'ai donc :
+
+1. **Pré-chargé les clients 222xxx** dans le JCL de chargement initial (LOADVSAM.jcl) pour avoir des données de test dès le départ
+
+2. **Créé les clients 111xxx** lors des tests de la transaction AJOU (exercices 7-8), ce qui m'a permis de valider la fonction d'ajout tout en préparant les données pour cet exercice
+
+**Clients à créer pour compléter :**
+
+Les clients 444xxx et 777xxx peuvent être créés via la transaction AJOU si nécessaire pour des tests supplémentaires.
+
+### Résolution
+
+**Clients 222xxx (pré-chargés via LOADVSAM.jcl) :**
+
+```
+222001 - LEROY Michel (Paris, Créditeur)
+222002 - ROUX Nathalie (Marseille, Débiteur)
+222003 - DAVID François (Lyon, Créditeur)
+222004 - BERTRAND Isabelle (Lille, Débiteur)
+222005 - MOREL Philippe (Paris, Créditeur)
+```
+
+**Clients 111xxx (créés via AJOU lors des tests) :**
+
+Plusieurs clients ont été créés lors du debug de la transaction AJOU, avec des clés commençant par 111.
+
+**Création de clients supplémentaires (optionnel) :**
+
+Pour créer les clients 444xxx et 777xxx, utiliser la transaction AJOU :
+
+```
+AJOU
+-> Saisir numéro 444001, remplir les champs, valider
+-> Répéter pour 444002, 444003, etc.
+```
+
+### Vérification
+
+Pour vérifier les clients existants avec un préfixe donné, utiliser la transaction AFFI :
+
+```
+AFFI
+-> Saisir 222001 -> Client affiché
+-> Saisir 111001 -> Client affiché (si créé)
+```
+
+### Captures d'écran
+
+<!--
+Suggestions de captures d'écran pour cet exercice :
+
+1. pt3ex16-1 : Transaction AFFI - Affichage client 222001
+2. pt3ex16-2 : Transaction AFFI - Affichage client 111001
+3. pt3ex16-3 : Transaction AJOU - Création d'un client 444001 (optionnel)
+-->
+
+---
+
+## Exercice 17 : Suppression par code générique (STARTBR)
+
+### Énoncé
+
+En utilisant les commandes adéquates, supprimer les CLIENT dont le code générique est '111...'.
+
+### Mon travail
+
+J'ai utilisé STARTBR pour positionner le curseur sur le premier client '111', puis READNEXT en boucle pour lire et supprimer chaque client commençant par '111'.
+
+**Principe de la navigation VSAM :**
+
+```
+STARTBR (111000, GTEQ)     READNEXT           READNEXT           READNEXT
+        │                      │                  │                  │
+        ▼                      ▼                  ▼                  ▼
+   ┌─────────┐            ┌─────────┐        ┌─────────┐        ┌─────────┐
+   │ 111001  │ ────────►  │ 111002  │ ────►  │ 111003  │ ────►  │ 222001  │
+   │ DELETE  │            │ DELETE  │        │ DELETE  │        │ STOP!   │
+   └─────────┘            └─────────┘        └─────────┘        └─────────┘
+                                                                Clé != 111
+```
+
+### Résolution
+
+**Programme : PRGSDEL.cbl** (Suppression Générique)
 
 ```cobol
        2000-SUPPRIMER-GENERIQUE.
@@ -99,7 +160,7 @@ J'ai utilise STARTBR pour positionner le curseur sur le premier client '111', pu
            EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 <!-- ![pt3ex17-1](images-pt3/pt3ex17-1.png) -->
 
@@ -107,21 +168,53 @@ J'ai utilise STARTBR pour positionner le curseur sur le premier client '111', pu
 
 ## Exercice 18 : Lecture successive (READNEXT, ENDBR)
 
-### Enonce
+### Énoncé
 
-Faire une lecture successive des CLIENT dont le code generique est '222...' en utilisant la commande READNEXT et ENDBR.
+Faire une lecture successive des CLIENT dont le code générique est '222...' en utilisant la commande READNEXT et ENDBR.
 
 ### Mon travail
 
-Ce programme illustre le parcours sequentiel d'un fichier VSAM avec positionnement generique :
-1. STARTBR avec GTEQ pour se positionner sur le premier '222xxx'
-2. READNEXT en boucle pour lire les suivants
-3. Arret quand le code ne commence plus par '222'
-4. ENDBR pour terminer le browse
+Ce programme illustre le parcours séquentiel d'un fichier VSAM avec positionnement générique :
 
-### Resolution
+1. **STARTBR** avec GTEQ pour se positionner sur le premier '222xxx'
+2. **READNEXT** en boucle pour lire les suivants
+3. **Arrêt** quand le code ne commence plus par '222'
+4. **ENDBR** pour terminer le browse et libérer les ressources
 
-**Programme : PRGLGEN.cbl** (Liste Generique)
+**Schéma du parcours :**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  STARTBR('222000', GTEQ)                                    │
+│  ─────────────────────────                                  │
+│  Positionne le curseur sur le premier enregistrement        │
+│  dont la clé est >= '222000'                                │
+│  Résultat : curseur sur 222001                              │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  READNEXT (boucle)                                          │
+│  ─────────────────                                          │
+│  222001 → Afficher    (clé commence par '222')              │
+│  222002 → Afficher    (clé commence par '222')              │
+│  222003 → Afficher    (clé commence par '222')              │
+│  222004 → Afficher    (clé commence par '222')              │
+│  222005 → Afficher    (clé commence par '222')              │
+│  444001 → STOP        (clé ne commence plus par '222')      │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  ENDBR                                                      │
+│  ─────                                                      │
+│  Libère les ressources du browse                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Résolution
+
+**Programme : PRGLGEN.cbl** (Liste Générique)
 
 ```cobol
        2000-LISTER-GENERIQUE.
@@ -156,36 +249,52 @@ Ce programme illustre le parcours sequentiel d'un fichier VSAM avec positionneme
 
            EXEC CICS ENDBR FILE('FCLIENT') END-EXEC
 
-           DISPLAY 'TOTAL CLIENTS 222XXX : ' WS-COMPTEUR.
+           MOVE WS-COMPTEUR TO MSGO
+           STRING 'TOTAL CLIENTS 222XXX : ' WS-COMPTEUR
+               DELIMITED BY SIZE INTO MSGO.
 ```
 
-### Captures d'ecran
+### Captures d'écran
 
 <!-- ![pt3ex18-1](images-pt3/pt3ex18-1.png) -->
 
 ---
 
-## Exercice 19 : Statistiques par region
+## Exercice 19 : Statistiques par région
 
-### Enonce
+### Énoncé
 
-Elaborer une transaction permettant de calculer pour une REGION le nombre de CLIENT, la somme des montants des CLIENT Debiteurs et leur nombre et la somme des montants des CLIENT Crediteurs et leur nombre. Cette transaction aura en entree le code REGION et affichera les quatre informations specifiees ci-dessus.
+Élaborer une transaction permettant de calculer pour une REGION le nombre de CLIENT, la somme des montants des CLIENT Débiteurs et leur nombre et la somme des montants des CLIENT Créditeurs et leur nombre. Cette transaction aura en entrée le code REGION et affichera les quatre informations spécifiées ci-dessus.
 
 ### Mon travail
 
-Cette transaction effectue un parcours complet du fichier pour calculer les statistiques d'une region donnee :
-- Nombre total de clients de la region
-- Nombre et somme des clients debiteurs (DB)
-- Nombre et somme des clients crediteurs (CR)
+Cette transaction effectue un parcours complet du fichier pour calculer les statistiques d'une région donnée :
+- Nombre total de clients de la région
+- Nombre et somme des clients débiteurs (DB)
+- Nombre et somme des clients créditeurs (CR)
 
-J'utilise STARTBR/READNEXT pour parcourir tout le fichier et je filtre sur le code region.
+J'utilise STARTBR/READNEXT pour parcourir tout le fichier et je filtre sur le code région.
 
-### Resolution
+**Algorithme :**
+
+```
+1. Saisie du code région (01, 02, 03 ou 04)
+2. STARTBR depuis le début du fichier (LOW-VALUES)
+3. Pour chaque enregistrement (READNEXT) :
+   - Si code région correspond :
+     - Incrémenter compteur total
+     - Si position = 'DB' : compteur débiteurs + montant
+     - Si position = 'CR' : compteur créditeurs + montant
+4. ENDBR
+5. Afficher les résultats
+```
+
+### Résolution
 
 **MAP BMS : CLISTAT.bms**
 
 ```
-* Zone de saisie code region
+* Zone de saisie code région
          DFHMDF POS=(3,2),LENGTH=15,                                   X
                INITIAL='CODE REGION   :'
 CODREG   DFHMDF POS=(3,18),LENGTH=2,                                   X
@@ -222,7 +331,7 @@ MTCR     DFHMDF POS=(10,35),LENGTH=12,ATTRB=(ASKIP)
            INITIALIZE WS-STATS
            MOVE CODREGI TO WS-CODE-REGION
 
-      * Verification region existante
+      * Vérification région existante
            IF WS-CODE-REGION NOT = '01' AND '02' AND '03' AND '04'
                MOVE 'REGION INEXISTANTE, SAISIR CODE REGION' TO MSGO
                EXIT PARAGRAPH
@@ -247,7 +356,7 @@ MTCR     DFHMDF POS=(10,35),LENGTH=12,ATTRB=(ASKIP)
                ELSE
                    IF CLI-CODREG = WS-CODE-REGION
                        ADD 1 TO WS-NB-TOTAL
-                       IF CLI-DEBITEUR
+                       IF CLI-POSITION = 'DB'
                            ADD 1 TO WS-NB-DEBITEURS
                            ADD CLI-SOLDE TO WS-MT-DEBITEURS
                        ELSE
@@ -275,11 +384,28 @@ MTCR     DFHMDF POS=(10,35),LENGTH=12,ATTRB=(ASKIP)
 ```
 CEDA DEFINE TRANSACTION(STAT) GROUP(CLIGROUP)
      PROGRAM(PRGSTAT)
+
+CEDA INSTALL TRANSACTION(STAT) GROUP(CLIGROUP)
 ```
 
-### Captures d'ecran
+**Résultats attendus (avec les données initiales) :**
 
-<!-- ![pt3ex19-1](images-pt3/pt3ex19-1.png) -->
+| Région | Total | Débiteurs | Montant DB | Créditeurs | Montant CR |
+|--------|-------|-----------|------------|------------|------------|
+| 01 Paris | 5 | 1 | 80 000 | 4 | 871 000 |
+| 02 Marseille | 4 | 2 | 77 000 | 2 | 395 000 |
+| 03 Lyon | 3 | 1 | 12 000 | 2 | 598 000 |
+| 04 Lille | 3 | 2 | 118 000 | 1 | 180 000 |
+
+### Captures d'écran
+
+<!--
+Suggestions de captures d'écran pour cet exercice :
+
+1. pt3ex19-1 : Écran CLISTAT - Saisie code région 01
+2. pt3ex19-2 : Résultats statistiques pour Paris
+3. pt3ex19-3 : Résultats statistiques pour une autre région
+-->
 
 ---
 
