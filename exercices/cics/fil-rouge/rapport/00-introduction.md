@@ -98,10 +98,10 @@ Partie 2 : Opérations CRUD
         └── Exercice 15 : Variante avec lecture préalable
 
 Partie 3 : Opérations avancées
-    ├── Exercice 16 : Navigation VSAM (STARTBR, READNEXT)
-    ├── Exercice 17 : Affichage liste de clients
-    ├── Exercice 18 : Statistiques par région
-    └── Exercice 19 : Menu principal
+    ├── Exercice 16 : Création de clients génériques
+    ├── Exercice 17 : Suppression par code générique (STARTBR, READNEXT, DELETE)
+    ├── Exercice 18 : Liste générique paginée (10 clients/page)
+    └── Exercice 19 : Statistiques par région
 ```
 
 **Justification de ce découpage :**
