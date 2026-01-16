@@ -2,17 +2,6 @@
 *  MAPSET : CLILIST - Liste Generique des Clients
 *  Transaction : LGEN
 *  Fil Rouge CICS - Exercice 18
-*
-*  FONCTIONNALITE :
-*  ----------------
-*  Affiche une liste paginee de clients par prefixe generique.
-*  - 10 clients par page
-*  - Navigation PF7 (page prec.) / PF8 (page suiv.)
-*  - Saisie du prefixe (1 a 6 caracteres)
-*
-*  MODE PSEUDO-CONVERSATIONNEL :
-*  - COMMAREA sauvegarde la position de navigation
-*  - Permet de parcourir tout le fichier par pages de 10
 ***********************************************************************
 CLILIST  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
                STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
@@ -21,142 +10,131 @@ MAPLGEN  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 *----------------------------------------------------------------------
 * TITRE
 *----------------------------------------------------------------------
-         DFHMDF POS=(1,20),LENGTH=40,ATTRB=(ASKIP,BRT),                 X
+         DFHMDF POS=(1,18),LENGTH=44,ATTRB=(ASKIP,BRT),                 X
                INITIAL='*** LISTE GENERIQUE DES CLIENTS ***'
-         DFHMDF POS=(2,1),LENGTH=78,ATTRB=ASKIP,                        X
-               INITIAL='------------------------------------------------X
-               ------------------------------'
 *----------------------------------------------------------------------
 * ZONE DE SAISIE - PREFIXE
 *----------------------------------------------------------------------
          DFHMDF POS=(3,2),LENGTH=10,ATTRB=ASKIP,INITIAL='PREFIXE :'
 PREFIXE  DFHMDF POS=(3,13),LENGTH=6,ATTRB=(UNPROT,IC)
          DFHMDF POS=(3,20),LENGTH=1,ATTRB=ASKIP
-         DFHMDF POS=(3,22),LENGTH=20,ATTRB=ASKIP,                       X
+         DFHMDF POS=(3,22),LENGTH=18,ATTRB=ASKIP,                       X
                INITIAL='(1 a 6 caracteres)'
 *----------------------------------------------------------------------
 * EN-TETE DES COLONNES
 *----------------------------------------------------------------------
-         DFHMDF POS=(5,1),LENGTH=78,ATTRB=(ASKIP,BRT),                  X
-               INITIAL='NUM.CPT  RG  NOM        PRENOM     SOLDE      POX
-               S'
-         DFHMDF POS=(6,1),LENGTH=78,ATTRB=ASKIP,                        X
-               INITIAL='-------- --  ---------- ---------- ---------- --X
-               -'
+         DFHMDF POS=(5,1),LENGTH=50,ATTRB=(ASKIP,BRT),                  X
+               INITIAL='NUMCPT RG NOM        PRENOM     SOLDE      POS'
 *----------------------------------------------------------------------
 * LIGNE 1
 *----------------------------------------------------------------------
 L1NUM    DFHMDF POS=(7,1),LENGTH=6,ATTRB=ASKIP
-L1REG    DFHMDF POS=(7,10),LENGTH=2,ATTRB=ASKIP
-L1NOM    DFHMDF POS=(7,14),LENGTH=10,ATTRB=ASKIP
-L1PRE    DFHMDF POS=(7,25),LENGTH=10,ATTRB=ASKIP
-L1SOL    DFHMDF POS=(7,36),LENGTH=10,ATTRB=ASKIP
-L1POS    DFHMDF POS=(7,47),LENGTH=2,ATTRB=ASKIP
+L1REG    DFHMDF POS=(7,8),LENGTH=2,ATTRB=ASKIP
+L1NOM    DFHMDF POS=(7,11),LENGTH=10,ATTRB=ASKIP
+L1PRE    DFHMDF POS=(7,22),LENGTH=10,ATTRB=ASKIP
+L1SOL    DFHMDF POS=(7,33),LENGTH=10,ATTRB=ASKIP
+L1POS    DFHMDF POS=(7,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 2
 *----------------------------------------------------------------------
 L2NUM    DFHMDF POS=(8,1),LENGTH=6,ATTRB=ASKIP
-L2REG    DFHMDF POS=(8,10),LENGTH=2,ATTRB=ASKIP
-L2NOM    DFHMDF POS=(8,14),LENGTH=10,ATTRB=ASKIP
-L2PRE    DFHMDF POS=(8,25),LENGTH=10,ATTRB=ASKIP
-L2SOL    DFHMDF POS=(8,36),LENGTH=10,ATTRB=ASKIP
-L2POS    DFHMDF POS=(8,47),LENGTH=2,ATTRB=ASKIP
+L2REG    DFHMDF POS=(8,8),LENGTH=2,ATTRB=ASKIP
+L2NOM    DFHMDF POS=(8,11),LENGTH=10,ATTRB=ASKIP
+L2PRE    DFHMDF POS=(8,22),LENGTH=10,ATTRB=ASKIP
+L2SOL    DFHMDF POS=(8,33),LENGTH=10,ATTRB=ASKIP
+L2POS    DFHMDF POS=(8,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 3
 *----------------------------------------------------------------------
 L3NUM    DFHMDF POS=(9,1),LENGTH=6,ATTRB=ASKIP
-L3REG    DFHMDF POS=(9,10),LENGTH=2,ATTRB=ASKIP
-L3NOM    DFHMDF POS=(9,14),LENGTH=10,ATTRB=ASKIP
-L3PRE    DFHMDF POS=(9,25),LENGTH=10,ATTRB=ASKIP
-L3SOL    DFHMDF POS=(9,36),LENGTH=10,ATTRB=ASKIP
-L3POS    DFHMDF POS=(9,47),LENGTH=2,ATTRB=ASKIP
+L3REG    DFHMDF POS=(9,8),LENGTH=2,ATTRB=ASKIP
+L3NOM    DFHMDF POS=(9,11),LENGTH=10,ATTRB=ASKIP
+L3PRE    DFHMDF POS=(9,22),LENGTH=10,ATTRB=ASKIP
+L3SOL    DFHMDF POS=(9,33),LENGTH=10,ATTRB=ASKIP
+L3POS    DFHMDF POS=(9,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 4
 *----------------------------------------------------------------------
 L4NUM    DFHMDF POS=(10,1),LENGTH=6,ATTRB=ASKIP
-L4REG    DFHMDF POS=(10,10),LENGTH=2,ATTRB=ASKIP
-L4NOM    DFHMDF POS=(10,14),LENGTH=10,ATTRB=ASKIP
-L4PRE    DFHMDF POS=(10,25),LENGTH=10,ATTRB=ASKIP
-L4SOL    DFHMDF POS=(10,36),LENGTH=10,ATTRB=ASKIP
-L4POS    DFHMDF POS=(10,47),LENGTH=2,ATTRB=ASKIP
+L4REG    DFHMDF POS=(10,8),LENGTH=2,ATTRB=ASKIP
+L4NOM    DFHMDF POS=(10,11),LENGTH=10,ATTRB=ASKIP
+L4PRE    DFHMDF POS=(10,22),LENGTH=10,ATTRB=ASKIP
+L4SOL    DFHMDF POS=(10,33),LENGTH=10,ATTRB=ASKIP
+L4POS    DFHMDF POS=(10,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 5
 *----------------------------------------------------------------------
 L5NUM    DFHMDF POS=(11,1),LENGTH=6,ATTRB=ASKIP
-L5REG    DFHMDF POS=(11,10),LENGTH=2,ATTRB=ASKIP
-L5NOM    DFHMDF POS=(11,14),LENGTH=10,ATTRB=ASKIP
-L5PRE    DFHMDF POS=(11,25),LENGTH=10,ATTRB=ASKIP
-L5SOL    DFHMDF POS=(11,36),LENGTH=10,ATTRB=ASKIP
-L5POS    DFHMDF POS=(11,47),LENGTH=2,ATTRB=ASKIP
+L5REG    DFHMDF POS=(11,8),LENGTH=2,ATTRB=ASKIP
+L5NOM    DFHMDF POS=(11,11),LENGTH=10,ATTRB=ASKIP
+L5PRE    DFHMDF POS=(11,22),LENGTH=10,ATTRB=ASKIP
+L5SOL    DFHMDF POS=(11,33),LENGTH=10,ATTRB=ASKIP
+L5POS    DFHMDF POS=(11,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 6
 *----------------------------------------------------------------------
 L6NUM    DFHMDF POS=(12,1),LENGTH=6,ATTRB=ASKIP
-L6REG    DFHMDF POS=(12,10),LENGTH=2,ATTRB=ASKIP
-L6NOM    DFHMDF POS=(12,14),LENGTH=10,ATTRB=ASKIP
-L6PRE    DFHMDF POS=(12,25),LENGTH=10,ATTRB=ASKIP
-L6SOL    DFHMDF POS=(12,36),LENGTH=10,ATTRB=ASKIP
-L6POS    DFHMDF POS=(12,47),LENGTH=2,ATTRB=ASKIP
+L6REG    DFHMDF POS=(12,8),LENGTH=2,ATTRB=ASKIP
+L6NOM    DFHMDF POS=(12,11),LENGTH=10,ATTRB=ASKIP
+L6PRE    DFHMDF POS=(12,22),LENGTH=10,ATTRB=ASKIP
+L6SOL    DFHMDF POS=(12,33),LENGTH=10,ATTRB=ASKIP
+L6POS    DFHMDF POS=(12,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 7
 *----------------------------------------------------------------------
 L7NUM    DFHMDF POS=(13,1),LENGTH=6,ATTRB=ASKIP
-L7REG    DFHMDF POS=(13,10),LENGTH=2,ATTRB=ASKIP
-L7NOM    DFHMDF POS=(13,14),LENGTH=10,ATTRB=ASKIP
-L7PRE    DFHMDF POS=(13,25),LENGTH=10,ATTRB=ASKIP
-L7SOL    DFHMDF POS=(13,36),LENGTH=10,ATTRB=ASKIP
-L7POS    DFHMDF POS=(13,47),LENGTH=2,ATTRB=ASKIP
+L7REG    DFHMDF POS=(13,8),LENGTH=2,ATTRB=ASKIP
+L7NOM    DFHMDF POS=(13,11),LENGTH=10,ATTRB=ASKIP
+L7PRE    DFHMDF POS=(13,22),LENGTH=10,ATTRB=ASKIP
+L7SOL    DFHMDF POS=(13,33),LENGTH=10,ATTRB=ASKIP
+L7POS    DFHMDF POS=(13,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 8
 *----------------------------------------------------------------------
 L8NUM    DFHMDF POS=(14,1),LENGTH=6,ATTRB=ASKIP
-L8REG    DFHMDF POS=(14,10),LENGTH=2,ATTRB=ASKIP
-L8NOM    DFHMDF POS=(14,14),LENGTH=10,ATTRB=ASKIP
-L8PRE    DFHMDF POS=(14,25),LENGTH=10,ATTRB=ASKIP
-L8SOL    DFHMDF POS=(14,36),LENGTH=10,ATTRB=ASKIP
-L8POS    DFHMDF POS=(14,47),LENGTH=2,ATTRB=ASKIP
+L8REG    DFHMDF POS=(14,8),LENGTH=2,ATTRB=ASKIP
+L8NOM    DFHMDF POS=(14,11),LENGTH=10,ATTRB=ASKIP
+L8PRE    DFHMDF POS=(14,22),LENGTH=10,ATTRB=ASKIP
+L8SOL    DFHMDF POS=(14,33),LENGTH=10,ATTRB=ASKIP
+L8POS    DFHMDF POS=(14,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 9
 *----------------------------------------------------------------------
 L9NUM    DFHMDF POS=(15,1),LENGTH=6,ATTRB=ASKIP
-L9REG    DFHMDF POS=(15,10),LENGTH=2,ATTRB=ASKIP
-L9NOM    DFHMDF POS=(15,14),LENGTH=10,ATTRB=ASKIP
-L9PRE    DFHMDF POS=(15,25),LENGTH=10,ATTRB=ASKIP
-L9SOL    DFHMDF POS=(15,36),LENGTH=10,ATTRB=ASKIP
-L9POS    DFHMDF POS=(15,47),LENGTH=2,ATTRB=ASKIP
+L9REG    DFHMDF POS=(15,8),LENGTH=2,ATTRB=ASKIP
+L9NOM    DFHMDF POS=(15,11),LENGTH=10,ATTRB=ASKIP
+L9PRE    DFHMDF POS=(15,22),LENGTH=10,ATTRB=ASKIP
+L9SOL    DFHMDF POS=(15,33),LENGTH=10,ATTRB=ASKIP
+L9POS    DFHMDF POS=(15,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * LIGNE 10
 *----------------------------------------------------------------------
 L10NUM   DFHMDF POS=(16,1),LENGTH=6,ATTRB=ASKIP
-L10REG   DFHMDF POS=(16,10),LENGTH=2,ATTRB=ASKIP
-L10NOM   DFHMDF POS=(16,14),LENGTH=10,ATTRB=ASKIP
-L10PRE   DFHMDF POS=(16,25),LENGTH=10,ATTRB=ASKIP
-L10SOL   DFHMDF POS=(16,36),LENGTH=10,ATTRB=ASKIP
-L10POS   DFHMDF POS=(16,47),LENGTH=2,ATTRB=ASKIP
+L10REG   DFHMDF POS=(16,8),LENGTH=2,ATTRB=ASKIP
+L10NOM   DFHMDF POS=(16,11),LENGTH=10,ATTRB=ASKIP
+L10PRE   DFHMDF POS=(16,22),LENGTH=10,ATTRB=ASKIP
+L10SOL   DFHMDF POS=(16,33),LENGTH=10,ATTRB=ASKIP
+L10POS   DFHMDF POS=(16,44),LENGTH=2,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * ZONE INFORMATIONS PAGINATION
 *----------------------------------------------------------------------
-         DFHMDF POS=(18,1),LENGTH=78,ATTRB=ASKIP,                       X
-               INITIAL='------------------------------------------------X
-               ------------------------------'
-         DFHMDF POS=(19,2),LENGTH=6,ATTRB=ASKIP,INITIAL='PAGE :'
-PAGNUM   DFHMDF POS=(19,9),LENGTH=3,ATTRB=(ASKIP,BRT)
-         DFHMDF POS=(19,13),LENGTH=1,ATTRB=ASKIP,INITIAL='/'
-PAGTOT   DFHMDF POS=(19,15),LENGTH=3,ATTRB=(ASKIP,BRT)
-         DFHMDF POS=(19,22),LENGTH=7,ATTRB=ASKIP,INITIAL='TOTAL :'
-CLITOT   DFHMDF POS=(19,30),LENGTH=5,ATTRB=(ASKIP,BRT)
-         DFHMDF POS=(19,36),LENGTH=10,ATTRB=ASKIP,INITIAL='CLIENT(S)'
+         DFHMDF POS=(18,2),LENGTH=6,ATTRB=ASKIP,INITIAL='PAGE :'
+PAGNUM   DFHMDF POS=(18,9),LENGTH=3,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(18,13),LENGTH=1,ATTRB=ASKIP,INITIAL='/'
+PAGTOT   DFHMDF POS=(18,15),LENGTH=3,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(18,22),LENGTH=7,ATTRB=ASKIP,INITIAL='TOTAL :'
+CLITOT   DFHMDF POS=(18,30),LENGTH=5,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(18,36),LENGTH=10,ATTRB=ASKIP,INITIAL='CLIENT(S)'
 *----------------------------------------------------------------------
 * ZONE MESSAGE
 *----------------------------------------------------------------------
-         DFHMDF POS=(21,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
-MSG      DFHMDF POS=(21,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(20,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
+MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 *----------------------------------------------------------------------
 * TOUCHES FONCTION
 *----------------------------------------------------------------------
-         DFHMDF POS=(23,2),LENGTH=70,ATTRB=ASKIP,                       X
-               INITIAL='ENTER=Chercher  PF7=Page prec  PF8=Page suiv  PFX
-               3=Quitter'
+         DFHMDF POS=(23,2),LENGTH=60,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Chercher  PF7=Prec  PF8=Suiv  PF3=Quitter'
 ***********************************************************************
          DFHMSD TYPE=FINAL
          END
