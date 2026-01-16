@@ -131,13 +131,22 @@ STARTBR (111000, GTEQ)     READNEXT           READNEXT           READNEXT
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  PHASE 2 : CONFIRMATION                                     │
-│  ──────────────────────                                     │
+│  PHASE 2 : CONFIRMATION ET SUPPRESSION                      │
+│  ─────────────────────────────────────                      │
 │  4. L'utilisateur répond O ou N                            │
-│  5. Si O : STARTBR/READNEXT + DELETE pour chaque client    │
-│  6. Si N : Retour phase 1                                  │
+│  5. Si N : Retour phase 1                                  │
+│  6. Si O : Suppression en 2 étapes (évite deadlock)        │
+│     a) STARTBR/READNEXT → collecter clés en table (max 100)│
+│     b) ENDBR (fermer browse)                               │
+│     c) Pour chaque clé : DELETE RIDFLD                     │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**Point technique - Éviter le deadlock CICS :**
+
+On ne peut pas faire `DELETE RIDFLD` pendant un browse actif (STARTBR/READNEXT) car cela provoque un deadlock : le browse tient un verrou lecture, le DELETE demande un verrou exclusif sur le même enregistrement → CICS freeze.
+
+**Solution adoptée :** Collecter les clés dans une table (max 100), fermer le browse avec ENDBR, puis supprimer chaque clé. Si plus de 100 clients correspondent, l'utilisateur doit relancer la transaction.
 
 **Choix technique important :**
 
@@ -177,7 +186,7 @@ NBCLI    DFHMDF POS=(8,28),LENGTH=5,ATTRB=(ASKIP,BRT)
 *----------------------------------------------------------------------
          DFHMDF POS=(10,2),LENGTH=25,ATTRB=ASKIP,                       X
                INITIAL='CONFIRMER (O/N)         :'
-CONFIRM  DFHMDF POS=(10,28),LENGTH=1,ATTRB=(UNPROT,IC)
+CONFIRM  DFHMDF POS=(10,28),LENGTH=1,ATTRB=UNPROT
 *----------------------------------------------------------------------
 * ZONE MESSAGE
 *----------------------------------------------------------------------
@@ -245,11 +254,23 @@ MSG      DFHMDF POS=(15,13),LENGTH=60,ATTRB=(ASKIP,BRT)
            EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
 
       *-----------------------------------------------------------------
+      * TABLE DES CLES A SUPPRIMER (max 100 clients)
+      *-----------------------------------------------------------------
+       01  WS-TABLE-CLES.
+           05 WS-NB-CLES          PIC 9(03) VALUE 0.
+           05 WS-CLES OCCURS 100 TIMES.
+              10 WS-CLE-SUP       PIC X(06).
+       01  WS-IDX-SUP             PIC 9(03) VALUE 0.
+
+      *-----------------------------------------------------------------
        4100-SUPPRIMER-CLIENTS.
       *-----------------------------------------------------------------
-      * Suppression effective de tous les clients correspondants
-      * Utilise STARTBR/READNEXT puis DELETE pour chaque client
+      * Suppression en 2 étapes pour éviter le deadlock
+      * Étape 1 : Collecter les clés pendant le browse
+      * Étape 2 : Supprimer après ENDBR
       *-----------------------------------------------------------------
+           MOVE 0 TO WS-NB-CLES
+
            EXEC CICS STARTBR
                FILE('FCLIENT')
                RIDFLD(WS-CLE-DEBUT)
@@ -257,7 +278,7 @@ MSG      DFHMDF POS=(15,13),LENGTH=60,ATTRB=(ASKIP,BRT)
                RESP(WS-RESP)
            END-EXEC
 
-      *    Boucle de lecture et suppression
+      *    ETAPE 1 : Collecter les clés (sans DELETE)
            PERFORM UNTIL FIN-BROWSE
                EXEC CICS READNEXT
                    FILE('FCLIENT')
@@ -272,20 +293,32 @@ MSG      DFHMDF POS=(15,13),LENGTH=60,ATTRB=(ASKIP,BRT)
                    WHEN WS-CLE-COURANTE(1:WS-LONGUEUR) NOT =
                        WS-PREFIXE(1:WS-LONGUEUR)
                        MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN WS-NB-CLES >= 100
+      *                Table pleine
+                       MOVE 'O' TO WS-FIN-BROWSE
                    WHEN OTHER
-      *                Suppression du client courant
-                       EXEC CICS DELETE
-                           FILE('FCLIENT')
-                           RIDFLD(WS-CLE-COURANTE)
-                           RESP(WS-RESP)
-                       END-EXEC
-                       IF WS-RESP = DFHRESP(NORMAL)
-                           ADD 1 TO WS-COMPTEUR-SUP
-                       END-IF
+      *                Stocker la clé dans la table
+                       ADD 1 TO WS-NB-CLES
+                       MOVE WS-CLE-COURANTE TO WS-CLE-SUP(WS-NB-CLES)
                END-EVALUATE
            END-PERFORM
 
-           EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
+      *    Fermer le browse AVANT les suppressions
+           EXEC CICS ENDBR FILE('FCLIENT') END-EXEC
+
+      *    ETAPE 2 : Supprimer chaque clé collectée
+           PERFORM VARYING WS-IDX-SUP FROM 1 BY 1
+               UNTIL WS-IDX-SUP > WS-NB-CLES
+               MOVE WS-CLE-SUP(WS-IDX-SUP) TO WS-CLE-COURANTE
+               EXEC CICS DELETE
+                   FILE('FCLIENT')
+                   RIDFLD(WS-CLE-COURANTE)
+                   RESP(WS-RESP)
+               END-EXEC
+               IF WS-RESP = DFHRESP(NORMAL)
+                   ADD 1 TO WS-COMPTEUR-SUP
+               END-IF
+           END-PERFORM.
 ```
 
 **JCL d'assemblage BMS : ASMDEL.jcl**
