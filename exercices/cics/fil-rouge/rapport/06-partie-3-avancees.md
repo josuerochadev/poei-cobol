@@ -101,7 +101,9 @@ En utilisant les commandes adéquates, supprimer les CLIENT dont le code génér
 
 ### Mon travail
 
-J'ai utilisé STARTBR pour positionner le curseur sur le premier client '111', puis READNEXT en boucle pour lire et supprimer chaque client commençant par '111'.
+J'ai créé un programme qui va plus loin que l'énoncé initial en permettant :
+- La suppression par **préfixe variable** (1 à 5 caractères) : supprime tous les clients correspondants
+- La suppression par **clé complète** (6 caractères) : supprime un seul client spécifique
 
 **Principe de la navigation VSAM :**
 
@@ -113,17 +115,103 @@ STARTBR (111000, GTEQ)     READNEXT           READNEXT           READNEXT
    │ 111001  │ ────────►  │ 111002  │ ────►  │ 111003  │ ────►  │ 222001  │
    │ DELETE  │            │ DELETE  │        │ DELETE  │        │ STOP!   │
    └─────────┘            └─────────┘        └─────────┘        └─────────┘
-                                                                Clé != 111
+                                                               Clé != 111
 ```
+
+**Mode pseudo-conversationnel à 2 phases :**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  PHASE 1 : COMPTAGE                                         │
+│  ─────────────────                                          │
+│  1. Saisie préfixe (1-5 car) ou clé complète (6 car)       │
+│  2. STARTBR/READNEXT pour compter les clients              │
+│  3. Affichage : "X client(s) trouvé(s)"                    │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  PHASE 2 : CONFIRMATION                                     │
+│  ──────────────────────                                     │
+│  4. L'utilisateur répond O ou N                            │
+│  5. Si O : STARTBR/READNEXT + DELETE pour chaque client    │
+│  6. Si N : Retour phase 1                                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Choix technique important :**
+
+Le champ PREFIXE est défini en `PIC X` (et non `PIC 9` avec NUM) pour éviter la justification à droite des valeurs numériques. Ainsi, si l'utilisateur saisit `1`, la valeur reste `1_____` (avec espaces) et non `_____1`.
 
 ### Résolution
 
-**Programme : PRGSDEL.cbl** (Suppression Générique)
+**MAP BMS : CLIDEL.bms**
+
+```
+***********************************************************************
+*  MAPSET : CLIDEL - Suppression Générique Client
+*  Transaction : DELG
+*  Fil Rouge CICS - Exercice 17
+***********************************************************************
+CLIDEL   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPDEL   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* ZONE DE SAISIE - PREFIXE OU CLE COMPLETE
+*----------------------------------------------------------------------
+         DFHMDF POS=(5,2),LENGTH=25,ATTRB=ASKIP,                        X
+               INITIAL='PREFIXE OU CLE COMPLETE :'
+PREFIXE  DFHMDF POS=(5,28),LENGTH=6,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(5,35),LENGTH=1,ATTRB=ASKIP
+         DFHMDF POS=(5,37),LENGTH=30,ATTRB=ASKIP,                       X
+               INITIAL='(1 a 6 caracteres)'
+*----------------------------------------------------------------------
+* ZONE D'INFORMATION - NOMBRE DE CLIENTS
+*----------------------------------------------------------------------
+         DFHMDF POS=(8,2),LENGTH=25,ATTRB=ASKIP,                        X
+               INITIAL='CLIENTS CORRESPONDANTS  :'
+NBCLI    DFHMDF POS=(8,28),LENGTH=5,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* ZONE DE CONFIRMATION
+*----------------------------------------------------------------------
+         DFHMDF POS=(10,2),LENGTH=25,ATTRB=ASKIP,                       X
+               INITIAL='CONFIRMER (O/N)         :'
+CONFIRM  DFHMDF POS=(10,28),LENGTH=1,ATTRB=(UNPROT,IC)
+*----------------------------------------------------------------------
+* ZONE MESSAGE
+*----------------------------------------------------------------------
+MSG      DFHMDF POS=(15,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+```
+
+**Programme : PRGDELG.cbl** (Suppression Générique)
 
 ```cobol
-       2000-SUPPRIMER-GENERIQUE.
-           MOVE '111000' TO WS-CLE-DEBUT
+      *-----------------------------------------------------------------
+      * ZONE DE COMMUNICATION (COMMAREA)
+      * Sauvegarde la phase, le préfixe et le compte entre passages
+      *-----------------------------------------------------------------
+       01  WS-COMMAREA.
+           05 WS-PHASE            PIC X(01) VALUE '1'.
+              88 PHASE-COMPTAGE   VALUE '1'.
+              88 PHASE-CONFIRM    VALUE '2'.
+           05 WS-PREFIXE-SAVED    PIC X(06) VALUE SPACES.
+           05 WS-LONGUEUR-SAVED   PIC 9(01) VALUE 0.
+           05 WS-NBCLI-SAVED      PIC 9(05) VALUE 0.
 
+      *-----------------------------------------------------------------
+       3100-PARCOURIR-FICHIER.
+      *-----------------------------------------------------------------
+      * Parcours du fichier pour compter les clients correspondants
+      *-----------------------------------------------------------------
+           MOVE 0 TO WS-COMPTEUR
+           MOVE 'N' TO WS-FIN-BROWSE
+
+      *    Construction de la clé de début (préfixe complété par des 0)
+           MOVE SPACES TO WS-CLE-DEBUT
+           MOVE WS-PREFIXE(1:WS-LONGUEUR) TO WS-CLE-DEBUT
+
+      *    Positionnement sur le premier client >= préfixe
            EXEC CICS STARTBR
                FILE('FCLIENT')
                RIDFLD(WS-CLE-DEBUT)
@@ -131,12 +219,8 @@ STARTBR (111000, GTEQ)     READNEXT           READNEXT           READNEXT
                RESP(WS-RESP)
            END-EXEC
 
-           IF WS-RESP NOT = DFHRESP(NORMAL)
-               MOVE 'AUCUN CLIENT 111XXX TROUVE' TO MSGO
-               EXIT PARAGRAPH
-           END-IF
-
-           PERFORM UNTIL WS-FIN-BROWSE = 'O'
+      *    Boucle de lecture
+           PERFORM UNTIL FIN-BROWSE
                EXEC CICS READNEXT
                    FILE('FCLIENT')
                    INTO(ENR-CLIENT)
@@ -144,25 +228,116 @@ STARTBR (111000, GTEQ)     READNEXT           READNEXT           READNEXT
                    RESP(WS-RESP)
                END-EXEC
 
-               IF WS-RESP = DFHRESP(ENDFILE)
-                   MOVE 'O' TO WS-FIN-BROWSE
-               ELSE IF WS-CLE-COURANTE(1:3) NOT = '111'
-                   MOVE 'O' TO WS-FIN-BROWSE
-               ELSE
-                   EXEC CICS DELETE
-                       FILE('FCLIENT')
-                       RIDFLD(WS-CLE-COURANTE)
-                   END-EXEC
-                   ADD 1 TO WS-COMPTEUR-SUP
-               END-IF
+               EVALUATE TRUE
+                   WHEN WS-RESP = DFHRESP(ENDFILE)
+                       MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN WS-CLE-COURANTE(1:WS-LONGUEUR) NOT =
+                       WS-PREFIXE(1:WS-LONGUEUR)
+      *                Clé ne correspond plus au préfixe
+                       MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN OTHER
+      *                Client correspondant trouvé
+                       ADD 1 TO WS-COMPTEUR
+               END-EVALUATE
+           END-PERFORM
+
+      *    Fermeture du browse
+           EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
+
+      *-----------------------------------------------------------------
+       4100-SUPPRIMER-CLIENTS.
+      *-----------------------------------------------------------------
+      * Suppression effective de tous les clients correspondants
+      * Utilise STARTBR/READNEXT puis DELETE pour chaque client
+      *-----------------------------------------------------------------
+           EXEC CICS STARTBR
+               FILE('FCLIENT')
+               RIDFLD(WS-CLE-DEBUT)
+               GTEQ
+               RESP(WS-RESP)
+           END-EXEC
+
+      *    Boucle de lecture et suppression
+           PERFORM UNTIL FIN-BROWSE
+               EXEC CICS READNEXT
+                   FILE('FCLIENT')
+                   INTO(ENR-CLIENT)
+                   RIDFLD(WS-CLE-COURANTE)
+                   RESP(WS-RESP)
+               END-EXEC
+
+               EVALUATE TRUE
+                   WHEN WS-RESP = DFHRESP(ENDFILE)
+                       MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN WS-CLE-COURANTE(1:WS-LONGUEUR) NOT =
+                       WS-PREFIXE(1:WS-LONGUEUR)
+                       MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN OTHER
+      *                Suppression du client courant
+                       EXEC CICS DELETE
+                           FILE('FCLIENT')
+                           RIDFLD(WS-CLE-COURANTE)
+                           RESP(WS-RESP)
+                       END-EXEC
+                       IF WS-RESP = DFHRESP(NORMAL)
+                           ADD 1 TO WS-COMPTEUR-SUP
+                       END-IF
+               END-EVALUATE
            END-PERFORM
 
            EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
 ```
 
+**JCL d'assemblage BMS : ASMDEL.jcl**
+
+```jcl
+//ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
+//          MAPLIB='ROCHA.CICS.LOAD',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          MAPNAME='CLIDEL',RMODE=24
+//SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLIDEL),DISP=SHR
+```
+
+**JCL de compilation COBOL : CMPDELG.jcl**
+
+```jcl
+//COMPIL   EXEC PROC=DFHYITVL,
+//          INDEX='DFH510.CICS',
+//          PROGLIB='ROCHA.CICS.LOAD',
+//          AD370HLQ='IGY420',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          LE370HLQ='CEE'
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGDELG),DISP=SHR
+//LKED.SYSIN DD *
+     INCLUDE SYSLIB(DFHELII)
+     NAME PRGDELG(R)
+/*
+```
+
+**Définition de la transaction DELG :**
+
+```
+CEDA DEFINE MAPSET(CLIDEL) GROUP(CLIGROUP)
+
+CEDA DEFINE PROGRAM(PRGDELG) GROUP(CLIGROUP)
+     LANGUAGE(COBOL)
+
+CEDA DEFINE TRANSACTION(DELG) GROUP(CLIGROUP)
+     PROGRAM(PRGDELG)
+
+CEDA INSTALL GROUP(CLIGROUP)
+```
+
 ### Captures d'écran
 
-<!-- ![pt3ex17-1](images-pt3/pt3ex17-1.png) -->
+<!--
+Suggestions de captures d'écran pour cet exercice :
+
+1. pt3ex17-1 : Écran CLIDEL - Saisie préfixe "111"
+2. pt3ex17-2 : Résultat comptage "5 client(s) trouvé(s)"
+3. pt3ex17-3 : Confirmation "O" et résultat suppression
+4. pt3ex17-4 : Saisie clé complète "222001" pour suppression unique
+-->
 
 ---
 

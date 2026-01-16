@@ -122,6 +122,7 @@ Au cours du projet, les membres suivants ont été créés dans `ROCHA.CICS.SOUR
 | PRGAJT | AJOU | Ajout client (WRITE) |
 | PRGMAJ | MAJO | Mise à jour client (REWRITE) |
 | PRGSUP | SUPP | Suppression client (DELETE) |
+| PRGDELG | DELG | Suppression générique (STARTBR/READNEXT/DELETE) |
 | PRGLGEN | LGEN | Liste générique (STARTBR/READNEXT) |
 | PRGSTAT | STAT | Statistiques par région |
 
@@ -133,6 +134,7 @@ Au cours du projet, les membres suivants ont été créés dans `ROCHA.CICS.SOUR
 | CLIAJT | PRGAJT | Écran ajout client |
 | CLIMAJ | PRGMAJ | Écran mise à jour client |
 | CLISUP | PRGSUP | Écran suppression client |
+| CLIDEL | PRGDELG | Écran suppression générique |
 | CLISTAT | PRGSTAT | Écran statistiques |
 
 **JCL :**
@@ -149,6 +151,8 @@ Au cours du projet, les membres suivants ont été créés dans `ROCHA.CICS.SOUR
 | CMPMAJ | Compilation PRGMAJ | Ex 10 |
 | ASMSUP | Assemblage MAP CLISUP | Ex 12 |
 | CMPSUP | Compilation PRGSUP | Ex 13 |
+| ASMDEL | Assemblage MAP CLIDEL | Ex 17 |
+| CMPDELG | Compilation PRGDELG | Ex 17 |
 
 > **Note sur les copybooks** : Les copybooks pour les MAPs BMS sont générés automatiquement lors de l'assemblage avec l'option `TYPE=DSECT`. Ils contiennent les structures de données avec les suffixes :
 > - `I` : Zone input (données reçues de l'écran)

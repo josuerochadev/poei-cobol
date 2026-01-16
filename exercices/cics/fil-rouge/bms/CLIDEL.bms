@@ -1,0 +1,69 @@
+***********************************************************************
+*  MAPSET : CLIDEL - Suppression Generique Client
+*  Transaction : DELG
+*  Fil Rouge CICS - Exercice 17
+*
+*  PARTICULARITE :
+*  ---------------
+*  Permet la suppression par prefixe (1 a 5 car) ou cle complete (6 car)
+*  - Prefixe : Supprime tous les clients correspondants
+*  - Cle complete : Supprime un seul client
+*
+*  Le champ PREFIXE est en PIC X (pas NUM) pour eviter la
+*  justification a droite des valeurs numeriques.
+*
+*  MODE PSEUDO-CONVERSATIONNEL A 2 PHASES :
+*  Phase 1 : Saisie prefixe/cle -> Comptage et affichage
+*  Phase 2 : Confirmation O/N -> Suppression effective
+***********************************************************************
+CLIDEL   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPDEL   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* TITRE
+*----------------------------------------------------------------------
+         DFHMDF POS=(1,20),LENGTH=40,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='*** SUPPRESSION GENERIQUE CLIENT ***'
+         DFHMDF POS=(2,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+*----------------------------------------------------------------------
+* ZONE DE SAISIE - PREFIXE OU CLE COMPLETE
+*----------------------------------------------------------------------
+         DFHMDF POS=(5,2),LENGTH=25,ATTRB=ASKIP,                        X
+               INITIAL='PREFIXE OU CLE COMPLETE :'
+PREFIXE  DFHMDF POS=(5,28),LENGTH=6,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(5,35),LENGTH=1,ATTRB=ASKIP
+         DFHMDF POS=(5,37),LENGTH=30,ATTRB=ASKIP,                       X
+               INITIAL='(1 a 6 caracteres)'
+*----------------------------------------------------------------------
+* ZONE D'INFORMATION - NOMBRE DE CLIENTS
+*----------------------------------------------------------------------
+         DFHMDF POS=(8,2),LENGTH=25,ATTRB=ASKIP,                        X
+               INITIAL='CLIENTS CORRESPONDANTS  :'
+NBCLI    DFHMDF POS=(8,28),LENGTH=5,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(8,35),LENGTH=1,ATTRB=ASKIP
+*----------------------------------------------------------------------
+* ZONE DE CONFIRMATION
+*----------------------------------------------------------------------
+         DFHMDF POS=(10,2),LENGTH=25,ATTRB=ASKIP,                       X
+               INITIAL='CONFIRMER (O/N)         :'
+CONFIRM  DFHMDF POS=(10,28),LENGTH=1,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(10,30),LENGTH=1,ATTRB=ASKIP
+*----------------------------------------------------------------------
+* ZONE MESSAGE
+*----------------------------------------------------------------------
+         DFHMDF POS=(14,1),LENGTH=78,ATTRB=ASKIP,                       X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+         DFHMDF POS=(15,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
+MSG      DFHMDF POS=(15,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* TOUCHES FONCTION
+*----------------------------------------------------------------------
+         DFHMDF POS=(23,2),LENGTH=70,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Valider  PF3=Quitter  CLEAR=Reinitialiser'
+***********************************************************************
+         DFHMSD TYPE=FINAL
+         END
