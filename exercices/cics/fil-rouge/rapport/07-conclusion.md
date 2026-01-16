@@ -155,7 +155,7 @@ Ce projet m'a permis de mettre en pratique l'ensemble des compétences acquises 
 
 - **Administrer les transactions** : Définition via CEDA, installation de groupes, tests avec CEDF.
 
-Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec **5 programmes COBOL-CICS**, **5 MAPs BMS** et **5 transactions**. Les principales difficultés rencontrées (gestion des attributs BMS, validation des données, navigation VSAM, fusion des modifications) m'ont permis de développer une approche méthodique de résolution de problèmes.
+Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec **6 programmes COBOL-CICS**, **6 MAPs BMS** et **6 transactions**. Les principales difficultés rencontrées (gestion des attributs BMS, validation des données, navigation VSAM, fusion des modifications, deadlock lors de suppressions multiples) m'ont permis de développer une approche méthodique de résolution de problèmes.
 
 Cette expérience constitue une base solide pour aborder des projets mainframe transactionnels en entreprise.
 
