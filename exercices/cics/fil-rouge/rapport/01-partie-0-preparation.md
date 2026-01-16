@@ -135,6 +135,7 @@ Au cours du projet, les membres suivants ont été créés dans `ROCHA.CICS.SOUR
 | CLIMAJ | PRGMAJ | Écran mise à jour client |
 | CLISUP | PRGSUP | Écran suppression client |
 | CLIDEL | PRGDELG | Écran suppression générique |
+| CLILIST | PRGLGEN | Écran liste générique paginée |
 | CLISTAT | PRGSTAT | Écran statistiques |
 
 **JCL :**
@@ -153,6 +154,8 @@ Au cours du projet, les membres suivants ont été créés dans `ROCHA.CICS.SOUR
 | CMPSUP | Compilation PRGSUP | Ex 13 |
 | ASMDEL | Assemblage MAP CLIDEL | Ex 17 |
 | CMPDELG | Compilation PRGDELG | Ex 17 |
+| ASMLIST | Assemblage MAP CLILIST | Ex 18 |
+| CMPLGEN | Compilation PRGLGEN | Ex 18 |
 
 > **Note sur les copybooks** : Les copybooks pour les MAPs BMS sont générés automatiquement lors de l'assemblage avec l'option `TYPE=DSECT`. Ils contiennent les structures de données avec les suffixes :
 > - `I` : Zone input (données reçues de l'écran)

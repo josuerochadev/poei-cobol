@@ -88,6 +88,7 @@
 | PRGMAJ | MAJO | READ UPDATE, REWRITE | Mise à jour d'un client |
 | PRGSUP | SUPP | READ, DELETE | Suppression d'un client (avec affichage) |
 | PRGDELG | DELG | STARTBR, READNEXT, DELETE | Suppression générique par préfixe |
+| PRGLGEN | LGEN | STARTBR, READNEXT | Liste générique paginée (10 clients/page) |
 
 ### Liste des MAPs BMS
 
@@ -98,6 +99,7 @@
 | CLIMAJ | MAPMAJ | PRGMAJ | Écran de mise à jour |
 | CLISUP | MAPSUP | PRGSUP | Écran de suppression |
 | CLIDEL | MAPDEL | PRGDELG | Écran de suppression générique |
+| CLILIST | MAPLGEN | PRGLGEN | Écran de liste générique paginée |
 
 ### Liste des transactions CICS
 
@@ -108,6 +110,7 @@
 | MAJO | PRGMAJ | Mise à jour client |
 | SUPP | PRGSUP | Suppression client |
 | DELG | PRGDELG | Suppression générique |
+| LGEN | PRGLGEN | Liste générique paginée |
 
 ### Structure du fichier CLIENT (80 octets)
 
