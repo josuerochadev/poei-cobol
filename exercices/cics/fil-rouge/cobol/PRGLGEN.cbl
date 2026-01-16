@@ -187,6 +187,8 @@
 
            EXEC CICS SEND MAP('MAPLGEN')
                MAPSET('CLILIST')
+               FREEKB
+               CURSOR
                ERASE
            END-EXEC.
 
@@ -224,6 +226,8 @@
                MOVE 'VEUILLEZ SAISIR UN PREFIXE' TO MSGO
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FREEKB
+                   CURSOR
                    ERASE
                END-EXEC
                GO TO 3000-FIN
@@ -239,6 +243,8 @@
                MOVE 'PREFIXE OBLIGATOIRE (1 A 6 CARACTERES)' TO MSGO
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FREEKB
+                   CURSOR
                    ERASE
                END-EXEC
                GO TO 3000-FIN
@@ -253,6 +259,8 @@
                MOVE 'PREFIXE INVALIDE - MIN 1 CARACTERE' TO MSGO
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FREEKB
+                   CURSOR
                    ERASE
                END-EXEC
                GO TO 3000-FIN
@@ -278,6 +286,8 @@
                MOVE 'N' TO WS-FIN-FICHIER
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FREEKB
+                   CURSOR
                    ERASE
                END-EXEC
                GO TO 3000-FIN
@@ -443,6 +453,8 @@
                MOVE 'ERREUR POSITIONNEMENT FICHIER' TO MSGO
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FREEKB
+                   CURSOR
                    ERASE
                END-EXEC
                GO TO 6000-FIN
@@ -583,6 +595,8 @@
 
            EXEC CICS SEND MAP('MAPLGEN')
                MAPSET('CLILIST')
+               FREEKB
+               CURSOR
                ERASE
            END-EXEC.
 
@@ -601,6 +615,8 @@
 
            EXEC CICS SEND MAP('MAPLGEN')
                MAPSET('CLILIST')
+               FREEKB
+               CURSOR
                ERASE
            END-EXEC.
 
