@@ -268,7 +268,14 @@
            IF WS-TOTAL-CLIENTS = 0
                MOVE LOW-VALUES TO MAPLGENO
                MOVE WS-PREFIXE TO PREFIXEO
-               MOVE 'AUCUN CLIENT TROUVE AVEC CE PREFIXE' TO MSGO
+               MOVE 'AUCUN CLIENT TROUVE - SAISIR AUTRE PREFIXE' TO MSGO
+      *        Reinitialiser pour permettre nouvelle recherche
+               MOVE SPACES TO WS-PREFIXE-SAVED
+               MOVE 0 TO WS-LONGUEUR-SAVED
+               MOVE SPACES TO WS-DERNIERE-CLE
+               MOVE 0 TO WS-PAGE-COURANTE
+               MOVE 0 TO WS-TOTAL-PAGES
+               MOVE 'N' TO WS-FIN-FICHIER
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
                    ERASE
