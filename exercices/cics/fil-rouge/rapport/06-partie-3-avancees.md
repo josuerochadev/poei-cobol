@@ -662,98 +662,188 @@ J'utilise STARTBR/READNEXT pour parcourir tout le fichier et je filtre sur le co
 **MAP BMS : CLISTAT.bms**
 
 ```
-* Zone de saisie code région
-         DFHMDF POS=(3,2),LENGTH=15,                                   X
-               INITIAL='CODE REGION   :'
-CODREG   DFHMDF POS=(3,18),LENGTH=2,                                   X
-               ATTRB=(UNPROT,NUM,IC)
-
-* Zones d'affichage des statistiques
-         DFHMDF POS=(6,2),LENGTH=25,                                   X
-               INITIAL='NOMBRE TOTAL CLIENTS    :'
-NBTOT    DFHMDF POS=(6,28),LENGTH=5,ATTRB=(ASKIP)
-
-         DFHMDF POS=(8,2),LENGTH=25,                                   X
-               INITIAL='CLIENTS DEBITEURS       :'
-NBDB     DFHMDF POS=(8,28),LENGTH=5,ATTRB=(ASKIP)
-MTDB     DFHMDF POS=(8,35),LENGTH=12,ATTRB=(ASKIP)
-
-         DFHMDF POS=(10,2),LENGTH=25,                                  X
-               INITIAL='CLIENTS CREDITEURS      :'
-NBCR     DFHMDF POS=(10,28),LENGTH=5,ATTRB=(ASKIP)
-MTCR     DFHMDF POS=(10,35),LENGTH=12,ATTRB=(ASKIP)
+***********************************************************************
+*  MAPSET : CLISTAT - Statistiques par Region
+*  Transaction : STAT
+*  Fil Rouge CICS - Exercice 19
+***********************************************************************
+CLISTAT  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPSTAT  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* TITRE
+*----------------------------------------------------------------------
+         DFHMDF POS=(1,20),LENGTH=40,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='*** STATISTIQUES PAR REGION ***'
+*----------------------------------------------------------------------
+* ZONE DE SAISIE - CODE REGION
+*----------------------------------------------------------------------
+         DFHMDF POS=(4,2),LENGTH=25,ATTRB=ASKIP,                        X
+               INITIAL='CODE REGION           :'
+CODREG   DFHMDF POS=(4,28),LENGTH=2,ATTRB=(UNPROT,NUM,IC)
+         DFHMDF POS=(4,33),LENGTH=40,ATTRB=ASKIP,                       X
+               INITIAL='(01=Paris, 02=Marseille, 03=Lyon, 04=Lille)'
+*----------------------------------------------------------------------
+* NOM DE LA REGION
+*----------------------------------------------------------------------
+         DFHMDF POS=(6,2),LENGTH=25,ATTRB=ASKIP,                        X
+               INITIAL='REGION                :'
+NOMREG   DFHMDF POS=(6,28),LENGTH=15,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* STATISTIQUES GLOBALES
+*----------------------------------------------------------------------
+         DFHMDF POS=(10,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='NOMBRE TOTAL DE CLIENTS         :'
+NBTOT    DFHMDF POS=(10,38),LENGTH=5,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* STATISTIQUES DEBITEURS
+*----------------------------------------------------------------------
+         DFHMDF POS=(12,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='CLIENTS DEBITEURS (DB)          :'
+NBDB     DFHMDF POS=(12,38),LENGTH=5,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(13,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='SOMME DES SOLDES DEBITEURS      :'
+MTDB     DFHMDF POS=(13,38),LENGTH=15,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* STATISTIQUES CREDITEURS
+*----------------------------------------------------------------------
+         DFHMDF POS=(15,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='CLIENTS CREDITEURS (CR)         :'
+NBCR     DFHMDF POS=(15,38),LENGTH=5,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(16,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='SOMME DES SOLDES CREDITEURS     :'
+MTCR     DFHMDF POS=(16,38),LENGTH=15,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* ZONE MESSAGE ET TOUCHES FONCTION
+*----------------------------------------------------------------------
+         DFHMDF POS=(20,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
+MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,2),LENGTH=70,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Calculer  PF3=Quitter  CLEAR=Reinitialiser'
+         DFHMSD TYPE=FINAL
+         END
 ```
 
-**Programme : PRGSTAT.cbl**
+**Programme : PRGSTAT.cbl** (extraits clés)
 
 ```cobol
-       WORKING-STORAGE SECTION.
-       01 WS-STATS.
-          05 WS-NB-TOTAL         PIC 9(05) VALUE 0.
-          05 WS-NB-DEBITEURS     PIC 9(05) VALUE 0.
-          05 WS-MT-DEBITEURS     PIC 9(10) VALUE 0.
-          05 WS-NB-CREDITEURS    PIC 9(05) VALUE 0.
-          05 WS-MT-CREDITEURS    PIC 9(10) VALUE 0.
+      *-----------------------------------------------------------------
+      * STATISTIQUES CALCULEES
+      *-----------------------------------------------------------------
+       01  WS-STATS.
+           05 WS-NB-TOTAL        PIC 9(05) VALUE 0.
+           05 WS-NB-DEBITEURS    PIC 9(05) VALUE 0.
+           05 WS-MT-DEBITEURS    PIC 9(12) VALUE 0.
+           05 WS-NB-CREDITEURS   PIC 9(05) VALUE 0.
+           05 WS-MT-CREDITEURS   PIC 9(12) VALUE 0.
 
-       2000-CALCULER-STATS.
+      *-----------------------------------------------------------------
+      * TABLE DES NOMS DE REGIONS
+      *-----------------------------------------------------------------
+       01  WS-TABLE-REGIONS.
+           05 FILLER             PIC X(17) VALUE '01PARIS          '.
+           05 FILLER             PIC X(17) VALUE '02MARSEILLE      '.
+           05 FILLER             PIC X(17) VALUE '03LYON           '.
+           05 FILLER             PIC X(17) VALUE '04LILLE          '.
+
+      *-----------------------------------------------------------------
+       3000-CALCULER-STATS.
+      *-----------------------------------------------------------------
            INITIALIZE WS-STATS
-           MOVE CODREGI TO WS-CODE-REGION
+           MOVE 'N' TO WS-FIN-BROWSE
 
-      * Vérification région existante
-           IF WS-CODE-REGION NOT = '01' AND '02' AND '03' AND '04'
-               MOVE 'REGION INEXISTANTE, SAISIR CODE REGION' TO MSGO
-               EXIT PARAGRAPH
-           END-IF
-
-      * Parcours du fichier
+      *    Positionner au debut du fichier
            MOVE LOW-VALUES TO WS-CLE-DEBUT
-           EXEC CICS STARTBR FILE('FCLIENT')
+
+           EXEC CICS STARTBR
+               FILE('FCLIENT')
                RIDFLD(WS-CLE-DEBUT)
                RESP(WS-RESP)
            END-EXEC
 
-           PERFORM UNTIL WS-FIN-BROWSE = 'O'
-               EXEC CICS READNEXT FILE('FCLIENT')
+      *    Boucle de lecture de tous les enregistrements
+           PERFORM UNTIL FIN-BROWSE
+               EXEC CICS READNEXT
+                   FILE('FCLIENT')
                    INTO(ENR-CLIENT)
                    RIDFLD(WS-CLE-COURANTE)
                    RESP(WS-RESP)
                END-EXEC
 
-               IF WS-RESP = DFHRESP(ENDFILE)
-                   MOVE 'O' TO WS-FIN-BROWSE
-               ELSE
-                   IF CLI-CODREG = WS-CODE-REGION
-                       ADD 1 TO WS-NB-TOTAL
-                       IF CLI-POSITION = 'DB'
-                           ADD 1 TO WS-NB-DEBITEURS
-                           ADD CLI-SOLDE TO WS-MT-DEBITEURS
-                       ELSE
-                           ADD 1 TO WS-NB-CREDITEURS
-                           ADD CLI-SOLDE TO WS-MT-CREDITEURS
+               EVALUATE TRUE
+                   WHEN WS-RESP = DFHRESP(ENDFILE)
+                       MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN WS-RESP NOT = DFHRESP(NORMAL)
+                       MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN OTHER
+      *                Verifier si le client est de la region demandee
+                       IF CLI-CODREG = WS-CODE-REGION
+                           ADD 1 TO WS-NB-TOTAL
+      *                    Convertir le solde en numerique
+                           PERFORM 3100-CONVERTIR-SOLDE
+      *                    Verifier si debiteur ou crediteur
+                           IF CLI-POSITION = 'DB'
+                               ADD 1 TO WS-NB-DEBITEURS
+                               ADD WS-SOLDE-NUM TO WS-MT-DEBITEURS
+                           ELSE
+                               ADD 1 TO WS-NB-CREDITEURS
+                               ADD WS-SOLDE-NUM TO WS-MT-CREDITEURS
+                           END-IF
                        END-IF
-                   END-IF
-               END-IF
+               END-EVALUATE
            END-PERFORM
 
-           EXEC CICS ENDBR FILE('FCLIENT') END-EXEC
-           PERFORM 3000-AFFICHER-RESULTATS.
+      *    Fermeture du browse
+           EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
 
-       3000-AFFICHER-RESULTATS.
-           MOVE WS-NB-TOTAL      TO NBTOTO
-           MOVE WS-NB-DEBITEURS  TO NBDBO
-           MOVE WS-MT-DEBITEURS  TO MTDBO
-           MOVE WS-NB-CREDITEURS TO NBCRO
-           MOVE WS-MT-CREDITEURS TO MTCRO
-           MOVE 'STATISTIQUES CALCULEES' TO MSGO.
+      *-----------------------------------------------------------------
+       3100-CONVERTIR-SOLDE.
+      *-----------------------------------------------------------------
+      * Convertit le solde texte en numerique avec FUNCTION NUMVAL
+      *-----------------------------------------------------------------
+           MOVE 0 TO WS-SOLDE-NUM
+           MOVE FUNCTION NUMVAL(CLI-SOLDE) TO WS-SOLDE-NUM.
 ```
 
-**Transaction :**
+**JCL d'assemblage BMS : ASMSTAT.jcl**
+
+```jcl
+//ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
+//          MAPLIB='ROCHA.CICS.LOAD',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          MAPNAME='CLISTAT',RMODE=24
+//SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLISTAT),DISP=SHR
+```
+
+**JCL de compilation COBOL : CMPSTAT.jcl**
+
+```jcl
+//COMPIL   EXEC PROC=DFHYITVL,
+//          INDEX='DFH510.CICS',
+//          PROGLIB='ROCHA.CICS.LOAD',
+//          AD370HLQ='IGY420',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          LE370HLQ='CEE'
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGSTAT),DISP=SHR
+//LKED.SYSIN DD *
+     INCLUDE SYSLIB(DFHELII)
+     NAME PRGSTAT(R)
+/*
+```
+
+**Définition de la transaction STAT :**
 
 ```
+CEDA DEFINE MAPSET(CLISTAT) GROUP(CLIGROUP)
+
+CEDA DEFINE PROGRAM(PRGSTAT) GROUP(CLIGROUP)
+     LANGUAGE(COBOL)
+
 CEDA DEFINE TRANSACTION(STAT) GROUP(CLIGROUP)
      PROGRAM(PRGSTAT)
 
-CEDA INSTALL TRANSACTION(STAT) GROUP(CLIGROUP)
+CEDA INSTALL GROUP(CLIGROUP)
 ```
 
 **Résultats attendus (avec les données initiales) :**

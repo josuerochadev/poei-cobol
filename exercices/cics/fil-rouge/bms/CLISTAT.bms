@@ -1,0 +1,96 @@
+***********************************************************************
+*  MAPSET : CLISTAT - Statistiques par Region
+*  Transaction : STAT
+*  Fil Rouge CICS - Exercice 19
+*
+*  FONCTIONNALITE :
+*  ----------------
+*  Affiche les statistiques d'une region :
+*  - Nombre total de clients
+*  - Nombre et somme des clients debiteurs (DB)
+*  - Nombre et somme des clients crediteurs (CR)
+*
+*  REGIONS DISPONIBLES :
+*  01 - Paris     02 - Marseille
+*  03 - Lyon      04 - Lille
+*
+*  MODE PSEUDO-CONVERSATIONNEL :
+*  - Premier passage : Affichage ecran de saisie
+*  - Passages suivants : Calcul et affichage des statistiques
+***********************************************************************
+CLISTAT  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPSTAT  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* TITRE
+*----------------------------------------------------------------------
+         DFHMDF POS=(1,20),LENGTH=40,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='*** STATISTIQUES PAR REGION ***'
+         DFHMDF POS=(2,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+*----------------------------------------------------------------------
+* ZONE DE SAISIE - CODE REGION
+*----------------------------------------------------------------------
+         DFHMDF POS=(4,2),LENGTH=25,ATTRB=ASKIP,                        X
+               INITIAL='CODE REGION           :'
+CODREG   DFHMDF POS=(4,28),LENGTH=2,ATTRB=(UNPROT,NUM,IC)
+         DFHMDF POS=(4,31),LENGTH=1,ATTRB=ASKIP
+         DFHMDF POS=(4,33),LENGTH=40,ATTRB=ASKIP,                       X
+               INITIAL='(01=Paris, 02=Marseille, 03=Lyon, 04=Lille)'
+*----------------------------------------------------------------------
+* NOM DE LA REGION
+*----------------------------------------------------------------------
+         DFHMDF POS=(6,2),LENGTH=25,ATTRB=ASKIP,                        X
+               INITIAL='REGION                :'
+NOMREG   DFHMDF POS=(6,28),LENGTH=15,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* SEPARATEUR
+*----------------------------------------------------------------------
+         DFHMDF POS=(8,1),LENGTH=78,ATTRB=ASKIP,                        X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+*----------------------------------------------------------------------
+* STATISTIQUES GLOBALES
+*----------------------------------------------------------------------
+         DFHMDF POS=(10,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='NOMBRE TOTAL DE CLIENTS         :'
+NBTOT    DFHMDF POS=(10,38),LENGTH=5,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* STATISTIQUES DEBITEURS
+*----------------------------------------------------------------------
+         DFHMDF POS=(12,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='CLIENTS DEBITEURS (DB)          :'
+NBDB     DFHMDF POS=(12,38),LENGTH=5,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(13,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='SOMME DES SOLDES DEBITEURS      :'
+MTDB     DFHMDF POS=(13,38),LENGTH=15,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* STATISTIQUES CREDITEURS
+*----------------------------------------------------------------------
+         DFHMDF POS=(15,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='CLIENTS CREDITEURS (CR)         :'
+NBCR     DFHMDF POS=(15,38),LENGTH=5,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(16,2),LENGTH=35,ATTRB=ASKIP,                       X
+               INITIAL='SOMME DES SOLDES CREDITEURS     :'
+MTCR     DFHMDF POS=(16,38),LENGTH=15,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* SEPARATEUR
+*----------------------------------------------------------------------
+         DFHMDF POS=(18,1),LENGTH=78,ATTRB=ASKIP,                       X
+               INITIAL='------------------------------------------------X
+               ------------------------------'
+*----------------------------------------------------------------------
+* ZONE MESSAGE
+*----------------------------------------------------------------------
+         DFHMDF POS=(20,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
+MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* TOUCHES FONCTION
+*----------------------------------------------------------------------
+         DFHMDF POS=(23,2),LENGTH=70,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Calculer  PF3=Quitter  CLEAR=Reinitialiser'
+***********************************************************************
+         DFHMSD TYPE=FINAL
+         END

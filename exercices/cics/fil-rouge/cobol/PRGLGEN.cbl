@@ -187,6 +187,7 @@
 
            EXEC CICS SEND MAP('MAPLGEN')
                MAPSET('CLILIST')
+               FROM(MAPLGENO)
                FREEKB
                CURSOR
                ERASE
@@ -199,11 +200,11 @@
       *-----------------------------------------------------------------
            EVALUATE EIBAID
                WHEN DFHENTER
-                   PERFORM 3000-CHERCHER
+                   PERFORM 3000-CHERCHER THRU 3000-FIN
                WHEN DFHPF8
-                   PERFORM 4000-PAGE-SUIVANTE
+                   PERFORM 4000-PAGE-SUIVANTE THRU 4000-FIN
                WHEN DFHPF7
-                   PERFORM 5000-PAGE-PRECEDENTE
+                   PERFORM 5000-PAGE-PRECEDENTE THRU 5000-FIN
                WHEN OTHER
                    MOVE LOW-VALUES TO MAPLGENO
                    MOVE 'TOUCHE NON RECONNUE - UTILISER ENTER/PF7/PF8/PF3'
@@ -226,6 +227,7 @@
                MOVE 'VEUILLEZ SAISIR UN PREFIXE' TO MSGO
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FROM(MAPLGENO)
                    FREEKB
                    CURSOR
                    ERASE
@@ -243,6 +245,7 @@
                MOVE 'PREFIXE OBLIGATOIRE (1 A 6 CARACTERES)' TO MSGO
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FROM(MAPLGENO)
                    FREEKB
                    CURSOR
                    ERASE
@@ -259,6 +262,7 @@
                MOVE 'PREFIXE INVALIDE - MIN 1 CARACTERE' TO MSGO
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FROM(MAPLGENO)
                    FREEKB
                    CURSOR
                    ERASE
@@ -274,20 +278,20 @@
            PERFORM 3100-COMPTER-TOTAL
 
            IF WS-TOTAL-CLIENTS = 0
-               MOVE LOW-VALUES TO MAPLGENO
-               MOVE WS-PREFIXE TO PREFIXEO
-               MOVE 'AUCUN CLIENT TROUVE - SAISIR AUTRE PREFIXE' TO MSGO
-      *        Reinitialiser pour permettre nouvelle recherche
+      *        Reinitialiser la COMMAREA AVANT le SEND MAP
                MOVE SPACES TO WS-PREFIXE-SAVED
                MOVE 0 TO WS-LONGUEUR-SAVED
                MOVE SPACES TO WS-DERNIERE-CLE
                MOVE 0 TO WS-PAGE-COURANTE
                MOVE 0 TO WS-TOTAL-PAGES
                MOVE 'N' TO WS-FIN-FICHIER
+      *        Preparer l'ecran
+               MOVE LOW-VALUES TO MAPLGENO
+               MOVE WS-PREFIXE TO PREFIXEO
+               MOVE 'AUCUN CLIENT TROUVE - SAISIR AUTRE PREFIXE' TO MSGO
+      *        Envoyer l'ecran (simplifie comme PRGDELG)
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
-                   FREEKB
-                   CURSOR
                    ERASE
                END-EXEC
                GO TO 3000-FIN
@@ -453,6 +457,7 @@
                MOVE 'ERREUR POSITIONNEMENT FICHIER' TO MSGO
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
+                   FROM(MAPLGENO)
                    FREEKB
                    CURSOR
                    ERASE
@@ -595,6 +600,7 @@
 
            EXEC CICS SEND MAP('MAPLGEN')
                MAPSET('CLILIST')
+               FROM(MAPLGENO)
                FREEKB
                CURSOR
                ERASE
@@ -615,6 +621,7 @@
 
            EXEC CICS SEND MAP('MAPLGEN')
                MAPSET('CLILIST')
+               FROM(MAPLGENO)
                FREEKB
                CURSOR
                ERASE

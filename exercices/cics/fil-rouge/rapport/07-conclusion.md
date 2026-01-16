@@ -89,6 +89,7 @@
 | PRGSUP | SUPP | READ, DELETE | Suppression d'un client (avec affichage) |
 | PRGDELG | DELG | STARTBR, READNEXT, DELETE | Suppression générique par préfixe |
 | PRGLGEN | LGEN | STARTBR, READNEXT | Liste générique paginée (10 clients/page) |
+| PRGSTAT | STAT | STARTBR, READNEXT | Statistiques par région (DB/CR) |
 
 ### Liste des MAPs BMS
 
@@ -100,6 +101,7 @@
 | CLISUP | MAPSUP | PRGSUP | Écran de suppression |
 | CLIDEL | MAPDEL | PRGDELG | Écran de suppression générique |
 | CLILIST | MAPLGEN | PRGLGEN | Écran de liste générique paginée |
+| CLISTAT | MAPSTAT | PRGSTAT | Écran de statistiques par région |
 
 ### Liste des transactions CICS
 
@@ -111,6 +113,7 @@
 | SUPP | PRGSUP | Suppression client |
 | DELG | PRGDELG | Suppression générique |
 | LGEN | PRGLGEN | Liste générique paginée |
+| STAT | PRGSTAT | Statistiques par région |
 
 ### Structure du fichier CLIENT (80 octets)
 
@@ -155,7 +158,7 @@ Ce projet m'a permis de mettre en pratique l'ensemble des compétences acquises 
 
 - **Administrer les transactions** : Définition via CEDA, installation de groupes, tests avec CEDF.
 
-Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec **6 programmes COBOL-CICS**, **6 MAPs BMS** et **6 transactions**. Les principales difficultés rencontrées (gestion des attributs BMS, validation des données, navigation VSAM, fusion des modifications, deadlock lors de suppressions multiples) m'ont permis de développer une approche méthodique de résolution de problèmes.
+Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec **7 programmes COBOL-CICS**, **7 MAPs BMS** et **7 transactions**. Les principales difficultés rencontrées (gestion des attributs BMS, validation des données, navigation VSAM, fusion des modifications, deadlock lors de suppressions multiples) m'ont permis de développer une approche méthodique de résolution de problèmes.
 
 Cette expérience constitue une base solide pour aborder des projets mainframe transactionnels en entreprise.
 
