@@ -99,6 +99,15 @@
            05 WS-COMPTEUR-SUP     PIC 9(05) VALUE 0.
 
       *-----------------------------------------------------------------
+      * TABLE DES CLES A SUPPRIMER (max 100 clients)
+      *-----------------------------------------------------------------
+       01  WS-TABLE-CLES.
+           05 WS-NB-CLES          PIC 9(03) VALUE 0.
+           05 WS-CLES OCCURS 100 TIMES.
+              10 WS-CLE-SUP       PIC X(06).
+       01  WS-IDX-SUP             PIC 9(03) VALUE 0.
+
+      *-----------------------------------------------------------------
       * SAUVEGARDE DES DONNEES SAISIES
       *-----------------------------------------------------------------
        01  WS-SAISIE.
@@ -438,9 +447,11 @@
        4100-SUPPRIMER-CLIENTS.
       *-----------------------------------------------------------------
       * Suppression effective de tous les clients correspondants
-      * Utilise STARTBR/READNEXT puis DELETE pour chaque client
+      * Methode : Collecter les cles d'abord, puis supprimer apres ENDBR
+      * (evite le deadlock READNEXT/DELETE)
       *-----------------------------------------------------------------
            MOVE 0 TO WS-COMPTEUR-SUP
+           MOVE 0 TO WS-NB-CLES
            MOVE 'N' TO WS-FIN-BROWSE
 
       *    Restaurer le prefixe et la longueur
@@ -482,7 +493,7 @@
       *    Initialiser la cle courante pour READNEXT
            MOVE WS-CLE-DEBUT TO WS-CLE-COURANTE
 
-      *    Boucle de lecture et suppression
+      *    PHASE 1 : Collecter les cles dans la table (sans UPDATE)
            PERFORM UNTIL FIN-BROWSE
                EXEC CICS READNEXT
                    FILE('FCLIENT')
@@ -499,30 +510,51 @@
                    WHEN WS-CLE-COURANTE(1:WS-LONGUEUR) NOT =
                        WS-PREFIXE(1:WS-LONGUEUR)
                        MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN WS-NB-CLES >= 100
+      *                Table pleine - on s'arrete
+                       MOVE 'O' TO WS-FIN-BROWSE
                    WHEN OTHER
-      *                Suppression du client courant
-                       EXEC CICS DELETE
-                           FILE('FCLIENT')
-                           RIDFLD(WS-CLE-COURANTE)
-                           RESP(WS-RESP)
-                       END-EXEC
-                       IF WS-RESP = DFHRESP(NORMAL)
-                           ADD 1 TO WS-COMPTEUR-SUP
-                       END-IF
+      *                Stocker la cle dans la table
+                       ADD 1 TO WS-NB-CLES
+                       MOVE WS-CLE-COURANTE TO WS-CLE-SUP(WS-NB-CLES)
                END-EVALUATE
            END-PERFORM
 
-      *    Fermeture du browse
+      *    Fermeture du browse AVANT les suppressions
            EXEC CICS ENDBR
                FILE('FCLIENT')
            END-EXEC
 
+      *    PHASE 2 : Supprimer chaque cle collectee
+           PERFORM VARYING WS-IDX-SUP FROM 1 BY 1
+               UNTIL WS-IDX-SUP > WS-NB-CLES
+               MOVE WS-CLE-SUP(WS-IDX-SUP) TO WS-CLE-COURANTE
+               EXEC CICS DELETE
+                   FILE('FCLIENT')
+                   RIDFLD(WS-CLE-COURANTE)
+                   RESP(WS-RESP)
+               END-EXEC
+               IF WS-RESP = DFHRESP(NORMAL)
+                   ADD 1 TO WS-COMPTEUR-SUP
+               END-IF
+           END-PERFORM
+
       *    Affichage du resultat
            MOVE LOW-VALUES TO MAPDELO
-           STRING WS-COMPTEUR-SUP DELIMITED BY SIZE
-               ' CLIENT(S) SUPPRIME(S) - NOUVEAU PREFIXE OU PF3'
-               DELIMITED BY SIZE
-               INTO WS-MSG-RESULT
+           MOVE SPACES TO WS-MSG-RESULT
+
+           IF WS-NB-CLES >= 100
+      *        Limite atteinte - prevenir l'utilisateur
+               STRING WS-COMPTEUR-SUP DELIMITED BY SIZE
+                   ' SUPPR. (LIMITE 100) - RELANCER POUR CONTINUER'
+                   DELIMITED BY SIZE
+                   INTO WS-MSG-RESULT
+           ELSE
+               STRING WS-COMPTEUR-SUP DELIMITED BY SIZE
+                   ' CLIENT(S) SUPPRIME(S) - NOUVEAU PREFIXE OU PF3'
+                   DELIMITED BY SIZE
+                   INTO WS-MSG-RESULT
+           END-IF
            MOVE WS-MSG-RESULT TO MSGO
 
       *    Retour en phase comptage
