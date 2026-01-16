@@ -374,7 +374,7 @@ Suggestions de captures d'écran pour cet exercice :
 
 ---
 
-## Exercice 18 : Lecture successive (READNEXT, ENDBR)
+## Exercice 18 : Liste générique paginée (READNEXT, ENDBR)
 
 ### Énoncé
 
@@ -382,53 +382,134 @@ Faire une lecture successive des CLIENT dont le code générique est '222...' en
 
 ### Mon travail
 
-Ce programme illustre le parcours séquentiel d'un fichier VSAM avec positionnement générique :
+J'ai étendu l'énoncé pour créer un programme complet de **liste paginée** :
 
-1. **STARTBR** avec GTEQ pour se positionner sur le premier '222xxx'
-2. **READNEXT** en boucle pour lire les suivants
-3. **Arrêt** quand le code ne commence plus par '222'
-4. **ENDBR** pour terminer le browse et libérer les ressources
+- Saisie d'un préfixe générique (1 à 6 caractères)
+- Affichage de **10 clients par page**
+- Navigation avec **PF7** (page précédente) et **PF8** (page suivante)
+- Affichage du compteur total et du numéro de page
 
-**Schéma du parcours :**
+**Nouveau mapset BMS requis :** CLILIST avec 10 lignes répétitives pour afficher les clients.
+
+**Mode pseudo-conversationnel avec pagination :**
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  STARTBR('222000', GTEQ)                                    │
-│  ─────────────────────────                                  │
-│  Positionne le curseur sur le premier enregistrement        │
-│  dont la clé est >= '222000'                                │
-│  Résultat : curseur sur 222001                              │
+│  COMMAREA (sauvegarde entre passages)                       │
+│  ─────────────────────────────────────                      │
+│  - Préfixe saisi et sa longueur                            │
+│  - Dernière clé affichée (pour navigation)                 │
+│  - Numéro de page courante                                 │
+│  - Total clients trouvés et nombre de pages                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Algorithme de pagination :**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ENTER : Nouvelle recherche                                 │
+│  ───────────────────────────                                │
+│  1. Compter tous les clients correspondants                │
+│  2. Calculer le nombre de pages (total / 10)               │
+│  3. Afficher la première page                              │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  READNEXT (boucle)                                          │
-│  ─────────────────                                          │
-│  222001 → Afficher    (clé commence par '222')              │
-│  222002 → Afficher    (clé commence par '222')              │
-│  222003 → Afficher    (clé commence par '222')              │
-│  222004 → Afficher    (clé commence par '222')              │
-│  222005 → Afficher    (clé commence par '222')              │
-│  444001 → STOP        (clé ne commence plus par '222')      │
+│  PF8 : Page suivante                                        │
+│  ───────────────────                                        │
+│  1. STARTBR au début du préfixe                            │
+│  2. READNEXT pour sauter (page - 1) × 10 enregistrements   │
+│  3. READNEXT × 10 pour remplir l'écran                     │
+│  4. ENDBR                                                  │
 └─────────────────────────────────────────────────────────────┘
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  ENDBR                                                      │
-│  ─────                                                      │
-│  Libère les ressources du browse                            │
+│  PF7 : Page précédente                                      │
+│  ─────────────────────                                      │
+│  Même principe avec page - 1                               │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**Gestion du cas "aucun client trouvé" :**
+
+Quand le préfixe saisi ne correspond à aucun client, le programme :
+1. Affiche le message "AUCUN CLIENT TROUVE - SAISIR AUTRE PREFIXE"
+2. Réinitialise la COMMAREA pour permettre une nouvelle recherche
+3. Reste en mode pseudo-conversationnel (la transaction ne se termine pas)
 
 ### Résolution
 
-**Programme : PRGLGEN.cbl** (Liste Générique)
+**MAP BMS : CLILIST.bms**
+
+```
+CLILIST  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+MAPLGEN  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+*----------------------------------------------------------------------
+* ZONE DE SAISIE - PREFIXE
+*----------------------------------------------------------------------
+         DFHMDF POS=(3,2),LENGTH=10,ATTRB=ASKIP,INITIAL='PREFIXE :'
+PREFIXE  DFHMDF POS=(3,13),LENGTH=6,ATTRB=(UNPROT,IC)
+*----------------------------------------------------------------------
+* EN-TETE DES COLONNES
+*----------------------------------------------------------------------
+         DFHMDF POS=(5,1),LENGTH=50,ATTRB=(ASKIP,BRT),                  X
+               INITIAL='NUMCPT RG NOM        PRENOM     SOLDE      POS'
+*----------------------------------------------------------------------
+* LIGNES 1 à 10 (structure répétitive)
+*----------------------------------------------------------------------
+L1NUM    DFHMDF POS=(7,1),LENGTH=6,ATTRB=ASKIP
+L1REG    DFHMDF POS=(7,8),LENGTH=2,ATTRB=ASKIP
+L1NOM    DFHMDF POS=(7,11),LENGTH=10,ATTRB=ASKIP
+L1PRE    DFHMDF POS=(7,22),LENGTH=10,ATTRB=ASKIP
+L1SOL    DFHMDF POS=(7,33),LENGTH=10,ATTRB=ASKIP
+L1POS    DFHMDF POS=(7,44),LENGTH=2,ATTRB=ASKIP
+* ... (L2 à L10 sur les lignes 8 à 16)
+*----------------------------------------------------------------------
+* ZONE INFORMATIONS PAGINATION
+*----------------------------------------------------------------------
+         DFHMDF POS=(18,2),LENGTH=6,ATTRB=ASKIP,INITIAL='PAGE :'
+PAGNUM   DFHMDF POS=(18,9),LENGTH=3,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(18,13),LENGTH=1,ATTRB=ASKIP,INITIAL='/'
+PAGTOT   DFHMDF POS=(18,15),LENGTH=3,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(18,22),LENGTH=7,ATTRB=ASKIP,INITIAL='TOTAL :'
+CLITOT   DFHMDF POS=(18,30),LENGTH=5,ATTRB=(ASKIP,BRT)
+*----------------------------------------------------------------------
+* ZONE MESSAGE ET TOUCHES FONCTION
+*----------------------------------------------------------------------
+MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,2),LENGTH=60,ATTRB=ASKIP,                       X
+               INITIAL='ENTER=Chercher  PF7=Prec  PF8=Suiv  PF3=Quitter'
+```
+
+**Programme : PRGLGEN.cbl** (Liste Générique Paginée)
 
 ```cobol
-       2000-LISTER-GENERIQUE.
-           MOVE '222000' TO WS-CLE-DEBUT
-           MOVE 0 TO WS-COMPTEUR
+      *-----------------------------------------------------------------
+      * ZONE DE COMMUNICATION (COMMAREA)
+      *-----------------------------------------------------------------
+       01  WS-COMMAREA.
+           05 WS-PREFIXE-SAVED   PIC X(06) VALUE SPACES.
+           05 WS-LONGUEUR-SAVED  PIC 9(01) VALUE 0.
+           05 WS-DERNIERE-CLE    PIC X(06) VALUE SPACES.
+           05 WS-PAGE-COURANTE   PIC 9(03) VALUE 0.
+           05 WS-TOTAL-CLIENTS   PIC 9(05) VALUE 0.
+           05 WS-TOTAL-PAGES     PIC 9(03) VALUE 0.
+           05 WS-FIN-FICHIER     PIC X(01) VALUE 'N'.
 
+      *-----------------------------------------------------------------
+       3100-COMPTER-TOTAL.
+      *-----------------------------------------------------------------
+      * Compte le nombre total de clients correspondant au préfixe
+      *-----------------------------------------------------------------
+           MOVE 0 TO WS-TOTAL-CLIENTS
+           MOVE SPACES TO WS-CLE-DEBUT
+           MOVE WS-PREFIXE(1:WS-LONGUEUR) TO WS-CLE-DEBUT
+      *    Compléter avec des zéros
+           ...
            EXEC CICS STARTBR
                FILE('FCLIENT')
                RIDFLD(WS-CLE-DEBUT)
@@ -436,7 +517,9 @@ Ce programme illustre le parcours séquentiel d'un fichier VSAM avec positionnem
                RESP(WS-RESP)
            END-EXEC
 
-           PERFORM UNTIL WS-FIN-BROWSE = 'O'
+           MOVE WS-CLE-DEBUT TO WS-CLE-COURANTE
+
+           PERFORM UNTIL FIN-BROWSE
                EXEC CICS READNEXT
                    FILE('FCLIENT')
                    INTO(ENR-CLIENT)
@@ -447,24 +530,101 @@ Ce programme illustre le parcours séquentiel d'un fichier VSAM avec positionnem
                EVALUATE TRUE
                    WHEN WS-RESP = DFHRESP(ENDFILE)
                        MOVE 'O' TO WS-FIN-BROWSE
-                   WHEN WS-CLE-COURANTE(1:3) NOT = '222'
+                   WHEN WS-CLE-COURANTE(1:WS-LONGUEUR-SAVED) NOT =
+                       WS-PREFIXE-SAVED(1:WS-LONGUEUR-SAVED)
                        MOVE 'O' TO WS-FIN-BROWSE
                    WHEN OTHER
-                       PERFORM 3000-AFFICHER-LIGNE
-                       ADD 1 TO WS-COMPTEUR
+                       ADD 1 TO WS-TOTAL-CLIENTS
                END-EVALUATE
+           END-PERFORM
+
+           EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
+
+      *-----------------------------------------------------------------
+       6000-AFFICHER-PAGE.
+      *-----------------------------------------------------------------
+      * Affiche la page courante (10 clients)
+      *-----------------------------------------------------------------
+           EXEC CICS STARTBR ... END-EXEC
+
+      *    Sauter les enregistrements des pages précédentes
+           COMPUTE WS-COMPTEUR = (WS-PAGE-COURANTE - 1) * 10
+           PERFORM WS-COMPTEUR TIMES
+               EXEC CICS READNEXT ... END-EXEC
+           END-PERFORM
+
+      *    Lire les 10 clients de cette page
+           PERFORM UNTIL FIN-BROWSE OR WS-LIGNE-COURANTE >= 10
+               EXEC CICS READNEXT ... END-EXEC
+               ...
+               MOVE CLI-NUMCPT TO WS-CLI-NUM(WS-LIGNE-COURANTE)
+               MOVE CLI-NOM TO WS-CLI-NOM(WS-LIGNE-COURANTE)
+               ...
            END-PERFORM
 
            EXEC CICS ENDBR FILE('FCLIENT') END-EXEC
 
-           MOVE WS-COMPTEUR TO MSGO
-           STRING 'TOTAL CLIENTS 222XXX : ' WS-COMPTEUR
-               DELIMITED BY SIZE INTO MSGO.
+      *    Transférer vers la MAP
+           MOVE WS-CLI-NUM(1) TO L1NUMO
+           ...
+           MOVE WS-PAGE-COURANTE TO PAGNUMO
+           MOVE WS-TOTAL-PAGES TO PAGTOTO
+           MOVE WS-TOTAL-CLIENTS TO CLITOTO
+
+           EXEC CICS SEND MAP('MAPLGEN') MAPSET('CLILIST') ERASE
+           END-EXEC.
+```
+
+**JCL d'assemblage BMS : ASMLIST.jcl**
+
+```jcl
+//ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
+//          MAPLIB='ROCHA.CICS.LOAD',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          MAPNAME='CLILIST',RMODE=24
+//SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLILIST),DISP=SHR
+```
+
+**JCL de compilation COBOL : CMPLGEN.jcl**
+
+```jcl
+//COMPIL   EXEC PROC=DFHYITVL,
+//          INDEX='DFH510.CICS',
+//          PROGLIB='ROCHA.CICS.LOAD',
+//          AD370HLQ='IGY420',
+//          DSCTLIB='ROCHA.CICS.LINK',
+//          LE370HLQ='CEE'
+//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGLGEN),DISP=SHR
+//LKED.SYSIN DD *
+     INCLUDE SYSLIB(DFHELII)
+     NAME PRGLGEN(R)
+/*
+```
+
+**Définition de la transaction LGEN :**
+
+```
+CEDA DEFINE MAPSET(CLILIST) GROUP(CLIGROUP)
+
+CEDA DEFINE PROGRAM(PRGLGEN) GROUP(CLIGROUP)
+     LANGUAGE(COBOL)
+
+CEDA DEFINE TRANSACTION(LGEN) GROUP(CLIGROUP)
+     PROGRAM(PRGLGEN)
+
+CEDA INSTALL GROUP(CLIGROUP)
 ```
 
 ### Captures d'écran
 
-<!-- ![pt3ex18-1](images-pt3/pt3ex18-1.png) -->
+<!--
+Suggestions de captures d'écran pour cet exercice :
+
+1. pt3ex18-1 : Écran MAPLGEN - Saisie préfixe "1"
+2. pt3ex18-2 : Liste des 10 premiers clients (page 1/3)
+3. pt3ex18-3 : Navigation PF8 - Page 2/3
+4. pt3ex18-4 : Message "AUCUN CLIENT TROUVE" avec préfixe "9"
+-->
 
 ---
 
