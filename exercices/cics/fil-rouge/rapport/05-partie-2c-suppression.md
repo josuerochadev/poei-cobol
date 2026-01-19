@@ -140,14 +140,31 @@ CEDA VIEW MAPSET(CLISUP) GROUP(CLIGROUP)
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Définition du mapset CLISUP dans CICS
 
-1. pt2ex12-1 : Source BMS dans ISPF EDIT - ROCHA.CICS.SOURCE(CLISUP)
-2. pt2ex12-2 : Soumission JCL assemblage BMS ASMSUP
-3. pt2ex12-3 : SDSF - Job output avec RC=0000
-4. pt2ex12-4 : CEDA DEFINE MAPSET(CLISUP)
--->
+Après l'assemblage BMS réussi, on définit le mapset dans CICS avec CEDA.
+
+![CEDA DEFINE MAPSET CLISUP](../captures/pt04/exo12/1.PNG)
+
+*La commande CEDA DEFINE MAPSET(CLISUP) GROUP(CLIGROUP) crée la définition du mapset de suppression. Le message "DEFINE SUCCESSFUL" confirme la création.*
+
+#### Installation du mapset CLISUP
+
+![CEDA INSTALL MAPSET CLISUP](../captures/pt04/exo12/2.PNG)
+
+*La commande CEDA INSTALL MAPSET(CLISUP) charge le mapset en mémoire CICS. Le message "INSTALL SUCCESSFUL" indique que le mapset est prêt.*
+
+#### Vérification de la définition
+
+![CEDA VIEW MAPSET CLISUP](../captures/pt04/exo12/3.PNG)
+
+*CEDA VIEW permet de consulter tous les paramètres du mapset : nom, groupe, résidence, et statut d'installation.*
+
+#### Résultat de l'assemblage BMS
+
+![Assemblage BMS CLISUP](../captures/pt04/exo12/4.PNG)
+
+*Le job ROCHA12 (assemblage BMS) retourne Return Code 000. On note 114 Primary Input Records Read et 34 Object Records Written, confirmant la génération correcte du mapset CLISUP.*
 
 ---
 
@@ -394,17 +411,31 @@ Résultat attendu : `Prog(PRGSUP) Cob Ena`
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Définition du programme PRGSUP dans CICS
 
-1. pt2ex13-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGSUP)
-2. pt2ex13-2 : Soumission JCL CMPSUP - compilation du programme
-3. pt2ex13-3 : SDSF - Job output avec RC=0000
-4. pt2ex13-4 : Écran MAPSUP - saisie du numéro à supprimer
-5. pt2ex13-5 : Affichage client avec demande confirmation
-6. pt2ex13-6 : Message "CLIENT SUPPRIME" après confirmation O
-7. pt2ex13-7 : Message "SUPPRESSION ANNULEE" après confirmation N
--->
+Après la compilation COBOL réussie, on définit le programme dans CICS.
+
+![CEDA DEFINE PROGRAM PRGSUP](../captures/pt04/exo13/1.PNG)
+
+*La commande CEDA DEFINE PROGRAM(PRGSUP) GROUP(CLIGROUP) LANGUAGE(COBOL) crée la définition du programme. Le message "DEFINE SUCCESSFUL" confirme la création.*
+
+#### Installation du programme PRGSUP
+
+![CEDA INSTALL PROGRAM PRGSUP](../captures/pt04/exo13/2.PNG)
+
+*La commande CEDA INSTALL PROGRAM(PRGSUP) charge le programme compilé en mémoire CICS. Le message "INSTALL SUCCESSFUL" indique que le programme est prêt.*
+
+#### Vérification avec CEMT
+
+![CEMT INQ PROGRAM PRGSUP](../captures/pt04/exo13/3.PNG)
+
+*CEMT INQ PROGRAM(PRGSUP) affiche le statut du programme : "Cob" (COBOL), "Pro" (Protected), "Ena" (Enabled). Le programme est correctement installé et activé.*
+
+#### Compilation du programme PRGSUP
+
+![Compilation PRGSUP - RC=0](../captures/pt04/exo13/4.PNG)
+
+*Statistiques de compilation du programme PRGSUP : 996 enregistrements sources, 339 instructions DATA DIVISION, 183 instructions PROCEDURE DIVISION. Return code 0 confirme la compilation réussie.*
 
 ---
 
@@ -521,14 +552,79 @@ Points d'arrêt observés :
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Définition de la transaction SUPP
 
-1. pt2ex14-1 : CEDA DEFINE TRANSACTION(SUPP)
-2. pt2ex14-2 : CEDA VIEW TRANSACTION(SUPP) - vérification définition
-3. pt2ex14-3 : Test CEDF - point d'arrêt sur DELETE FILE
-4. pt2ex14-4 : Message "CLIENT SUPPRIME" après confirmation O
--->
+La transaction fait le lien entre le code utilisateur et le programme COBOL.
+
+![CEDA DEFINE TRANSACTION SUPP](../captures/pt04/exo14/1.PNG)
+
+*La commande CEDA DEFINE TRANSACTION(SUPP) GROUP(CLIGROUP) PROGRAM(PRGSUP) associe le code "SUPP" au programme PRGSUP. Le message "DEFINE SUCCESSFUL" confirme la création.*
+
+#### Installation de la transaction SUPP
+
+![CEDA INSTALL TRANSACTION SUPP](../captures/pt04/exo14/2.PNG)
+
+*La commande CEDA INSTALL TRANSACTION(SUPP) rend la transaction accessible aux utilisateurs. Le message "INSTALL SUCCESSFUL" confirme l'activation.*
+
+#### Test fonctionnel - Écran de suppression vide
+
+Après avoir tapé "SUPP" sur l'écran CICS, l'écran de saisie s'affiche.
+
+![Écran MAPSUP - Premier passage](../captures/pt04/exo14/3.PNG)
+
+*Phase 1 : L'écran de suppression s'affiche vide avec le message "SAISIR LE NUMERO DE COMPTE A SUPPRIMER". L'utilisateur doit saisir un numéro de compte existant.*
+
+#### Session de débogage CEDF - Suppression complète
+
+Le débogueur CEDF permet de suivre l'exécution des commandes CICS pas à pas lors d'une suppression.
+
+##### CEDF - RECEIVE MAP (réception du numéro)
+
+![CEDF - RECEIVE MAP](../captures/pt04/exo14/4.PNG)
+
+*Point d'arrêt CEDF sur la commande RECEIVE MAP : réception du numéro de compte 333333 saisi par l'utilisateur. RESPONSE: NORMAL.*
+
+##### CEDF - READ FILE (lecture du client)
+
+![CEDF - READ FILE](../captures/pt04/exo14/5.PNG)
+
+*Point d'arrêt CEDF sur la commande READ FILE avec RIDFLD('333333'). Le client GIL GILBERTO est trouvé (données visibles : 19851212M10VBRESIL 8888888888CR). RESPONSE: NORMAL.*
+
+##### Écran - Client trouvé, demande de confirmation
+
+![Écran - Confirmation suppression](../captures/pt04/exo14/6.PNG)
+
+*L'écran affiche les données complètes du client 333333 (GIL GILBERTO, MARSEILLE, VEUF, CREDITEUR). Le message "CLIENT TROUVE - CONFIRMER SUPPRESSION (O/N) ?" invite l'utilisateur à confirmer ou annuler.*
+
+##### CEDF - SEND MAP (affichage pour confirmation)
+
+![CEDF - SEND MAP](../captures/pt04/exo14/7.PNG)
+
+*Point d'arrêt CEDF sur la commande SEND MAP : envoi de l'écran avec les données du client (333333, 02, MARSEILLE...). RESPONSE: NORMAL.*
+
+##### CEDF - DELETE FILE (suppression VSAM)
+
+![CEDF - DELETE FILE](../captures/pt04/exo14/8.PNG)
+
+*Point d'arrêt CEDF sur la commande DELETE FILE avec RIDFLD('333333'). **RESPONSE: NORMAL** confirme que l'enregistrement a été supprimé du fichier VSAM.*
+
+##### Écran - Suppression effectuée
+
+![Écran - Client supprimé](../captures/pt04/exo14/9.PNG)
+
+*Message "CLIENT SUPPRIME - NOUVEAU NUM OU PF3" confirmant le succès de l'opération. L'écran est réinitialisé pour permettre une nouvelle suppression.*
+
+##### Test d'erreur - Client déjà supprimé
+
+![Erreur - Client déjà supprimé](../captures/pt04/exo14/10.PNG)
+
+*En tentant de supprimer à nouveau le client 333333, le programme affiche "CLIENT INEXISTANT - VERIFIEZ LE NUMERO" car l'enregistrement n'existe plus.*
+
+##### Vérification avec AFFI
+
+![AFFI - Vérification après suppression](../captures/pt04/exo14/11.PNG)
+
+*Vérification avec la transaction AFFI : le client 333333 n'existe plus. Le message "CLIENT INEXISTANT - VERIFIEZ LE NUMERO" confirme que la suppression a bien été effectuée.*
 
 ---
 

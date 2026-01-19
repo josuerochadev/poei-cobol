@@ -212,17 +212,69 @@ Le chargement utilise directement IDCAMS REPRO avec des enregistrements de 80 oc
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Création du cluster VSAM
 
-1. pt1ex01-1 : Soumission JCL DEFVSAM - ISPF EDIT avec SUB
-2. pt1ex01-2 : SDSF - Job output avec RC=0000 pour IDCAMS DEFINE
-3. pt1ex01-3 : CEDA DEFINE FILE(FCLIENT) - écran de définition
-4. pt1ex01-4 : CEDA INSTALL FILE(FCLIENT) - message INSTALL SUCCESSFUL
-5. pt1ex01-5 : CEMT INQ FILE(FCLIENT) - vérification statut Ena Ope
-6. pt1ex01-6 : Soumission JCL LOADVSAM - chargement des données
-7. pt1ex01-7 : SDSF - Output PRINT montrant les 15 enregistrements chargés
--->
+Après exécution du JCL IDCAMS DEFINE, le cluster ROCHA.CICS.CLIENT est créé. La commande LISTCAT affiche les composants du cluster :
+
+![IDCAMS DEFINE CLUSTER](../captures/pt01/exo01/1.PNG)
+
+*Sortie IDCAMS montrant la création du cluster VSAM avec ses composants DATA et INDEX. Les paramètres KEYS(6 0) définissent la clé primaire (numéro de compte) en position 0 sur 6 octets.*
+
+#### Vérification des Data Sets créés
+
+La commande DSLIST montre le cluster VSAM avec ses composants (DATA et INDEX) ainsi que les libraries du projet :
+
+![DSLIST après création VSAM](../captures/pt01/exo01/2.PNG)
+
+*Le cluster VSAM apparaît avec ses deux composants. Noter que VSAM gère automatiquement les composants DATA et INDEX - l'application accède uniquement au cluster via son nom (ROCHA.CICS.CLIENT).*
+
+#### Contenu du fichier après chargement
+
+Le JCL de chargement utilise IDCAMS REPRO pour insérer les 15 enregistrements. La commande PRINT affiche le contenu :
+
+![PRINT - Premiers enregistrements](../captures/pt01/exo01/3.PNG)
+
+*Premiers enregistrements chargés (000001 à 000008). La structure est visible : numéro compte (6), code région (2), nature compte (2), nom (10), prénom (10), etc.*
+
+![PRINT - Derniers enregistrements](../captures/pt01/exo01/4.PNG)
+
+*Suite et fin des enregistrements (000009 à 222005). Les 15 clients sont correctement chargés, incluant les 5 clients 222xxx pour les tests de browse.*
+
+#### Visualisation VSAM avec DITTO
+
+L'utilitaire DITTO/ESA permet de naviguer dans le fichier VSAM et visualiser les enregistrements :
+
+![DITTO VSAM Browse - partie 1](../captures/pt01/exo01/5.PNG)
+
+*DITTO montre les enregistrements avec leur RBA (Relative Byte Address) et leur contenu. On voit clairement les champs : DUPONT JEAN, PARIS, 0000150000CR pour le premier client.*
+
+![DITTO VSAM Browse - partie 2](../captures/pt01/exo01/6.PNG)
+
+*Fin du fichier avec "End of data" confirmant les 15 enregistrements chargés. Le dernier client est MOREL PHILIPPE (222005).*
+
+#### Définition du fichier dans CICS
+
+La commande CEDA DEFINE FILE crée la ressource FCLIENT dans le groupe CLIGROUP :
+
+![CEDA DEFINE FILE(FCLIENT)](../captures/pt01/exo01/7.PNG)
+
+*Écran de définition du fichier CICS. Les paramètres importants : DSName=ROCHA.CICS.CLIENT, RLsaccess=No (pas de Record Level Sharing), DSNSharing=Allreqs (partage entre régions autorisé).*
+
+#### Installation du fichier
+
+Après définition, la ressource doit être installée pour être active :
+
+![CEDA INSTALL FILE(FCLIENT)](../captures/pt01/exo01/8.PNG)
+
+*Message "INSTALL SUCCESSFUL" confirmant que le fichier est maintenant actif dans CICS. La date/heure de l'installation est enregistrée.*
+
+#### Vérification avec CEMT
+
+La commande CEMT INQUIRE FILE permet de vérifier l'état du fichier :
+
+![CEMT INQ FILE(FCLIENT)](../captures/pt01/exo01/9.PNG)
+
+*Le fichier est actif avec tous les droits : Vsa (VSAM), Clo (Closed au démarrage), Ena (Enabled), Rea (Read), Upd (Update), Add (Add), Bro (Browse), Del (Delete). Le statut "Sha" indique le partage activé.*
 
 ---
 
@@ -467,15 +519,37 @@ Cette maquette (wireframe) représente la disposition des champs sur l'écran 24
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Assemblage du source BMS
 
-1. pt1ex02-1 : Source BMS dans ISPF EDIT - ROCHA.CICS.SOURCE(CLIAFF)
-2. pt1ex02-2 : Soumission JCL ASMCLAF - assemblage de la MAP
-3. pt1ex02-3 : SDSF - Job output avec RC=0000 pour assemblage
-4. pt1ex02-4 : Vérification ROCHA.CICS.LOAD - membre CLIAFF présent
-5. pt1ex02-5 : Vérification ROCHA.CICS.LINK - copybook CLIAFF généré
--->
+Le JCL d'assemblage utilise la procédure DFHMAPS pour générer le module physique et le copybook DSECT :
+
+![SDSF - Assemblage BMS](../captures/pt01/exo02/1.PNG)
+
+*Sortie de l'assembleur High Level Assembler. Le "Return Code 000" confirme l'assemblage réussi. On voit les fichiers utilisés : SYSLIB (macros CICS), SYSPUNCH (sortie vers ROCHA.CICS.LINK membre CLIAFF).*
+
+#### Copybook généré dans ROCHA.CICS.LINK
+
+L'assemblage génère automatiquement le copybook COBOL (DSECT) dans la library LINK :
+
+![ROCHA.CICS.LINK - membre CLIAFF](../captures/pt01/exo02/2.PNG)
+
+*Le membre CLIAFF est créé dans ROCHA.CICS.LINK. Ce copybook contient les structures de données avec les suffixes L, F, A, I, O pour chaque champ de la MAP.*
+
+#### Définition du MAPSET dans CICS
+
+La commande CEDA DEFINE MAPSET déclare l'écran BMS comme ressource CICS :
+
+![CEDA DEFINE MAPSET(CLIAFF)](../captures/pt01/exo02/31.PNG)
+
+*Définition du mapset CLIAFF dans le groupe CLIGROUP. USAge=Normal signifie que le mapset sera chargé à la première utilisation et déchargé après un certain temps d'inactivité.*
+
+#### Vérification de la définition
+
+La commande CEDA VIEW permet de vérifier les caractéristiques du mapset :
+
+![CEDA VIEW MAPSET(CLIAFF)](../captures/pt01/exo02/4.PNG)
+
+*Caractéristiques du mapset : Status=Enabled, DEFinetime indique la date/heure de création, CHANGEUsrid montre l'utilisateur qui a créé la définition (CICSUSER).*
 
 ---
 
@@ -862,17 +936,37 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGCLIA)`. Voici le code comp
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Modules compilés dans ROCHA.CICS.LOAD
 
-1. pt1ex03-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGCLIA)
-2. pt1ex03-2 : Soumission JCL CMPCLAF - compilation du programme
-3. pt1ex03-3 : SDSF - Job output avec RC=0000 pour compilation
-4. pt1ex03-4 : Vérification ROCHA.CICS.LOAD - membre PRGCLIA présent
-5. pt1ex03-5 : Écran MAPAFF vide - premier passage (message "SAISIR LE NUMERO...")
-6. pt1ex03-6 : Écran avec client affiché - après saisie numéro valide
-7. pt1ex03-7 : Écran avec message erreur - client inexistant
--->
+Après compilation du programme COBOL et assemblage de la MAP, les modules exécutables sont stockés dans ROCHA.CICS.LOAD :
+
+![ROCHA.CICS.LOAD - membres CLIAFF et PRGCLIA](../captures/pt01/exo3/0.PNG)
+
+*La library LOAD contient les deux modules : CLIAFF (module physique de la MAP BMS) et PRGCLIA (programme COBOL compilé). La taille et le TTR (Track Table Record) confirment que les modules sont bien générés.*
+
+#### Compilation COBOL réussie
+
+Le JCL de compilation utilise la procédure DFHYITVL qui effectue la traduction CICS, la compilation COBOL et le link-edit :
+
+![SDSF - Compilation COBOL](../captures/pt01/exo3/2.PNG)
+
+*Statistiques de compilation : 622 source records, 261 Data Division statements, 80 Procedure Division statements. Le "Return code 0" confirme une compilation sans erreur.*
+
+#### Définition du programme dans CICS
+
+La commande CEDA DEFINE PROGRAM déclare le programme compilé :
+
+![CEDA DEFINE PROGRAM(PRGCLIA)](../captures/pt01/exo3/3.PNG)
+
+*Définition du programme PRGCLIA avec Language=CObol. Les paramètres CEdf=Yes permettent le debug avec CEDF, DATalocation=Below indique que les données seront allouées sous la barre des 16 Mo (compatible 24-bit).*
+
+#### Vérification du programme
+
+La commande CEMT INQUIRE PROGRAM vérifie l'état du programme :
+
+![CEMT INQ PROGRAM(PRGCLIA)](../captures/pt01/exo3/5.PNG)
+
+*Le programme PRGCLIA est actif : Cob (COBOL), Pro (Protected), Ena (Enabled), Pri (Private). Leng indique la taille du module en mémoire.*
 
 ---
 
@@ -962,16 +1056,33 @@ Résultat attendu : `Tra(AFFI) Pro(PRGCLIA) Ena`
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Définition de la transaction
 
-1. pt1ex04-1 : Écran CEDA DEFINE MAPSET(CLIAFF) - définition du mapset
-2. pt1ex04-2 : Écran CEDA DEFINE PROGRAM(PRGCLIA) - définition du programme
-3. pt1ex04-3 : Écran CEDA DEFINE TRANSACTION(AFFI) - définition de la transaction
-4. pt1ex04-4 : Écran CEDA INSTALL avec message de succès (ou erreur ALREADY INSTALLED)
-5. pt1ex04-5 : Écran CEMT INQ TRAN(AFFI) - vérification que la transaction est active
-6. pt1ex04-6 : Test de la transaction AFFI - écran d'affichage vide
--->
+La commande CEDA DEFINE TRANSACTION crée le lien entre le code AFFI et le programme PRGCLIA :
+
+![CEDA DEFINE TRANSACTION(AFFI)](../captures/pt01/exo4/2.PNG)
+
+*Définition de la transaction AFFI. Les paramètres importants : PROGram=PRGCLIA (programme à exécuter), PROFile=DFHCICST (profil par défaut), STAtus=Enabled (transaction active).*
+
+#### Installation du groupe complet
+
+L'installation du groupe CLIGROUP tente d'installer toutes les ressources définies :
+
+![CEDA INSTALL GROUP(CLIGROUP) - tentative](../captures/pt01/exo4/3.PNG)
+
+*L'installation échoue partiellement avec "1 SEVERE 1 WARNING". Ceci est normal car certaines ressources (comme FCLIENT) sont déjà installées depuis l'exercice 1.*
+
+![Message d'erreur détaillé](../captures/pt01/exo4/4.PNG)
+
+*Le message explique l'échec : "Install failed because an existing definition for file FCLIENT could not be deleted." C'est un comportement attendu - FCLIENT était déjà installé. Le groupe est "partially installed", les autres ressources sont actives.*
+
+#### Vérification de la transaction
+
+Malgré l'erreur partielle, la transaction AFFI est bien installée et opérationnelle :
+
+![CEMT INQ TRANSACTION(AFFI)](../captures/pt01/exo4/6.PNG)
+
+*La transaction AFFI est active : Pri(001) = priorité 1, Pro(PRGCLIA) = programme associé, Tcl(DFHTCL00) = classe de transaction, Ena Sta = Enabled Status. La transaction est prête à être utilisée.*
 
 ---
 
@@ -1038,20 +1149,77 @@ La transaction s'exécute normalement sans interruption, affichant directement l
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Premier passage - Écran vide
 
-1. pt1ex05-1 : Premier arrêt CEDF - SEND MAP (avant exécution)
-2. pt1ex05-2 : SEND MAP (après exécution) - RESPONSE: NORMAL
-3. pt1ex05-3 : RETURN TRANSID - affichage de la COMMAREA
-4. pt1ex05-4 : TASK TERMINATION - fin du premier passage
-5. pt1ex05-5 : Écran d'affichage vide (MAP envoyée) - saisie numéro
-6. pt1ex05-6 : RECEIVE MAP - réception des données saisies
-7. pt1ex05-7 : READ FILE - lecture VSAM avec RESP visible
-8. pt1ex05-8 : Affichage PF5 - WORKING-STORAGE avec données client
-9. pt1ex05-9 : SEND MAP final - affichage du client trouvé
-10. pt1ex05-10 : Test sans debugger - transaction AFFI directe (écran fonctionnel)
--->
+Lors du lancement de la transaction AFFI, le programme affiche l'écran de saisie vide :
+
+![Écran AFFICHAGE CLIENT - premier passage](../captures/pt01/exo5/3.PNG)
+
+*L'écran initial invite l'utilisateur à saisir un numéro de compte. Tous les champs sont vides et le curseur est positionné sur NUMERO COMPTE (attribut IC = Initial Cursor dans la MAP BMS).*
+
+#### Debug CEDF - SEND MAP
+
+Le debugger CEDF intercepte la commande SEND MAP et affiche les détails :
+
+![CEDF - EXEC CICS SEND MAP](../captures/pt01/exo5/4.PNG)
+
+*Point d'arrêt après SEND MAP : MAP='MAPAFF', MAPSET='CLIAFF', RESPONSE: NORMAL (EIBRESP=0). La zone FROM contient les données de la MAP envoyées à l'écran (254 octets).*
+
+#### Terminaison du premier passage
+
+Après le SEND MAP, le programme exécute RETURN TRANSID et se termine :
+
+![CEDF - TASK TERMINATION](../captures/pt01/exo5/7.PNG)
+
+*Fin de la tâche (TASK TERMINATION). Le prompt "CONTINUE EDF? (ENTER YES OR NO)" permet de continuer le debug lors du prochain passage ou de désactiver CEDF.*
+
+#### Saisie d'un numéro de compte
+
+L'utilisateur saisit le numéro 000001 pour rechercher un client :
+
+![Écran avec numéro 000001 saisi](../captures/pt01/exo5/8.PNG)
+
+*Le numéro de compte 000001 est saisi. Après ENTER, CICS relance le programme qui va recevoir cette saisie via RECEIVE MAP.*
+
+#### Debug CEDF - RECEIVE MAP
+
+Le debugger montre la réception des données saisies par l'utilisateur :
+
+![CEDF - EXEC CICS RECEIVE MAP](../captures/pt01/exo5/11.PNG)
+
+*Point d'arrêt après RECEIVE MAP : la zone INTO contient "000001" (le numéro saisi). RESPONSE: NORMAL confirme que la saisie a été correctement transmise au programme.*
+
+#### Debug CEDF - READ FILE
+
+Le programme effectue ensuite une lecture VSAM avec la clé saisie :
+
+![CEDF - EXEC CICS READ FILE](../captures/pt01/exo5/13.PNG)
+
+*Point d'arrêt après READ FILE : la zone INTO contient l'enregistrement complet du client DUPONT Jean. On voit les données : 0000010120DUPONT JEAN 19850315M10CPARIS 0000150000CR.*
+
+#### Résultat - Client trouvé
+
+Après le READ réussi, le programme affiche les données du client :
+
+![Écran avec données client affichées](../captures/pt01/exo5/15.PNG)
+
+*Le client Jean DUPONT est affiché avec toutes ses informations : région 01 (Paris), nature compte 20, date de naissance 19850315, sexe M (MASCULIN), situation C (CELIBATAIRE), solde 0000150000, position CR (CREDITEUR). Le message confirme "CLIENT TROUVE".*
+
+#### Fin du debug
+
+L'utilisateur peut arrêter le mode debug en répondant "no" au prompt :
+
+![CEDF - Fin du debug](../captures/pt01/exo5/18.PNG)
+
+*En tapant "no", CEDF se désactive et la transaction continue sans interruption. Pour les prochains tests, il suffit de lancer directement AFFI sans passer par CEDF.*
+
+#### Test d'erreur - Client inexistant
+
+Le programme gère correctement les erreurs, par exemple un numéro de compte inexistant :
+
+![Écran avec message CLIENT INEXISTANT](../captures/pt01/exo5/19.PNG)
+
+*Le numéro 222222 n'existe pas dans le fichier. Le programme affiche le message "CLIENT INEXISTANT - VERIFIEZ LE NUMERO" et conserve le numéro saisi pour correction.*
 
 ---
 

@@ -70,10 +70,13 @@ AFFI
 
 ### Captures d'écran
 
-<!--
-1. pt3ex16-1 : Transaction AFFI - Affichage client 222001
-2. pt3ex16-2 : Transaction AFFI - Affichage client 111001
--->
+#### Vérification des clients génériques avec DITTO/ESA
+
+Avant de tester les fonctionnalités de navigation VSAM, on vérifie la présence des clients génériques dans le fichier.
+
+![DITTO VSAM Browse - Clients génériques](../captures/pt05/exo16/1.PNG)
+
+*L'utilitaire DITTO/ESA en mode VSAM Browse montre le contenu du fichier ROCHA.CICS.CLIENT. On voit les clients avec des préfixes génériques (111xxx) créés via la transaction AJOU lors des exercices précédents.*
 
 ---
 
@@ -306,11 +309,101 @@ CEDA INSTALL GROUP(CLIGROUP)
 
 ### Captures d'écran
 
-<!--
-1. pt3ex17-1 : Écran MAPDEL - Saisie préfixe "111"
-2. pt3ex17-2 : Résultat comptage "5 client(s) trouvé(s)"
-3. pt3ex17-3 : Confirmation "O" et résultat suppression
--->
+#### Résultats des compilations
+
+##### Assemblage BMS CLIDEL
+
+![Assemblage BMS CLIDEL](../captures/pt05/exo16/19.PNG)
+
+*Le job ROCHA09 (assemblage BMS) retourne Return Code 000. On note 69 Primary Input Records Read et 17 Object Records Written, confirmant la génération correcte du mapset CLIDEL (plus léger que CLISUP car moins de champs).*
+
+##### Compilation du programme PRGDELG
+
+![Compilation PRGDELG - RC=0](../captures/pt05/exo16/20.PNG)
+
+*Statistiques de compilation du programme PRGDELG : 1018 enregistrements sources, 280 instructions DATA DIVISION, 199 instructions PROCEDURE DIVISION. Return code 0 confirme la compilation réussie.*
+
+#### Définition des ressources CICS pour DELG
+
+La transaction de suppression générique nécessite trois ressources : MAPSET, PROGRAM et TRANSACTION.
+
+![CEDA DEFINE MAPSET CLIDEL](../captures/pt05/exo16/2.PNG)
+
+*La commande CEDA DEFINE MAPSET(CLIDEL) GROUP(CLIGROUP) crée la définition du mapset de suppression générique. Le message "DEFINE SUCCESSFUL" confirme la création.*
+
+![CEDA INSTALL MAPSET CLIDEL](../captures/pt05/exo16/3.PNG)
+
+*La commande CEDA INSTALL MAPSET(CLIDEL) charge le mapset en mémoire CICS.*
+
+![CEDA DEFINE PROGRAM PRGDELG](../captures/pt05/exo16/4.PNG)
+
+*La commande CEDA DEFINE PROGRAM(PRGDELG) GROUP(CLIGROUP) LANGUAGE(COBOL) crée la définition du programme de suppression générique.*
+
+![CEDA INSTALL PROGRAM PRGDELG](../captures/pt05/exo16/5.PNG)
+
+*La commande CEDA INSTALL PROGRAM(PRGDELG) charge le programme en mémoire.*
+
+![CEDA VIEW MAPSET CLIDEL](../captures/pt05/exo16/6.PNG)
+
+*CEDA VIEW permet de vérifier la définition du mapset CLIDEL.*
+
+![CEDA DEFINE TRANSACTION DELG](../captures/pt05/exo16/7.PNG)
+
+*La commande CEDA DEFINE TRANSACTION(DELG) GROUP(CLIGROUP) PROGRAM(PRGDELG) associe le code "DELG" au programme PRGDELG.*
+
+![CEDA INSTALL TRANSACTION DELG](../captures/pt05/exo16/8.PNG)
+
+*La commande CEDA INSTALL TRANSACTION(DELG) rend la transaction accessible aux utilisateurs.*
+
+#### Vérification des ressources du groupe
+
+![CEDA DISPLAY GROUP CLIGROUP](../captures/pt05/exo16/9.PNG)
+
+*CEDA DISPLAY GROUP(CLIGROUP) affiche toutes les ressources définies dans le groupe.*
+
+![Suite DISPLAY GROUP](../captures/pt05/exo16/10.PNG)
+
+*Suite de la liste des ressources du groupe CLIGROUP.*
+
+#### Test fonctionnel - Phase 1 : Comptage
+
+![Écran MAPDEL - Préfixe "1"](../captures/pt05/exo16/11.PNG)
+
+*L'utilisateur saisit le préfixe "1" et appuie sur ENTER. Le programme parcourt le fichier VSAM avec STARTBR/READNEXT et compte 11 clients correspondants (tous ceux dont le numéro commence par "1").*
+
+![Suppression annulée](../captures/pt05/exo16/12.PNG)
+
+*L'utilisateur a répondu "N" à la confirmation. Le message "NOUVEAU PREFIXE OU PF3" indique que la suppression est annulée et qu'on peut saisir un nouveau préfixe.*
+
+#### Test fonctionnel - Suppression d'un client unique
+
+![Préfixe 111114 - 1 client trouvé](../captures/pt05/exo16/13.PNG)
+
+*Avec le préfixe "111114" (6 caractères = clé complète), seul 1 client correspond.*
+
+![Veuillez répondre O ou N](../captures/pt05/exo16/14.PNG)
+
+*Le programme demande une confirmation explicite. Si l'utilisateur appuie sur ENTER sans répondre, le message "VEUILLEZ REPONDRE O OU N" s'affiche.*
+
+![1 client supprimé](../captures/pt05/exo16/15.PNG)
+
+*Après confirmation "O", le client 111114 est supprimé. Le message "00001 CLIENT(S) SUPPRIME(S)" confirme l'opération.*
+
+#### Test fonctionnel - Suppression multiple
+
+![Préfixe 11111 - 6 clients trouvés](../captures/pt05/exo16/16.PNG)
+
+*Avec le préfixe "11111" (5 caractères), 6 clients correspondent. L'utilisateur répond "O" pour confirmer la suppression.*
+
+![6 clients supprimés](../captures/pt05/exo16/17.PNG)
+
+*Les 6 clients ont été supprimés. Le programme a collecté les clés dans une table, fermé le browse avec ENDBR, puis exécuté DELETE pour chaque clé (évitant ainsi le deadlock).*
+
+#### Vérification après suppressions
+
+![DITTO VSAM Browse - Après suppressions](../captures/pt05/exo16/18.PNG)
+
+*Après les suppressions, DITTO/ESA montre que les clients 11111x ont bien été supprimés du fichier VSAM. Seuls les autres clients (000001, 222xxx, etc.) restent.*
 
 ---
 
@@ -421,12 +514,37 @@ CEDA INSTALL GROUP(CLIGROUP)
 
 ### Captures d'écran
 
-<!--
-1. pt3ex18-1 : Écran MAPLGEN - Saisie préfixe "1"
-2. pt3ex18-2 : Liste des 10 premiers clients (page 1/3)
-3. pt3ex18-3 : Navigation PF8 - Page 2/3
-4. pt3ex18-4 : Message "AUCUN CLIENT TROUVE" avec préfixe "9"
--->
+#### Définition des ressources CICS pour LGEN
+
+La transaction de liste générique nécessite trois ressources : MAPSET, PROGRAM et TRANSACTION.
+
+![CEDA DEFINE MAPSET CLILIST](../captures/pt05/exo18/1.PNG)
+
+*La commande CEDA DEFINE MAPSET(CLILIST) GROUP(CLIGROUP) crée la définition du mapset de liste paginée. Le message "DEFINE SUCCESSFUL" confirme la création.*
+
+![CEDA DEFINE PROGRAM PRGLGEN](../captures/pt05/exo18/2.PNG)
+
+*La commande CEDA DEFINE PROGRAM(PRGLGEN) GROUP(CLIGROUP) LANGUAGE(COBOL) crée la définition du programme de liste générique.*
+
+![CEDA DEFINE TRANSACTION LGEN](../captures/pt05/exo18/3.PNG)
+
+*La commande CEDA DEFINE TRANSACTION(LGEN) GROUP(CLIGROUP) PROGRAM(PRGLGEN) associe le code "LGEN" au programme PRGLGEN.*
+
+![CEDA DISPLAY GROUP - Installation](../captures/pt05/exo18/4.PNG)
+
+*Après installation du groupe, CEDA DISPLAY montre les ressources CLILIST, PRGLGEN et LGEN installées.*
+
+#### Test fonctionnel - Liste avec peu de résultats
+
+![Liste préfixe "1" - 3 clients](../captures/pt05/exo18/5.PNG)
+
+*L'utilisateur saisit le préfixe "1" et appuie sur ENTER. Le programme affiche les 3 clients restants (après les suppressions de l'exercice 17). Le message "FIN DE LISTE" indique qu'il n'y a pas d'autres pages.*
+
+#### Test fonctionnel - Liste avec plusieurs résultats
+
+![Liste préfixe "0" - 10 clients](../captures/pt05/exo18/6.PNG)
+
+*Avec le préfixe "0", 10 clients sont affichés sur une seule page. Le format d'affichage montre pour chaque client : numéro, région, nom, prénom, solde et position (DB/CR).*
 
 ---
 
@@ -757,11 +875,99 @@ CEDA INSTALL GROUP(CLIGROUP)
 
 ### Captures d'écran
 
-<!--
-1. pt3ex19-1 : Écran MAPSTAT - Saisie code région 01
-2. pt3ex19-2 : Résultats statistiques pour Paris
-3. pt3ex19-3 : Résultats statistiques pour une autre région
--->
+#### Vérification des datasets AIX et PATH
+
+Avant de définir les ressources CICS, on vérifie que l'AIX et le PATH ont été correctement créés par le JCL DEFPATH.
+
+![DSLIST - Datasets CICS](../captures/pt05/exo19/1.PNG)
+
+*La liste DSLIST montre les datasets du projet CICS : le fichier de base CLIENT, l'index alternatif CLIENT.AIX et le chemin d'accès CLIENT.PATH.*
+
+#### Création de l'AIX et du PATH avec IDCAMS
+
+![IDCAMS - Création AIX](../captures/pt05/exo19/2.PNG)
+
+*Le JCL DEFPATH utilise IDCAMS pour créer l'AIX (Alternate Index) sur le champ CODREG avec les paramètres KEYS(2 6) et NONUNIQUEKEY.*
+
+![IDCAMS - BLDINDEX](../captures/pt05/exo19/3.PNG)
+
+*La commande BLDINDEX construit l'index alternatif à partir des données du fichier de base. Le message "AIX SUCCESSFULLY BUILT" confirme la réussite.*
+
+![IDCAMS - DEFINE PATH](../captures/pt05/exo19/4.PNG)
+
+*La commande DEFINE PATH crée le chemin d'accès ROCHA.CICS.CLIENT.PATH qui permet d'accéder au fichier de base via l'index alternatif.*
+
+![LISTCAT - Vérification](../captures/pt05/exo19/5.PNG)
+
+*LISTCAT montre les associations entre le cluster de base, les composants DATA et INDEX, l'AIX et le PATH.*
+
+#### Définition du FILE CICS pour le PATH
+
+![CEDA DEFINE FILE PCLIENT](../captures/pt05/exo19/6.PNG)
+
+*La commande CEDA DEFINE FILE(PCLIENT) définit le fichier CICS qui pointe vers le PATH. Le DSN est ROCHA.CICS.CLIENT.PATH.*
+
+![Suite DEFINE FILE](../captures/pt05/exo19/7.PNG)
+
+*Les paramètres du FILE : ADD(NO), BROWSE(YES), DELETE(NO), READ(YES), UPDATE(NO). Le PATH est en lecture seule.*
+
+![CEDA INSTALL FILE PCLIENT](../captures/pt05/exo19/8.PNG)
+
+*La commande CEDA INSTALL FILE(PCLIENT) active le fichier. Le message "INSTALL SUCCESSFUL" confirme que le PATH est accessible.*
+
+![CEDA VIEW FILE PCLIENT](../captures/pt05/exo19/9.PNG)
+
+*CEDA VIEW FILE(PCLIENT) montre les opérations autorisées : Browse et Read uniquement (accès via l'index alternatif).*
+
+#### Définition des ressources CICS pour STAT
+
+![CEDA DEFINE MAPSET CLISTAT](../captures/pt05/exo19/10.PNG)
+
+*La commande CEDA DEFINE MAPSET(CLISTAT) GROUP(CLIGROUP) crée la définition du mapset de statistiques.*
+
+![CEDA DEFINE PROGRAM PRGSTAT](../captures/pt05/exo19/11.PNG)
+
+*La commande CEDA DEFINE PROGRAM(PRGSTAT) GROUP(CLIGROUP) LANGUAGE(COBOL) crée la définition du programme de statistiques.*
+
+![CEDA DEFINE TRANSACTION STAT](../captures/pt05/exo19/12.PNG)
+
+*La commande CEDA DEFINE TRANSACTION(STAT) GROUP(CLIGROUP) PROGRAM(PRGSTAT) associe le code "STAT" au programme PRGSTAT.*
+
+![CEDA DISPLAY GROUP - CLISTAT](../captures/pt05/exo19/13.PNG)
+
+*CEDA DISPLAY GROUP(CLIGROUP) montre les ressources CLISTAT installées.*
+
+![Suite DISPLAY GROUP - STAT](../captures/pt05/exo19/14.PNG)
+
+*Suite de la liste montrant la transaction STAT définie et installée.*
+
+#### Test fonctionnel - Statistiques par région
+
+![Statistiques région 01 PARIS](../captures/pt05/exo19/15.PNG)
+
+*Transaction STAT avec code région 01 (PARIS). L'écran affiche : 10 clients total, 5 débiteurs, 5 créditeurs, avec les sommes des soldes pour chaque catégorie.*
+
+![Statistiques région 02 MARSEILLE](../captures/pt05/exo19/16.PNG)
+
+*Transaction STAT avec code région 02 (MARSEILLE). Résultats : 4 clients, 2 débiteurs, 2 créditeurs.*
+
+![Statistiques région 03 LYON](../captures/pt05/exo19/17.PNG)
+
+*Transaction STAT avec code région 03 (LYON). Résultats : 3 clients, 2 débiteurs, 1 créditeur.*
+
+![Statistiques région 04 LILLE](../captures/pt05/exo19/18.PNG)
+
+*Transaction STAT avec code région 04 (LILLE). Résultats : 3 clients, 1 débiteur, 2 créditeurs.*
+
+#### Test des cas d'erreur
+
+![Région 05 - Code invalide](../captures/pt05/exo19/19.PNG)
+
+*Transaction STAT avec code région 05. Le message "CODE REGION INVALIDE" s'affiche car seules les régions 01 à 04 sont autorisées.*
+
+![Région valide mais vide](../captures/pt05/exo19/20.PNG)
+
+*Après correction, si une région valide ne contient aucun client, le message "AUCUN CLIENT DANS CETTE REGION" s'affiche avec des statistiques à zéro.*
 
 ---
 

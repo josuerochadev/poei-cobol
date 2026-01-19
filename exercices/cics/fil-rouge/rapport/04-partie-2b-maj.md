@@ -142,14 +142,33 @@ CEDA VIEW MAPSET(CLIMAJ) GROUP(CLIGROUP)
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Résultat de l'assemblage BMS
 
-1. pt2ex09-1 : Source BMS dans ISPF EDIT - ROCHA.CICS.SOURCE(CLIMAJ)
-2. pt2ex09-2 : Soumission JCL assemblage BMS
-3. pt2ex09-3 : SDSF - Job output avec RC=0000
-4. pt2ex09-4 : Vérification ROCHA.CICS.LINK - copybook CLIMAJ généré
--->
+Après soumission du JCL ASMMAJ, le job d'assemblage s'exécute avec succès.
+
+![Assemblage BMS CLIMAJ](../captures/pt03/exo09/4.PNG)
+
+*Le job ROCHA09 (assemblage BMS) retourne Return Code 000. On note 115 Primary Input Records Read et 31 Object Records Written, confirmant la génération correcte du mapset CLIMAJ.*
+
+#### Définition du mapset CLIMAJ dans CICS
+
+Après l'assemblage BMS réussi, on définit le mapset dans CICS avec CEDA.
+
+![CEDA DEFINE MAPSET CLIMAJ](../captures/pt03/exo09/1.PNG)
+
+*La commande CEDA DEFINE MAPSET(CLIMAJ) GROUP(CLIGROUP) crée la définition du mapset. Le message "DEFINE SUCCESSFUL" confirme la création.*
+
+#### Installation du mapset CLIMAJ
+
+![CEDA INSTALL MAPSET CLIMAJ](../captures/pt03/exo09/2.PNG)
+
+*La commande CEDA INSTALL MAPSET(CLIMAJ) charge le mapset en mémoire CICS. Le message "INSTALL SUCCESSFUL" indique que le mapset est prêt à être utilisé.*
+
+#### Vérification de la définition
+
+![CEDA VIEW MAPSET CLIMAJ](../captures/pt03/exo09/3.PNG)
+
+*CEDA VIEW permet de consulter tous les paramètres du mapset : nom, groupe, résidence, et statut d'installation.*
 
 ---
 
@@ -529,17 +548,41 @@ Résultat attendu : `Prog(PRGMAJ) Cob Ena`
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Définition du programme PRGMAJ dans CICS
 
-1. pt2ex10-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGMAJ)
-2. pt2ex10-2 : Soumission JCL CMPMAJ - compilation du programme
-3. pt2ex10-3 : SDSF - Job output avec RC=0000 pour compilation
-4. pt2ex10-4 : Écran phase 1 - saisie numéro de compte (NUMCPT saisissable)
-5. pt2ex10-5 : Écran phase 2 - affichage client (NUMCPT protégé, visible mais grisé)
-6. pt2ex10-6 : Écran phase 3 - message "MISE A JOUR EFFECTUEE"
-7. pt2ex10-7 : Vérification avec AFFI - données modifiées visibles
--->
+Après la compilation COBOL réussie, on définit le programme dans CICS.
+
+![CEDA DEFINE PROGRAM PRGMAJ](../captures/pt03/exo10/1.PNG)
+
+*La commande CEDA DEFINE PROGRAM(PRGMAJ) GROUP(CLIGROUP) LANGUAGE(COBOL) crée la définition du programme. Le message "DEFINE SUCCESSFUL" confirme la création.*
+
+#### Installation du programme PRGMAJ
+
+![CEDA INSTALL PROGRAM PRGMAJ](../captures/pt03/exo10/2.PNG)
+
+*La commande CEDA INSTALL PROGRAM(PRGMAJ) charge le programme compilé en mémoire CICS. Le message "INSTALL SUCCESSFUL" indique que le programme est prêt.*
+
+#### Vérification avec CEMT
+
+![CEMT INQ PROGRAM PRGMAJ](../captures/pt03/exo10/3.PNG)
+
+*CEMT INQ PROGRAM(PRGMAJ) affiche le statut du programme : "Cob" (COBOL), "Pro" (Protected), "Ena" (Enabled). Le programme est correctement installé et activé.*
+
+#### Compilation du programme PRGMAJ
+
+Le job de compilation COBOL s'exécute avec succès.
+
+![Compilation PRGMAJ - RC=0](../captures/pt03/exo10/4.PNG)
+
+*Statistiques de compilation du programme PRGMAJ : 1134 enregistrements sources, 328 instructions DATA DIVISION, 249 instructions PROCEDURE DIVISION. Return code 0 confirme la compilation réussie.*
+
+#### Test d'erreur - Client inexistant
+
+Le programme gère correctement le cas où le client recherché n'existe pas.
+
+![Erreur - Client inexistant](../captures/pt03/exo10/5.PNG)
+
+*Message "CLIENT INEXISTANT - VERIFIEZ LE NUMERO" lorsque l'utilisateur saisit un numéro de compte qui n'existe pas dans le fichier VSAM (NOTFND).*
 
 ---
 
@@ -662,17 +705,99 @@ Points d'arrêt observés pour une mise à jour complète :
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Définition de la transaction MAJO
 
-1. pt2ex11-1 : CEDA DEFINE TRANSACTION(MAJO) - écran de définition
-2. pt2ex11-2 : CEDA INSTALL TRANSACTION(MAJO) - message INSTALL SUCCESSFUL
-3. pt2ex11-3 : CEMT INQ TRAN(MAJO) - vérification statut Ena
-4. pt2ex11-4 : Test CEDF - point d'arrêt sur READ UPDATE
-5. pt2ex11-5 : Test CEDF - point d'arrêt sur REWRITE avec RESP NORMAL
-6. pt2ex11-6 : Test fonctionnel - écran avec message "MISE A JOUR EFFECTUEE"
-7. pt2ex11-7 : Vérification avec AFFI - les données modifiées sont visibles
--->
+La transaction fait le lien entre le code utilisateur et le programme COBOL.
+
+![CEDA DEFINE TRANSACTION MAJO](../captures/pt03/exo11/1.PNG)
+
+*La commande CEDA DEFINE TRANSACTION(MAJO) GROUP(CLIGROUP) PROGRAM(PRGMAJ) associe le code "MAJO" au programme PRGMAJ. Le message "DEFINE SUCCESSFUL" confirme la création.*
+
+#### Installation de la transaction MAJO
+
+![CEDA INSTALL TRANSACTION MAJO](../captures/pt03/exo11/2.PNG)
+
+*La commande CEDA INSTALL TRANSACTION(MAJO) rend la transaction accessible aux utilisateurs. Le message "INSTALL SUCCESSFUL" indique que la transaction est active.*
+
+#### Vérification de la définition
+
+![CEDA VIEW TRANSACTION MAJO](../captures/pt03/exo11/3.PNG)
+
+*CEDA VIEW permet de vérifier les paramètres de la transaction : code MAJO, programme associé PRGMAJ, et groupe CLIGROUP.*
+
+#### Test fonctionnel - Phase 1 : Saisie du numéro
+
+Après avoir tapé "MAJO" sur l'écran CICS, l'écran de mise à jour s'affiche.
+
+![Écran MAPMAJ vide](../captures/pt03/exo11/4.PNG)
+
+*Phase 1 : L'écran s'affiche vide avec le curseur sur le champ NUMCPT. L'utilisateur doit saisir le numéro du client à modifier.*
+
+#### Test fonctionnel - Saisie du numéro de compte
+
+![Saisie numéro 000001](../captures/pt03/exo11/5.PNG)
+
+*L'utilisateur a saisi le numéro de compte "000001" et appuie sur ENTER pour rechercher le client.*
+
+#### Test fonctionnel - Phase 2 : Affichage des données
+
+![Données client affichées](../captures/pt03/exo11/6.PNG)
+
+*Phase 2 : Le client a été trouvé. Toutes ses données sont affichées et le message "CLIENT TROUVE" confirme la recherche réussie. L'utilisateur peut maintenant modifier les champs souhaités et valider avec ENTER.*
+
+#### Session de débogage CEDF - Mise à jour complète
+
+Le débogueur CEDF permet de suivre l'exécution des commandes CICS pas à pas lors d'une mise à jour.
+
+##### CEDF - RECEIVE MAP (réception du numéro)
+
+![CEDF - RECEIVE MAP](../captures/pt03/exo11/7.PNG)
+
+*Point d'arrêt CEDF sur la commande RECEIVE MAP : réception du numéro de compte 000001 saisi par l'utilisateur. RESPONSE: NORMAL.*
+
+##### CEDF - READ FILE (lecture du client)
+
+![CEDF - READ FILE](../captures/pt03/exo11/8.PNG)
+
+*Point d'arrêt CEDF sur la commande READ FILE avec RIDFLD('000001'). Le client DUPONT est trouvé (données visibles : 19850315M..M...CR). RESPONSE: NORMAL.*
+
+##### Écran - Client trouvé
+
+![Écran - Client trouvé](../captures/pt03/exo11/9.PNG)
+
+*L'écran affiche les données du client 000001 (DUPONT JOSUE). Le message "CLIENT TROUVE - MODIFIER ET VALIDER AVEC ENTER" invite l'utilisateur à effectuer ses modifications. Noter que le NUMCPT est maintenant protégé (clé non modifiable).*
+
+##### CEDF - SEND MAP (affichage client)
+
+![CEDF - SEND MAP](../captures/pt03/exo11/10.PNG)
+
+*Point d'arrêt CEDF sur la commande SEND MAP : envoi de l'écran avec les données du client (0000001...01...10...DUPONT...). RESPONSE: NORMAL.*
+
+##### CEDF - REWRITE (mise à jour VSAM)
+
+![CEDF - REWRITE](../captures/pt03/exo11/11.PNG)
+
+*Point d'arrêt CEDF sur la commande REWRITE : écriture de l'enregistrement modifié dans le fichier FCLIENT. On voit les données complètes (000001 DUPONT JOSUE 19850315M10M...CR). RESPONSE: NORMAL confirme la mise à jour réussie.*
+
+##### Écran - Mise à jour effectuée
+
+![Écran - Mise à jour effectuée](../captures/pt03/exo11/12.PNG)
+
+*Message "MISE A JOUR EFFECTUEE - NOUVEAU OU PF3" confirmant le succès de l'opération. L'écran est réinitialisé pour permettre la modification d'un autre client.*
+
+##### CEDF - SEND MAP (message de succès)
+
+![CEDF - SEND MAP succès](../captures/pt03/exo11/13.PNG)
+
+*Point d'arrêt CEDF sur le SEND MAP final : envoi du message de succès à l'utilisateur. RESPONSE: NORMAL.*
+
+##### Vérification avec AFFI
+
+Après la mise à jour, on peut vérifier les modifications avec la transaction d'affichage.
+
+![AFFI - Vérification](../captures/pt03/exo11/14.PNG)
+
+*Vérification avec la transaction AFFI : le client 000001 (DUPONT JOSUE) s'affiche avec ses données mises à jour. On note la situation sociale "M" traduite en "MARIE(E)" et la position "CR" traduite en "CREDITEUR".*
 
 ---
 

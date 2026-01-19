@@ -102,6 +102,34 @@ Command - Enter "/" to select action
          ROCHA.CICS.SOURCE
 ```
 
+### Captures d'écran
+
+#### Liste des Data Sets créés
+
+La commande DSLIST (option 3.4) permet de vérifier que les trois libraries ont été correctement créées sur le volume FDDBAS :
+
+![DSLIST - Data Sets Matching ROCHA.CICS](../captures/pt00/1.PNG)
+
+*Cette capture montre les trois PDS créés : ROCHA.CICS.LINK, ROCHA.CICS.LOAD et ROCHA.CICS.SOURCE. La commande "I" (Info) permet d'afficher les caractéristiques détaillées de chaque Data Set.*
+
+#### Caractéristiques de ROCHA.CICS.LINK
+
+![Data Set Information - ROCHA.CICS.LINK](../captures/pt00/2%20(2).PNG)
+
+*La library LINK contient les modules objets après compilation. Elle utilise le format FB (Fixed Block) avec une longueur d'enregistrement de 80 octets, le standard pour les fichiers source z/OS. La date de création (2026/01/12) confirme l'allocation récente.*
+
+#### Caractéristiques de ROCHA.CICS.LOAD
+
+![Data Set Information - ROCHA.CICS.LOAD](../captures/pt00/3.PNG)
+
+*La library LOAD contient les programmes exécutables (load modules). Elle utilise le format U (Undefined) car les modules exécutables n'ont pas de longueur d'enregistrement fixe. C'est le format standard pour les load modules z/OS.*
+
+#### Caractéristiques de ROCHA.CICS.SOURCE
+
+![Data Set Information - ROCHA.CICS.SOURCE](../captures/pt00/4%20(2).PNG)
+
+*La library SOURCE contiendra les programmes COBOL, les définitions BMS et les JCL. Comme LINK, elle utilise le format FB/80 pour la compatibilité avec les éditeurs ISPF et les compilateurs.*
+
 ### Structure des libraries
 
 | Library | Contenu | RECFM | LRECL |

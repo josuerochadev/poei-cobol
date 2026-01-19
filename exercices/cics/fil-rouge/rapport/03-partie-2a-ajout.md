@@ -120,14 +120,33 @@ CEDA VIEW MAPSET(CLIAJT) GROUP(CLIGROUP)
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Résultat de l'assemblage BMS
 
-1. pt2ex06-1 : Source BMS dans ISPF EDIT - ROCHA.CICS.SOURCE(CLIAJT)
-2. pt2ex06-2 : Soumission JCL assemblage BMS
-3. pt2ex06-3 : SDSF - Job output avec RC=0000
-4. pt2ex06-4 : Vérification ROCHA.CICS.LINK - copybook CLIAJT généré
--->
+Après soumission du JCL d'assemblage ASMAJT, le job ROCHA05 s'exécute avec succès.
+
+![Assemblage BMS CLIAJT](../captures/pt02/exo06/7.PNG)
+
+*Le job d'assemblage retourne RC=0000, confirmant que la MAP CLIAJT a été correctement compilée. Le copybook est généré dans ROCHA.CICS.LINK(CLIAJT) via SYSPUNCH.*
+
+#### Définition du mapset CLIAJT dans CICS
+
+Après l'assemblage BMS réussi, on définit le mapset dans CICS avec CEDA.
+
+![CEDA DEFINE MAPSET CLIAJT](../captures/pt02/exo06/1.PNG)
+
+*La commande CEDA DEFINE MAPSET(CLIAJT) GROUP(CLIGROUP) crée la définition du mapset d'ajout. Le message "DEFINE SUCCESSFUL" confirme la création. On note le statut Enabled par défaut.*
+
+#### Installation du mapset CLIAJT
+
+![CEDA INSTALL MAPSET CLIAJT](../captures/pt02/exo06/2.PNG)
+
+*La commande CEDA INSTALL MAPSET(CLIAJT) charge le mapset en mémoire CICS. Le message "INSTALL SUCCESSFUL" indique que le mapset est prêt à être utilisé.*
+
+#### Vérification de la définition
+
+![CEDA VIEW MAPSET CLIAJT](../captures/pt02/exo06/3.PNG)
+
+*CEDA VIEW permet de consulter tous les paramètres du mapset : nom, groupe, résidence (Normal), et statut (Enabled).*
 
 ---
 
@@ -588,17 +607,43 @@ END-IF
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Compilation du programme PRGAJT
 
-1. pt2ex07-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGAJT)
-2. pt2ex07-2 : Soumission JCL CMPAJT - compilation du programme
-3. pt2ex07-3 : SDSF - Job output avec RC=0000 pour compilation
-4. pt2ex07-4 : Écran MAPAJT vide - premier passage (message "SAISIR LES DONNEES...")
-5. pt2ex07-5 : Test erreur de validation - message "SEXE INVALIDE (M OU F)"
-6. pt2ex07-6 : Test doublon - message "ENREGISTREMENT EN DOUBLE"
-7. pt2ex07-7 : Ajout réussi - message "CLIENT AJOUTE AVEC SUCCES"
--->
+Après soumission du JCL CMPAJT, le job de compilation s'exécute avec succès.
+
+![Compilation PRGAJT - RC=0](../captures/pt02/exo07/1.PNG)
+
+*Le job de compilation COBOL retourne RC=0, confirmant que le programme PRGAJT a été correctement compilé. On note 739 enregistrements sources traités.*
+
+#### Définition du programme dans CICS
+
+Après la compilation réussie, on définit le programme dans CICS avec CEDA.
+
+![CEDA DEFINE PROGRAM PRGAJT](../captures/pt02/exo07/4.PNG)
+
+*La commande CEDA DEFINE PROGRAM(PRGAJT) GROUP(CLIGROUP) crée la définition du programme. On voit les options disponibles : Language (CObol par défaut), Status (Enabled), CEdf (Yes pour le débogage).*
+
+#### Installation du programme PRGAJT
+
+![CEDA INSTALL PROGRAM PRGAJT](../captures/pt02/exo07/5.PNG)
+
+*La commande CEDA INSTALL PROGRAM(PRGAJT) charge le programme compilé en mémoire CICS. Le message "INSTALL SUCCESSFUL" confirme l'activation.*
+
+#### Vérification avec CEDA VIEW
+
+La commande CEDA VIEW permet de visualiser les caractéristiques du programme enregistré dans CICS.
+
+![CEDA VIEW PROGRAM(PRGAJT)](../captures/pt02/exo07/2.PNG)
+
+*Vue de la définition du programme PRGAJT dans le groupe CLIGROUP. On note le langage COBOL et le statut Enabled.*
+
+#### Vérification avec CEMT
+
+La commande CEMT INQ permet de vérifier que le programme est bien actif dans CICS.
+
+![CEMT INQ PROGRAM(PRGAJT)](../captures/pt02/exo07/3.PNG)
+
+*Le programme PRGAJT est correctement installé : "Cob Pro Ena" indique un programme COBOL (Cob), compilé et prêt (Pro), et activé (Ena).*
 
 ---
 
@@ -735,20 +780,151 @@ Saisir le numéro du client ajouté → Les données doivent s'afficher.
 
 ### Captures d'écran
 
-<!--
-Suggestions de captures d'écran pour cet exercice :
+#### Définition de la transaction AJOU
 
-1. pt2ex08-1 : CEDA DEFINE MAPSET(CLIAJT) - écran de définition
-2. pt2ex08-2 : CEDA DEFINE PROGRAM(PRGAJT) - écran de définition
-3. pt2ex08-3 : CEDA DEFINE TRANSACTION(AJOU) - écran de définition
-4. pt2ex08-4 : CEDA INSTALL avec message de succès
-5. pt2ex08-5 : CEMT INQ TRAN(AJOU) - vérification statut Ena
-6. pt2ex08-6 : Test CEDF - point d'arrêt sur READ FILE avec RESP NOTFND
-7. pt2ex08-7 : Test CEDF - point d'arrêt sur WRITE FILE avec RESP NORMAL
-8. pt2ex08-8 : Écran MAPAJT - saisie d'un nouveau client
-9. pt2ex08-9 : Message "CLIENT AJOUTE AVEC SUCCES" après ajout
-10. pt2ex08-10 : Vérification avec AFFI - le nouveau client existe
--->
+La commande CEDA DEFINE crée la liaison entre le code transaction et le programme.
+
+![CEDA DEFINE TRANSACTION AJOU](../captures/pt02/exo08/21.PNG)
+
+*La commande CEDA DEFINE TRANSACTION(AJOU) GROUP(CLIGROUP) PROGRAM(PRGAJT) associe le code "AJOU" au programme PRGAJT. On voit les paramètres : PROFile (DFHCICST), STAtus (Enabled), TWasize, etc.*
+
+#### Installation de la transaction AJOU
+
+![CEDA INSTALL TRANSACTION AJOU](../captures/pt02/exo08/22.PNG)
+
+*La commande CEDA INSTALL TRANSACTION(AJOU) rend la transaction accessible aux utilisateurs. Le message "INSTALL SUCCESSFUL" confirme l'activation.*
+
+#### Vérification de la transaction avec CEMT
+
+La commande CEMT INQ permet de vérifier que la transaction est bien active.
+
+![CEMT INQ TRANSACTION(AJOU)](../captures/pt02/exo08/1.PNG)
+
+*La transaction AJOU est correctement installée et activée (Ena Sta). Elle est liée au programme PRGAJT.*
+
+#### Vérification avec CEDA VIEW
+
+La commande CEDA VIEW affiche les caractéristiques détaillées de la transaction.
+
+![CEDA VIEW TRANSACTION(AJOU)](../captures/pt02/exo08/2.PNG)
+
+*Vue complète de la définition de la transaction AJOU : elle appartient au groupe CLIGROUP, est liée au programme PRGAJT, avec un statut Enabled.*
+
+#### Premier passage - Écran vide
+
+Lorsque l'utilisateur lance la transaction AJOU, l'écran de saisie s'affiche vide.
+
+![Écran AJOUT CLIENT - Premier passage](../captures/pt02/exo08/4.PNG)
+
+*L'écran de saisie MAPAJT s'affiche avec tous les champs vides et le message d'instruction "SAISIR LES DONNEES DU NOUVEAU CLIENT ET VALIDER".*
+
+#### Messages d'erreur de validation
+
+Le programme valide les données saisies et affiche des messages d'erreur appropriés.
+
+##### Aucune donnée saisie
+
+![Erreur - Aucune donnée saisie](../captures/pt02/exo08/5.PNG)
+
+*Message "AUCUNE DONNEE SAISIE - VEUILLEZ REMPLIR" lorsque l'utilisateur appuie sur ENTER sans avoir saisi de données (MAPFAIL).*
+
+##### Client existant (doublon)
+
+![Erreur - Enregistrement en double](../captures/pt02/exo08/6.PNG)
+
+*Message "ENREGISTREMENT EN DOUBLE - CE CLIENT EXISTE DEJA" lorsque le numéro de compte existe déjà dans le fichier VSAM.*
+
+##### Numéro de compte obligatoire
+
+![Erreur - Numéro de compte obligatoire](../captures/pt02/exo08/7.PNG)
+
+*Message "NUMERO DE COMPTE OBLIGATOIRE" lorsque le champ NUMCPT est vide.*
+
+##### Code région invalide
+
+![Erreur - Code région invalide](../captures/pt02/exo08/8.PNG)
+
+*Message "CODE REGION INVALIDE (01/02/03/04)" lorsque le code région n'est pas une valeur autorisée.*
+
+##### Sexe invalide
+
+![Erreur - Sexe invalide](../captures/pt02/exo08/9.PNG)
+
+*Message "SEXE INVALIDE (M OU F)" lorsque le sexe saisi n'est pas M ou F.*
+
+##### Situation sociale invalide
+
+![Erreur - Situation invalide](../captures/pt02/exo08/10.PNG)
+
+*Message "SITUATION INVALIDE (C/M/D/V)" lorsque la situation sociale n'est pas reconnue.*
+
+##### Position invalide
+
+![Erreur - Position invalide](../captures/pt02/exo08/11.PNG)
+
+*Message "POSITION INVALIDE (DB OU CR)" lorsque la position n'est pas DB (débiteur) ou CR (créditeur).*
+
+#### Test d'ajout réussi - Premier client
+
+Ajout du client RONALDO CRISTIANO avec toutes les données valides.
+
+![Ajout réussi - Client RONALDO](../captures/pt02/exo08/12.PNG)
+
+*Message "CLIENT AJOUTE AVEC SUCCES - NOUVEAU OU PF3" après l'ajout du client 222222 (RONALDO CRISTIANO, Paris, Célibataire, Débiteur).*
+
+#### Vérification avec AFFI
+
+Après l'ajout, on vérifie que le client existe bien en utilisant la transaction d'affichage.
+
+![Vérification AFFI - Client 222222](../captures/pt02/exo08/13.PNG)
+
+*Le client 222222 (RONALDO CRISTIANO) s'affiche correctement dans la transaction AFFI, confirmant que l'ajout a bien été effectué dans le fichier VSAM.*
+
+#### Session de débogage CEDF
+
+Le débogueur CEDF permet de suivre l'exécution des commandes CICS pas à pas.
+
+##### CEDF - SEND MAP (affichage écran)
+
+![CEDF - EXEC CICS SEND MAP](../captures/pt02/exo08/14.PNG)
+
+*Point d'arrêt CEDF sur la commande SEND MAP : envoi de MAPAJT depuis le mapset CLIAJT. RESPONSE: NORMAL indique le succès de l'opération.*
+
+##### Saisie d'un nouveau client
+
+![Saisie nouveau client - GIL GILBERTO](../captures/pt02/exo08/15.PNG)
+
+*Saisie des données pour un nouveau client : 333333, région 02 (Marseille), GIL GILBERTO, Veuf, Créditeur.*
+
+##### CEDF - RECEIVE MAP (réception saisie)
+
+![CEDF - EXEC CICS RECEIVE MAP](../captures/pt02/exo08/16.PNG)
+
+*Point d'arrêt CEDF sur la commande RECEIVE MAP : réception des données saisies. On voit les valeurs transmises (333333, 02, 10, GIL, GILBERTO...). RESPONSE: NORMAL.*
+
+##### CEDF - READ FILE (vérification doublon)
+
+![CEDF - EXEC CICS READ FILE - NOTFND](../captures/pt02/exo08/17.PNG)
+
+*Point d'arrêt CEDF sur la commande READ FILE avec RIDFLD('333333'). **RESPONSE: NOTFND** (EIBRESP=13) est le résultat **attendu** : le client n'existe pas encore, on peut procéder à l'écriture.*
+
+##### CEDF - WRITE FILE (écriture client)
+
+![CEDF - EXEC CICS WRITE FILE](../captures/pt02/exo08/18.PNG)
+
+*Point d'arrêt CEDF sur la commande WRITE FILE : écriture de l'enregistrement complet du client. On voit les données (3333330210GIL GILBERTO 19851212M10VBRESIL 8888888888CR). RESPONSE: NORMAL confirme l'écriture réussie.*
+
+##### Ajout réussi - Deuxième client
+
+![Ajout réussi - Client GIL](../captures/pt02/exo08/19.PNG)
+
+*Message "CLIENT AJOUTE AVEC SUCCES" après l'ajout du client 333333 (GIL GILBERTO, Marseille, Veuf, Créditeur).*
+
+##### CEDF - SEND MAP final
+
+![CEDF - EXEC CICS SEND MAP final](../captures/pt02/exo08/20.PNG)
+
+*Point d'arrêt CEDF sur le SEND MAP final : envoi du message de succès à l'écran. RESPONSE: NORMAL.*
 
 ---
 

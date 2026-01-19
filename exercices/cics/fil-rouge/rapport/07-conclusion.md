@@ -16,6 +16,58 @@
 | Données effacées après mise à jour | Bug fusion des modifications | Ajouter clause ELSE pour préserver les champs non modifiés dans le paragraphe 4050-FUSIONNER-MODIFICATIONS |
 | Justification à droite des clés | Attribut NUM sur champ préfixe | Utiliser PIC X sans NUM pour les champs de clé partielle |
 
+### Vue d'ensemble du projet réalisé
+
+Ces captures montrent l'ensemble des ressources créées au cours du projet.
+
+#### Ressources CICS - Groupe CLIGROUP
+
+Le groupe CLIGROUP contient toutes les ressources définies pour l'application de gestion clientèle.
+
+![CEDA DISPLAY GROUP - Partie 1](../captures/conclusion/1.PNG)
+
+*Vue des ressources du groupe CLIGROUP : 2 fichiers (FCLIENT, PCLIENT), 7 mapsets BMS (CLIAFF à CLISTAT), et les premiers programmes COBOL.*
+
+![CEDA DISPLAY GROUP - Partie 2](../captures/conclusion/2.PNG)
+
+*Suite des ressources : les 7 programmes (PRGAJT à PRGSUP) et les 7 transactions (AFFI, AJOU, DELG, LGEN, MAJO, STAT, SUPP).*
+
+#### Datasets sur z/OS
+
+L'ensemble des fichiers du projet sont organisés dans l'espace de noms ROCHA.CICS.
+
+![DSLIST - Datasets ROCHA.CICS](../captures/conclusion/3.PNG)
+
+*Liste des 10 datasets du projet : CLIENT (VSAM KSDS), AIX (index alternatif), PATH, les composants VSAM (DATA, INDEX), et les bibliothèques (LINK, LOAD, SOURCE).*
+
+#### Bibliothèque des sources - ROCHA.CICS.SOURCE
+
+Cette bibliothèque contient tous les codes sources : BMS, COPY, JCL et programmes COBOL.
+
+![ROCHA.CICS.SOURCE - Partie 1](../captures/conclusion/4.PNG)
+
+*Membres sources : ASM* (JCL d'assemblage BMS), CLI* (sources BMS des mapsets), CMP* (JCL de compilation), ainsi que les tailles et dates de modification.*
+
+![ROCHA.CICS.SOURCE - Partie 2](../captures/conclusion/5.PNG)
+
+*Suite des membres : CMP* (compilations), DEFPATH (définition AIX/PATH), DEFVSAM (définition cluster), LOADVSAM (chargement données), et les 7 programmes PRG* (PRGAJT, PRGCLIA, PRGDELG, PRGLGEN, PRGMAJ, PRGSTAT, PRGSUP).*
+
+#### Bibliothèque des modules - ROCHA.CICS.LOAD
+
+Cette bibliothèque contient les programmes compilés (load modules) prêts à être exécutés.
+
+![ROCHA.CICS.LOAD - Modules compilés](../captures/conclusion/6.PNG)
+
+*14 modules load : 7 mapsets BMS compilés (CLI*) et 7 programmes COBOL-CICS compilés (PRG*). On note la taille de chaque module et le mode d'adressage (AMODE 24/31).*
+
+#### Bibliothèque des linkedits BMS - ROCHA.CICS.LINK
+
+Cette bibliothèque contient les copybooks générés lors de l'assemblage BMS.
+
+![ROCHA.CICS.LINK - Copybooks BMS](../captures/conclusion/7.PNG)
+
+*7 copybooks BMS (CLI*) générés par l'assembleur. Ces copybooks sont inclus dans les programmes COBOL via la COPY statement pour décrire la structure des écrans.*
+
 ### Compétences mises en œuvre
 
 **VSAM et CICS :**
