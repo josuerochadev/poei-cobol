@@ -4,13 +4,15 @@
       * PROGRAMME : PRGSTAT
       * FONCTION  : Statistiques clients par region
       * TRANSACTION : STAT
-      * FICHIER   : FCLIENT (VSAM KSDS)
+      * FICHIER   : PCLIENT (PATH vers AIX sur CODREG)
       * MAP       : MAPSTAT (MAPSET CLISTAT)
       *
       * MODE PSEUDO-CONVERSATIONNEL :
       * -----------------------------
       * - Saisie d'un code region (01, 02, 03 ou 04)
-      * - Parcours complet du fichier avec STARTBR/READNEXT
+      * - Acces direct via AIX/PATH sur le code region
+      * - STARTBR positionne directement sur la region demandee
+      * - READNEXT ne lit que les clients de cette region
       * - Calcul et affichage des statistiques :
       *   - Nombre total de clients de la region
       *   - Nombre et somme des clients debiteurs (DB)
@@ -19,6 +21,11 @@
       * REGIONS :
       * 01 - Paris      02 - Marseille
       * 03 - Lyon       04 - Lille
+      *
+      * PRE-REQUIS :
+      * - AIX defini sur CODREG (offset 6, longueur 2)
+      * - PATH defini (ROCHA.CICS.CLIENT.PATH)
+      * - Definition CICS : FILE(PCLIENT) DSN(PATH)
       *
       * FIL ROUGE CICS - EXERCICE 19
       ******************************************************************
@@ -72,11 +79,10 @@
            VALUE 'TRANSACTION STAT TERMINEE - AU REVOIR'.
 
       *-----------------------------------------------------------------
-      * VARIABLES POUR LA NAVIGATION VSAM
+      * VARIABLES POUR LA NAVIGATION VSAM VIA AIX/PATH
       *-----------------------------------------------------------------
        01  WS-BROWSE.
-           05 WS-CLE-DEBUT       PIC X(06) VALUE LOW-VALUES.
-           05 WS-CLE-COURANTE    PIC X(06) VALUE SPACES.
+           05 WS-CLE-AIX         PIC X(02) VALUE SPACES.
            05 WS-FIN-BROWSE      PIC X(01) VALUE 'N'.
               88 FIN-BROWSE      VALUE 'O'.
               88 PAS-FIN-BROWSE  VALUE 'N'.
@@ -239,7 +245,7 @@
       *    Sauvegarder pour la COMMAREA
            MOVE WS-CODE-REGION TO WS-CODE-REGION-SAVED
 
-      *    Calculer les statistiques
+      *    Calculer les statistiques via AIX/PATH
            PERFORM 3000-CALCULER-STATS
 
       *    Afficher les resultats
@@ -265,17 +271,18 @@
       *-----------------------------------------------------------------
        3000-CALCULER-STATS.
       *-----------------------------------------------------------------
-      * Parcours complet du fichier pour calculer les statistiques
+      * Parcours du fichier via AIX/PATH pour la region demandee
+      * L'AIX permet d'acceder directement aux clients de la region
       *-----------------------------------------------------------------
            INITIALIZE WS-STATS
            MOVE 'N' TO WS-FIN-BROWSE
 
-      *    Positionner au debut du fichier
-           MOVE LOW-VALUES TO WS-CLE-DEBUT
+      *    Positionner sur la cle AIX (code region)
+           MOVE WS-CODE-REGION TO WS-CLE-AIX
 
            EXEC CICS STARTBR
-               FILE('FCLIENT')
-               RIDFLD(WS-CLE-DEBUT)
+               FILE('PCLIENT')
+               RIDFLD(WS-CLE-AIX)
                RESP(WS-RESP)
            END-EXEC
 
@@ -284,7 +291,7 @@
                WHEN DFHRESP(NORMAL)
                    CONTINUE
                WHEN DFHRESP(NOTFND)
-      *            Fichier vide
+      *            Aucun client dans cette region
                    GO TO 3000-FIN
                WHEN DFHRESP(ENDFILE)
       *            Fichier vide
@@ -294,14 +301,12 @@
                    GO TO 3000-FIN
            END-EVALUATE
 
-           MOVE WS-CLE-DEBUT TO WS-CLE-COURANTE
-
-      *    Boucle de lecture de tous les enregistrements
+      *    Boucle de lecture des enregistrements de la region
            PERFORM UNTIL FIN-BROWSE
                EXEC CICS READNEXT
-                   FILE('FCLIENT')
+                   FILE('PCLIENT')
                    INTO(ENR-CLIENT)
-                   RIDFLD(WS-CLE-COURANTE)
+                   RIDFLD(WS-CLE-AIX)
                    RESP(WS-RESP)
                END-EXEC
 
@@ -309,27 +314,30 @@
                    WHEN WS-RESP = DFHRESP(ENDFILE)
                        MOVE 'O' TO WS-FIN-BROWSE
                    WHEN WS-RESP NOT = DFHRESP(NORMAL)
+                      AND WS-RESP NOT = DFHRESP(DUPKEY)
+      *                Erreur autre que DUPKEY (normal pour AIX)
+                       MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN CLI-CODREG NOT = WS-CODE-REGION
+      *                Changement de region = fin du browse
                        MOVE 'O' TO WS-FIN-BROWSE
                    WHEN OTHER
-      *                Verifier si le client est de la region demandee
-                       IF CLI-CODREG = WS-CODE-REGION
-                           ADD 1 TO WS-NB-TOTAL
-      *                    Convertir le solde en numerique
-                           PERFORM 3100-CONVERTIR-SOLDE
-      *                    Verifier si debiteur ou crediteur
-                           IF CLI-POSITION = 'DB'
-                               ADD 1 TO WS-NB-DEBITEURS
-                               ADD WS-SOLDE-NUM TO WS-MT-DEBITEURS
-                           ELSE
-                               ADD 1 TO WS-NB-CREDITEURS
-                               ADD WS-SOLDE-NUM TO WS-MT-CREDITEURS
-                           END-IF
+      *                Client de la region - comptabiliser
+                       ADD 1 TO WS-NB-TOTAL
+      *                Convertir le solde en numerique
+                       PERFORM 3100-CONVERTIR-SOLDE
+      *                Verifier si debiteur ou crediteur
+                       IF CLI-POSITION = 'DB'
+                           ADD 1 TO WS-NB-DEBITEURS
+                           ADD WS-SOLDE-NUM TO WS-MT-DEBITEURS
+                       ELSE
+                           ADD 1 TO WS-NB-CREDITEURS
+                           ADD WS-SOLDE-NUM TO WS-MT-CREDITEURS
                        END-IF
                END-EVALUATE
            END-PERFORM
 
       *    Fermeture du browse
-           EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
+           EXEC CICS ENDBR FILE('PCLIENT') END-EXEC.
 
        3000-FIN.
            EXIT.
