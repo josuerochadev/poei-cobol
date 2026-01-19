@@ -918,6 +918,14 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
            05 WS-MT-CREDITEURS   PIC 9(12) VALUE 0.
 
       *-----------------------------------------------------------------
+      * VARIABLES POUR CONVERSION SOLDE (REDEFINES)
+      * Note: FUNCTION NUMVAL non supporte sur IBM Enterprise COBOL
+      *-----------------------------------------------------------------
+       01  WS-SOLDE-ALPHA        PIC X(10) VALUE SPACES.
+       01  WS-SOLDE-NUM REDEFINES WS-SOLDE-ALPHA
+                                 PIC 9(10).
+
+      *-----------------------------------------------------------------
       * TABLE DES NOMS DE REGIONS
       *-----------------------------------------------------------------
        01  WS-TABLE-REGIONS.
@@ -1003,10 +1011,10 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
       *-----------------------------------------------------------------
        3100-CONVERTIR-SOLDE.
       *-----------------------------------------------------------------
-      * Convertit le solde texte en numerique avec FUNCTION NUMVAL
+      * Convertit le solde texte en numerique
+      * Utilise REDEFINES (compatible IBM Enterprise COBOL)
       *-----------------------------------------------------------------
-           MOVE 0 TO WS-SOLDE-NUM
-           MOVE FUNCTION NUMVAL(CLI-SOLDE) TO WS-SOLDE-NUM.
+           MOVE CLI-SOLDE TO WS-SOLDE-ALPHA.
 ```
 
 **Points clés du code :**
@@ -1017,6 +1025,8 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 | `WS-CLE-AIX PIC X(02)` | Clé de 2 caractères (code région) au lieu de 6 |
 | `DFHRESP(DUPKEY)` | Normal pour un AIX avec NONUNIQUEKEY |
 | `CLI-CODREG NOT = WS-CODE-REGION` | Condition d'arrêt : changement de région |
+| `REDEFINES` | Conversion solde sans NUMVAL (non supporté sur mainframe) |
+| `PERFORM ... THRU` | Obligatoire quand le paragraphe contient des GO TO |
 
 #### Étape 4 : JCL d'assemblage BMS (ASMSTAT.jcl)
 
@@ -1137,6 +1147,26 @@ CEDA INSTALL GROUP(CLIGROUP)
 | 02 Marseille | 4 | 2 | 77 000 | 2 | 395 000 |
 | 03 Lyon | 3 | 1 | 12 000 | 2 | 598 000 |
 | 04 Lille | 3 | 2 | 118 000 | 1 | 180 000 |
+
+### Difficultés rencontrées et solutions
+
+| Problème | Cause | Solution |
+|----------|-------|----------|
+| Erreur DFH7053I - options MAP, MAPSET, FROM invalides | Ligne COBOL dépassant la colonne 72 | Raccourcir les messages : `'CODE REGION OBLIGATOIRE (01-04)'` |
+| Erreur NUMVAL not allowed | `FUNCTION NUMVAL` non supporté dans MOVE sur IBM Enterprise COBOL | Utiliser `REDEFINES` : `WS-SOLDE-NUM REDEFINES WS-SOLDE-ALPHA` |
+| Double affichage de messages (CODE INVALIDE + AUCUN CLIENT) | `PERFORM` sans `THRU` ne capture pas les `GO TO` vers les paragraphes de sortie | Ajouter `THRU` : `PERFORM 2000-TRAITEMENT THRU 2000-FIN` |
+
+**Règle COBOL mainframe importante :**
+
+> Si un paragraphe contient un `GO TO` vers un paragraphe de sortie, le `PERFORM` appelant doit inclure `THRU` jusqu'à ce paragraphe.
+
+```cobol
+*    Incorrect (le GO TO sort du PERFORM et continue séquentiellement):
+     PERFORM 2000-TRAITEMENT
+
+*    Correct (le GO TO reste dans la portée du PERFORM):
+     PERFORM 2000-TRAITEMENT THRU 2000-FIN
+```
 
 ### Captures d'écran
 
