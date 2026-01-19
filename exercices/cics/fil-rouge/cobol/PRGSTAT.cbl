@@ -157,7 +157,7 @@
                WHEN OTHER
       *            Restaurer la COMMAREA et traiter
                    MOVE DFHCOMMAREA TO WS-COMMAREA
-                   PERFORM 2000-TRAITEMENT
+                   PERFORM 2000-TRAITEMENT THRU 2000-FIN
            END-EVALUATE
 
       *    Retour pseudo-conversationnel
@@ -249,7 +249,7 @@
            MOVE WS-CODE-REGION TO WS-CODE-REGION-SAVED
 
       *    Calculer les statistiques via AIX/PATH
-           PERFORM 3000-CALCULER-STATS
+           PERFORM 3000-CALCULER-STATS THRU 3000-FIN
 
       *    Afficher les resultats
            PERFORM 4000-AFFICHER-RESULTATS.
