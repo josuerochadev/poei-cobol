@@ -1,317 +1,270 @@
-# Partie 2b : Operations de Mise a Jour (REWRITE)
+# Partie 2b : Opérations de Mise à Jour (REWRITE)
 
 [< Partie 2a : Ajout](03-partie-2a-ajout.md) | [Retour au sommaire](00-introduction.md) | [Partie 2c : Suppression >](05-partie-2c-suppression.md)
 
 ---
 
-Cette section couvre les exercices 9 a 11 : MAP de mise a jour, programme de modification avec la commande REWRITE, et definition de la transaction MAJO.
+Cette section couvre les exercices 9 à 11 : MAP de mise à jour, programme de modification avec la commande REWRITE, et définition de la transaction MAJO.
 
-## Difference WRITE vs REWRITE
+## Différence WRITE vs REWRITE
 
-| Aspect | WRITE (Ajout) | REWRITE (Mise a jour) |
+| Aspect | WRITE (Ajout) | REWRITE (Mise à jour) |
 |--------|---------------|----------------------|
 | Client | Ne doit PAS exister | DOIT exister |
-| Cle | Nouvelle | Existante (non modifiable) |
-| Prerequis | Aucun | READ UPDATE obligatoire |
+| Clé | Nouvelle | Existante (non modifiable) |
+| Prérequis | Aucun | READ UPDATE obligatoire |
 | Erreur typique | DUPREC (doublon) | NOTFND (inexistant) |
 
 ---
 
-## Exercice 9 : MAP pour mise a jour
+## Exercice 9 : MAP pour mise à jour
 
-### Enonce
+### Énoncé
 
-Creer ou adapter la MAP precedente pour une operation de mise a jour de CLIENT dans le Data Set CLIENT.
+Créer ou adapter la MAP précédente pour une opération de mise à jour de CLIENT dans le Data Set CLIENT.
 
 ### Mon travail
 
-La MAP de mise a jour differe de celle d'ajout par la **gestion dynamique des attributs** :
+J'ai créé une nouvelle MAP BMS (CLIMAJ) basée sur CLIAJT mais avec une particularité importante : la **gestion dynamique des attributs** du champ clé.
 
-1. **Phase 1 (Recherche)** : Le numero de compte est saisissable (UNPROT) pour permettre la recherche du client
-2. **Phase 2 (Affichage)** : Apres lecture du client, le numero de compte passe en lecture seule (ASKIP) car la cle d'un enregistrement VSAM ne peut pas etre modifiee
-3. **Phase 3 (Modification)** : L'utilisateur modifie les autres champs et valide
+#### Pourquoi une gestion dynamique des attributs ?
 
-Cette gestion dynamique se fait dans le programme COBOL via le **suffixe 'A'** (Attribut) du copybook genere :
+En mise à jour, contrairement à l'ajout, le numéro de compte change de comportement au cours de la transaction :
+
+1. **Phase 1 (Recherche)** : L'utilisateur doit pouvoir saisir le numéro du client à modifier → NUMCPT doit être **saisissable (UNPROT)**
+2. **Phase 2 (Affichage)** : Une fois le client trouvé, son numéro s'affiche mais ne peut pas être modifié (la clé VSAM est immuable) → NUMCPT doit passer en **lecture seule (ASKIP)**
+3. **Phase 3 (Modification)** : L'utilisateur modifie les autres champs et valide → NUMCPT reste **protégé (ASKIP)**
+
+Cette gestion dynamique se fait dans le programme COBOL via le **suffixe 'A'** (Attribut) du copybook généré (voir Partie 1, Exercice 2 pour la structure DSECT et les suffixes L, F, A, I, O).
+
+#### Comment modifier un attribut à l'exécution ?
+
+Le copybook généré par l'assemblage BMS contient pour chaque champ nommé une variable suffixée `A` qui permet de changer son attribut dynamiquement :
 
 ```cobol
-* Proteger le numero de compte apres affichage
+* Après affichage du client, protéger le numéro de compte
+* DFHBMASK = X'20' = ASKIP (protégé, intensité normale)
 MOVE DFHBMASK TO NUMCPTA
 ```
 
-### Resolution
+> **Important** : Les constantes d'attribut (DFHBMASK, DFHBMUNN, etc.) sont définies dans le copybook système `DFHBMSCA`. Il faut l'inclure dans le programme avec `COPY DFHBMSCA`.
+
+### Résolution
 
 **MAP BMS : CLIMAJ.bms**
 
+Le code source est stocké dans `ROCHA.CICS.SOURCE(CLIMAJ)`. La structure reprend les mêmes concepts BMS que CLIAFF et CLIAJT (voir Partie 1, Exercice 2 pour les explications sur DFHMSD, DFHMDI, DFHMDF et les attributs).
+
+**Maquette de l'écran MAPMAJ :**
+
+Cette maquette (wireframe) représente la disposition des champs sur l'écran 24x80 :
+
 ```
-***********************************************************************
-*  MAPSET : CLIMAJ - Mise a jour Client
-*  Transaction : MAJO
-*  Fil Rouge CICS - Exercice 9
-*
-*  PARTICULARITE MISE A JOUR :
-*  ---------------------------
-*  Le numero de compte est d'abord saisissable (recherche),
-*  puis passe en lecture seule apres affichage des donnees.
-*  Cette gestion dynamique des attributs se fait dans le programme
-*  COBOL via le suffixe 'A' (ex: NUMCPTA pour modifier l'attribut).
-***********************************************************************
-CLIMAJ   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
-               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
-***********************************************************************
-MAPMAJ   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
-*----------------------------------------------------------------------
-* TITRE
-*----------------------------------------------------------------------
-         DFHMDF POS=(1,25),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
-               INITIAL='*** MISE A JOUR CLIENT ***'
-         DFHMDF POS=(2,1),LENGTH=78,ATTRB=ASKIP,                        X
-               INITIAL='------------------------------------------------X
-               ------------------------------'
-*----------------------------------------------------------------------
-* NUMERO DE COMPTE - CHAMP CLE
-* Commence en UNPROT pour la saisie initiale (recherche)
-* Le programme passera l'attribut a ASKIP apres affichage
-*----------------------------------------------------------------------
-         DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='NUMERO COMPTE :'
-NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
-         DFHMDF POS=(4,26),LENGTH=20,ATTRB=ASKIP,                       X
-               INITIAL='(Cle - non modifiable)'
-*----------------------------------------------------------------------
-* ZONES DE SAISIE/MODIFICATION (meme structure que CLIAJT)
-*----------------------------------------------------------------------
-         DFHMDF POS=(5,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='CODE REGION   :'
-CODREG   DFHMDF POS=(5,19),LENGTH=2,ATTRB=(UNPROT,NUM)
-         DFHMDF POS=(5,22),LENGTH=25,ATTRB=ASKIP,                       X
-               INITIAL='(01=PAR,02=MAR,03=LYO,04=LIL)'
-*
-         DFHMDF POS=(6,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='NATURE COMPTE :'
-NATCPT   DFHMDF POS=(6,19),LENGTH=2,ATTRB=(UNPROT,NUM)
-         DFHMDF POS=(6,22),LENGTH=1,ATTRB=ASKIP
-*
-         DFHMDF POS=(7,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='NOM           :'
-NOM      DFHMDF POS=(7,19),LENGTH=10,ATTRB=UNPROT
-         DFHMDF POS=(7,30),LENGTH=1,ATTRB=ASKIP
-*
-         DFHMDF POS=(8,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='PRENOM        :'
-PRENOM   DFHMDF POS=(8,19),LENGTH=10,ATTRB=UNPROT
-         DFHMDF POS=(8,30),LENGTH=1,ATTRB=ASKIP
-*
-         DFHMDF POS=(9,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='DATE NAISSANCE:'
-DATNA    DFHMDF POS=(9,19),LENGTH=8,ATTRB=(UNPROT,NUM)
-         DFHMDF POS=(9,28),LENGTH=12,ATTRB=ASKIP,                       X
-               INITIAL='(AAAAMMJJ)'
-*
-         DFHMDF POS=(10,2),LENGTH=16,ATTRB=ASKIP,                       X
-               INITIAL='SEXE          :'
-SEXE     DFHMDF POS=(10,19),LENGTH=1,ATTRB=UNPROT
-         DFHMDF POS=(10,21),LENGTH=10,ATTRB=ASKIP,                      X
-               INITIAL='(M ou F)'
-*
-         DFHMDF POS=(11,2),LENGTH=16,ATTRB=ASKIP,                       X
-               INITIAL='ACTIVITE PRO  :'
-ACTPRO   DFHMDF POS=(11,19),LENGTH=2,ATTRB=(UNPROT,NUM)
-         DFHMDF POS=(11,22),LENGTH=1,ATTRB=ASKIP
-*
-         DFHMDF POS=(12,2),LENGTH=16,ATTRB=ASKIP,                       X
-               INITIAL='SITUATION SOC :'
-SITSO    DFHMDF POS=(12,19),LENGTH=1,ATTRB=UNPROT
-         DFHMDF POS=(12,21),LENGTH=15,ATTRB=ASKIP,                      X
-               INITIAL='(C/M/D/V)'
-*
-         DFHMDF POS=(13,2),LENGTH=16,ATTRB=ASKIP,                       X
-               INITIAL='ADRESSE       :'
-ADRESSE  DFHMDF POS=(13,19),LENGTH=10,ATTRB=UNPROT
-         DFHMDF POS=(13,30),LENGTH=1,ATTRB=ASKIP
-*
-         DFHMDF POS=(14,2),LENGTH=16,ATTRB=ASKIP,                       X
-               INITIAL='SOLDE         :'
-SOLDE    DFHMDF POS=(14,19),LENGTH=10,ATTRB=(UNPROT,NUM)
-         DFHMDF POS=(14,30),LENGTH=1,ATTRB=ASKIP
-*
-         DFHMDF POS=(15,2),LENGTH=16,ATTRB=ASKIP,                       X
-               INITIAL='POSITION      :'
-POSIT    DFHMDF POS=(15,19),LENGTH=2,ATTRB=UNPROT
-         DFHMDF POS=(15,22),LENGTH=12,ATTRB=ASKIP,                      X
-               INITIAL='(DB ou CR)'
-*----------------------------------------------------------------------
-* ZONE MESSAGE
-*----------------------------------------------------------------------
-         DFHMDF POS=(18,1),LENGTH=78,ATTRB=ASKIP,                       X
-               INITIAL='------------------------------------------------X
-               ------------------------------'
-         DFHMDF POS=(19,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
-MSG      DFHMDF POS=(19,13),LENGTH=60,ATTRB=(ASKIP,BRT)
-*----------------------------------------------------------------------
-* TOUCHES FONCTION
-*----------------------------------------------------------------------
-         DFHMDF POS=(22,2),LENGTH=70,ATTRB=ASKIP,                       X
-               INITIAL='ENTER=Valider  PF3=Quitter  CLEAR=Reinitialiser'
-***********************************************************************
-         DFHMSD TYPE=FINAL
-         END
++------------------------------------------------------------------------------+
+|                         *** MISE A JOUR CLIENT ***                           |
+|------------------------------------------------------------------------------|
+|                                                                              |
+|  NUMERO COMPTE : ______  (Clé - non modifiable)                              |
+|  CODE REGION   : __     (01=PAR,02=MAR,03=LYO,04=LIL)                        |
+|  NATURE COMPTE : __                                                          |
+|  NOM           : __________                                                  |
+|  PRENOM        : __________                                                  |
+|  DATE NAISSANCE: ________  (AAAAMMJJ)                                        |
+|  SEXE          : _  (M ou F)                                                 |
+|  ACTIVITE PRO  : __                                                          |
+|  SITUATION SOC : _  (C/M/D/V)                                                |
+|  ADRESSE       : __________                                                  |
+|  SOLDE         : __________                                                  |
+|  POSITION      : __  (DB ou CR)                                              |
+|                                                                              |
+|                                                                              |
+|------------------------------------------------------------------------------|
+|  MESSAGE : ____________________________________________________________      |
+|                                                                              |
+|                                                                              |
+|  ENTER=Valider  PF3=Quitter  CLEAR=Réinitialiser                             |
++------------------------------------------------------------------------------+
 ```
+
+**Zones de la MAP :**
+
+| Zone | Longueur | Attribut initial | Comportement dynamique |
+|------|----------|------------------|------------------------|
+| NUMCPT | 6 | UNPROT,NUM,IC | Devient ASKIP après recherche (via NUMCPTA) |
+| CODREG | 2 | UNPROT,NUM | Reste saisissable |
+| NATCPT | 2 | UNPROT,NUM | Reste saisissable |
+| NOM | 10 | UNPROT | Reste saisissable |
+| PRENOM | 10 | UNPROT | Reste saisissable |
+| DATNA | 8 | UNPROT,NUM | Reste saisissable |
+| SEXE | 1 | UNPROT | Reste saisissable |
+| ACTPRO | 2 | UNPROT,NUM | Reste saisissable |
+| SITSO | 1 | UNPROT | Reste saisissable |
+| ADRESSE | 10 | UNPROT | Reste saisissable |
+| SOLDE | 10 | UNPROT,NUM | Reste saisissable |
+| POSIT | 2 | UNPROT | Reste saisissable |
+| MSG | 60 | ASKIP,BRT | Zone message (affichage seul) |
+
+### Constantes d'attribut BMS (DFHBMSCA)
+
+Le copybook `DFHBMSCA` contient les constantes hexadécimales pour modifier les attributs à l'exécution :
+
+| Constante | Valeur | Description | Usage typique |
+|-----------|--------|-------------|---------------|
+| DFHBMASK | X'20' | ASKIP - Protégé, intensité normale | Protéger un champ |
+| DFHBMPRF | X'28' | ASKIP - Protégé, brillant | Mise en évidence |
+| DFHBMUNN | X'4C' | UNPROT + NUM - Saisie numérique | Rendre saisissable (chiffres) |
+| DFHBMUNP | X'40' | UNPROT - Saisie alphanumérique | Rendre saisissable (texte) |
+| DFHBMFSE | X'08' | MDT forcé | Forcer la transmission |
+| DFHBMPRO | X'20' | PROT - Protégé | Synonyme de DFHBMASK |
+
+> **Rappel MDT** : Le MDT (Modified Data Tag) indique si un champ a été modifié. Avec FRSET dans la MAP, les MDT sont remis à zéro au SEND MAP. Seuls les champs modifiés par l'utilisateur sont transmis au RECEIVE MAP (voir Partie 1, Exercice 2).
 
 **JCL d'assemblage : ASMMAJ.jcl**
 
-```jcl
-//ROCHA09 JOB (ACCT),'ASSEMBL BMS CLIMAJ',CLASS=A,MSGCLASS=X,
-//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
-//*****************************************************************
-//* PROJET FIL ROUGE CICS - EXERCICE 9
-//* ASSEMBLAGE DE LA MAP BMS CLIMAJ (MISE A JOUR CLIENT)
-//*
-//* Ce JCL assemble le source BMS et genere :
-//*   - Le module MAP physique dans ROCHA.CICS.LOAD
-//*   - Le copybook DSECT dans ROCHA.CICS.LINK
-//*
-//* Le copybook genere contiendra pour chaque champ :
-//*   - NOMCPTx  ou x = I (input), O (output), L (longueur), A (attr)
-//*   - Le suffixe 'A' permet de modifier l'attribut dynamiquement
-//*****************************************************************
-//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
-//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
-//*
-//* ASSEMBLAGE DE LA MAP BMS
-//*
-//ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
-//          MAPLIB='ROCHA.CICS.LOAD',
-//          DSCTLIB='ROCHA.CICS.LINK',
-//          MAPNAME='CLIMAJ',RMODE=24
-//SYSPRINT DD SYSOUT=*
-//SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLIMAJ),DISP=SHR
-/*
-//
-```
+Le JCL d'assemblage suit la même structure que ASMCLAF.jcl (voir Partie 1, Exercice 2). Seuls le nom du job (ROCHA09) et le membre source (CLIMAJ) changent.
 
-### Concept cle : Attributs dynamiques BMS
+### Définition CICS
 
-Le copybook genere par l'assemblage BMS contient pour chaque champ un suffixe `A` permettant de modifier l'attribut a l'execution :
-
-| Constante CICS | Valeur | Description |
-|----------------|--------|-------------|
-| DFHBMASK | X'20' | ASKIP - Protege, intensite normale |
-| DFHBMPRF | X'28' | ASKIP - Protege, brillant |
-| DFHBMUNN | X'4C' | UNPROT + NUM - Saisie numerique |
-| DFHBMUNP | X'40' | UNPROT - Saisie alphanumerique |
-| DFHBMFSE | X'08' | MDT force - Champ marque comme modifie |
-| DFHBMPRO | X'20' | PROT - Protege (synonyme de DFHBMASK) |
-
-> **Note** : Ces constantes sont definies dans le copybook DFHBMSCA qu'il faut inclure dans le programme avec `COPY DFHBMSCA`.
-
-### Definition CICS
+La définition et l'installation du mapset suivent le même processus que pour les mapsets précédents (voir Partie 1, Exercice 4 pour les explications sur CEDA) :
 
 ```
 CEDA DEFINE MAPSET(CLIMAJ) GROUP(CLIGROUP)
 CEDA INSTALL MAPSET(CLIMAJ) GROUP(CLIGROUP)
 ```
 
-### Verification
+### Vérification
 
 ```
 CEDA VIEW MAPSET(CLIMAJ) GROUP(CLIGROUP)
 ```
 
-> **Note** : `CEMT INQ MAPSET` n'existe pas dans CICS. Pour verifier un mapset, utiliser `CEDA VIEW`.
+> **Note** : `CEMT INQ MAPSET` n'existe pas dans CICS. Pour vérifier un mapset, utiliser `CEDA VIEW`.
 
-### Captures d'ecran
+### Captures d'écran
 
-<!-- ![pt2ex09-1](images-pt2/pt2ex09-1.png) -->
+<!--
+Suggestions de captures d'écran pour cet exercice :
+
+1. pt2ex09-1 : Source BMS dans ISPF EDIT - ROCHA.CICS.SOURCE(CLIMAJ)
+2. pt2ex09-2 : Soumission JCL assemblage BMS
+3. pt2ex09-3 : SDSF - Job output avec RC=0000
+4. pt2ex09-4 : Vérification ROCHA.CICS.LINK - copybook CLIMAJ généré
+-->
 
 ---
 
-## Exercice 10 : Programme de mise a jour (REWRITE)
+## Exercice 10 : Programme de mise à jour (REWRITE)
 
-### Enonce
+### Énoncé
 
-Creer le PROGRAMME pour une operation de mise a jour d'un CLIENT dans le Data Set CLIENT. Un controle de conformite de donnee et d'existence doit etre effectue.
+Créer le PROGRAMME pour une opération de mise à jour d'un CLIENT dans le Data Set CLIENT. Un contrôle de conformité de donnée et d'existence doit être effectué.
 
 ### Mon travail
 
-Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
+J'ai développé le programme PRGMAJ qui gère la mise à jour des clients existants. Ce programme présente plusieurs différences importantes par rapport à PRGAJT (ajout).
 
-1. **Phase RECHERCHE** : Saisie du numero de compte, verification existence
-2. **Phase AFFICHAGE** : Affichage des donnees actuelles, NUMCPT protege (ASKIP)
-3. **Phase VALIDATION** : Reception modifications, validation, READ UPDATE + REWRITE
+#### Pourquoi un mode pseudo-conversationnel à 3 phases ?
 
-**Points techniques importants :**
-
-| Aspect | Explication |
-|--------|-------------|
-| COPY DFHBMSCA | Copybook pour les constantes d'attribut (DFHBMASK, etc.) |
-| COMMAREA etendue | Sauvegarde la phase ET le numero de compte |
-| READ UPDATE atomique | Le READ UPDATE et REWRITE doivent etre dans la meme UOW |
-| NUMCPT sauvegarde | Necessaire car un champ ASKIP n'est pas transmis par le terminal |
-
-### Mode pseudo-conversationnel a 3 phases
+Contrairement à l'ajout (2 phases), la mise à jour nécessite 3 phases distinctes car l'utilisateur doit d'abord **rechercher** le client avant de le **modifier** :
 
 ```
-+------------------+     +-------------------+     +-------------------+
-|   PHASE 1        |     |   PHASE 2         |     |   PHASE 3         |
-|   RECHERCHE      | --> |   AFFICHAGE       | --> |   VALIDATION      |
-+------------------+     +-------------------+     +-------------------+
-|                  |     |                   |     |                   |
-| NUMCPT: UNPROT   |     | NUMCPT: ASKIP     |     | NUMCPT: ASKIP     |
-| Autres: vides    |     | Autres: remplis   |     | Autres: modifies  |
-|                  |     |                   |     |                   |
-| Action: Saisie   |     | Action: READ      |     | Action: REWRITE   |
-| du numero        |     | + Affichage       |     | apres validation  |
-+------------------+     +-------------------+     +-------------------+
+┌─────────────────────────────────────────────────────────────────┐
+│ LANCEMENT TRANSACTION "MAJO"                                    │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 1 : RECHERCHE (EIBCALEN = 0)                              │
+│ ──────────────────────────────────────────────────────────────  │
+│ → CICS lance le programme pour la première fois                 │
+│ → Affichage écran vide avec NUMCPT saisissable (UNPROT)         │
+│ → Le programme se TERMINE (RETURN TRANSID)                      │
+│ → COMMAREA : WS-PHASE = '1', WS-NUMCPT-SAVED = SPACES           │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+        L'utilisateur saisit un numéro et appuie sur ENTRÉE
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 2 : AFFICHAGE (WS-PHASE = '1' → '2')                      │
+│ ──────────────────────────────────────────────────────────────  │
+│ → CICS relance le programme                                     │
+│ → READ du fichier pour vérifier existence                       │
+│ → Si trouvé : affichage des données, NUMCPT passe en ASKIP      │
+│ → Le programme se TERMINE (RETURN TRANSID)                      │
+│ → COMMAREA : WS-PHASE = '2', WS-NUMCPT-SAVED = '000001'         │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+        L'utilisateur modifie les champs et appuie sur ENTRÉE
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 3 : VALIDATION (WS-PHASE = '2' ou '3')                    │
+│ ──────────────────────────────────────────────────────────────  │
+│ → CICS relance le programme                                     │
+│ → RECEIVE MAP des modifications                                 │
+│ → Fusion avec données actuelles (champs non modifiés)           │
+│ → Validation des données                                        │
+│ → READ UPDATE + REWRITE atomiques                               │
+│ → Retour en phase 1 pour nouveau client                         │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Resolution
+Voir Partie 1, Exercice 3 pour les explications détaillées sur le mode pseudo-conversationnel et les variables EIB.
 
-**Programme complet : PRGMAJ.cbl**
+#### Pourquoi une COMMAREA étendue ?
+
+En mise à jour, la COMMAREA doit sauvegarder plus d'informations qu'en ajout :
+
+| Programme | Contenu COMMAREA | Raison |
+|-----------|------------------|--------|
+| PRGAJT (Ajout) | WS-FLAG-INIT (1 octet) | Distinguer premier passage |
+| PRGMAJ (MAJ) | WS-PHASE (1 octet) + WS-NUMCPT-SAVED (6 octets) | Phase + numéro protégé |
+
+**Pourquoi sauvegarder le numéro de compte ?**
+
+Une fois le champ NUMCPT protégé (ASKIP), le terminal ne le transmet plus au programme lors du RECEIVE MAP. Or, on a besoin de ce numéro pour relire et modifier le client. La COMMAREA permet de le conserver entre les passages.
+
+#### Pourquoi fusionner les modifications ?
+
+C'est une différence majeure avec l'ajout. En mise à jour :
+
+- L'utilisateur ne modifie que **certains** champs (ex: changer l'adresse uniquement)
+- Les champs non modifiés ne sont pas transmis par le terminal (longueur = 0)
+- Si on écrivait directement les valeurs reçues, on écraserait les autres champs avec des espaces !
+
+**Solution** : Relire le client, puis ne remplacer que les champs dont la longueur > 0.
+
+#### Pourquoi READ UPDATE + REWRITE dans le même paragraphe ?
+
+En CICS, la commande `REWRITE` nécessite un `READ UPDATE` préalable dans la **même unité de travail (UOW)**.
+
+**Problème** : En mode pseudo-conversationnel, chaque passage est une nouvelle tâche CICS → nouvelle UOW.
+
+**Conséquence** : On ne peut PAS faire :
+- Phase 2 : READ UPDATE (verrouillage)
+- *-- Fin de tâche --*
+- Phase 3 : REWRITE (échec car pas de verrouillage actif)
+
+**Solution** : Faire les deux dans le même passage, juste avant l'écriture :
+
+```
+Phase 2 : READ simple (affichage) → Fin de tâche
+Phase 3 : READ UPDATE + REWRITE (atomique) → Fin de tâche
+```
+
+### Résolution
+
+**Programme : PRGMAJ.cbl**
+
+Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGMAJ)`. Voici les sections clés du programme.
+
+**Structure de la COMMAREA étendue (WORKING-STORAGE) :**
 
 ```cobol
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. PRGMAJ.
-      ******************************************************************
-      * PROGRAMME : PRGMAJ
-      * FONCTION  : Mise a jour d'un client existant
-      * TRANSACTION : MAJO
-      * FICHIER   : FCLIENT (VSAM KSDS)
-      * MAP       : MAPMAJ (MAPSET CLIMAJ)
-      *
-      * MODE PSEUDO-CONVERSATIONNEL A 3 PHASES :
-      * ----------------------------------------
-      * Phase 1 (RECHERCHE) :
-      *   - Affiche ecran vide pour saisie numero compte
-      *   - NUMCPT en UNPROT (saisissable)
-      *   - Autres champs vides
-      *
-      * Phase 2 (AFFICHAGE) :
-      *   - Lit le client avec READ UPDATE (verrouillage)
-      *   - Affiche les donnees actuelles
-      *   - NUMCPT passe en ASKIP (protege, cle non modifiable)
-      *   - Autres champs en UNPROT pour modification
-      *
-      * Phase 3 (VALIDATION) :
-      *   - Recoit les modifications
-      *   - Valide les donnees
-      *   - REWRITE pour sauvegarder
-      *
-      * DIFFERENCE AVEC AJOUT (WRITE) :
-      * - READ UPDATE obligatoire avant REWRITE
-      * - La cle (NUMCPT) ne peut pas etre modifiee
-      * - Le client doit exister (pas de creation)
-      *
-      * FIL ROUGE CICS - EXERCICE 10
-      ******************************************************************
-       ENVIRONMENT DIVISION.
-       CONFIGURATION SECTION.
-       DATA DIVISION.
-      ******************************************************************
-       WORKING-STORAGE SECTION.
-      ******************************************************************
       *-----------------------------------------------------------------
       * ZONE DE COMMUNICATION (COMMAREA)
-      * Sauvegarde la phase et le numero de compte entre passages
+      * Sauvegarde la phase et le numéro de compte entre passages
       *-----------------------------------------------------------------
        01  WS-COMMAREA.
            05 WS-PHASE            PIC X(01) VALUE '1'.
@@ -319,92 +272,25 @@ Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
               88 PHASE-AFFICHAGE  VALUE '2'.
               88 PHASE-VALIDATION VALUE '3'.
            05 WS-NUMCPT-SAVED     PIC X(06) VALUE SPACES.
+```
 
-      *-----------------------------------------------------------------
-      * COPYBOOKS CICS
-      *-----------------------------------------------------------------
-       COPY DFHAID.
-       COPY DFHBMSCA.
+**LINKAGE SECTION (obligatoire pour recevoir la COMMAREA) :**
 
-      *-----------------------------------------------------------------
-      * COPYBOOK GENERE PAR ASSEMBLAGE BMS (DSECT)
-      * Stocke dans ROCHA.CICS.LINK(CLIMAJ)
-      *-----------------------------------------------------------------
-       COPY CLIMAJ.
-
-      *-----------------------------------------------------------------
-      * STRUCTURE ENREGISTREMENT CLIENT (80 OCTETS)
-      *-----------------------------------------------------------------
-       01  ENR-CLIENT.
-           05 CLI-NUMCPT          PIC X(06).
-           05 CLI-CODREG          PIC X(02).
-           05 CLI-NATCPT          PIC X(02).
-           05 CLI-NOM             PIC X(10).
-           05 CLI-PRENOM          PIC X(10).
-           05 CLI-DATNAISS        PIC X(08).
-           05 CLI-SEXE            PIC X(01).
-           05 CLI-ACTPRO          PIC X(02).
-           05 CLI-SITSO           PIC X(01).
-           05 CLI-ADRESSE         PIC X(10).
-           05 CLI-SOLDE           PIC X(10).
-           05 CLI-POSITION        PIC X(02).
-           05 FILLER              PIC X(16).
-
-      *-----------------------------------------------------------------
-      * VARIABLES DE TRAVAIL
-      *-----------------------------------------------------------------
-       01  WS-RESP                PIC S9(08) COMP VALUE 0.
-       01  WS-ERREUR              PIC X(01) VALUE 'N'.
-           88 ERREUR-DETECTEE     VALUE 'O'.
-           88 PAS-ERREUR          VALUE 'N'.
-       01  WS-MSG-FIN             PIC X(40)
-           VALUE 'TRANSACTION MAJO TERMINEE - AU REVOIR'.
-
-      *-----------------------------------------------------------------
-      * SAUVEGARDE DES DONNEES SAISIES (EVITE ECRASEMENT PAR LOW-VALUES)
-      *-----------------------------------------------------------------
-       01  WS-SAISIE.
-           05 WS-NUMCPT           PIC X(06).
-           05 WS-NUMCPTL          PIC S9(04) COMP.
-           05 WS-CODREG           PIC X(02).
-           05 WS-CODREGL          PIC S9(04) COMP.
-           05 WS-NATCPT           PIC X(02).
-           05 WS-NOM              PIC X(10).
-           05 WS-NOML             PIC S9(04) COMP.
-           05 WS-PRENOM           PIC X(10).
-           05 WS-DATNAISS         PIC X(08).
-           05 WS-DATNAISSL        PIC S9(04) COMP.
-           05 WS-SEXE             PIC X(01).
-           05 WS-SEXEL            PIC S9(04) COMP.
-           05 WS-ACTPRO           PIC X(02).
-           05 WS-SITSO            PIC X(01).
-           05 WS-SITSOL           PIC S9(04) COMP.
-           05 WS-ADRESSE          PIC X(10).
-           05 WS-SOLDE            PIC X(10).
-           05 WS-POSITION         PIC X(02).
-           05 WS-POSITL           PIC S9(04) COMP.
-
-      ******************************************************************
+```cobol
        LINKAGE SECTION.
-      ******************************************************************
       *-----------------------------------------------------------------
       * ZONE COMMAREA PASSEE PAR CICS
-      * OBLIGATOIRE pour acceder aux donnees du RETURN precedent
+      * OBLIGATOIRE pour accéder aux données du RETURN précédent
       *-----------------------------------------------------------------
        01  DFHCOMMAREA.
            05 LS-PHASE            PIC X(01).
            05 LS-NUMCPT-SAVED     PIC X(06).
+```
 
-      ******************************************************************
-       PROCEDURE DIVISION.
-      ******************************************************************
+**Point d'entrée avec gestion des phases :**
 
-      *-----------------------------------------------------------------
+```cobol
        0000-PRINCIPAL.
-      *-----------------------------------------------------------------
-      * Point d'entree du programme
-      * Gestion du mode pseudo-conversationnel
-      *-----------------------------------------------------------------
            EVALUATE TRUE
                WHEN EIBCALEN = 0
       *            Premier appel - Phase recherche
@@ -413,7 +299,7 @@ Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
       *            PF3 - Fin de transaction
                    PERFORM 9000-FIN-PROGRAMME
                WHEN EIBAID = DFHCLEAR
-      *            CLEAR - Reinitialiser
+      *            CLEAR - Réinitialiser
                    PERFORM 1000-INIT-RECHERCHE
                WHEN OTHER
       *            Traitement selon la phase en cours
@@ -427,135 +313,19 @@ Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
                COMMAREA(WS-COMMAREA)
                LENGTH(LENGTH OF WS-COMMAREA)
            END-EXEC.
+```
 
-      *-----------------------------------------------------------------
-       1000-INIT-RECHERCHE.
-      *-----------------------------------------------------------------
-      * Affichage ecran initial pour saisie numero compte
-      * NUMCPT en UNPROT (saisissable)
-      *-----------------------------------------------------------------
-           MOVE LOW-VALUES TO MAPMAJO
-           MOVE 'SAISIR LE NUMERO DE COMPTE A MODIFIER' TO MSGO
-           MOVE '1' TO WS-PHASE
-           MOVE SPACES TO WS-NUMCPT-SAVED
+**Paragraphe d'affichage avec protection du NUMCPT :**
 
-           EXEC CICS SEND MAP('MAPMAJ')
-               MAPSET('CLIMAJ')
-               ERASE
-           END-EXEC.
-
-      *-----------------------------------------------------------------
-       2000-TRAITEMENT.
-      *-----------------------------------------------------------------
-      * Aiguillage selon la phase en cours
-      *-----------------------------------------------------------------
-           MOVE 'N' TO WS-ERREUR
-
-           EVALUATE TRUE
-               WHEN PHASE-RECHERCHE
-                   PERFORM 3000-RECHERCHER-CLIENT THRU 3000-FIN
-               WHEN PHASE-AFFICHAGE
-               WHEN PHASE-VALIDATION
-                   PERFORM 4000-VALIDER-MODIFICATION THRU 4000-FIN
-           END-EVALUATE.
-
-       2000-FIN.
-           EXIT.
-
-      *-----------------------------------------------------------------
-       3000-RECHERCHER-CLIENT.
-      *-----------------------------------------------------------------
-      * Phase 1 -> 2 : Recherche du client par son numero
-      *-----------------------------------------------------------------
-           EXEC CICS RECEIVE MAP('MAPMAJ')
-               MAPSET('CLIMAJ')
-               RESP(WS-RESP)
-           END-EXEC
-
-           IF WS-RESP = DFHRESP(MAPFAIL)
-               MOVE LOW-VALUES TO MAPMAJO
-               MOVE 'VEUILLEZ SAISIR UN NUMERO DE COMPTE' TO MSGO
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 3000-FIN
-           END-IF
-
-      *    Sauvegarde du numero saisi
-           MOVE NUMCPTI TO WS-NUMCPT
-           MOVE NUMCPTL TO WS-NUMCPTL
-
-      *    Controle numero de compte
-           IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
-               MOVE LOW-VALUES TO MAPMAJO
-               MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 3000-FIN
-           END-IF
-
-           IF WS-NUMCPT NOT NUMERIC
-               MOVE LOW-VALUES TO MAPMAJO
-               MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 3000-FIN
-           END-IF
-
-      *    Lecture du client (sans UPDATE car on affiche seulement)
-           MOVE WS-NUMCPT TO CLI-NUMCPT
-
-           EXEC CICS READ
-               FILE('FCLIENT')
-               INTO(ENR-CLIENT)
-               RIDFLD(CLI-NUMCPT)
-               RESP(WS-RESP)
-           END-EXEC
-
-           IF WS-RESP = DFHRESP(NOTFND)
-               MOVE LOW-VALUES TO MAPMAJO
-               MOVE 'CLIENT INEXISTANT - VERIFIEZ LE NUMERO' TO MSGO
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 3000-FIN
-           END-IF
-
-           IF WS-RESP NOT = DFHRESP(NORMAL)
-               MOVE LOW-VALUES TO MAPMAJO
-               MOVE 'ERREUR LECTURE FICHIER - CONTACTEZ SUPPORT' TO MSGO
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 3000-FIN
-           END-IF
-
-      *    Client trouve - Affichage des donnees
-           PERFORM 3100-AFFICHER-CLIENT
-
-      *    Passage en phase AFFICHAGE/VALIDATION
-           MOVE '2' TO WS-PHASE
-           MOVE WS-NUMCPT TO WS-NUMCPT-SAVED.
-
-       3000-FIN.
-           EXIT.
-
-      *-----------------------------------------------------------------
+```cobol
        3100-AFFICHER-CLIENT.
       *-----------------------------------------------------------------
-      * Affiche les donnees du client dans la MAP
-      * NUMCPT passe en ASKIP (protege)
+      * Affiche les données du client dans la MAP
+      * NUMCPT passe en ASKIP (protégé) - clé non modifiable
       *-----------------------------------------------------------------
            MOVE LOW-VALUES TO MAPMAJO
 
-      *    Transfert des donnees vers la MAP
+      *    Transfert des données vers la MAP
            MOVE CLI-NUMCPT   TO NUMCPTO
            MOVE CLI-CODREG   TO CODREGO
            MOVE CLI-NATCPT   TO NATCPTO
@@ -569,8 +339,8 @@ Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
            MOVE CLI-SOLDE    TO SOLDEO
            MOVE CLI-POSITION TO POSITO
 
-      *    IMPORTANT : Proteger le numero de compte (cle non modifiable)
-      *    DFHBMASK = X'20' = ASKIP (protege, intensite normale)
+      *    IMPORTANT : Protéger le numéro de compte (clé non modifiable)
+      *    DFHBMASK = X'20' = ASKIP (protégé, intensité normale)
            MOVE DFHBMASK TO NUMCPTA
 
            MOVE 'CLIENT TROUVE - MODIFIER ET VALIDER AVEC ENTER' TO MSGO
@@ -579,250 +349,49 @@ Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
                MAPSET('CLIMAJ')
                ERASE
            END-EXEC.
+```
 
-      *-----------------------------------------------------------------
-       4000-VALIDER-MODIFICATION.
-      *-----------------------------------------------------------------
-      * Phase 2/3 : Reception et validation des modifications
-      *
-      * IMPORTANT - MISE A JOUR vs AJOUT :
-      * En mise a jour, l'utilisateur ne modifie que certains champs.
-      * Les champs non modifies ont une longueur = 0 (terminal n'envoie
-      * que les champs modifies). On doit donc :
-      *   1. Relire le client pour avoir ses donnees actuelles
-      *   2. Ne remplacer que les champs modifies (longueur > 0)
-      *-----------------------------------------------------------------
-           EXEC CICS RECEIVE MAP('MAPMAJ')
-               MAPSET('CLIMAJ')
-               RESP(WS-RESP)
-           END-EXEC
+**Paragraphe de fusion des modifications :**
 
-           IF WS-RESP = DFHRESP(MAPFAIL)
-               MOVE LOW-VALUES TO MAPMAJO
-               MOVE WS-NUMCPT-SAVED TO NUMCPTO
-               MOVE DFHBMASK TO NUMCPTA
-               MOVE 'AUCUNE MODIFICATION - ENTREZ DES DONNEES' TO MSGO
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 4000-FIN
-           END-IF
-
-      *    SAUVEGARDE DES DONNEES MAP AVANT ECRASEMENT PAR LOW-VALUES
-           MOVE WS-NUMCPT-SAVED TO WS-NUMCPT
-           MOVE CODREGI   TO WS-CODREG
-           MOVE CODREGL   TO WS-CODREGL
-           MOVE NATCPTI   TO WS-NATCPT
-           MOVE NOMI      TO WS-NOM
-           MOVE NOML      TO WS-NOML
-           MOVE PRENOMI   TO WS-PRENOM
-           MOVE DATNAI    TO WS-DATNAISS
-           MOVE DATNAL    TO WS-DATNAISSL
-           MOVE SEXEI     TO WS-SEXE
-           MOVE SEXEL     TO WS-SEXEL
-           MOVE ACTPROI   TO WS-ACTPRO
-           MOVE SITSOI    TO WS-SITSO
-           MOVE SITSOL    TO WS-SITSOL
-           MOVE ADRESSEI  TO WS-ADRESSE
-           MOVE SOLDEI    TO WS-SOLDE
-           MOVE POSITI    TO WS-POSITION
-           MOVE POSITL    TO WS-POSITL
-
-      *    RELECTURE DU CLIENT POUR AVOIR LES DONNEES ACTUELLES
-           MOVE WS-NUMCPT TO CLI-NUMCPT
-           EXEC CICS READ
-               FILE('FCLIENT')
-               INTO(ENR-CLIENT)
-               RIDFLD(CLI-NUMCPT)
-               RESP(WS-RESP)
-           END-EXEC
-
-           IF WS-RESP NOT = DFHRESP(NORMAL)
-               MOVE LOW-VALUES TO MAPMAJO
-               MOVE WS-NUMCPT TO NUMCPTO
-               MOVE DFHBMASK TO NUMCPTA
-               MOVE 'ERREUR RELECTURE CLIENT - REESSAYEZ' TO MSGO
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 4000-FIN
-           END-IF
-
-      *    FUSION : Ne remplacer que les champs modifies (longueur > 0)
-      *    Les champs non modifies gardent leur valeur actuelle (CLI-*)
-           PERFORM 4050-FUSIONNER-MODIFICATIONS
-
-      *    Validation des donnees finales
-           PERFORM 4100-VALIDER-DONNEES THRU 4100-FIN
-
-           IF ERREUR-DETECTEE
-               MOVE DFHBMASK TO NUMCPTA
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 4000-FIN
-           END-IF
-
-      *    Ecriture de l'enregistrement
-           PERFORM 4300-ECRIRE-MODIFICATION THRU 4300-FIN
-
-           MOVE DFHBMASK TO NUMCPTA
-           EXEC CICS SEND MAP('MAPMAJ')
-               MAPSET('CLIMAJ')
-               ERASE
-           END-EXEC.
-
-       4000-FIN.
-           EXIT.
-
-      *-----------------------------------------------------------------
+```cobol
        4050-FUSIONNER-MODIFICATIONS.
       *-----------------------------------------------------------------
-      * Fusionne les modifications de l'utilisateur avec les donnees
-      * actuelles du client. Seuls les champs modifies (longueur > 0)
+      * Fusionne les modifications de l'utilisateur avec les données
+      * actuelles du client. Seuls les champs modifiés (longueur > 0)
       * remplacent les valeurs existantes.
       *-----------------------------------------------------------------
-      *    Code region : si modifie, prendre la nouvelle valeur
+      *    Code région : si modifié, prendre la nouvelle valeur
            IF WS-CODREGL > 0
                MOVE WS-CODREG TO CLI-CODREG
            ELSE
                MOVE CLI-CODREG TO WS-CODREG
            END-IF
 
-      *    Nature compte : pas de longueur, on prend si non vide
-           IF WS-NATCPT NOT = SPACES AND WS-NATCPT NOT = LOW-VALUES
-               MOVE WS-NATCPT TO CLI-NATCPT
-           ELSE
-               MOVE CLI-NATCPT TO WS-NATCPT
-           END-IF
-
-      *    Nom
+      *    Nom : si modifié, prendre la nouvelle valeur
            IF WS-NOML > 0
                MOVE WS-NOM TO CLI-NOM
            ELSE
                MOVE CLI-NOM TO WS-NOM
            END-IF
 
-      *    Prenom : pas de longueur obligatoire
-           IF WS-PRENOM NOT = SPACES AND WS-PRENOM NOT = LOW-VALUES
-               MOVE WS-PRENOM TO CLI-PRENOM
-           ELSE
-               MOVE CLI-PRENOM TO WS-PRENOM
-           END-IF
-
-      *    Date naissance
-           IF WS-DATNAISSL > 0
-               MOVE WS-DATNAISS TO CLI-DATNAISS
-           ELSE
-               MOVE CLI-DATNAISS TO WS-DATNAISS
-           END-IF
-
-      *    Sexe
+      *    Sexe : si modifié, prendre la nouvelle valeur
            IF WS-SEXEL > 0
                MOVE WS-SEXE TO CLI-SEXE
            ELSE
                MOVE CLI-SEXE TO WS-SEXE
            END-IF
+      *    ... (même logique pour tous les champs)
+```
 
-      *    Activite pro : pas de longueur obligatoire
-           IF WS-ACTPRO NOT = SPACES AND WS-ACTPRO NOT = LOW-VALUES
-               MOVE WS-ACTPRO TO CLI-ACTPRO
-           ELSE
-               MOVE CLI-ACTPRO TO WS-ACTPRO
-           END-IF
+**Paragraphe READ UPDATE + REWRITE atomique :**
 
-      *    Situation sociale
-           IF WS-SITSOL > 0
-               MOVE WS-SITSO TO CLI-SITSO
-           ELSE
-               MOVE CLI-SITSO TO WS-SITSO
-           END-IF
-
-      *    Adresse : pas de longueur obligatoire
-           IF WS-ADRESSE NOT = SPACES AND WS-ADRESSE NOT = LOW-VALUES
-               MOVE WS-ADRESSE TO CLI-ADRESSE
-           ELSE
-               MOVE CLI-ADRESSE TO WS-ADRESSE
-           END-IF
-
-      *    Solde : pas de longueur obligatoire
-           IF WS-SOLDE NOT = SPACES AND WS-SOLDE NOT = LOW-VALUES
-               MOVE WS-SOLDE TO CLI-SOLDE
-           ELSE
-               MOVE CLI-SOLDE TO WS-SOLDE
-           END-IF
-
-      *    Position
-           IF WS-POSITL > 0
-               MOVE WS-POSITION TO CLI-POSITION
-           ELSE
-               MOVE CLI-POSITION TO WS-POSITION
-           END-IF.
-
-      *-----------------------------------------------------------------
-       4100-VALIDER-DONNEES.
-      *-----------------------------------------------------------------
-      * Controles de conformite des donnees finales (apres fusion)
-      * Note: Les variables WS-* contiennent soit la modification de
-      * l'utilisateur, soit la valeur actuelle du client (via fusion)
-      * Donc on ne verifie plus les longueurs, seulement les valeurs.
-      *-----------------------------------------------------------------
-           MOVE LOW-VALUES TO MAPMAJO
-           MOVE WS-NUMCPT TO NUMCPTO
-
-      *    Controle code region (01, 02, 03 ou 04)
-           IF WS-CODREG NOT = '01' AND WS-CODREG NOT = '02'
-              AND WS-CODREG NOT = '03' AND WS-CODREG NOT = '04'
-               MOVE 'CODE REGION INVALIDE (01/02/03/04)' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF
-
-      *    Controle nom (obligatoire)
-           IF WS-NOM = SPACES
-               MOVE 'NOM OBLIGATOIRE' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF
-
-      *    Controle sexe (M ou F)
-           IF WS-SEXE NOT = 'M' AND WS-SEXE NOT = 'F'
-               MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF
-
-      *    Controle situation sociale (C, M, D ou V)
-           IF WS-SITSO NOT = 'C' AND WS-SITSO NOT = 'M'
-              AND WS-SITSO NOT = 'D' AND WS-SITSO NOT = 'V'
-               MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF
-
-      *    Controle position (DB ou CR)
-           IF WS-POSITION NOT = 'DB' AND WS-POSITION NOT = 'CR'
-               MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 4100-FIN
-           END-IF.
-
-       4100-FIN.
-           EXIT.
-
-      *-----------------------------------------------------------------
+```cobol
        4300-ECRIRE-MODIFICATION.
       *-----------------------------------------------------------------
-      * Mise a jour de l'enregistrement avec READ UPDATE + REWRITE
+      * Mise à jour de l'enregistrement avec READ UPDATE + REWRITE
       *
-      * IMPORTANT : Le REWRITE necessite un READ UPDATE prealable
-      * dans la meme unite de travail (UOW).
-      *
-      * Les variables WS-* contiennent les donnees finales (apres fusion
-      * des modifications utilisateur avec les donnees actuelles).
+      * IMPORTANT : Le REWRITE nécessite un READ UPDATE préalable
+      * dans la même unité de travail (UOW).
       *-----------------------------------------------------------------
       *    READ UPDATE pour verrouiller l'enregistrement
            EXEC CICS READ
@@ -839,7 +408,7 @@ Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
                GO TO 4300-FIN
            END-IF
 
-      *    Reappliquer les modifications sur l'enregistrement lu
+      *    Réappliquer les modifications sur l'enregistrement lu
            MOVE WS-CODREG    TO CLI-CODREG
            MOVE WS-NATCPT    TO CLI-NATCPT
            MOVE WS-NOM       TO CLI-NOM
@@ -852,7 +421,7 @@ Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
            MOVE WS-SOLDE     TO CLI-SOLDE
            MOVE WS-POSITION  TO CLI-POSITION
 
-      *    REWRITE - Mise a jour effective
+      *    REWRITE - Mise à jour effective
            EXEC CICS REWRITE
                FILE('FCLIENT')
                FROM(ENR-CLIENT)
@@ -875,232 +444,116 @@ Le programme PRGMAJ implemente un mode **pseudo-conversationnel a 3 phases** :
 
        4300-FIN.
            EXIT.
-
-      *-----------------------------------------------------------------
-       9000-FIN-PROGRAMME.
-      *-----------------------------------------------------------------
-      * Fin de la transaction
-      *-----------------------------------------------------------------
-           EXEC CICS SEND TEXT
-               FROM(WS-MSG-FIN)
-               LENGTH(40)
-               ERASE
-           END-EXEC
-
-           EXEC CICS RETURN
-           END-EXEC.
-```
-
-### Sections importantes du programme
-
-#### 1. La LINKAGE SECTION (obligatoire pour DFHCOMMAREA)
-
-```cobol
-       LINKAGE SECTION.
-      *-----------------------------------------------------------------
-      * ZONE COMMAREA PASSEE PAR CICS
-      * OBLIGATOIRE pour acceder aux donnees du RETURN precedent
-      *-----------------------------------------------------------------
-       01  DFHCOMMAREA.
-           05 LS-PHASE            PIC X(01).
-           05 LS-NUMCPT-SAVED     PIC X(06).
-```
-
-**Pourquoi la LINKAGE SECTION est obligatoire :**
-
-En mode pseudo-conversationnel, CICS passe les donnees du RETURN precedent via DFHCOMMAREA. Sans la LINKAGE SECTION, le programme ne peut pas acceder a ces donnees.
-
-La variable speciale EIBCALEN (dans EIB) contient la longueur de la COMMAREA recue :
-- `EIBCALEN = 0` : Premier appel (pas de COMMAREA)
-- `EIBCALEN > 0` : Rappel avec COMMAREA
-
-Le code dans 0000-PRINCIPAL utilise cette information :
-```cobol
-           EVALUATE TRUE
-               WHEN EIBCALEN = 0
-      *            Premier appel - pas de COMMAREA
-                   PERFORM 1000-INIT-RECHERCHE
-               WHEN OTHER
-      *            COMMAREA presente - copier dans WORKING-STORAGE
-                   MOVE DFHCOMMAREA TO WS-COMMAREA
-```
-
-#### 2. Le paragraphe 4050-FUSIONNER-MODIFICATIONS
-
-Ce paragraphe est crucial pour la mise a jour. En mode mise a jour (contrairement a l'ajout), l'utilisateur ne modifie que certains champs. Le terminal BMS ne transmet que les champs modifies (les autres ont une longueur = 0).
-
-**Probleme :** Si on ecrit directement les valeurs de la MAP, les champs non modifies seraient ecrases par des espaces ou LOW-VALUES.
-
-**Solution :** Fusionner les modifications de l'utilisateur avec les donnees actuelles du client.
-
-```cobol
-      *    Code region : si modifie, prendre la nouvelle valeur
-           IF WS-CODREGL > 0
-               MOVE WS-CODREG TO CLI-CODREG    <- Utilisateur a modifie
-           ELSE
-               MOVE CLI-CODREG TO WS-CODREG    <- Garder valeur actuelle
-           END-IF
-```
-
-La logique est la suivante :
-- Si la longueur du champ saisi (suffixe L) > 0 : l'utilisateur a modifie ce champ
-- Si la longueur = 0 : l'utilisateur n'a pas touche ce champ, on garde la valeur existante
-
-Pour les champs sans variable de longueur, on teste si le champ est different de SPACES et LOW-VALUES :
-```cobol
-           IF WS-NATCPT NOT = SPACES AND WS-NATCPT NOT = LOW-VALUES
-               MOVE WS-NATCPT TO CLI-NATCPT
-           ELSE
-               MOVE CLI-NATCPT TO WS-NATCPT
-           END-IF
-```
-
-#### 3. Le READ UPDATE + REWRITE atomique
-
-En CICS, la commande REWRITE necessite un READ UPDATE prealable dans la **meme unite de travail (UOW)**. Or, en mode pseudo-conversationnel, chaque interaction utilisateur termine la tache CICS (et donc l'UOW).
-
-**Consequence :** On ne peut pas faire READ UPDATE en phase 2 et REWRITE en phase 3.
-
-**Solution :** Faire les deux operations dans le meme paragraphe, juste avant la mise a jour effective :
-
-```cobol
-       4300-ECRIRE-MODIFICATION.
-      *    1. READ UPDATE : verrouille l'enregistrement
-           EXEC CICS READ
-               FILE('FCLIENT')
-               INTO(ENR-CLIENT)
-               RIDFLD(CLI-NUMCPT)
-               UPDATE                 <-- Option cle : verrouillage
-               RESP(WS-RESP)
-           END-EXEC
-
-      *    2. Application des modifications sur l'enregistrement
-           MOVE WS-CODREG TO CLI-CODREG
-           ...
-
-      *    3. REWRITE : ecrit l'enregistrement modifie
-           EXEC CICS REWRITE
-               FILE('FCLIENT')
-               FROM(ENR-CLIENT)
-               RESP(WS-RESP)
-           END-EXEC
-```
-
-**Sequence des lectures :**
-
-```
-Passage 1 (RECHERCHE) : READ simple -> Affichage
-                        (pas de verrouillage car fin de tache apres)
-
-Passage 2 (VALIDATION) : READ UPDATE -> Modifications -> REWRITE
-                         (atomique, meme UOW)
 ```
 
 **JCL de compilation : CMPMAJ.jcl**
 
-```jcl
-//ROCHA10 JOB (ACCT),'COMPILE PRGMAJ',CLASS=A,MSGCLASS=X,
-//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
-//*****************************************************************
-//* PROJET FIL ROUGE CICS - EXERCICE 10
-//* COMPILATION DU PROGRAMME COBOL-CICS PRGMAJ (MISE A JOUR CLIENT)
-//*
-//* Copybooks requis :
-//*   - DFHAID   : Codes touches fonction
-//*   - DFHBMSCA : Constantes attributs (DFHBMASK, etc.)
-//*   - CLIMAJ   : Structure MAP generee
-//*****************************************************************
-//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
-//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
-//*
-//COMPIL   EXEC PROC=DFHYITVL,
-//          INDEX='DFH510.CICS',
-//          PROGLIB='ROCHA.CICS.LOAD',
-//          AD370HLQ='IGY420',
-//          DSCTLIB='ROCHA.CICS.LINK',
-//          LE370HLQ='CEE'
-//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGMAJ),DISP=SHR
-//LKED.SYSIN DD *
-     INCLUDE SYSLIB(DFHELII)
-     NAME PRGMAJ(R)
-/*
-//
-```
+Le JCL de compilation suit la même structure que CMPCLAF.jcl (voir Partie 1, Exercice 3). Seuls le nom du job (ROCHA10) et le membre source (PRGMAJ) changent.
 
-### Definition CICS
+> **Note** : Ce programme nécessite trois copybooks : `DFHAID` (touches fonction), `DFHBMSCA` (constantes attribut), et `CLIMAJ` (structure MAP).
+
+### Structure du programme
+
+| Paragraphe | Fonction |
+|------------|----------|
+| 0000-PRINCIPAL | Point d'entrée, aiguillage selon EIBCALEN et EIBAID |
+| 1000-INIT-RECHERCHE | Affichage écran vide pour saisie numéro |
+| 2000-TRAITEMENT | Aiguillage selon la phase en cours |
+| 3000-RECHERCHER-CLIENT | Phase 1→2 : Recherche et affichage |
+| 3100-AFFICHER-CLIENT | Transfert données vers MAP, protection NUMCPT |
+| 4000-VALIDER-MODIFICATION | Phase 2/3 : Réception et validation |
+| 4050-FUSIONNER-MODIFICATIONS | Fusion modifications/données actuelles |
+| 4100-VALIDER-DONNEES | Contrôles de conformité |
+| 4300-ECRIRE-MODIFICATION | READ UPDATE + REWRITE atomique |
+| 9000-FIN-PROGRAMME | Message de fin et RETURN sans TRANSID |
+
+### Commandes CICS utilisées
+
+| Commande | Usage |
+|----------|-------|
+| SEND MAP | Envoyer l'écran (avec ERASE pour effacer) |
+| RECEIVE MAP | Recevoir la saisie avec RESP pour MAPFAIL |
+| READ FILE | Lecture simple (phase recherche/relecture) |
+| READ UPDATE | Verrouillage pour REWRITE |
+| REWRITE FILE | Mise à jour de l'enregistrement |
+| RETURN TRANSID | Retour pseudo-conversationnel avec COMMAREA |
+| SEND TEXT | Message de fin (sans MAP) |
+
+### Messages d'erreur gérés
+
+| Message | Contexte |
+|---------|----------|
+| SAISIR LE NUMERO DE COMPTE A MODIFIER | Premier passage |
+| VEUILLEZ SAISIR UN NUMERO DE COMPTE | MAPFAIL en phase recherche |
+| NUMERO DE COMPTE OBLIGATOIRE | Champ NUMCPT vide |
+| NUMERO DE COMPTE DOIT ETRE NUMERIQUE | Caractères non numériques |
+| CLIENT INEXISTANT - VERIFIEZ LE NUMERO | NOTFND lors du READ |
+| CLIENT TROUVE - MODIFIER ET VALIDER | Affichage réussi |
+| AUCUNE MODIFICATION - ENTREZ DES DONNEES | MAPFAIL en phase validation |
+| CODE REGION INVALIDE (01/02/03/04) | Code différent des valeurs autorisées |
+| NOM OBLIGATOIRE | Champ NOM vide après fusion |
+| SEXE INVALIDE (M OU F) | Sexe différent de M ou F |
+| SITUATION INVALIDE (C/M/D/V) | Situation non reconnue |
+| POSITION INVALIDE (DB OU CR) | Position non reconnue |
+| ERREUR VERROUILLAGE - REESSAYEZ | Échec du READ UPDATE |
+| MISE A JOUR EFFECTUEE - NOUVEAU OU PF3 | REWRITE réussi |
+
+### Définition CICS
 
 ```
 CEDA DEFINE PROGRAM(PRGMAJ) GROUP(CLIGROUP) LANGUAGE(COBOL)
 CEDA INSTALL PROGRAM(PRGMAJ) GROUP(CLIGROUP)
 ```
 
-### Verification
+### Vérification
 
 ```
 CEMT INQ PROGRAM(PRGMAJ)
 ```
 
-Resultat attendu : `Prog(PRGMAJ) Cob Ena`
-
-### Utilisation
-
-#### 1. Copier le source COBOL dans la library
-
-```
-ISPF 3.4 > ROCHA.CICS.SOURCE
-Edit member PRGMAJ
-Copier le contenu de PRGMAJ.cbl
-```
-
-#### 2. Soumettre le JCL de compilation
-
-```
-ISPF 3.4 > ROCHA.CICS.SOURCE
-Edit member CMPMAJ (copier CMPMAJ.jcl)
-SUB (submit)
-```
-
-#### 3. Verifier le resultat
-
-- RC=0000 dans SDSF
-- Membre PRGMAJ present dans ROCHA.CICS.LOAD
-
-#### 4. Definir le programme dans CICS
-
-```
-CEDA DEFINE PROGRAM(PRGMAJ) GROUP(CLIGROUP) LANGUAGE(COBOL)
-CEDA INSTALL PROGRAM(PRGMAJ) GROUP(CLIGROUP)
-```
+Résultat attendu : `Prog(PRGMAJ) Cob Ena`
 
 ### Points importants
 
-1. **COPY DFHBMSCA** : Ajoute pour avoir acces aux constantes d'attribut (DFHBMASK, etc.)
+1. **COPY DFHBMSCA** : Copybook système contenant les constantes d'attribut (DFHBMASK, DFHBMUNN, etc.). Obligatoire pour modifier dynamiquement les attributs des champs.
 
-2. **Sauvegarde du NUMCPT** : Le numero est sauvegarde dans WS-NUMCPT-SAVED car une fois en ASKIP, il n'est plus transmis par le terminal
+2. **Sauvegarde du NUMCPT dans la COMMAREA** : Une fois protégé (ASKIP), le champ n'est plus transmis par le terminal. On doit le conserver dans WS-NUMCPT-SAVED pour les phases suivantes.
 
-3. **READ sans UPDATE en phase 2** : La premiere lecture (affichage) n'utilise pas UPDATE car le verrouillage ne persiste pas entre les passages pseudo-conversationnels
+3. **READ simple en phase recherche** : La première lecture n'utilise pas UPDATE car le verrouillage ne persisterait pas après la fin de tâche (mode pseudo-conversationnel).
 
-4. **READ UPDATE + REWRITE atomique** : Les deux commandes sont executees dans le meme paragraphe pour garantir l'atomicite
+4. **READ UPDATE + REWRITE atomiques** : Les deux commandes doivent être dans le même paragraphe, exécutées séquentiellement, pour garantir que le verrouillage est actif au moment du REWRITE.
 
-5. **Retour en phase 1** : Apres une mise a jour reussie, le programme revient en phase RECHERCHE pour permettre la modification d'un autre client
+5. **Retour en phase 1 après succès** : Après une mise à jour réussie, le programme réinitialise la COMMAREA pour permettre la modification d'un autre client sans relancer la transaction.
 
-### Captures d'ecran
+6. **PERFORM THRU avec GO TO** : Comme pour PRGAJT (voir Partie 2a, Exercice 7), la clause THRU permet aux GO TO de rester dans la plage du PERFORM et de retourner correctement à l'appelant.
 
-<!-- ![pt2ex10-1](images-pt2/pt2ex10-1.png) -->
+### Captures d'écran
+
+<!--
+Suggestions de captures d'écran pour cet exercice :
+
+1. pt2ex10-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGMAJ)
+2. pt2ex10-2 : Soumission JCL CMPMAJ - compilation du programme
+3. pt2ex10-3 : SDSF - Job output avec RC=0000 pour compilation
+4. pt2ex10-4 : Écran phase 1 - saisie numéro de compte (NUMCPT saisissable)
+5. pt2ex10-5 : Écran phase 2 - affichage client (NUMCPT protégé, visible mais grisé)
+6. pt2ex10-6 : Écran phase 3 - message "MISE A JOUR EFFECTUEE"
+7. pt2ex10-7 : Vérification avec AFFI - données modifiées visibles
+-->
 
 ---
 
-## Exercice 11 : Transaction de mise a jour
+## Exercice 11 : Transaction de mise à jour
 
-### Enonce
+### Énoncé
 
-Definir une transaction independante de la precedente pour appeler le programme de mise a jour.
+Définir une transaction indépendante de la précédente pour appeler le programme de mise à jour.
 
 ### Mon travail
 
-La transaction MAJO est le point d'entree utilisateur pour la mise a jour.
+La transaction MAJO est le point d'entrée utilisateur pour la mise à jour des clients. Comme pour AFFI et AJOU, elle fait le lien entre le code saisi par l'utilisateur et le programme COBOL-CICS à exécuter.
 
-**Architecture CICS - Liaison Transaction/Programme/MAP/Fichier :**
+#### Architecture CICS - Liaison des ressources
 
 ```
 +-------------+     +-------------+     +-------------+
@@ -1115,72 +568,111 @@ La transaction MAJO est le point d'entree utilisateur pour la mise a jour.
                     +-------------+
 ```
 
-Une transaction CICS est le point d'entree utilisateur. Elle fait le lien entre :
-- Le code transaction saisi par l'utilisateur (MAJO)
-- Le programme COBOL-CICS a executer (PRGMAJ)
+### Résolution
 
-Le programme utilise ensuite le mapset (CLIMAJ) pour l'interface et le fichier (FCLIENT) pour les donnees.
-
-### Resolution
-
-**Definition de la transaction :**
+**Étape 1 : Définition de la transaction**
 
 ```
 CEDA DEFINE TRANSACTION(MAJO) GROUP(CLIGROUP) PROGRAM(PRGMAJ)
 ```
 
-| Parametre | Valeur | Description |
+| Paramètre | Valeur | Description |
 |-----------|--------|-------------|
-| TRANSACTION | MAJO | Code transaction (4 caracteres max) |
+| TRANSACTION | MAJO | Code transaction (4 caractères max) |
 | GROUP | CLIGROUP | Groupe de ressources du projet |
-| PROGRAM | PRGMAJ | Programme COBOL a executer |
+| PROGRAM | PRGMAJ | Programme COBOL à exécuter |
 
-**Installation de la transaction :**
+**Étape 2 : Installation de la transaction**
 
 ```
 CEDA INSTALL TRANSACTION(MAJO) GROUP(CLIGROUP)
 ```
 
-> **Bonne pratique** : Installer uniquement la ressource ajoutee plutot que tout le groupe. Reinstaller le groupe peut causer des problemes si FCLIENT est ouvert.
+> **Bonne pratique** : Installer uniquement la ressource ajoutée (`CEDA INSTALL TRANSACTION`) plutôt que tout le groupe (`CEDA INSTALL GROUP`). Réinstaller le groupe complet peut causer des erreurs si certaines ressources (comme FCLIENT) sont déjà ouvertes.
 
-### Verification
+### Vérification
 
 ```
 CEDA VIEW TRANSACTION(MAJO) GROUP(CLIGROUP)
-CEMT INQ PROGRAM(PRGMAJ)
 ```
+Résultat attendu : Affichage de la définition avec PROGRAM(PRGMAJ)
 
-### Test
+```
+CEMT INQ TRAN(MAJO)
+```
+Résultat attendu : `Tra(MAJO) Pro(PRGMAJ) Ena`
+
+### Test de la transaction
+
+**Test sans debugger :**
 
 ```
 MAJO
 ```
 
 Comportement attendu :
-1. Ecran de saisie du numero de compte
-2. Saisir un numero existant (ex: 100001)
-3. Affichage des donnees du client (NUMCPT protege)
-4. Modifier les champs souhaites
-5. ENTER pour valider -> Message "MISE A JOUR EFFECTUEE"
+1. Écran de saisie du numéro de compte (NUMCPT saisissable)
+2. Saisir un numéro existant (ex: 000001) et ENTER
+3. Affichage des données du client (NUMCPT protégé/grisé)
+4. Modifier les champs souhaités (ex: changer l'adresse)
+5. ENTER pour valider → Message "MISE A JOUR EFFECTUEE"
+6. L'écran revient en phase 1 pour un nouveau client
+7. PF3 pour quitter
 
-### Ressources du groupe CLIGROUP apres exercice 11
+**Test avec CEDF** (voir Partie 1, Exercice 5 pour la navigation CEDF) :
 
-| Type | Nom | Description |
-|------|-----|-------------|
-| FILE | FCLIENT | Fichier VSAM clients |
-| MAPSET | CLIAFF | Ecran affichage |
-| MAPSET | CLIAJT | Ecran ajout |
-| MAPSET | CLIMAJ | Ecran mise a jour |
-| PROGRAM | PRGCLIA | Programme affichage |
-| PROGRAM | PRGAJT | Programme ajout |
-| PROGRAM | PRGMAJ | Programme mise a jour |
-| TRANSACTION | AFFI | Transaction affichage |
-| TRANSACTION | AJOU | Transaction ajout |
-| TRANSACTION | MAJO | Transaction mise a jour |
+```
+CEDF
+MAJO
+```
 
-### Captures d'ecran
+Points d'arrêt observés pour une mise à jour complète :
 
-<!-- ![pt2ex11-1](images-pt2/pt2ex11-1.png) -->
+| Étape | Commande CICS | RESP attendu | Phase |
+|-------|---------------|--------------|-------|
+| 1 | SEND MAP | NORMAL | 1 - Écran recherche |
+| 2 | RETURN TRANSID | - | Fin phase 1 |
+| 3 | RECEIVE MAP | NORMAL | 2 - Réception numéro |
+| 4 | READ FILE | NORMAL | 2 - Vérification existence |
+| 5 | SEND MAP | NORMAL | 2 - Affichage client |
+| 6 | RETURN TRANSID | - | Fin phase 2 |
+| 7 | RECEIVE MAP | NORMAL | 3 - Réception modifications |
+| 8 | READ FILE | NORMAL | 3 - Relecture données |
+| 9 | READ UPDATE | NORMAL | 3 - Verrouillage |
+| 10 | REWRITE | NORMAL | 3 - Mise à jour |
+| 11 | SEND MAP | NORMAL | 3 - Message succès |
+| 12 | RETURN TRANSID | - | Retour phase 1 |
+
+> **Note** : Si le client n'existe pas, l'étape 4 retourne NOTFND et le programme affiche un message d'erreur sans passer à la phase 2.
+
+### Ressources du groupe CLIGROUP après exercice 11
+
+| Type | Nom | Description | Défini dans |
+|------|-----|-------------|-------------|
+| FILE | FCLIENT | Fichier VSAM clients | Exercice 1 |
+| MAPSET | CLIAFF | Écran affichage | Exercice 4 |
+| MAPSET | CLIAJT | Écran ajout | Exercice 8 |
+| MAPSET | CLIMAJ | Écran mise à jour | Exercice 9 |
+| PROGRAM | PRGCLIA | Programme affichage | Exercice 4 |
+| PROGRAM | PRGAJT | Programme ajout | Exercice 8 |
+| PROGRAM | PRGMAJ | Programme mise à jour | Exercice 10 |
+| TRANSACTION | AFFI | Transaction affichage | Exercice 4 |
+| TRANSACTION | AJOU | Transaction ajout | Exercice 8 |
+| TRANSACTION | MAJO | Transaction mise à jour | Exercice 11 |
+
+### Captures d'écran
+
+<!--
+Suggestions de captures d'écran pour cet exercice :
+
+1. pt2ex11-1 : CEDA DEFINE TRANSACTION(MAJO) - écran de définition
+2. pt2ex11-2 : CEDA INSTALL TRANSACTION(MAJO) - message INSTALL SUCCESSFUL
+3. pt2ex11-3 : CEMT INQ TRAN(MAJO) - vérification statut Ena
+4. pt2ex11-4 : Test CEDF - point d'arrêt sur READ UPDATE
+5. pt2ex11-5 : Test CEDF - point d'arrêt sur REWRITE avec RESP NORMAL
+6. pt2ex11-6 : Test fonctionnel - écran avec message "MISE A JOUR EFFECTUEE"
+7. pt2ex11-7 : Vérification avec AFFI - les données modifiées sont visibles
+-->
 
 ---
 

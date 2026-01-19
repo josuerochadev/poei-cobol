@@ -15,8 +15,6 @@ Cette section couvre les exercices 6 à 8 : création de la MAP d'ajout, program
 
 ---
 
-# Partie 2 : Opérations CRUD
-
 ## Exercice 6 : MAP pour ajout de client
 
 ### Énoncé
@@ -25,7 +23,11 @@ Créer ou adapter la MAP précédente pour une opération d'ajout de CLIENT dans
 
 ### Mon travail
 
-J'ai adapté la MAP d'affichage (CLIAFF) pour créer une nouvelle MAP de saisie (CLIAJT). La principale différence est que tous les champs sont maintenant saisissables (UNPROT) au lieu d'être en affichage seul (ASKIP).
+J'ai adapté la MAP d'affichage (CLIAFF) pour créer une nouvelle MAP de saisie (CLIAJT). La structure BMS est similaire mais le comportement des champs change fondamentalement.
+
+#### Pourquoi une MAP différente pour l'ajout ?
+
+En affichage, l'utilisateur ne saisit que le numéro de compte (clé de recherche) et les autres champs sont en lecture seule. En ajout, **tous les champs** doivent être saisissables car l'utilisateur crée un nouveau client de toutes pièces.
 
 **Différences entre CLIAFF et CLIAJT :**
 
@@ -33,115 +35,44 @@ J'ai adapté la MAP d'affichage (CLIAFF) pour créer une nouvelle MAP de saisie 
 |--------|-------------------|----------------|
 | NUMCPT | UNPROT (saisie clé) | UNPROT (saisie) |
 | Autres champs | ASKIP (affichage) | UNPROT (saisie) |
-| Libellés (région, sexe...) | Affichés | Non affichés |
+| Libellés (région, sexe...) | Affichés (LIBREG, LIBSEX...) | Non présents |
 | Titre | "AFFICHAGE CLIENT" | "AJOUT CLIENT" |
 | Touches | ENTER=Rechercher | ENTER=Valider |
+
+#### Pourquoi pas de libellés dans la MAP d'ajout ?
+
+Dans CLIAFF, des zones supplémentaires (LIBREG, LIBSEX, LIBSIT, LIBPOS) affichent les libellés correspondant aux codes (ex: "01" → "PARIS"). En ajout, l'utilisateur saisit directement les codes, donc ces zones seraient vides et inutiles. On les remplace par des indications statiques à côté des champs (ex: "(01=Paris,02=Mars...)").
 
 ### Résolution
 
 **MAP BMS : CLIAJT.bms**
 
-Le code source est stocké dans `ROCHA.CICS.SOURCE(CLIAJT)`. Voici le code complet :
+Le code source est stocké dans `ROCHA.CICS.SOURCE(CLIAJT)`. La structure reprend les mêmes concepts BMS que CLIAFF (voir Partie 1, Exercice 2 pour les explications sur DFHMSD, DFHMDI, DFHMDF et les attributs).
 
-```
-***********************************************************************
-*  MAPSET : CLIAJT - Ajout Client
-*  Transaction : AJOU
-*  Fil Rouge CICS - Exercice 6
-***********************************************************************
-CLIAJT   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
-               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
-***********************************************************************
-MAPAJT   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
-*----------------------------------------------------------------------
-* TITRE
-*----------------------------------------------------------------------
-         DFHMDF POS=(1,28),LENGTH=24,ATTRB=(ASKIP,BRT),                 X
-               INITIAL='*** AJOUT CLIENT ***'
-*----------------------------------------------------------------------
-* ZONES DE SAISIE - TOUS LES CHAMPS EN UNPROT
-*----------------------------------------------------------------------
-         DFHMDF POS=(3,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='NUMERO COMPTE :'
-NUMCPT   DFHMDF POS=(3,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
-         DFHMDF POS=(3,26),LENGTH=1,ATTRB=ASKIP
-*
-         DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='CODE REGION   :'
-CODREG   DFHMDF POS=(4,19),LENGTH=2,ATTRB=(UNPROT,NUM)
-         DFHMDF POS=(4,22),LENGTH=20,ATTRB=ASKIP,                       X
-               INITIAL='(01=Paris,02=Mars...)'
-*
-         DFHMDF POS=(5,2),LENGTH=16,ATTRB=ASKIP,                        X
-               INITIAL='NATURE COMPTE :'
-NATCPT   DFHMDF POS=(5,19),LENGTH=2,ATTRB=(UNPROT,NUM)
-*
-         DFHMDF POS=(6,2),LENGTH=16,ATTRB=ASKIP,INITIAL='NOM           :'
-NOM      DFHMDF POS=(6,19),LENGTH=10,ATTRB=UNPROT
-*
-         DFHMDF POS=(7,2),LENGTH=16,ATTRB=ASKIP,INITIAL='PRENOM        :'
-PRENOM   DFHMDF POS=(7,19),LENGTH=10,ATTRB=UNPROT
-*
-         DFHMDF POS=(8,2),LENGTH=16,ATTRB=ASKIP,INITIAL='DATE NAISSANCE:'
-DATNA    DFHMDF POS=(8,19),LENGTH=8,ATTRB=(UNPROT,NUM)
-         DFHMDF POS=(8,28),LENGTH=10,ATTRB=ASKIP,INITIAL='(AAAAMMJJ)'
-*
-         DFHMDF POS=(9,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SEXE          :'
-SEXE     DFHMDF POS=(9,19),LENGTH=1,ATTRB=UNPROT
-         DFHMDF POS=(9,21),LENGTH=8,ATTRB=ASKIP,INITIAL='(M ou F)'
-*
-         DFHMDF POS=(10,2),LENGTH=16,ATTRB=ASKIP,INITIAL='ACTIVITE PRO  :'
-ACTPRO   DFHMDF POS=(10,19),LENGTH=2,ATTRB=(UNPROT,NUM)
-*
-         DFHMDF POS=(11,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SITUATION SOC :'
-SITSO    DFHMDF POS=(11,19),LENGTH=1,ATTRB=UNPROT
-         DFHMDF POS=(11,21),LENGTH=12,ATTRB=ASKIP,INITIAL='(C/M/D/V)'
-*
-         DFHMDF POS=(12,2),LENGTH=16,ATTRB=ASKIP,INITIAL='ADRESSE       :'
-ADRESSE  DFHMDF POS=(12,19),LENGTH=10,ATTRB=UNPROT
-*
-         DFHMDF POS=(13,2),LENGTH=16,ATTRB=ASKIP,INITIAL='SOLDE         :'
-SOLDE    DFHMDF POS=(13,19),LENGTH=10,ATTRB=(UNPROT,NUM)
-*
-         DFHMDF POS=(14,2),LENGTH=16,ATTRB=ASKIP,INITIAL='POSITION      :'
-POSIT    DFHMDF POS=(14,19),LENGTH=2,ATTRB=UNPROT
-         DFHMDF POS=(14,22),LENGTH=10,ATTRB=ASKIP,INITIAL='(DB ou CR)'
-*----------------------------------------------------------------------
-* ZONE MESSAGE ET TOUCHES FONCTION
-*----------------------------------------------------------------------
-         DFHMDF POS=(18,2),LENGTH=10,ATTRB=ASKIP,INITIAL='MESSAGE :'
-MSG      DFHMDF POS=(18,13),LENGTH=60,ATTRB=(ASKIP,BRT)
-*
-         DFHMDF POS=(22,2),LENGTH=70,ATTRB=ASKIP,                       X
-               INITIAL='ENTER=Valider  PF3=Quitter  CLEAR=Effacer'
-***********************************************************************
-         DFHMSD TYPE=FINAL
-         END
-```
+**Maquette de l'écran MAPAJT :**
 
-**Aperçu de l'écran MAPAJT :**
+Cette maquette (wireframe) représente la disposition des champs sur l'écran 24x80 :
 
 ```
 +------------------------------------------------------------------------------+
 |                         *** AJOUT CLIENT ***                                 |
+|------------------------------------------------------------------------------|
 |                                                                              |
 |  NUMERO COMPTE : ______                                                      |
-|  CODE REGION   : __     (01=Paris,02=Mars...)                                |
+|  CODE REGION   : __     (01=Paris,02=Marseille,03=Lyon,04=Lille)             |
 |  NATURE COMPTE : __                                                          |
 |  NOM           : __________                                                  |
 |  PRENOM        : __________                                                  |
 |  DATE NAISSANCE: ________  (AAAAMMJJ)                                        |
 |  SEXE          : _  (M ou F)                                                 |
 |  ACTIVITE PRO  : __                                                          |
-|  SITUATION SOC : _  (C/M/D/V)                                                |
+|  SITUATION SOC : _  (C=Célib/M=Marié/D=Divorcé/V=Veuf)                       |
 |  ADRESSE       : __________                                                  |
 |  SOLDE         : __________                                                  |
-|  POSITION      : __  (DB ou CR)                                              |
+|  POSITION      : __  (DB=Débiteur ou CR=Créditeur)                           |
 |                                                                              |
-|                                                                              |
-|                                                                              |
+|------------------------------------------------------------------------------|
 |  MESSAGE : ____________________________________________________________      |
-|                                                                              |
 |                                                                              |
 |                                                                              |
 |  ENTER=Valider  PF3=Quitter  CLEAR=Effacer                                   |
@@ -150,20 +81,42 @@ MSG      DFHMDF POS=(18,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 
 **Zones de saisie :**
 
-| Zone | Longueur | Attribut | Aide affichée |
-|------|----------|----------|---------------|
-| NUMCPT | 6 | UNPROT,NUM,IC | - |
-| CODREG | 2 | UNPROT,NUM | (01=Paris,02=Mars...) |
-| NATCPT | 2 | UNPROT,NUM | - |
-| NOM | 10 | UNPROT | - |
-| PRENOM | 10 | UNPROT | - |
-| DATNA | 8 | UNPROT,NUM | (AAAAMMJJ) |
-| SEXE | 1 | UNPROT | (M ou F) |
-| ACTPRO | 2 | UNPROT,NUM | - |
-| SITSO | 1 | UNPROT | (C/M/D/V) |
-| ADRESSE | 10 | UNPROT | - |
-| SOLDE | 10 | UNPROT,NUM | - |
-| POSIT | 2 | UNPROT | (DB ou CR) |
+| Zone | Longueur | Attribut | Description |
+|------|----------|----------|-------------|
+| NUMCPT | 6 | UNPROT,NUM,IC | Numéro de compte (curseur initial) |
+| CODREG | 2 | UNPROT,NUM | Code région (01/02/03/04) |
+| NATCPT | 2 | UNPROT,NUM | Nature du compte |
+| NOM | 10 | UNPROT | Nom du client |
+| PRENOM | 10 | UNPROT | Prénom du client |
+| DATNA | 8 | UNPROT,NUM | Date de naissance (AAAAMMJJ) |
+| SEXE | 1 | UNPROT | Sexe (M/F) |
+| ACTPRO | 2 | UNPROT,NUM | Code activité professionnelle |
+| SITSO | 1 | UNPROT | Situation sociale (C/M/D/V) |
+| ADRESSE | 10 | UNPROT | Adresse |
+| SOLDE | 10 | UNPROT,NUM | Solde du compte |
+| POSIT | 2 | UNPROT | Position (DB/CR) |
+| MSG | 60 | ASKIP,BRT | Zone message (affichage seul) |
+
+> **Note** : L'attribut `IC` (Initial Cursor) sur NUMCPT positionne automatiquement le curseur sur ce champ au premier affichage. L'attribut `NUM` (Numeric) force la saisie en mode numérique sur certains terminaux.
+
+**JCL d'assemblage : ASMAJT.jcl**
+
+Le JCL d'assemblage suit la même structure que ASMCLAF.jcl (voir Partie 1, Exercice 2). Seuls le nom du job (ROCHA05) et le membre source (CLIAJT) changent.
+
+### Définition CICS
+
+La définition et l'installation du mapset suivent le même processus que pour CLIAFF (voir Partie 1, Exercice 4 pour les explications sur CEDA) :
+
+```
+CEDA DEFINE MAPSET(CLIAJT) GROUP(CLIGROUP)
+CEDA INSTALL MAPSET(CLIAJT) GROUP(CLIGROUP)
+```
+
+### Vérification
+
+```
+CEDA VIEW MAPSET(CLIAJT) GROUP(CLIGROUP)
+```
 
 ### Captures d'écran
 
@@ -173,7 +126,7 @@ Suggestions de captures d'écran pour cet exercice :
 1. pt2ex06-1 : Source BMS dans ISPF EDIT - ROCHA.CICS.SOURCE(CLIAJT)
 2. pt2ex06-2 : Soumission JCL assemblage BMS
 3. pt2ex06-3 : SDSF - Job output avec RC=0000
-4. pt2ex06-4 : Écran MAPAJT vide - prêt pour saisie
+4. pt2ex06-4 : Vérification ROCHA.CICS.LINK - copybook CLIAJT généré
 -->
 
 ---
@@ -186,66 +139,131 @@ Créer le PROGRAMME pour une opération d'ajout d'un nouveau CLIENT dans le Data
 
 ### Mon travail
 
-J'ai développé le programme PRGAJT qui gère l'ajout de nouveaux clients avec les fonctionnalités suivantes :
+J'ai développé le programme PRGAJT qui gère l'ajout de nouveaux clients. Ce programme est plus complexe que PRGCLIA car il doit valider les données avant l'écriture et gérer plusieurs types d'erreurs.
 
-1. **Mode pseudo-conversationnel** : Premier passage affiche écran vide, passages suivants traitent la saisie
-2. **Gestion MAPFAIL** : Détection si l'utilisateur n'a saisi aucune donnée
-3. **Contrôles de conformité** avant écriture :
-   - Numéro de compte obligatoire et numérique (6 chiffres)
-   - Code région valide (01, 02, 03 ou 04)
-   - Nom obligatoire
-   - Sexe valide (M ou F)
-   - Situation sociale valide (C, M, D ou V)
-   - Position valide (DB ou CR)
-4. **Vérification de doublure** : READ pour vérifier que le client n'existe pas déjà
-5. **Écriture VSAM** : WRITE avec gestion des erreurs (DUPREC, etc.)
+#### Pourquoi un mode pseudo-conversationnel à 2 phases ?
 
-**Point technique** : La commande `EXIT PARAGRAPH` n'étant pas supportée sur la version COBOL de TK4-, j'ai utilisé le pattern `GO TO paragraphe-FIN` pour sortir des validations en cas d'erreur.
+Contrairement à la mise à jour (3 phases), l'ajout ne nécessite que 2 phases car il n'y a pas de recherche préalable :
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ LANCEMENT TRANSACTION "AJOU"                                    │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 1 : SAISIE (EIBCALEN = 0)                                 │
+│ ──────────────────────────────────────────────────────────────  │
+│ → CICS lance le programme pour la première fois                 │
+│ → EIBCALEN = 0 (pas de COMMAREA, c'est un nouveau contexte)     │
+│ → Le programme affiche l'écran vide (SEND MAP avec ERASE)       │
+│ → Le programme se TERMINE (RETURN TRANSID)                      │
+│ → Mémoire libérée, ressources libérées                          │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+        L'utilisateur saisit les données et appuie sur ENTRÉE
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 2 : VALIDATION ET ÉCRITURE (EIBCALEN > 0)                 │
+│ ──────────────────────────────────────────────────────────────  │
+│ → CICS relance le programme (nouveau processus)                 │
+│ → EIBCALEN > 0 (la COMMAREA indique un contexte existant)       │
+│ → Le programme reçoit la saisie (RECEIVE MAP)                   │
+│ → Sauvegarde des données dans WS-SAISIE                         │
+│ → Validation des données (contrôles de conformité)              │
+│ → Vérification de doublure (READ pour NOTFND attendu)           │
+│ → Écriture du client (WRITE)                                    │
+│ → Affichage message succès ou erreur (SEND MAP)                 │
+│ → Le programme se TERMINE (RETURN TRANSID)                      │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+        Si succès : écran vide pour nouveau client
+        Si erreur : message d'erreur, l'utilisateur corrige
+```
+
+Voir Partie 1, Exercice 3 pour les explications détaillées sur le mode pseudo-conversationnel et les variables EIB.
+
+#### Pourquoi sauvegarder les données dans WS-SAISIE ?
+
+C'est un point technique crucial. Avec `MODE=INOUT` et `STORAGE=AUTO` dans la définition BMS, les zones input (suffixe I) et output (suffixe O) **partagent la même zone mémoire** (voir Partie 1, Exercice 2 pour les explications sur la structure DSECT).
+
+**Problème** : Après le `RECEIVE MAP`, les données saisies sont dans `NUMCPTI`, `CODREGL`, etc. Mais dès qu'on fait `MOVE LOW-VALUES TO MAPAJTO` pour préparer l'affichage, ces données sont écrasées !
+
+**Solution** : Sauvegarder immédiatement les données dans des variables Working-Storage (préfixe WS-) :
+
+```cobol
+* SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
+MOVE NUMCPTI   TO WS-NUMCPT
+MOVE NUMCPTL   TO WS-NUMCPTL
+MOVE CODREGI   TO WS-CODREG
+MOVE CODREGL   TO WS-CODREGL
+...
+```
+
+#### Pourquoi vérifier la doublure avant l'écriture ?
+
+La commande `WRITE` avec une clé existante retourne l'erreur `DUPREC` (Duplicate Record). Cependant, il est préférable de vérifier **avant** l'écriture avec un `READ` :
+
+1. **Meilleur message** : On peut afficher "CE CLIENT EXISTE DÉJÀ" au lieu de l'erreur technique DUPREC
+2. **Cohérence** : On valide toutes les données avant toute tentative d'écriture
+3. **Performance** : Le READ est moins coûteux qu'un WRITE qui échoue
+
+**Logique inversée** : Dans ce READ, on **espère** un `NOTFND` ! Si le READ retourne `NORMAL`, c'est que le client existe déjà → erreur de doublure.
 
 ### Résolution
 
 **Programme : PRGAJT.cbl**
 
-Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits principaux :
+Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les sections clés du programme.
+
+**Structure de la COMMAREA (WORKING-STORAGE) :**
 
 ```cobol
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. PRGAJT.
-      ******************************************************************
-      * PROGRAMME : PRGAJT - Ajout client
-      * TRANSACTION : AJOU
-      * MODE : Pseudo-conversationnel
-      ******************************************************************
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-
+      *-----------------------------------------------------------------
+      * ZONE DE COMMUNICATION (COMMAREA)
+      *-----------------------------------------------------------------
        01  WS-COMMAREA.
            05 WS-FLAG-INIT         PIC X(01) VALUE 'N'.
+              88 PREMIER-PASSAGE   VALUE 'N'.
+              88 PASSAGE-SUIVANT   VALUE 'O'.
+```
 
-      * Copybooks CICS
-       COPY DFHAID.
-       COPY CLIAJT.
+La COMMAREA de l'ajout est simple : un seul indicateur pour distinguer le premier passage des suivants.
 
-       01  ENR-CLIENT.
-           05 CLI-NUMCPT           PIC X(06).
-           05 CLI-CODREG           PIC X(02).
-           05 CLI-NATCPT           PIC X(02).
-           05 CLI-NOM              PIC X(10).
-           05 CLI-PRENOM           PIC X(10).
-           05 CLI-DATNAISS         PIC X(08).
-           05 CLI-SEXE             PIC X(01).
-           05 CLI-ACTPRO           PIC X(02).
-           05 CLI-SITSO            PIC X(01).
-           05 CLI-ADRESSE          PIC X(10).
-           05 CLI-SOLDE            PIC X(10).
-           05 CLI-POSITION         PIC X(02).
-           05 FILLER               PIC X(16).
+**Zone de sauvegarde des données saisies :**
 
-       01  WS-RESP                 PIC S9(08) COMP VALUE 0.
-       01  WS-ERREUR               PIC X(01) VALUE 'N'.
+```cobol
+      *-----------------------------------------------------------------
+      * SAUVEGARDE DES DONNEES SAISIES (EVITE ECRASEMENT PAR LOW-VALUES)
+      *-----------------------------------------------------------------
+       01  WS-SAISIE.
+           05 WS-NUMCPT            PIC X(06).
+           05 WS-NUMCPTL           PIC S9(04) COMP.
+           05 WS-CODREG            PIC X(02).
+           05 WS-CODREGL           PIC S9(04) COMP.
+           05 WS-NATCPT            PIC X(02).
+           05 WS-NOM               PIC X(10).
+           05 WS-NOML              PIC S9(04) COMP.
+           05 WS-PRENOM            PIC X(10).
+           05 WS-DATNAISS          PIC X(08).
+           05 WS-SEXE              PIC X(01).
+           05 WS-SEXEL             PIC S9(04) COMP.
+           05 WS-ACTPRO            PIC X(02).
+           05 WS-SITSO             PIC X(01).
+           05 WS-SITSOL            PIC S9(04) COMP.
+           05 WS-ADRESSE           PIC X(10).
+           05 WS-SOLDE             PIC X(10).
+           05 WS-POSITION          PIC X(02).
+           05 WS-POSITL            PIC S9(04) COMP.
+```
 
-       PROCEDURE DIVISION.
+> **Note** : On sauvegarde aussi les longueurs (suffixe L) car elles indiquent si l'utilisateur a saisi quelque chose dans le champ. Une longueur = 0 signifie que le champ est vide.
 
+**Point d'entrée avec gestion des touches :**
+
+```cobol
        0000-PRINCIPAL.
            EVALUATE TRUE
                WHEN EIBCALEN = 0
@@ -263,7 +281,11 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
                COMMAREA(WS-COMMAREA)
                LENGTH(LENGTH OF WS-COMMAREA)
            END-EXEC.
+```
 
+**Paragraphe de traitement avec PERFORM THRU :**
+
+```cobol
        2000-TRAITEMENT.
            MOVE 'N' TO WS-ERREUR
 
@@ -272,7 +294,7 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
                RESP(WS-RESP)
            END-EXEC
 
-      * Gestion MAPFAIL (aucune donnee transmise)
+      * Gestion MAPFAIL (aucune donnée transmise)
            IF WS-RESP = DFHRESP(MAPFAIL)
                MOVE LOW-VALUES TO MAPAJTO
                MOVE 'AUCUNE DONNEE SAISIE - VEUILLEZ REMPLIR' TO MSGO
@@ -284,23 +306,15 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
            END-IF
 
       * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
-      * Important : sauvegarder aussi les champs longueur (L) pour les validations
            MOVE NUMCPTI   TO WS-NUMCPT
            MOVE NUMCPTL   TO WS-NUMCPTL
            MOVE CODREGI   TO WS-CODREG
            MOVE CODREGL   TO WS-CODREGL
-           MOVE NOMI      TO WS-NOM
-           MOVE NOML      TO WS-NOML
-           MOVE SEXEI     TO WS-SEXE
-           MOVE SEXEL     TO WS-SEXEL
-           MOVE SITSOI    TO WS-SITSO
-           MOVE SITSOL    TO WS-SITSOL
-           MOVE POSITI    TO WS-POSITION
-           MOVE POSITL    TO WS-POSITL
            ...
 
-      * Validation des donnees
+      * Validation des données
            PERFORM 2100-VALIDER-DONNEES THRU 2100-FIN
+
            IF ERREUR-DETECTEE
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
@@ -309,7 +323,7 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
                GO TO 2000-FIN
            END-IF
 
-      * Verification doublure (client existe deja ?)
+      * Vérification doublure (client existe déjà ?)
            PERFORM 2200-VERIFIER-DOUBLURE THRU 2200-FIN
            IF ERREUR-DETECTEE
                EXEC CICS SEND MAP('MAPAJT')
@@ -319,7 +333,7 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
                GO TO 2000-FIN
            END-IF
 
-      * Preparation et ecriture de l'enregistrement
+      * Préparation et écriture de l'enregistrement
            PERFORM 2300-PREPARER-ENREGISTREMENT
            PERFORM 2400-ECRIRE-CLIENT
 
@@ -329,11 +343,19 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
 
        2000-FIN.
            EXIT.
+```
 
+**Paragraphe de validation des données :**
+
+```cobol
        2100-VALIDER-DONNEES.
+      *-----------------------------------------------------------------
+      * Contrôles de conformité des données saisies
+      * Utilise les variables WS- sauvegardées (pas MAPAJTI)
+      *-----------------------------------------------------------------
            MOVE LOW-VALUES TO MAPAJTO
 
-      * Controle numero de compte (utilise variables WS- sauvegardees)
+      * Contrôle numéro de compte (obligatoire et numérique)
            IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
                MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
@@ -346,7 +368,7 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
                GO TO 2100-FIN
            END-IF
 
-      * Controle code region (utilise WS-CODREG sauvegardee)
+      * Contrôle code région (01, 02, 03 ou 04)
            IF WS-CODREGL = 0 OR WS-CODREG = SPACES
                MOVE 'CODE REGION OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
@@ -360,14 +382,14 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
                GO TO 2100-FIN
            END-IF
 
-      * Controle nom (obligatoire)
+      * Contrôle nom (obligatoire)
            IF WS-NOML = 0 OR WS-NOM = SPACES
                MOVE 'NOM OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
-      * Controle sexe (utilise WS-SEXE sauvegardee)
+      * Contrôle sexe (M ou F)
            IF WS-SEXEL = 0 OR WS-SEXE = SPACES
                MOVE 'SEXE OBLIGATOIRE' TO MSGO
                MOVE 'O' TO WS-ERREUR
@@ -379,38 +401,20 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
-
-      * Controle situation sociale (utilise WS-SITSO sauvegardee)
-           IF WS-SITSOL = 0 OR WS-SITSO = SPACES
-               MOVE 'SITUATION SOCIALE OBLIGATOIRE' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 2100-FIN
-           END-IF
-
-           IF WS-SITSO NOT = 'C' AND WS-SITSO NOT = 'M'
-              AND WS-SITSO NOT = 'D' AND WS-SITSO NOT = 'V'
-               MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 2100-FIN
-           END-IF
-
-      * Controle position (utilise WS-POSITION sauvegardee)
-           IF WS-POSITL = 0 OR WS-POSITION = SPACES
-               MOVE 'POSITION OBLIGATOIRE' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 2100-FIN
-           END-IF
-
-           IF WS-POSITION NOT = 'DB' AND WS-POSITION NOT = 'CR'
-               MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
-               MOVE 'O' TO WS-ERREUR
-               GO TO 2100-FIN
-           END-IF.
+           ...
 
        2100-FIN.
            EXIT.
+```
 
+**Paragraphe de vérification de doublure :**
+
+```cobol
        2200-VERIFIER-DOUBLURE.
+      *-----------------------------------------------------------------
+      * Vérification que le client n'existe pas déjà
+      * Note: NOTFND est attendu (client nouveau), NORMAL = doublure
+      *-----------------------------------------------------------------
            MOVE WS-NUMCPT TO CLI-NUMCPT
 
            EXEC CICS READ
@@ -426,7 +430,17 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
                MOVE 'O' TO WS-ERREUR
            END-IF.
 
+       2200-FIN.
+           EXIT.
+```
+
+**Paragraphe d'écriture du client :**
+
+```cobol
        2400-ECRIRE-CLIENT.
+      *-----------------------------------------------------------------
+      * Écriture du nouvel enregistrement dans le fichier VSAM
+      *-----------------------------------------------------------------
            EXEC CICS WRITE
                FILE('FCLIENT')
                FROM(ENR-CLIENT)
@@ -449,31 +463,11 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
            END-EVALUATE.
 ```
 
-**JCL de compilation : CMPAJT.jcl (ROCHA06)**
+**JCL de compilation : CMPAJT.jcl**
 
-```jcl
-//ROCHA06 JOB (ACCT),'COMPILE PRGAJT',CLASS=A,MSGCLASS=X,
-//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
-//*****************************************************************
-//* COMPILATION DU PROGRAMME COBOL-CICS PRGAJT (AJOUT CLIENT)
-//*****************************************************************
-//PROCMAN  JCLLIB ORDER=(DFH510.CICS.SDFHPROC,ROCHA.CICS.SOURCE,
-//          ROCHA.CICS.LINK,ROCHA.CICS.LOAD)
-//*
-//COMPIL   EXEC PROC=DFHYITVL,
-//          INDEX='DFH510.CICS',
-//          PROGLIB='ROCHA.CICS.LOAD',
-//          AD370HLQ='IGY420',
-//          DSCTLIB='ROCHA.CICS.LINK',
-//          LE370HLQ='CEE'
-//TRN.SYSIN DD DSN=ROCHA.CICS.SOURCE(PRGAJT),DISP=SHR
-//LKED.SYSIN DD *
-     INCLUDE SYSLIB(DFHELII)
-     NAME PRGAJT(R)
-/*
-```
+Le JCL de compilation suit la même structure que CMPCLAF.jcl (voir Partie 1, Exercice 3). Seuls le nom du job (ROCHA06) et le membre source (PRGAJT) changent.
 
-**Structure du programme :**
+### Structure du programme
 
 | Paragraphe | Fonction |
 |------------|----------|
@@ -481,79 +475,41 @@ Le code source est stocké dans `ROCHA.CICS.SOURCE(PRGAJT)`. Voici les extraits 
 | 1000-PREMIER-PASSAGE | Affichage de l'écran vide pour saisie |
 | 2000-TRAITEMENT | Réception saisie, validations, écriture |
 | 2100-VALIDER-DONNEES | Contrôles de conformité des champs |
-| 2200-VERIFIER-DOUBLURE | Vérification que le client n'existe pas |
-| 2300-PREPARER-ENREGISTREMENT | Transfert MAP vers enregistrement |
+| 2200-VERIFIER-DOUBLURE | READ pour vérifier que le client n'existe pas |
+| 2300-PREPARER-ENREGISTREMENT | Transfert WS-SAISIE vers ENR-CLIENT |
 | 2400-ECRIRE-CLIENT | WRITE VSAM avec gestion erreurs |
 | 9000-FIN-PROGRAMME | Message de fin et RETURN sans TRANSID |
 
-**Commandes CICS utilisées :**
+### Commandes CICS utilisées
 
 | Commande | Usage |
 |----------|-------|
-| SEND MAP | Envoyer l'écran (avec ERASE au premier passage) |
+| SEND MAP | Envoyer l'écran (avec ERASE pour effacer) |
 | RECEIVE MAP | Recevoir la saisie avec RESP pour MAPFAIL |
-| READ FILE | Vérifier si client existe (doublure) |
+| READ FILE | Vérifier si client existe (doublure) - NOTFND attendu |
 | WRITE FILE | Écrire le nouveau client |
-| RETURN TRANSID | Retour pseudo-conversationnel |
+| RETURN TRANSID | Retour pseudo-conversationnel avec COMMAREA |
+| SEND TEXT | Message de fin (sans MAP) |
 
-**Messages d'erreur gérés :**
+### Messages d'erreur gérés
 
 | Message | Contexte |
 |---------|----------|
+| SAISIR LES DONNEES DU NOUVEAU CLIENT | Premier passage |
 | AUCUNE DONNEE SAISIE | MAPFAIL - utilisateur a appuyé ENTER sans rien saisir |
-| NUMERO DE COMPTE OBLIGATOIRE | Champ NUMCPT vide (longueur = 0) |
-| NUMERO DE COMPTE DOIT ETRE NUMERIQUE | Champ NUMCPT contient des caractères non numériques |
+| NUMERO DE COMPTE OBLIGATOIRE | Champ NUMCPT vide |
+| NUMERO DE COMPTE DOIT ETRE NUMERIQUE | Caractères non numériques |
 | CODE REGION OBLIGATOIRE | Champ CODREG vide |
-| CODE REGION INVALIDE | Code région différent de 01/02/03/04 |
+| CODE REGION INVALIDE (01/02/03/04) | Code différent des valeurs autorisées |
 | NOM OBLIGATOIRE | Champ NOM vide |
 | SEXE OBLIGATOIRE | Champ SEXE vide |
-| SEXE INVALIDE | Sexe différent de M ou F |
+| SEXE INVALIDE (M OU F) | Sexe différent de M ou F |
 | SITUATION SOCIALE OBLIGATOIRE | Champ SITSO vide |
-| SITUATION INVALIDE | Situation différente de C/M/D/V |
+| SITUATION INVALIDE (C/M/D/V) | Situation non reconnue |
 | POSITION OBLIGATOIRE | Champ POSIT vide |
-| POSITION INVALIDE | Position différente de DB ou CR |
-| ENREGISTREMENT EN DOUBLE | Client avec ce numéro existe déjà (READ a trouvé un enregistrement) |
+| POSITION INVALIDE (DB OU CR) | Position non reconnue |
+| ENREGISTREMENT EN DOUBLE | Client existe déjà (READ NORMAL ou WRITE DUPREC) |
 | CLIENT AJOUTE AVEC SUCCES | WRITE VSAM réussi |
-| ERREUR ECRITURE FICHIER | Erreur VSAM inattendue (ni NORMAL ni DUPREC) |
-
-### Points techniques importants
-
-#### 1. Sauvegarde des données MAP (MODE=INOUT)
-
-Avec `MODE=INOUT` et `STORAGE=AUTO` dans BMS, les zones input (I) et output (O) partagent la même mémoire. Il faut sauvegarder les données dans des variables WS- après le `RECEIVE MAP` :
-
-```cobol
-      * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
-           MOVE NUMCPTI   TO WS-NUMCPT
-           MOVE SEXEI     TO WS-SEXE
-           MOVE POSITI    TO WS-POSITION
-```
-
-#### 2. PERFORM THRU pour les GO TO
-
-Quand un paragraphe utilise `GO TO paragraphe-FIN`, il faut inclure le paragraphe FIN dans la plage du PERFORM avec `THRU` :
-
-```cobol
-           PERFORM 2000-TRAITEMENT THRU 2000-FIN
-           PERFORM 2100-VALIDER-DONNEES THRU 2100-FIN
-           PERFORM 2200-VERIFIER-DOUBLURE THRU 2200-FIN
-```
-
-Sans `THRU`, le `GO TO` sort du PERFORM et le programme continue séquentiellement au lieu de retourner à l'appelant.
-
-#### 3. ERASE sur les SEND MAP d'erreur
-
-Pour que le message d'erreur s'affiche correctement, ajouter `ERASE` au SEND MAP :
-
-```cobol
-           IF ERREUR-DETECTEE
-               EXEC CICS SEND MAP('MAPAJT')
-                   MAPSET('CLIAJT')
-                   ERASE
-               END-EXEC
-               GO TO 2000-FIN
-           END-IF
-```
 
 ### Difficultés rencontrées et solutions
 
@@ -561,73 +517,73 @@ Pour que le message d'erreur s'affiche correctement, ajouter `ERASE` au SEND MAP
 
 **Symptôme** : Après le `RECEIVE MAP`, les données saisies étaient perdues lors du `MOVE LOW-VALUES TO MAPAJTO` dans le paragraphe de validation.
 
-**Cause** : Avec `MODE=INOUT` et `STORAGE=AUTO` dans la définition BMS, les zones input (suffixe I) et output (suffixe O) partagent la même zone mémoire. Le `MOVE LOW-VALUES TO MAPAJTO` écrasait donc les données reçues.
+**Cause** : Avec `MODE=INOUT` et `STORAGE=AUTO` dans la définition BMS, les zones input (suffixe I) et output (suffixe O) partagent la même zone mémoire (voir Partie 1, Exercice 2 pour les explications sur la structure DSECT).
 
-**Solution** : Sauvegarder les données saisies dans des variables Working-Storage (préfixe WS-) immédiatement après le `RECEIVE MAP`, avant tout `MOVE LOW-VALUES`.
+**Solution** : Sauvegarder les données saisies dans des variables Working-Storage (préfixe WS-) **immédiatement après** le `RECEIVE MAP`, avant tout `MOVE LOW-VALUES` :
 
 ```cobol
-      * SAUVEGARDE DES DONNEES AVANT ECRASEMENT PAR LOW-VALUES
-      * Sauvegarder aussi les champs longueur (suffixe L) pour les validations
-           MOVE NUMCPTI   TO WS-NUMCPT
-           MOVE NUMCPTL   TO WS-NUMCPTL
-           MOVE CODREGI   TO WS-CODREG
-           MOVE CODREGL   TO WS-CODREGL
-           MOVE NOMI      TO WS-NOM
-           MOVE NOML      TO WS-NOML
-           MOVE SEXEI     TO WS-SEXE
-           MOVE SEXEL     TO WS-SEXEL
-           MOVE SITSOI    TO WS-SITSO
-           MOVE SITSOL    TO WS-SITSOL
-           MOVE POSITI    TO WS-POSITION
-           MOVE POSITL    TO WS-POSITL
+* Juste après RECEIVE MAP, avant toute autre opération
+MOVE NUMCPTI   TO WS-NUMCPT
+MOVE NUMCPTL   TO WS-NUMCPTL
+MOVE SEXEI     TO WS-SEXE
+MOVE SEXEL     TO WS-SEXEL
+...
 ```
 
 #### Problème 2 : Validations ignorées - le client était ajouté malgré les erreurs
 
-**Symptôme** : Même avec des données invalides (sexe = 'X'), le client était ajouté dans le fichier. Les messages d'erreur s'affichaient dans CEDF mais le programme continuait jusqu'au WRITE.
+**Symptôme** : Même avec des données invalides (sexe = 'X'), le client était ajouté dans le fichier.
 
-**Cause** : Le `GO TO paragraphe-FIN` dans les validations sortait de la plage du `PERFORM`, ce qui faisait continuer le programme séquentiellement vers les paragraphes suivants (2200, 2300, 2400...) au lieu de retourner à l'appelant.
+**Cause** : Le `GO TO paragraphe-FIN` dans les validations sortait de la plage du `PERFORM`, ce qui faisait continuer le programme **séquentiellement** vers les paragraphes suivants (2200, 2300, 2400) au lieu de retourner à l'appelant.
 
-En COBOL, quand on fait :
+**Illustration du problème** :
+
 ```cobol
-       PERFORM 2100-VALIDER-DONNEES
-```
+* Code problématique
+PERFORM 2100-VALIDER-DONNEES    ← Sans THRU, la plage s'arrête à 2100-VALIDER-DONNEES
 
-Et dans 2100-VALIDER-DONNEES on fait :
-```cobol
-       GO TO 2100-FIN
-```
+2100-VALIDER-DONNEES.
+    ...
+    GO TO 2100-FIN              ← Sort de la plage du PERFORM !
+    ...
+2100-FIN.                       ← Hors de la plage, le programme continue séquentiellement
+    EXIT.
 
-Le `GO TO` sort du PERFORM car `2100-FIN` est un paragraphe séparé. Le programme continue alors séquentiellement après 2100-FIN.
+2200-VERIFIER-DOUBLURE.         ← Exécuté même si erreur de validation !
+```
 
 **Solution** : Utiliser la clause `THRU` pour inclure le paragraphe FIN dans la plage du PERFORM :
 
 ```cobol
-       PERFORM 2000-TRAITEMENT THRU 2000-FIN
-       ...
-       PERFORM 2100-VALIDER-DONNEES THRU 2100-FIN
-       ...
-       PERFORM 2200-VERIFIER-DOUBLURE THRU 2200-FIN
+* Code corrigé
+PERFORM 2100-VALIDER-DONNEES THRU 2100-FIN    ← La plage inclut 2100-FIN
+
+2100-VALIDER-DONNEES.
+    ...
+    GO TO 2100-FIN              ← Reste dans la plage du PERFORM
+    ...
+2100-FIN.                       ← Dans la plage, EXIT retourne à l'appelant
+    EXIT.
 ```
 
-Avec `THRU`, le `GO TO 2100-FIN` reste dans la plage du PERFORM, et après le `EXIT` de 2100-FIN, le contrôle retourne correctement à l'appelant.
+Avec `THRU`, le `GO TO 2100-FIN` reste dans la plage du PERFORM, et après le `EXIT` de 2100-FIN, le contrôle retourne correctement à l'appelant (2000-TRAITEMENT).
 
 #### Problème 3 : Message d'erreur non visible sans CEDF
 
 **Symptôme** : Le message d'erreur de validation s'affichait dans CEDF mais pas sur l'écran normal.
 
-**Cause** : Le `SEND MAP` après détection d'erreur n'avait pas l'option `ERASE`, donc l'écran précédent restait visible.
+**Cause** : Le `SEND MAP` sans `ERASE` ne rafraîchissait pas l'écran complet, causant des artefacts visuels.
 
-**Solution** : Ajouter `ERASE` au `SEND MAP` d'erreur :
+**Solution** : Ajouter `ERASE` au `SEND MAP` d'erreur pour rafraîchir l'écran :
 
 ```cobol
-           IF ERREUR-DETECTEE
-               EXEC CICS SEND MAP('MAPAJT')
-                   MAPSET('CLIAJT')
-                   ERASE
-               END-EXEC
-               GO TO 2000-FIN
-           END-IF
+IF ERREUR-DETECTEE
+    EXEC CICS SEND MAP('MAPAJT')
+        MAPSET('CLIAJT')
+        ERASE               ← Efface l'écran avant réaffichage
+    END-EXEC
+    GO TO 2000-FIN
+END-IF
 ```
 
 ### Captures d'écran
@@ -638,11 +594,10 @@ Suggestions de captures d'écran pour cet exercice :
 1. pt2ex07-1 : Source COBOL dans ISPF EDIT - ROCHA.CICS.SOURCE(PRGAJT)
 2. pt2ex07-2 : Soumission JCL CMPAJT - compilation du programme
 3. pt2ex07-3 : SDSF - Job output avec RC=0000 pour compilation
-4. pt2ex07-4 : Vérification ROCHA.CICS.LOAD - membre PRGAJT présent
-5. pt2ex07-5 : Écran MAPAJT vide - premier passage (message "SAISIR LES DONNEES...")
-6. pt2ex07-6 : Test erreur de validation - message "SEXE INVALIDE"
-7. pt2ex07-7 : Test doublon - message "ENREGISTREMENT EN DOUBLE"
-8. pt2ex07-8 : Ajout réussi - message "CLIENT AJOUTE AVEC SUCCES"
+4. pt2ex07-4 : Écran MAPAJT vide - premier passage (message "SAISIR LES DONNEES...")
+5. pt2ex07-5 : Test erreur de validation - message "SEXE INVALIDE (M OU F)"
+6. pt2ex07-6 : Test doublon - message "ENREGISTREMENT EN DOUBLE"
+7. pt2ex07-7 : Ajout réussi - message "CLIENT AJOUTE AVEC SUCCES"
 -->
 
 ---
@@ -655,13 +610,28 @@ Suivre cette opération par l'ajout d'une nouvelle Transaction dans le GROUP et 
 
 ### Mon travail
 
-Pour que la transaction AJOU fonctionne, je dois définir et installer trois ressources CICS :
+La transaction AJOU est le point d'entrée utilisateur pour l'ajout de clients. Comme pour AFFI, elle fait le lien entre le code saisi par l'utilisateur et le programme COBOL-CICS à exécuter.
 
-1. **MAPSET CLIAJT** : L'écran BMS compilé (exercice 6)
-2. **PROGRAM PRGAJT** : Le programme COBOL-CICS compilé (exercice 7)
+#### Architecture CICS - Liaison des ressources
+
+```
++-------------+     +-------------+     +-------------+
+| TRANSACTION | --> | PROGRAMME   | --> | MAPSET      |
+|    AJOU     |     |   PRGAJT    |     |   CLIAJT    |
++-------------+     +-------------+     +-------------+
+                           |
+                           v
+                    +-------------+
+                    |   FICHIER   |
+                    |   FCLIENT   |
+                    +-------------+
+```
+
+Pour que la transaction fonctionne, trois ressources doivent être définies et installées (voir Partie 1, Exercice 4 pour les explications détaillées sur CEDA) :
+
+1. **MAPSET CLIAJT** : L'écran BMS compilé
+2. **PROGRAM PRGAJT** : Le programme COBOL-CICS compilé
 3. **TRANSACTION AJOU** : Le code de 4 caractères qui lance le programme
-
-L'ordre de définition est important : le programme doit être défini avant la transaction (car TRANSACTION référence PROGRAM).
 
 ### Résolution
 
@@ -670,16 +640,12 @@ L'ordre de définition est important : le programme doit être défini avant la 
 ```
 CEDA DEFINE MAPSET(CLIAJT) GROUP(CLIGROUP)
 
-CEDA DEFINE PROGRAM(PRGAJT) GROUP(CLIGROUP)
-     LANGUAGE(COBOL)
+CEDA DEFINE PROGRAM(PRGAJT) GROUP(CLIGROUP) LANGUAGE(COBOL)
 
-CEDA DEFINE TRANSACTION(AJOU) GROUP(CLIGROUP)
-     PROGRAM(PRGAJT)
+CEDA DEFINE TRANSACTION(AJOU) GROUP(CLIGROUP) PROGRAM(PRGAJT)
 ```
 
 **Étape 2 : Installation des ressources**
-
-*Option A : Installation individuelle (recommandée)*
 
 ```
 CEDA INSTALL MAPSET(CLIAJT) GROUP(CLIGROUP)
@@ -687,15 +653,9 @@ CEDA INSTALL PROGRAM(PRGAJT) GROUP(CLIGROUP)
 CEDA INSTALL TRANSACTION(AJOU) GROUP(CLIGROUP)
 ```
 
-*Option B : Installation du groupe complet*
+> **Bonne pratique** : Installer les ressources individuellement plutôt que tout le groupe. Réinstaller le groupe peut causer des erreurs si certaines ressources (comme FCLIENT) sont déjà ouvertes.
 
-```
-CEDA INSTALL GROUP(CLIGROUP)
-```
-
-> **Note** : Si certaines ressources sont déjà installées (FCLIENT, CLIAFF, PRGCLIA, AFFI), des erreurs "ALREADY INSTALLED" apparaîtront. C'est normal et les nouvelles ressources seront quand même installées.
-
-**Étape 3 : Vérification avec CEMT et CEDA**
+**Étape 3 : Vérification**
 
 ```
 CEDA VIEW MAPSET(CLIAJT) GROUP(CLIGROUP)
@@ -705,74 +665,89 @@ Résultat attendu : Affichage de la définition du mapset
 ```
 CEMT INQ PROG(PRGAJT)
 ```
-Résultat attendu : `Pro(PRGAJT) Len(...) Cob Ena Pri`
+Résultat attendu : `Pro(PRGAJT) Cob Ena`
 
 ```
 CEMT INQ TRAN(AJOU)
 ```
 Résultat attendu : `Tra(AJOU) Pro(PRGAJT) Ena`
 
-> **Note** : `CEMT INQ MAPSET` n'existe pas dans CICS. Pour vérifier un mapset, utiliser `CEDA VIEW MAPSET(nom) GROUP(groupe)`.
+### Tableau récapitulatif du groupe CLIGROUP après exercice 8
 
-**Tableau récapitulatif du groupe CLIGROUP après exercice 8 :**
+| Type | Nom | Description | Défini dans |
+|------|-----|-------------|-------------|
+| FILE | FCLIENT | Fichier VSAM CLIENT | Exercice 1 |
+| MAPSET | CLIAFF | Écran d'affichage | Exercice 4 |
+| PROGRAM | PRGCLIA | Programme d'affichage | Exercice 4 |
+| TRANSACTION | AFFI | Transaction d'affichage | Exercice 4 |
+| MAPSET | CLIAJT | Écran d'ajout | Exercice 8 |
+| PROGRAM | PRGAJT | Programme d'ajout | Exercice 8 |
+| TRANSACTION | AJOU | Transaction d'ajout | Exercice 8 |
 
-| Ressource | Nom | Défini dans | Description |
-|-----------|-----|-------------|-------------|
-| FILE | FCLIENT | Exercice 1 | Fichier VSAM CLIENT |
-| MAPSET | CLIAFF | Exercice 4 | Écran d'affichage |
-| PROGRAM | PRGCLIA | Exercice 4 | Programme d'affichage |
-| TRANSACTION | AFFI | Exercice 4 | Transaction d'affichage |
-| MAPSET | CLIAJT | Exercice 8 | Écran d'ajout |
-| PROGRAM | PRGAJT | Exercice 8 | Programme d'ajout |
-| TRANSACTION | AJOU | Exercice 8 | Transaction d'ajout |
+### Test de la transaction
 
-**Étape 4 : Test avec CEDF**
+**Test avec CEDF** (voir Partie 1, Exercice 5 pour la navigation CEDF) :
 
 ```
 CEDF
 AJOU
 ```
 
-Observer les points d'arrêt :
-1. SEND MAP (écran vide)
-2. RETURN TRANSID (fin premier passage)
-3. RECEIVE MAP (réception saisie)
-4. READ FILE (vérification doublure)
-5. WRITE FILE (écriture client)
-6. SEND MAP (message succès)
-7. RETURN TRANSID (fin traitement)
+Points d'arrêt observés pour un ajout complet :
 
-> **Note importante sur NOTFND** : Lors du point d'arrêt 4 (READ FILE), CEDF affiche souvent une réponse `NOTFND`. C'est le comportement **attendu et normal** ! Ce READ sert à vérifier que le client n'existe pas déjà (contrôle de doublure). Si NOTFND est retourné, cela signifie que le numéro de compte est disponible et que le programme peut procéder au WRITE. Ce n'est pas une erreur mais une vérification réussie.
+| Étape | Commande CICS | RESP attendu | Description |
+|-------|---------------|--------------|-------------|
+| 1 | SEND MAP | NORMAL | Affichage écran vide |
+| 2 | RETURN TRANSID | - | Fin premier passage |
+| 3 | RECEIVE MAP | NORMAL | Réception saisie |
+| 4 | READ FILE | **NOTFND** | Vérification doublure |
+| 5 | WRITE FILE | NORMAL | Écriture client |
+| 6 | SEND MAP | NORMAL | Message succès |
+| 7 | RETURN TRANSID | - | Fin traitement |
 
-**Étape 5 : Test sans debugger**
+> **Note importante sur NOTFND** : Lors du READ FILE (étape 4), CEDF affiche souvent une réponse `NOTFND`. C'est le comportement **attendu et normal** ! Ce READ sert à vérifier que le client n'existe pas déjà (contrôle de doublure). Si NOTFND est retourné, cela signifie que le numéro de compte est disponible et qu'on peut procéder à l'écriture.
 
-Depuis un écran CICS vierge (sans CEDF actif) :
+**Test sans debugger :**
 
 ```
 AJOU
 ```
 
-Tester les scenarios suivants :
-- Saisir un nouveau client complet et valider → message "CLIENT AJOUTE AVEC SUCCES"
-- Ressaisir le même numéro → message "ENREGISTREMENT EN DOUBLE"
-- Saisir un sexe invalide → message "SEXE INVALIDE"
-- Appuyer ENTER sans rien saisir → message "AUCUNE DONNEE SAISIE"
-- Appuyer PF3 → fin de la transaction
+Scénarios de test :
+
+| Scénario | Action | Résultat attendu |
+|----------|--------|------------------|
+| Ajout normal | Saisir toutes les données valides | "CLIENT AJOUTE AVEC SUCCES" |
+| Doublon | Saisir un numéro existant | "ENREGISTREMENT EN DOUBLE" |
+| Sexe invalide | Saisir SEXE = 'X' | "SEXE INVALIDE (M OU F)" |
+| Champ vide | Laisser NOM vide | "NOM OBLIGATOIRE" |
+| Aucune saisie | Appuyer ENTER sans rien saisir | "AUCUNE DONNEE SAISIE" |
+| Quitter | Appuyer PF3 | Fin de la transaction |
+
+**Vérification de l'ajout :**
+
+Après un ajout réussi, utiliser la transaction AFFI pour vérifier que le client a bien été créé :
+
+```
+AFFI
+```
+Saisir le numéro du client ajouté → Les données doivent s'afficher.
 
 ### Captures d'écran
 
 <!--
 Suggestions de captures d'écran pour cet exercice :
 
-1. pt2ex08-1 : CEDA DEFINE MAPSET(CLIAJT) - définition du mapset
-2. pt2ex08-2 : CEDA DEFINE PROGRAM(PRGAJT) - définition du programme
-3. pt2ex08-3 : CEDA DEFINE TRANSACTION(AJOU) - définition de la transaction
+1. pt2ex08-1 : CEDA DEFINE MAPSET(CLIAJT) - écran de définition
+2. pt2ex08-2 : CEDA DEFINE PROGRAM(PRGAJT) - écran de définition
+3. pt2ex08-3 : CEDA DEFINE TRANSACTION(AJOU) - écran de définition
 4. pt2ex08-4 : CEDA INSTALL avec message de succès
-5. pt2ex08-5 : CEMT INQ TRAN(AJOU) - vérification transaction active
-6. pt2ex08-6 : Test CEDF - point d'arrêt sur WRITE FILE
-7. pt2ex08-7 : Écran MAPAJT - saisie d'un nouveau client
-8. pt2ex08-8 : Message "CLIENT AJOUTE AVEC SUCCES" après ajout
-9. pt2ex08-9 : Vérification avec AFFI - le nouveau client existe
+5. pt2ex08-5 : CEMT INQ TRAN(AJOU) - vérification statut Ena
+6. pt2ex08-6 : Test CEDF - point d'arrêt sur READ FILE avec RESP NOTFND
+7. pt2ex08-7 : Test CEDF - point d'arrêt sur WRITE FILE avec RESP NORMAL
+8. pt2ex08-8 : Écran MAPAJT - saisie d'un nouveau client
+9. pt2ex08-9 : Message "CLIENT AJOUTE AVEC SUCCES" après ajout
+10. pt2ex08-10 : Vérification avec AFFI - le nouveau client existe
 -->
 
 ---
