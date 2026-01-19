@@ -213,7 +213,8 @@
       *    Controle code region non vide
            IF WS-CODE-REGIONL = 0 OR WS-CODE-REGION = SPACES
                MOVE LOW-VALUES TO MAPSTATO
-               MOVE 'CODE REGION OBLIGATOIRE (01, 02, 03 OU 04)' TO MSGO
+               MOVE 'CODE REGION OBLIGATOIRE (01-04)'
+                   TO MSGO
                EXEC CICS SEND MAP('MAPSTAT')
                    MAPSET('CLISTAT')
                    FROM(MAPSTATO)
@@ -230,7 +231,7 @@
            IF WS-NOM-REGION = SPACES
                MOVE LOW-VALUES TO MAPSTATO
                MOVE WS-CODE-REGION TO CODREGO
-               MOVE 'CODE REGION INVALIDE - SAISIR 01, 02, 03 OU 04'
+               MOVE 'CODE REGION INVALIDE (01-04)'
                    TO MSGO
                EXEC CICS SEND MAP('MAPSTAT')
                    MAPSET('CLISTAT')
