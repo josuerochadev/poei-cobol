@@ -120,7 +120,9 @@
       *-----------------------------------------------------------------
       * VARIABLES POUR CONVERSION SOLDE
       *-----------------------------------------------------------------
-       01  WS-SOLDE-NUM          PIC 9(10) VALUE 0.
+       01  WS-SOLDE-ALPHA        PIC X(10) VALUE SPACES.
+       01  WS-SOLDE-NUM REDEFINES WS-SOLDE-ALPHA
+                                 PIC 9(10).
        01  WS-NOM-REGION         PIC X(15) VALUE SPACES.
        01  WS-INDEX              PIC 9(01) VALUE 0.
 
@@ -348,9 +350,9 @@
       *-----------------------------------------------------------------
       * Convertit le solde texte en numerique
       * Le solde est stocke en PIC X(10), format numerique
+      * Utilise REDEFINES pour la conversion (compatible mainframe)
       *-----------------------------------------------------------------
-           MOVE 0 TO WS-SOLDE-NUM
-           MOVE FUNCTION NUMVAL(CLI-SOLDE) TO WS-SOLDE-NUM.
+           MOVE CLI-SOLDE TO WS-SOLDE-ALPHA.
 
       *-----------------------------------------------------------------
        4000-AFFICHER-RESULTATS.
