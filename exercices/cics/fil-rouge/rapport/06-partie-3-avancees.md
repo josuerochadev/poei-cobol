@@ -636,20 +636,62 @@ Suggestions de captures d'écran pour cet exercice :
 
 ### Mon travail
 
-Cette transaction effectue un parcours complet du fichier pour calculer les statistiques d'une région donnée :
+Cette transaction utilise un **AIX (Alternate Index)** sur le champ CODREG pour accéder directement aux clients d'une région donnée, sans parcourir tout le fichier.
+
+**Statistiques calculées :**
 - Nombre total de clients de la région
 - Nombre et somme des clients débiteurs (DB)
 - Nombre et somme des clients créditeurs (CR)
 
-J'utilise STARTBR/READNEXT pour parcourir tout le fichier et je filtre sur le code région.
+**Pourquoi utiliser un AIX/PATH ?**
 
-**Algorithme :**
+| Approche | Avantages | Inconvénients |
+|----------|-----------|---------------|
+| **Full scan** (sans AIX) | Simple, pas de configuration | Lit TOUT le fichier, inefficace |
+| **AIX/PATH sur CODREG** | Accès direct par région, performant | Nécessite définition AIX + PATH + FILE CICS |
+
+En production, avec des milliers de clients, le full scan serait très lent. L'AIX permet de positionner directement sur les enregistrements de la région demandée.
+
+**Architecture AIX/PATH :**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  FICHIER DE BASE : ROCHA.CICS.CLIENT (KSDS)                     │
+│  Clé primaire : NUMCPT (position 0, longueur 6)                 │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ RELATE
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  AIX : ROCHA.CICS.CLIENT.AIX                                    │
+│  Clé alternative : CODREG (offset 6, longueur 2)                │
+│  NONUNIQUEKEY (plusieurs clients par région)                    │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ PATHENTRY
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  PATH : ROCHA.CICS.CLIENT.PATH                                  │
+│  Permet l'accès au fichier de base via la clé alternative       │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ DSN
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  FILE CICS : PCLIENT                                            │
+│  Utilisé par le programme PRGSTAT                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Algorithme avec AIX/PATH :**
 
 ```
 1. Saisie du code région (01, 02, 03 ou 04)
-2. STARTBR depuis le début du fichier (LOW-VALUES)
+2. STARTBR FILE('PCLIENT') avec le code région comme clé
+   → Positionnement DIRECT sur les clients de cette région
 3. Pour chaque enregistrement (READNEXT) :
-   - Si code région correspond :
+   - Si code région change → FIN (plus de clients de cette région)
+   - Sinon :
      - Incrémenter compteur total
      - Si position = 'DB' : compteur débiteurs + montant
      - Si position = 'CR' : compteur créditeurs + montant
@@ -657,9 +699,124 @@ J'utilise STARTBR/READNEXT pour parcourir tout le fichier et je filtre sur le co
 5. Afficher les résultats
 ```
 
+**Différence clé avec le full scan :**
+
+```
+Full scan (FCLIENT)                AIX/PATH (PCLIENT)
+───────────────────                ──────────────────
+STARTBR LOW-VALUES                 STARTBR '01' (code région)
+  │                                  │
+  ▼                                  ▼
+┌────────┐                         ┌────────┐
+│ 100001 │ CLI-CODREG=03? NON      │ 100003 │ CLI-CODREG=01 ✓
+│ 100002 │ CLI-CODREG=02? NON      │ 100005 │ CLI-CODREG=01 ✓
+│ 100003 │ CLI-CODREG=01? OUI ✓    │ 222001 │ CLI-CODREG=01 ✓
+│ 100004 │ CLI-CODREG=04? NON      │ 222005 │ CLI-CODREG=01 ✓
+│ 100005 │ CLI-CODREG=01? OUI ✓    │ 100001 │ CLI-CODREG=03 → STOP
+│  ...   │                         └────────┘
+│ 222015 │ FIN FICHIER               Lit uniquement 4 enreg.
+└────────┘
+  Lit TOUS les enregistrements
+```
+
 ### Résolution
 
-**MAP BMS : CLISTAT.bms**
+#### Étape 1 : Définition de l'AIX et du PATH (DEFPATH.jcl)
+
+Ce JCL crée l'index alternatif sur le champ CODREG et le PATH associé :
+
+```jcl
+//ROCHA19 JOB (ACCT),'DEF AIX REGION',CLASS=A,MSGCLASS=X,
+//             MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*================================================================*
+//* JCL : DEFPATH - Definition AIX et PATH sur CODREG              *
+//* AIX sur champ CODREG (offset 6, longueur 2)                    *
+//*================================================================*
+//*
+//*----------------------------------------------------------------*
+//* ETAPE 1 : Suppression AIX et PATH existants (si existent)      *
+//*----------------------------------------------------------------*
+//STEP1    EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE ROCHA.CICS.CLIENT.PATH ALTERNATEINDEX
+  SET MAXCC = 0
+  DELETE ROCHA.CICS.CLIENT.AIX ALTERNATEINDEX
+  SET MAXCC = 0
+/*
+//*
+//*----------------------------------------------------------------*
+//* ETAPE 2 : Definition de l'ALTERNATE INDEX (AIX)                *
+//*           Cle alternative : CODREG (offset 6, longueur 2)      *
+//*           NONUNIQUEKEY : plusieurs clients par region          *
+//*----------------------------------------------------------------*
+//STEP2    EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DEFINE ALTERNATEINDEX ( -
+         NAME(ROCHA.CICS.CLIENT.AIX) -
+         RELATE(ROCHA.CICS.CLIENT) -
+         KEYS(2 6) -
+         RECORDSIZE(14 200) -
+         TRACKS(2 2) -
+         VOLUMES(FDDBAS) -
+         SHAREOPTIONS(2 3) -
+         NONUNIQUEKEY -
+         UPGRADE -
+         ) -
+         DATA ( -
+         NAME(ROCHA.CICS.CLIENT.AIX.DATA) -
+         ) -
+         INDEX ( -
+         NAME(ROCHA.CICS.CLIENT.AIX.INDEX) -
+         )
+/*
+//*
+//*----------------------------------------------------------------*
+//* ETAPE 3 : Construction de l'AIX (BLDINDEX)                     *
+//*----------------------------------------------------------------*
+//STEP3    EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  BLDINDEX -
+         INDATASET(ROCHA.CICS.CLIENT) -
+         OUTDATASET(ROCHA.CICS.CLIENT.AIX)
+/*
+//*
+//*----------------------------------------------------------------*
+//* ETAPE 4 : Definition du PATH                                   *
+//*----------------------------------------------------------------*
+//STEP4    EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DEFINE PATH ( -
+         NAME(ROCHA.CICS.CLIENT.PATH) -
+         PATHENTRY(ROCHA.CICS.CLIENT.AIX) -
+         )
+/*
+//*
+//*----------------------------------------------------------------*
+//* ETAPE 5 : Verification - Listcat des objets crees              *
+//*----------------------------------------------------------------*
+//STEP5    EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  LISTCAT ENTRIES(ROCHA.CICS.CLIENT) ALL
+  LISTCAT ENTRIES(ROCHA.CICS.CLIENT.AIX) ALL
+  LISTCAT ENTRIES(ROCHA.CICS.CLIENT.PATH) ALL
+/*
+```
+
+**Paramètres clés de l'AIX :**
+
+| Paramètre | Valeur | Explication |
+|-----------|--------|-------------|
+| KEYS(2 6) | 2 octets à l'offset 6 | Position du champ CODREG dans l'enregistrement |
+| NONUNIQUEKEY | - | Plusieurs clients peuvent avoir le même code région |
+| UPGRADE | - | L'AIX est mis à jour automatiquement quand le fichier de base change |
+| RELATE | ROCHA.CICS.CLIENT | Fichier de base associé |
+
+#### Étape 2 : MAP BMS (CLISTAT.bms)
 
 ```
 ***********************************************************************
@@ -725,9 +882,31 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
          END
 ```
 
-**Programme : PRGSTAT.cbl** (extraits clés)
+#### Étape 3 : Programme COBOL (PRGSTAT.cbl) - Extraits clés
 
 ```cobol
+      ******************************************************************
+      * PROGRAMME : PRGSTAT
+      * FONCTION  : Statistiques clients par region
+      * TRANSACTION : STAT
+      * FICHIER   : PCLIENT (PATH vers AIX sur CODREG)
+      * MAP       : MAPSTAT (MAPSET CLISTAT)
+      *
+      * PRE-REQUIS :
+      * - AIX defini sur CODREG (offset 6, longueur 2)
+      * - PATH defini (ROCHA.CICS.CLIENT.PATH)
+      * - Definition CICS : FILE(PCLIENT) DSN(PATH)
+      ******************************************************************
+
+      *-----------------------------------------------------------------
+      * VARIABLES POUR LA NAVIGATION VSAM VIA AIX/PATH
+      *-----------------------------------------------------------------
+       01  WS-BROWSE.
+           05 WS-CLE-AIX         PIC X(02) VALUE SPACES.
+           05 WS-FIN-BROWSE      PIC X(01) VALUE 'N'.
+              88 FIN-BROWSE      VALUE 'O'.
+              88 PAS-FIN-BROWSE  VALUE 'N'.
+
       *-----------------------------------------------------------------
       * STATISTIQUES CALCULEES
       *-----------------------------------------------------------------
@@ -750,24 +929,42 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
       *-----------------------------------------------------------------
        3000-CALCULER-STATS.
       *-----------------------------------------------------------------
+      * Parcours du fichier via AIX/PATH pour la region demandee
+      * L'AIX permet d'acceder directement aux clients de la region
+      *-----------------------------------------------------------------
            INITIALIZE WS-STATS
            MOVE 'N' TO WS-FIN-BROWSE
 
-      *    Positionner au debut du fichier
-           MOVE LOW-VALUES TO WS-CLE-DEBUT
+      *    Positionner sur la cle AIX (code region)
+           MOVE WS-CODE-REGION TO WS-CLE-AIX
 
            EXEC CICS STARTBR
-               FILE('FCLIENT')
-               RIDFLD(WS-CLE-DEBUT)
+               FILE('PCLIENT')
+               RIDFLD(WS-CLE-AIX)
                RESP(WS-RESP)
            END-EXEC
 
-      *    Boucle de lecture de tous les enregistrements
+      *    Gestion explicite des erreurs STARTBR
+           EVALUATE WS-RESP
+               WHEN DFHRESP(NORMAL)
+                   CONTINUE
+               WHEN DFHRESP(NOTFND)
+      *            Aucun client dans cette region
+                   GO TO 3000-FIN
+               WHEN DFHRESP(ENDFILE)
+      *            Fichier vide
+                   GO TO 3000-FIN
+               WHEN OTHER
+      *            Autre erreur
+                   GO TO 3000-FIN
+           END-EVALUATE
+
+      *    Boucle de lecture des enregistrements de la region
            PERFORM UNTIL FIN-BROWSE
                EXEC CICS READNEXT
-                   FILE('FCLIENT')
+                   FILE('PCLIENT')
                    INTO(ENR-CLIENT)
-                   RIDFLD(WS-CLE-COURANTE)
+                   RIDFLD(WS-CLE-AIX)
                    RESP(WS-RESP)
                END-EXEC
 
@@ -775,27 +972,33 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
                    WHEN WS-RESP = DFHRESP(ENDFILE)
                        MOVE 'O' TO WS-FIN-BROWSE
                    WHEN WS-RESP NOT = DFHRESP(NORMAL)
+                      AND WS-RESP NOT = DFHRESP(DUPKEY)
+      *                Erreur autre que DUPKEY (normal pour AIX)
+                       MOVE 'O' TO WS-FIN-BROWSE
+                   WHEN CLI-CODREG NOT = WS-CODE-REGION
+      *                Changement de region = fin du browse
                        MOVE 'O' TO WS-FIN-BROWSE
                    WHEN OTHER
-      *                Verifier si le client est de la region demandee
-                       IF CLI-CODREG = WS-CODE-REGION
-                           ADD 1 TO WS-NB-TOTAL
-      *                    Convertir le solde en numerique
-                           PERFORM 3100-CONVERTIR-SOLDE
-      *                    Verifier si debiteur ou crediteur
-                           IF CLI-POSITION = 'DB'
-                               ADD 1 TO WS-NB-DEBITEURS
-                               ADD WS-SOLDE-NUM TO WS-MT-DEBITEURS
-                           ELSE
-                               ADD 1 TO WS-NB-CREDITEURS
-                               ADD WS-SOLDE-NUM TO WS-MT-CREDITEURS
-                           END-IF
+      *                Client de la region - comptabiliser
+                       ADD 1 TO WS-NB-TOTAL
+      *                Convertir le solde en numerique
+                       PERFORM 3100-CONVERTIR-SOLDE
+      *                Verifier si debiteur ou crediteur
+                       IF CLI-POSITION = 'DB'
+                           ADD 1 TO WS-NB-DEBITEURS
+                           ADD WS-SOLDE-NUM TO WS-MT-DEBITEURS
+                       ELSE
+                           ADD 1 TO WS-NB-CREDITEURS
+                           ADD WS-SOLDE-NUM TO WS-MT-CREDITEURS
                        END-IF
                END-EVALUATE
            END-PERFORM
 
       *    Fermeture du browse
-           EXEC CICS ENDBR FILE('FCLIENT') END-EXEC.
+           EXEC CICS ENDBR FILE('PCLIENT') END-EXEC.
+
+       3000-FIN.
+           EXIT.
 
       *-----------------------------------------------------------------
        3100-CONVERTIR-SOLDE.
@@ -806,7 +1009,16 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
            MOVE FUNCTION NUMVAL(CLI-SOLDE) TO WS-SOLDE-NUM.
 ```
 
-**JCL d'assemblage BMS : ASMSTAT.jcl**
+**Points clés du code :**
+
+| Élément | Explication |
+|---------|-------------|
+| `FILE('PCLIENT')` | Utilise le PATH (accès via AIX) au lieu de FCLIENT |
+| `WS-CLE-AIX PIC X(02)` | Clé de 2 caractères (code région) au lieu de 6 |
+| `DFHRESP(DUPKEY)` | Normal pour un AIX avec NONUNIQUEKEY |
+| `CLI-CODREG NOT = WS-CODE-REGION` | Condition d'arrêt : changement de région |
+
+#### Étape 4 : JCL d'assemblage BMS (ASMSTAT.jcl)
 
 ```jcl
 //ASSEM    EXEC DFHMAPS,INDEX='DFH510.CICS',
@@ -816,7 +1028,7 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 //SYSUT1   DD DSN=ROCHA.CICS.SOURCE(CLISTAT),DISP=SHR
 ```
 
-**JCL de compilation COBOL : CMPSTAT.jcl**
+#### Étape 5 : JCL de compilation COBOL (CMPSTAT.jcl)
 
 ```jcl
 //COMPIL   EXEC PROC=DFHYITVL,
@@ -832,7 +1044,34 @@ MSG      DFHMDF POS=(20,13),LENGTH=60,ATTRB=(ASKIP,BRT)
 /*
 ```
 
-**Définition de la transaction STAT :**
+#### Étape 6 : Définitions CICS
+
+**Définition du FILE PCLIENT (PATH) :**
+
+```
+CEDA DEFINE FILE(PCLIENT) GROUP(CLIGROUP)
+     DSNAME(ROCHA.CICS.CLIENT.PATH)
+     ADD(NO) BROWSE(YES) DELETE(NO) READ(YES) UPDATE(NO)
+     LSRPOOLID(1)
+     STRINGS(2)
+     RECORDFORMAT(F)
+
+CEDA INSTALL FILE(PCLIENT) GROUP(CLIGROUP)
+```
+
+**Paramètres du FILE PCLIENT :**
+
+| Paramètre | Valeur | Explication |
+|-----------|--------|-------------|
+| ADD(NO) | - | Pas d'ajout via le PATH (utiliser FCLIENT) |
+| BROWSE(YES) | - | Permet STARTBR/READNEXT/ENDBR |
+| DELETE(NO) | - | Pas de suppression via le PATH |
+| READ(YES) | - | Permet la lecture |
+| UPDATE(NO) | - | Pas de mise à jour via le PATH |
+
+> **Note** : Le PATH est en lecture seule. Les opérations d'écriture (WRITE, REWRITE, DELETE) doivent se faire via le fichier de base FCLIENT.
+
+**Définition de la MAP, du programme et de la transaction :**
 
 ```
 CEDA DEFINE MAPSET(CLISTAT) GROUP(CLIGROUP)
@@ -844,6 +1083,50 @@ CEDA DEFINE TRANSACTION(STAT) GROUP(CLIGROUP)
      PROGRAM(PRGSTAT)
 
 CEDA INSTALL GROUP(CLIGROUP)
+```
+
+### Procédure de déploiement complète
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  1. DÉFINITION AIX/PATH (JCL)                                   │
+│     Soumettre DEFPATH.jcl                                       │
+│     → Crée ROCHA.CICS.CLIENT.AIX et ROCHA.CICS.CLIENT.PATH     │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  2. DÉFINITION FILE CICS                                        │
+│     CEDA DEFINE FILE(PCLIENT) ... DSN(ROCHA.CICS.CLIENT.PATH)  │
+│     CEDA INSTALL FILE(PCLIENT)                                  │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  3. ASSEMBLAGE MAP BMS                                          │
+│     Copier CLISTAT.bms → ROCHA.CICS.SOURCE(CLISTAT)            │
+│     Soumettre ASMSTAT.jcl                                       │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  4. COMPILATION PROGRAMME                                       │
+│     Copier PRGSTAT.cbl → ROCHA.CICS.SOURCE(PRGSTAT)            │
+│     Soumettre CMPSTAT.jcl                                       │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  5. DÉFINITION ET INSTALLATION CICS                             │
+│     CEDA DEFINE MAPSET/PROGRAM/TRANSACTION                      │
+│     CEDA INSTALL GROUP(CLIGROUP)                                │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  6. TEST                                                        │
+│     STAT → Saisir 01, 02, 03 ou 04                              │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 **Résultats attendus (avec les données initiales) :**

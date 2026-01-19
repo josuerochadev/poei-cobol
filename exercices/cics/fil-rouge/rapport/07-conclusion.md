@@ -21,6 +21,7 @@
 **VSAM et CICS :**
 
 - Définition de fichiers VSAM KSDS (IDCAMS)
+- Création d'AIX (Alternate Index) et PATH pour accès par clé alternative
 - Intégration fichiers dans CICS (FCT - File Control Table)
 - Commandes CICS : READ, WRITE, REWRITE, DELETE
 - Navigation VSAM : STARTBR, READNEXT, ENDBR
@@ -81,15 +82,15 @@
 
 ### Liste des programmes COBOL-CICS
 
-| Programme | Transaction | Commandes | Description |
-|-----------|-------------|-----------|-------------|
-| PRGCLIA | AFFI | READ | Affichage d'un client |
-| PRGAJT | AJOU | WRITE | Ajout d'un nouveau client |
-| PRGMAJ | MAJO | READ UPDATE, REWRITE | Mise à jour d'un client |
-| PRGSUP | SUPP | READ, DELETE | Suppression d'un client (avec affichage) |
-| PRGDELG | DELG | STARTBR, READNEXT, DELETE | Suppression générique par préfixe |
-| PRGLGEN | LGEN | STARTBR, READNEXT | Liste générique paginée (10 clients/page) |
-| PRGSTAT | STAT | STARTBR, READNEXT | Statistiques par région (DB/CR) |
+| Programme | Transaction | Commandes | Fichier | Description |
+|-----------|-------------|-----------|---------|-------------|
+| PRGCLIA | AFFI | READ | FCLIENT | Affichage d'un client |
+| PRGAJT | AJOU | WRITE | FCLIENT | Ajout d'un nouveau client |
+| PRGMAJ | MAJO | READ UPDATE, REWRITE | FCLIENT | Mise à jour d'un client |
+| PRGSUP | SUPP | READ, DELETE | FCLIENT | Suppression d'un client (avec affichage) |
+| PRGDELG | DELG | STARTBR, READNEXT, DELETE | FCLIENT | Suppression générique par préfixe |
+| PRGLGEN | LGEN | STARTBR, READNEXT | FCLIENT | Liste générique paginée (10 clients/page) |
+| PRGSTAT | STAT | STARTBR, READNEXT | PCLIENT | Statistiques par région via AIX/PATH |
 
 ### Liste des MAPs BMS
 
@@ -114,6 +115,45 @@
 | DELG | PRGDELG | Suppression générique |
 | LGEN | PRGLGEN | Liste générique paginée |
 | STAT | PRGSTAT | Statistiques par région |
+
+### Liste des fichiers CICS
+
+| Nom CICS | Dataset | Type | Description |
+|----------|---------|------|-------------|
+| FCLIENT | ROCHA.CICS.CLIENT | KSDS | Fichier de base (clé primaire : NUMCPT) |
+| PCLIENT | ROCHA.CICS.CLIENT.PATH | PATH | Accès via AIX sur CODREG |
+
+**Architecture VSAM :**
+
+```
+ROCHA.CICS.CLIENT (KSDS)          ← Fichier de base
+    │
+    └── ROCHA.CICS.CLIENT.AIX     ← Index alternatif sur CODREG
+           │
+           └── ROCHA.CICS.CLIENT.PATH  ← PATH pour accès CICS
+```
+
+### Liste des JCL
+
+| JCL | Description | Exercice |
+|-----|-------------|----------|
+| DEFVSAM.jcl | Définition du cluster VSAM KSDS | Ex 1 |
+| LOADVSAM.jcl | Chargement des données initiales | Ex 1 |
+| ASMCLIA.jcl | Assemblage MAP CLIAFF | Ex 3 |
+| CMPCLIA.jcl | Compilation PRGCLIA | Ex 5 |
+| ASMAJT.jcl | Assemblage MAP CLIAJT | Ex 7 |
+| CMPAJT.jcl | Compilation PRGAJT | Ex 8 |
+| ASMMAJ.jcl | Assemblage MAP CLIMAJ | Ex 10 |
+| CMPMAJ.jcl | Compilation PRGMAJ | Ex 11 |
+| ASMSUP.jcl | Assemblage MAP CLISUP | Ex 13 |
+| CMPSUP.jcl | Compilation PRGSUP | Ex 14 |
+| ASMDEL.jcl | Assemblage MAP CLIDEL | Ex 17 |
+| CMPDELG.jcl | Compilation PRGDELG | Ex 17 |
+| ASMLIST.jcl | Assemblage MAP CLILIST | Ex 18 |
+| CMPLGEN.jcl | Compilation PRGLGEN | Ex 18 |
+| DEFPATH.jcl | Définition AIX et PATH sur CODREG | Ex 19 |
+| ASMSTAT.jcl | Assemblage MAP CLISTAT | Ex 19 |
+| CMPSTAT.jcl | Compilation PRGSTAT | Ex 19 |
 
 ### Structure du fichier CLIENT (80 octets)
 
@@ -150,7 +190,7 @@
 
 Ce projet m'a permis de mettre en pratique l'ensemble des compétences acquises durant la formation POEI Mainframe COBOL pour le volet CICS. À travers les différentes parties du projet, j'ai pu :
 
-- **Maîtriser VSAM sous CICS** : Définition de fichiers KSDS, intégration dans la FCT (File Control Table), et gestion des opérations de lecture, écriture, mise à jour et suppression.
+- **Maîtriser VSAM sous CICS** : Définition de fichiers KSDS, création d'index alternatifs (AIX) avec PATH pour l'accès par clé secondaire, intégration dans la FCT (File Control Table), et gestion des opérations de lecture, écriture, mise à jour et suppression.
 
 - **Développer des écrans BMS** : Conception de MAPs avec gestion des attributs (couleurs, protection), zones de saisie et d'affichage, messages d'erreur.
 
@@ -158,7 +198,7 @@ Ce projet m'a permis de mettre en pratique l'ensemble des compétences acquises 
 
 - **Administrer les transactions** : Définition via CEDA, installation de groupes, tests avec CEDF.
 
-Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec **7 programmes COBOL-CICS**, **7 MAPs BMS** et **7 transactions**. Les principales difficultés rencontrées (gestion des attributs BMS, validation des données, navigation VSAM, fusion des modifications, deadlock lors de suppressions multiples) m'ont permis de développer une approche méthodique de résolution de problèmes.
+Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec **7 programmes COBOL-CICS**, **7 MAPs BMS**, **7 transactions** et **2 fichiers CICS** (FCLIENT pour l'accès direct, PCLIENT via AIX/PATH pour les statistiques par région). Les principales difficultés rencontrées (gestion des attributs BMS, validation des données, navigation VSAM, fusion des modifications, deadlock lors de suppressions multiples, optimisation des accès via AIX) m'ont permis de développer une approche méthodique de résolution de problèmes.
 
 Cette expérience constitue une base solide pour aborder des projets mainframe transactionnels en entreprise.
 
