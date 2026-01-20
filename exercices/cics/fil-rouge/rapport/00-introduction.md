@@ -32,6 +32,46 @@ Le projet consiste à développer un système de gestion de clientèle pour une 
 
 ---
 
+## Objectifs pédagogiques
+
+### Compétences visées
+
+| Domaine | Objectif |
+|---------|----------|
+| **VSAM** | Définir et manipuler des fichiers VSAM (KSDS, ESDS, RRDS), créer des index alternatifs (AIX/PATH) |
+| **CICS** | Programmer des transactions avec gestion des commandes (SEND, RECEIVE, READ, WRITE, REWRITE, DELETE, STARTBR, READNEXT) |
+| **BMS** | Concevoir des écrans (MAPs) avec attributs dynamiques, validation de saisie et messages d'erreur |
+| **JCL** | Maîtriser les jobs de définition VSAM (IDCAMS), chargement de données, assemblage BMS et compilation COBOL-CICS |
+| **Administration CICS** | Définir et gérer des ressources via CEDA (DEFINE, INSTALL), CEMT (SET, INQ) et déboguer avec CEDF |
+
+### Progression pédagogique
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Partie 0         Partie 1          Partie 2a-2c           Partie 3          │
+│  ─────────        ─────────         ─────────────          ────────          │
+│  Préparation      READ              WRITE, REWRITE         STARTBR, READNEXT │
+│  (Libraries)      (Lecture)         DELETE (CRUD)          (Navigation, AIX) │
+│                                                                              │
+│  Environnement →  Fondamentaux  →   Opérations CRUD   →   Techniques avancées│
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Livrables du projet
+
+| Livrable | Quantité | Description |
+|----------|----------|-------------|
+| Programmes COBOL-CICS | 7 | Gestion complète du cycle de vie client |
+| MAPs BMS | 7 | Écrans de saisie et d'affichage |
+| Transactions CICS | 7 | AFFI, AJOU, MAJO, SUPP, DELG, LGEN, STAT |
+| Fichiers VSAM | 2 | FCLIENT (KSDS), PCLIENT (PATH via AIX) |
+| JCL | 17 | Définition, assemblage, compilation |
+| Captures d'écran | 160+ | Documentation de chaque étape |
+
+---
+
 ## Environnement de travail
 
 ### Système et interface

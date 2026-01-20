@@ -18,14 +18,13 @@ Ce travail nécessite la création de trois Library pour stocker les membres à 
 Avant de commencer le développement des programmes CICS, j'ai créé les trois libraries nécessaires via ISPF option 3.2 (Data Set Utility). Ces libraries sont des PDS (Partitioned Data Sets) qui contiendront tous les membres du projet.
 
 **Choix des caractéristiques :**
-- **Organisation** : PO (Partitioned Organization) pour stocker plusieurs membres
 - **Format d'enregistrement** : FB (Fixed Block) avec LRECL=80 pour les sources
 - **Taille** : 10 tracks primaires, 5 secondaires (suffisant pour le projet)
 - **Directory blocks** : 10 blocs pour l'index des membres
 
 ### Résolution
 
-**Méthode 1 : Via ISPF 3.2 (Data Set Utility)**
+Via ISPF 3.2 (Data Set Utility) :
 
 ```
 Option ===> 3.2
@@ -53,54 +52,6 @@ Allocation Parameters:
 ```
 
 Répéter l'opération pour `ROCHA.CICS.LINK` et `ROCHA.CICS.LOAD`.
-
-**Méthode 2 : Via JCL (IEFBR14)**
-
-```jcl
-//CREATLIB JOB (ACCT),'CREATE LIBRARIES',CLASS=A,MSGCLASS=X
-//*****************************************************************
-//* CREATION DES LIBRARIES POUR LE PROJET CICS
-//*****************************************************************
-//*
-//STEP1    EXEC PGM=IEFBR14
-//*
-//* LIBRARY SOURCE (PROGRAMMES COBOL, BMS, JCL)
-//SOURCE   DD DSN=ROCHA.CICS.SOURCE,
-//            DISP=(NEW,CATLG,DELETE),
-//            SPACE=(TRK,(10,5,10)),
-//            DCB=(RECFM=FB,LRECL=80,BLKSIZE=27920),
-//            UNIT=SYSDA
-//*
-//* LIBRARY LINK (PROGRAMMES OBJETS)
-//LINK     DD DSN=ROCHA.CICS.LINK,
-//            DISP=(NEW,CATLG,DELETE),
-//            SPACE=(TRK,(10,5,10)),
-//            DCB=(RECFM=FB,LRECL=80,BLKSIZE=27920),
-//            UNIT=SYSDA
-//*
-//* LIBRARY LOAD (PROGRAMMES EXECUTABLES)
-//LOAD     DD DSN=ROCHA.CICS.LOAD,
-//            DISP=(NEW,CATLG,DELETE),
-//            SPACE=(TRK,(20,10,10)),
-//            DCB=(RECFM=U,BLKSIZE=27998),
-//            UNIT=SYSDA
-```
-
-> **Note** : La library LOAD utilise RECFM=U (Undefined) car elle contient des modules exécutables (load modules) et non du texte source.
-
-**Vérification des libraries créées :**
-
-```
-Option ===> 3.4
-
-DSLIST - Data Sets Matching ROCHA.CICS
-
-Command - Enter "/" to select action
--------------------------------------------------------------------------------
-         ROCHA.CICS.LINK
-         ROCHA.CICS.LOAD
-         ROCHA.CICS.SOURCE
-```
 
 ### Captures d'écran
 
@@ -184,6 +135,9 @@ Au cours du projet, les membres suivants ont été créés dans `ROCHA.CICS.SOUR
 | CMPDELG | Compilation PRGDELG | Ex 17 |
 | ASMLIST | Assemblage MAP CLILIST | Ex 18 |
 | CMPLGEN | Compilation PRGLGEN | Ex 18 |
+| DEFPATH | Définition AIX et PATH | Ex 19 |
+| ASMSTAT | Assemblage MAP CLISTAT | Ex 19 |
+| CMPSTAT | Compilation PRGSTAT | Ex 19 |
 
 > **Note sur les copybooks** : Les copybooks pour les MAPs BMS sont générés automatiquement lors de l'assemblage avec l'option `TYPE=DSECT`. Ils contiennent les structures de données avec les suffixes :
 > - `I` : Zone input (données reçues de l'écran)

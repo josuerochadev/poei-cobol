@@ -6,17 +6,119 @@
 
 ## Bilan du projet
 
+### Synthèse chiffrée
+
+| Catégorie | Quantité | Détails |
+|-----------|----------|---------|
+| **Programmes COBOL-CICS** | 7 | PRGCLIA, PRGAJT, PRGMAJ, PRGSUP, PRGDELG, PRGLGEN, PRGSTAT |
+| **MAPs BMS** | 7 | CLIAFF, CLIAJT, CLIMAJ, CLISUP, CLIDEL, CLILIST, CLISTAT |
+| **Transactions CICS** | 7 | AFFI, AJOU, MAJO, SUPP, DELG, LGEN, STAT |
+| **Fichiers VSAM** | 2 | FCLIENT (KSDS), PCLIENT (PATH via AIX) |
+| **JCL** | 17 | Définition VSAM, assemblage BMS, compilation COBOL |
+| **Exercices réalisés** | 19 | Répartis en 4 parties thématiques |
+| **Captures d'écran** | 160+ | Documentation complète de chaque étape |
+
+**Commandes CICS maîtrisées :**
+
+| Opération | Commandes |
+|-----------|-----------|
+| Lecture | READ, READ UPDATE |
+| Écriture | WRITE, REWRITE, DELETE |
+| Navigation | STARTBR, READNEXT, ENDBR |
+| Écrans | SEND MAP, RECEIVE MAP |
+| Contrôle | RETURN, RETURN TRANSID |
+
 ### Difficultés rencontrées et solutions
+
+#### Définition VSAM et chargement (Partie 1)
 
 | Problème | Cause | Solution |
 |----------|-------|----------|
 | Erreur VSAM 108 au chargement | Longueur incorrecte des enregistrements | Le DD * du JCL lit en LRECL=80 par défaut. Définir RECORDSIZE(80 80) et utiliser un FILLER de 16 octets |
 | Volume non spécifié (TK4-) | Paramètre manquant | Ajouter VOLUMES(FDDBAS) dans la définition du cluster VSAM |
 | Fichier VSAM vide après REPRO | LRECL incompatible | Passer à 80 octets pour tous les enregistrements |
-| Données effacées après mise à jour | Bug fusion des modifications | Ajouter clause ELSE pour préserver les champs non modifiés dans le paragraphe 4050-FUSIONNER-MODIFICATIONS |
+
+#### Programmation COBOL-CICS (Parties 2 et 3)
+
+| Problème | Cause | Solution | Programme(s) |
+|----------|-------|----------|--------------|
+| Écrasement données saisies | MODE=INOUT partage zones I/O (suffixes I et O) | Sauvegarder dans WS-SAISIE immédiatement après RECEIVE MAP, avant tout MOVE LOW-VALUES | PRGAJT |
+| PERFORM sans THRU (GO TO bug) | GO TO vers paragraphe-FIN sort de la plage du PERFORM | Utiliser `PERFORM ... THRU paragraphe-FIN` pour inclure le paragraphe de sortie | PRGAJT, PRGLGEN, PRGSTAT |
+| Message erreur non visible | SEND MAP sans ERASE ne rafraîchit pas l'écran | Ajouter `ERASE` au SEND MAP d'erreur | PRGAJT |
+| LINKAGE SECTION manquante | DFHCOMMAREA non déclarée | Ajouter LINKAGE SECTION avec DFHCOMMAREA pour accéder aux données du RETURN précédent | PRGMAJ |
+| Données effacées après MAJ partielle | Champs non modifiés ont longueur = 0 | Fusionner avec les données actuelles : si longueur > 0, utiliser la saisie ; sinon, conserver l'existant | PRGMAJ |
+| Deadlock DELETE pendant browse | DELETE demande verrou exclusif pendant STARTBR actif | Collecter les clés en table (max 100), ENDBR, puis DELETE en boucle | PRGDELG |
+| COMMAREA non réinitialisée | Contexte précédent conservé si aucun résultat | Réinitialiser WS-COMMAREA quand aucun client trouvé | PRGLGEN |
+| NUMVAL non supporté | `FUNCTION NUMVAL` incompatible avec MOVE sur IBM Enterprise COBOL | Utiliser `REDEFINES` pour réinterpréter la zone alphanumérique comme numérique | PRGSTAT |
+| Lignes COBOL > 72 colonnes | Messages trop longs dans le source | Raccourcir les messages ou les découper sur plusieurs lignes | PRGSTAT |
+
+#### Administration CICS
+
+| Problème | Cause | Solution |
+|----------|-------|----------|
+| CEDA INSTALL GROUP échoue | Fichier FCLIENT déjà ouvert | Installer uniquement la ressource spécifique : `CEDA INSTALL TRANSACTION(xxx)` |
+| CEMT INQ MAPSET inexistant | Commande non disponible pour les mapsets | Utiliser `CEDA VIEW MAPSET(xxx)` à la place |
 | Justification à droite des clés | Attribut NUM sur champ préfixe | Utiliser PIC X sans NUM pour les champs de clé partielle |
 
-### Vue d'ensemble du projet réalisé
+#### Assemblage BMS et JCL (Partie 3)
+
+| Problème | Cause | Solution |
+|----------|-------|----------|
+| Erreurs assemblage BMS (CLILIST) | Structure MAP trop complexe | Simplifier la MAP en réduisant le nombre de champs ou en utilisant des noms plus courts |
+| Format JCL incorrect | Paramètres mal positionnés dans ASMLIST/CMPLGEN | Corriger l'alignement et la syntaxe des cartes JCL |
+
+### Compétences mises en œuvre
+
+**VSAM et CICS :**
+
+- Définition de fichiers VSAM KSDS (IDCAMS)
+- Création d'AIX (Alternate Index) et PATH pour accès par clé alternative
+- Intégration fichiers dans CICS (FCT - File Control Table)
+- Commandes CICS : READ, WRITE, REWRITE, DELETE
+- Navigation VSAM : STARTBR, READNEXT, ENDBR
+
+**BMS et Écrans :**
+
+- Conception d'écrans BMS (Basic Mapping Support)
+- Gestion des attributs (ASKIP, UNPROT, BRT)
+- Commandes SEND MAP, RECEIVE MAP
+
+**Programmation COBOL-CICS :**
+
+- Mode pseudo-conversationnel (RETURN TRANSID, COMMAREA)
+- LINKAGE SECTION pour DFHCOMMAREA
+- Validation et contrôle des données saisies
+- Gestion des erreurs (RESP, DFHRESP)
+
+**Administration :**
+
+- Définition de transactions (CEDA DEFINE)
+- Installation de ressources (CEDA INSTALL)
+- Débogage avec CEDF
+
+---
+
+## Conclusion
+
+Ce projet m'a permis de mettre en pratique l'ensemble des compétences acquises durant la formation POEI Mainframe COBOL pour le volet CICS. À travers les différentes parties du projet, j'ai pu :
+
+- **Maîtriser VSAM sous CICS** : Définition de fichiers KSDS, création d'index alternatifs (AIX) avec PATH pour l'accès par clé secondaire, intégration dans la FCT (File Control Table), et gestion des opérations de lecture, écriture, mise à jour et suppression.
+
+- **Développer des écrans BMS** : Conception de MAPs avec gestion des attributs (couleurs, protection), zones de saisie et d'affichage, messages d'erreur.
+
+- **Programmer en COBOL-CICS** : Utilisation des commandes CICS (SEND/RECEIVE MAP, READ, WRITE, REWRITE, DELETE), gestion pseudo-conversationnelle avec RETURN TRANSID, et navigation VSAM avec STARTBR/READNEXT/ENDBR.
+
+- **Administrer les transactions** : Définition via CEDA, installation de groupes, tests avec CEDF.
+
+Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec **7 programmes COBOL-CICS**, **7 MAPs BMS**, **7 transactions** et **2 fichiers VSAM** (FCLIENT pour l'accès direct, PCLIENT via AIX/PATH pour les statistiques par région). Les principales difficultés rencontrées (gestion des attributs BMS, validation des données, navigation VSAM, fusion des modifications, deadlock lors de suppressions multiples, optimisation des accès via AIX) m'ont permis de développer une approche méthodique de résolution de problèmes.
+
+Cette expérience constitue une base solide pour aborder des projets mainframe transactionnels en entreprise.
+
+---
+
+## Annexes
+
+### A. Vue d'ensemble du projet
 
 Ces captures montrent l'ensemble des ressources créées au cours du projet.
 
@@ -68,40 +170,11 @@ Cette bibliothèque contient les copybooks générés lors de l'assemblage BMS.
 
 *7 copybooks BMS (CLI*) générés par l'assembleur. Ces copybooks sont inclus dans les programmes COBOL via la COPY statement pour décrire la structure des écrans.*
 
-### Compétences mises en œuvre
-
-**VSAM et CICS :**
-
-- Définition de fichiers VSAM KSDS (IDCAMS)
-- Création d'AIX (Alternate Index) et PATH pour accès par clé alternative
-- Intégration fichiers dans CICS (FCT - File Control Table)
-- Commandes CICS : READ, WRITE, REWRITE, DELETE
-- Navigation VSAM : STARTBR, READNEXT, ENDBR
-
-**BMS et Écrans :**
-
-- Conception d'écrans BMS (Basic Mapping Support)
-- Gestion des attributs (ASKIP, UNPROT, BRT)
-- Commandes SEND MAP, RECEIVE MAP
-
-**Programmation COBOL-CICS :**
-
-- Mode pseudo-conversationnel (RETURN TRANSID, COMMAREA)
-- LINKAGE SECTION pour DFHCOMMAREA
-- Validation et contrôle des données saisies
-- Gestion des erreurs (RESP, DFHRESP)
-
-**Administration :**
-
-- Définition de transactions (CEDA DEFINE)
-- Installation de ressources (CEDA INSTALL)
-- Débogage avec CEDF
-
 ---
 
-## Référence des Commandes CICS
+### B. Référence des commandes CICS
 
-### Opérations sur enregistrements
+#### Opérations sur enregistrements
 
 | Commande | Usage | Prérequis |
 |----------|-------|-----------|
@@ -111,7 +184,7 @@ Cette bibliothèque contient les copybooks générés lors de l'assemblage BMS.
 | **REWRITE** | Mise à jour enregistrement | READ UPDATE obligatoire dans même UOW |
 | **DELETE** | Suppression enregistrement | Aucun |
 
-### Navigation VSAM (Browse)
+#### Navigation VSAM (Browse)
 
 | Commande | Usage |
 |----------|-------|
@@ -119,7 +192,7 @@ Cette bibliothèque contient les copybooks générés lors de l'assemblage BMS.
 | **READNEXT** | Lire l'enregistrement suivant |
 | **ENDBR** | Terminer le parcours et libérer les ressources |
 
-### Écrans BMS
+#### Écrans BMS
 
 | Commande | Usage |
 |----------|-------|
@@ -130,9 +203,7 @@ Cette bibliothèque contient les copybooks générés lors de l'assemblage BMS.
 
 ---
 
-## Annexes
-
-### Liste des programmes COBOL-CICS
+### C. Liste des programmes COBOL-CICS
 
 | Programme | Transaction | Commandes | Fichier | Description |
 |-----------|-------------|-----------|---------|-------------|
@@ -144,7 +215,9 @@ Cette bibliothèque contient les copybooks générés lors de l'assemblage BMS.
 | PRGLGEN | LGEN | STARTBR, READNEXT | FCLIENT | Liste générique paginée (10 clients/page) |
 | PRGSTAT | STAT | STARTBR, READNEXT | PCLIENT | Statistiques par région via AIX/PATH |
 
-### Liste des MAPs BMS
+---
+
+### D. Liste des MAPs BMS
 
 | Mapset | Map | Programme | Description |
 |--------|-----|-----------|-------------|
@@ -156,7 +229,9 @@ Cette bibliothèque contient les copybooks générés lors de l'assemblage BMS.
 | CLILIST | MAPLGEN | PRGLGEN | Écran de liste générique paginée |
 | CLISTAT | MAPSTAT | PRGSTAT | Écran de statistiques par région |
 
-### Liste des transactions CICS
+---
+
+### E. Liste des transactions CICS
 
 | Code | Programme | Description |
 |------|-----------|-------------|
@@ -168,7 +243,9 @@ Cette bibliothèque contient les copybooks générés lors de l'assemblage BMS.
 | LGEN | PRGLGEN | Liste générique paginée |
 | STAT | PRGSTAT | Statistiques par région |
 
-### Liste des fichiers CICS
+---
+
+### F. Liste des fichiers VSAM
 
 | Nom CICS | Dataset | Type | Description |
 |----------|---------|------|-------------|
@@ -185,7 +262,9 @@ ROCHA.CICS.CLIENT (KSDS)          ← Fichier de base
            └── ROCHA.CICS.CLIENT.PATH  ← PATH pour accès CICS
 ```
 
-### Liste des JCL
+---
+
+### G. Liste des JCL
 
 | JCL | Description | Exercice |
 |-----|-------------|----------|
@@ -207,7 +286,9 @@ ROCHA.CICS.CLIENT (KSDS)          ← Fichier de base
 | ASMSTAT.jcl | Assemblage MAP CLISTAT | Ex 19 |
 | CMPSTAT.jcl | Compilation PRGSTAT | Ex 19 |
 
-### Structure du fichier CLIENT (80 octets)
+---
+
+### H. Structure du fichier CLIENT (80 octets)
 
 | Position | Champ | Type | Longueur | Description |
 |----------|-------|------|----------|-------------|
@@ -225,7 +306,9 @@ ROCHA.CICS.CLIENT (KSDS)          ← Fichier de base
 | 63-64 | POSITION | ALPHA | 2 | Position (DB/CR) |
 | 65-80 | FILLER | - | 16 | Réserve |
 
-### Messages d'erreur standards
+---
+
+### I. Messages d'erreur standards
 
 | Message | Contexte |
 |---------|----------|
@@ -235,24 +318,6 @@ ROCHA.CICS.CLIENT (KSDS)          ← Fichier de base
 | CLIENT INEXISTANT | Recherche sans résultat |
 | SUPPRESSION EFFECTUEE | Confirmation suppression |
 | MISE A JOUR EFFECTUEE | Confirmation mise à jour |
-
----
-
-## Conclusion
-
-Ce projet m'a permis de mettre en pratique l'ensemble des compétences acquises durant la formation POEI Mainframe COBOL pour le volet CICS. À travers les différentes parties du projet, j'ai pu :
-
-- **Maîtriser VSAM sous CICS** : Définition de fichiers KSDS, création d'index alternatifs (AIX) avec PATH pour l'accès par clé secondaire, intégration dans la FCT (File Control Table), et gestion des opérations de lecture, écriture, mise à jour et suppression.
-
-- **Développer des écrans BMS** : Conception de MAPs avec gestion des attributs (couleurs, protection), zones de saisie et d'affichage, messages d'erreur.
-
-- **Programmer en COBOL-CICS** : Utilisation des commandes CICS (SEND/RECEIVE MAP, READ, WRITE, REWRITE, DELETE), gestion pseudo-conversationnelle avec RETURN TRANSID, et navigation VSAM avec STARTBR/READNEXT/ENDBR.
-
-- **Administrer les transactions** : Définition via CEDA, installation de groupes, tests avec CEDF.
-
-Le projet couvre un cas concret de gestion clientèle dans le secteur financier, avec **7 programmes COBOL-CICS**, **7 MAPs BMS**, **7 transactions** et **2 fichiers CICS** (FCLIENT pour l'accès direct, PCLIENT via AIX/PATH pour les statistiques par région). Les principales difficultés rencontrées (gestion des attributs BMS, validation des données, navigation VSAM, fusion des modifications, deadlock lors de suppressions multiples, optimisation des accès via AIX) m'ont permis de développer une approche méthodique de résolution de problèmes.
-
-Cette expérience constitue une base solide pour aborder des projets mainframe transactionnels en entreprise.
 
 ---
 

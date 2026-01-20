@@ -6,14 +6,20 @@
 
 Cette section couvre les exercices 9 à 11 : MAP de mise à jour, programme de modification avec la commande REWRITE, et définition de la transaction MAJO.
 
-## Différence WRITE vs REWRITE
+## WRITE vs REWRITE : Deux commandes d'écriture différentes
+
+Après l'ajout (WRITE) dans la Partie 2a, cette section introduit la mise à jour (REWRITE). Ces deux commandes écrivent dans le fichier mais avec des logiques très différentes :
 
 | Aspect | WRITE (Ajout) | REWRITE (Mise à jour) |
 |--------|---------------|----------------------|
-| Client | Ne doit PAS exister | DOIT exister |
-| Clé | Nouvelle | Existante (non modifiable) |
-| Prérequis | Aucun | READ UPDATE obligatoire |
-| Erreur typique | DUPREC (doublon) | NOTFND (inexistant) |
+| **Action** | Créer un nouvel enregistrement | Modifier un enregistrement existant |
+| **Client** | Ne doit PAS exister | DOIT exister |
+| **Clé** | Nouvelle (sera insérée) | Existante (non modifiable) |
+| **Prérequis** | Aucun | READ UPDATE obligatoire |
+| **Verrouillage** | Non | Oui (pendant READ UPDATE) |
+| **Erreur typique** | DUPREC (doublon) | NOTFND (inexistant) |
+
+> **Point clé** : Le REWRITE nécessite un READ UPDATE préalable dans la même unité de travail (UOW). En mode pseudo-conversationnel, cela signifie que les deux commandes doivent être exécutées dans le même passage du programme.
 
 ---
 
@@ -55,36 +61,43 @@ MOVE DFHBMASK TO NUMCPTA
 
 Le code source est stocké dans `ROCHA.CICS.SOURCE(CLIMAJ)`. La structure reprend les mêmes concepts BMS que CLIAFF et CLIAJT (voir Partie 1, Exercice 2 pour les explications sur DFHMSD, DFHMDI, DFHMDF et les attributs).
 
-**Maquette de l'écran MAPMAJ :**
-
-Cette maquette (wireframe) représente la disposition des champs sur l'écran 24x80 :
+**Extrait du code BMS - En-tête avec commentaires explicatifs :**
 
 ```
-+------------------------------------------------------------------------------+
-|                         *** MISE A JOUR CLIENT ***                           |
-|------------------------------------------------------------------------------|
-|                                                                              |
-|  NUMERO COMPTE : ______  (Clé - non modifiable)                              |
-|  CODE REGION   : __     (01=PAR,02=MAR,03=LYO,04=LIL)                        |
-|  NATURE COMPTE : __                                                          |
-|  NOM           : __________                                                  |
-|  PRENOM        : __________                                                  |
-|  DATE NAISSANCE: ________  (AAAAMMJJ)                                        |
-|  SEXE          : _  (M ou F)                                                 |
-|  ACTIVITE PRO  : __                                                          |
-|  SITUATION SOC : _  (C/M/D/V)                                                |
-|  ADRESSE       : __________                                                  |
-|  SOLDE         : __________                                                  |
-|  POSITION      : __  (DB ou CR)                                              |
-|                                                                              |
-|                                                                              |
-|------------------------------------------------------------------------------|
-|  MESSAGE : ____________________________________________________________      |
-|                                                                              |
-|                                                                              |
-|  ENTER=Valider  PF3=Quitter  CLEAR=Réinitialiser                             |
-+------------------------------------------------------------------------------+
+***********************************************************************
+*  MAPSET : CLIMAJ - Mise a jour Client
+*  Transaction : MAJO
+*
+*  PARTICULARITE MISE A JOUR :
+*  ---------------------------
+*  Le numero de compte est d'abord saisissable (recherche),
+*  puis passe en lecture seule apres affichage des donnees.
+*  Cette gestion dynamique des attributs se fait dans le programme
+*  COBOL via le suffixe 'A' (ex: NUMCPTA pour modifier l'attribut).
+*
+*  Attribut DFHBMASK = X'20' = ASKIP (protege, normal)
+*  Attribut DFHBMUNN = X'4C' = UNPROT + NUM (saisie numerique)
+***********************************************************************
+CLIMAJ   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
 ```
+
+**Extrait - Champ clé avec indication "non modifiable" :**
+
+```
+*----------------------------------------------------------------------
+* NUMERO DE COMPTE - CHAMP CLE
+* Commence en UNPROT pour la saisie initiale (recherche)
+* Le programme passera l'attribut a ASKIP apres affichage
+*----------------------------------------------------------------------
+         DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NUMERO COMPTE :'
+NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+         DFHMDF POS=(4,26),LENGTH=20,ATTRB=ASKIP,                       X
+               INITIAL='(Cle - non modifiable)'
+```
+
+> **Différence clé avec CLIAJT** : L'indication "(Clé - non modifiable)" rappelle à l'utilisateur que la clé VSAM ne peut pas être changée après création du client. Le programme gère dynamiquement le passage de UNPROT à ASKIP via `MOVE DFHBMASK TO NUMCPTA`.
 
 **Zones de la MAP :**
 
@@ -545,6 +558,88 @@ Résultat attendu : `Prog(PRGMAJ) Cob Ena`
 5. **Retour en phase 1 après succès** : Après une mise à jour réussie, le programme réinitialise la COMMAREA pour permettre la modification d'un autre client sans relancer la transaction.
 
 6. **PERFORM THRU avec GO TO** : Comme pour PRGAJT (voir Partie 2a, Exercice 7), la clause THRU permet aux GO TO de rester dans la plage du PERFORM et de retourner correctement à l'appelant.
+
+### Difficultés rencontrées et solutions
+
+#### Problème 1 : LINKAGE SECTION manquante pour DFHCOMMAREA
+
+**Symptôme** : Après le premier passage, le message "ERREUR RELECTURE CLIENT" s'affichait car le numéro de compte sauvegardé (WS-NUMCPT-SAVED) était vide.
+
+**Cause** : La LINKAGE SECTION était complètement absente du programme. Sans elle, les données passées via COMMAREA lors du RETURN précédent ne sont pas accessibles.
+
+**Solution** : Ajouter la LINKAGE SECTION avec DFHCOMMAREA pour recevoir les données du passage précédent :
+
+```cobol
+       LINKAGE SECTION.
+      *-----------------------------------------------------------------
+      * ZONE COMMAREA PASSEE PAR CICS
+      * OBLIGATOIRE pour accéder aux données du RETURN précédent
+      *-----------------------------------------------------------------
+       01  DFHCOMMAREA.
+           05 LS-PHASE            PIC X(01).
+           05 LS-NUMCPT-SAVED     PIC X(06).
+```
+
+> **Rappel** : En mode pseudo-conversationnel, chaque passage est une nouvelle tâche CICS. La LINKAGE SECTION est obligatoire pour récupérer le contexte sauvegardé.
+
+#### Problème 2 : Données effacées lors de la mise à jour partielle
+
+**Symptôme** : Quand l'utilisateur ne modifiait qu'un seul champ (ex: situation sociale), le message "CODE REGION OBLIGATOIRE" s'affichait malgré une région valide à l'écran.
+
+**Cause** : Le terminal BMS ne transmet que les champs **modifiés** (longueur > 0). Les champs affichés mais non modifiés ont une longueur = 0, même s'ils contiennent des données visibles à l'écran.
+
+**Solution** : Ajouter le paragraphe `4050-FUSIONNER-MODIFICATIONS` qui :
+1. Relit le client pour récupérer les valeurs actuelles
+2. Pour chaque champ : si longueur > 0, utilise la nouvelle valeur ; sinon, conserve l'existante
+
+```cobol
+       4050-FUSIONNER-MODIFICATIONS.
+      *    Code région : si modifié, prendre la nouvelle valeur
+           IF WS-CODREGL > 0
+               MOVE WS-CODREG TO CLI-CODREG
+           ELSE
+               MOVE CLI-CODREG TO WS-CODREG
+           END-IF
+      *    ... (même logique pour tous les champs)
+```
+
+#### Problème 3 : CEDA INSTALL GROUP échoue
+
+**Symptôme** : La commande `CEDA INSTALL GROUP(CLIGROUP)` retournait une erreur car le fichier FCLIENT était ouvert.
+
+**Cause** : Réinstaller tout le groupe tente de réinstaller **toutes** les ressources, y compris les fichiers déjà ouverts.
+
+**Solution** : Installer uniquement la ressource spécifique :
+
+```
+CEDA INSTALL TRANSACTION(MAJO) GROUP(CLIGROUP)
+```
+
+> **Bonne pratique** : Toujours installer individuellement les nouvelles ressources plutôt que réinstaller tout le groupe.
+
+### Amélioration future : Conservation des données lors des erreurs
+
+**Problème identifié** : Comme pour le programme d'ajout (PRGAJT), lorsqu'une erreur de validation se produit, l'écran est effacé (`ERASE`) et seul le message d'erreur s'affiche. L'utilisateur doit ressaisir les modifications, ce qui n'est pas ergonomique.
+
+**Cause technique** : L'option `ERASE` dans la commande `SEND MAP` efface l'écran entier. Combiné avec `MOVE LOW-VALUES TO MAPMAJO`, les données ne sont pas renvoyées à l'écran.
+
+**Solution envisagée** : Lors d'une erreur de validation en phase 3, recopier les données sauvegardées (WS-SAISIE) vers les zones output (MAPMAJO) avant le `SEND MAP`, et utiliser `DATAONLY` au lieu de `ERASE` :
+
+```cobol
+* Amélioration : conserver les données lors d'une erreur
+IF ERREUR-DETECTEE
+    MOVE WS-NUMCPT  TO NUMCPTO
+    MOVE WS-CODREG  TO CODREGO
+    MOVE WS-NOM     TO NOMO
+    ...
+    EXEC CICS SEND MAP('MAPMAJ')
+        MAPSET('CLIMAJ')
+        DATAONLY            ← Ne rafraîchit que les données
+    END-EXEC
+END-IF
+```
+
+> **Note** : Cette amélioration, commune à PRGAJT et PRGMAJ, n'a pas été implémentée dans la version actuelle. Elle constitue une évolution pour améliorer l'expérience utilisateur.
 
 ### Captures d'écran
 

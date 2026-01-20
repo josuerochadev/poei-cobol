@@ -104,6 +104,8 @@ CEDA INSTALL FILE(FCLIENT) GROUP(CLIGROUP)
 
 > **Note TK4-** : Sur l'émulateur, certains paramètres comme STATUS et OPENTIME peuvent avoir des valeurs par défaut. Le fichier s'ouvre automatiquement lors du premier accès.
 
+> **Note environnement TK4-** : Sur l'émulateur Hercules TK4-, une étape supplémentaire est nécessaire pour que CICS reconnaisse le fichier VSAM. Il faut ajouter une entrée dans le membre CICSTS51 de la bibliothèque ADCD.Z113F.PROCLIB (table de configuration CICS). Cette manipulation est spécifique à l'environnement d'émulation et ne serait pas requise sur un z/OS de production où la configuration CICS est gérée via CSD (CICS System Definition).
+
 **Étape 3 : Vérification avec CEMT**
 
 ```
@@ -485,37 +487,6 @@ Pour chaque champ nommé dans la MAP BMS (ex: NUMCPT), le copybook généré con
 | **O** | X(nn) | Zone output (données à envoyer) | NUMCPTO |
 
 > **Important** : Avec `STORAGE=AUTO`, les zones I et O partagent la même mémoire. Après un `RECEIVE MAP`, sauvegarder les valeurs importantes avant de faire `MOVE LOW-VALUES`.
-
-**Maquette de l'écran MAPAFF :**
-
-Cette maquette (wireframe) représente la disposition des champs sur l'écran 24x80 :
-
-```
-+------------------------------------------------------------------------------+
-|                         *** AFFICHAGE CLIENT ***                             |
-|------------------------------------------------------------------------------|
-|                                                                              |
-|  NUMERO COMPTE : ______                                                      |
-|                                                                              |
-|  CODE REGION   : __                            _______________               |
-|  NATURE COMPTE : __                            _______________               |
-|  NOM           : __________                                                  |
-|  PRENOM        : __________                                                  |
-|  DATE NAISSANCE: __________                                                  |
-|  SEXE          : _               ________                                    |
-|  ACTIVITE PRO  : __                                                          |
-|  SITUATION SOC : _               ____________                                |
-|  ADRESSE       : __________                                                  |
-|  SOLDE         : ____________                                                |
-|  POSITION      : __              __________                                  |
-|                                                                              |
-|------------------------------------------------------------------------------|
-|  MESSAGE : ____________________________________________________________      |
-|                                                                              |
-|                                                                              |
-|  ENTER=Rechercher  PF3=Quitter  CLEAR=Effacer                                |
-+------------------------------------------------------------------------------+
-```
 
 ### Captures d'écran
 

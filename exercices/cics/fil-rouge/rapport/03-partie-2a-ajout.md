@@ -6,12 +6,17 @@
 
 Cette section couvre les exercices 6 à 8 : création de la MAP d'ajout, programme d'ajout avec la commande WRITE, et définition de la transaction AJOU.
 
-## Comparaison des commandes CICS pour l'écriture
+## READ vs WRITE : Deux opérations opposées
 
-| Commande | Usage | Prérequis | Erreur typique |
-|----------|-------|-----------|----------------|
-| **WRITE** | Ajouter un nouvel enregistrement | Le client ne doit PAS exister | DUPREC (doublon) |
-| **REWRITE** | Modifier un enregistrement existant | READ UPDATE obligatoire | NOTFND (inexistant) |
+Après avoir maîtrisé la lecture (READ) dans la Partie 1, cette section introduit l'écriture (WRITE). Ces deux commandes sont complémentaires :
+
+| Aspect | READ (Partie 1) | WRITE (Partie 2a) |
+|--------|-----------------|-------------------|
+| **Action** | Lire un enregistrement existant | Créer un nouvel enregistrement |
+| **Prérequis** | Le client DOIT exister | Le client ne doit PAS exister |
+| **Erreur typique** | NOTFND (client inexistant) | DUPREC (doublon) |
+| **Données** | Fichier → Programme | Programme → Fichier |
+| **Clé (RIDFLD)** | Recherche | Insertion |
 
 ---
 
@@ -49,35 +54,43 @@ Dans CLIAFF, des zones supplémentaires (LIBREG, LIBSEX, LIBSIT, LIBPOS) affiche
 
 Le code source est stocké dans `ROCHA.CICS.SOURCE(CLIAJT)`. La structure reprend les mêmes concepts BMS que CLIAFF (voir Partie 1, Exercice 2 pour les explications sur DFHMSD, DFHMDI, DFHMDF et les attributs).
 
-**Maquette de l'écran MAPAJT :**
-
-Cette maquette (wireframe) représente la disposition des champs sur l'écran 24x80 :
+**Extrait du code BMS - Déclaration du MAPSET :**
 
 ```
-+------------------------------------------------------------------------------+
-|                         *** AJOUT CLIENT ***                                 |
-|------------------------------------------------------------------------------|
-|                                                                              |
-|  NUMERO COMPTE : ______                                                      |
-|  CODE REGION   : __     (01=Paris,02=Marseille,03=Lyon,04=Lille)             |
-|  NATURE COMPTE : __                                                          |
-|  NOM           : __________                                                  |
-|  PRENOM        : __________                                                  |
-|  DATE NAISSANCE: ________  (AAAAMMJJ)                                        |
-|  SEXE          : _  (M ou F)                                                 |
-|  ACTIVITE PRO  : __                                                          |
-|  SITUATION SOC : _  (C=Célib/M=Marié/D=Divorcé/V=Veuf)                       |
-|  ADRESSE       : __________                                                  |
-|  SOLDE         : __________                                                  |
-|  POSITION      : __  (DB=Débiteur ou CR=Créditeur)                           |
-|                                                                              |
-|------------------------------------------------------------------------------|
-|  MESSAGE : ____________________________________________________________      |
-|                                                                              |
-|                                                                              |
-|  ENTER=Valider  PF3=Quitter  CLEAR=Effacer                                   |
-+------------------------------------------------------------------------------+
+***********************************************************************
+*  MAPSET : CLIAJT - Ajout Client
+*  Transaction : AJOU
+***********************************************************************
+CLIAJT   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
+***********************************************************************
+MAPAJT   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 ```
+
+**Extrait - Champs de saisie (tous en UNPROT) :**
+
+```
+*----------------------------------------------------------------------
+* ZONES DE SAISIE - TOUS LES CHAMPS EN UNPROT
+*----------------------------------------------------------------------
+         DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NUMERO COMPTE :'
+NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+         DFHMDF POS=(4,26),LENGTH=1,ATTRB=ASKIP
+*
+         DFHMDF POS=(5,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='CODE REGION   :'
+CODREG   DFHMDF POS=(5,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+         DFHMDF POS=(5,22),LENGTH=25,ATTRB=ASKIP,                       X
+               INITIAL='(01=PAR,02=MAR,03=LYO,04=LIL)'
+*
+         DFHMDF POS=(7,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='NOM           :'
+NOM      DFHMDF POS=(7,19),LENGTH=10,ATTRB=UNPROT
+         DFHMDF POS=(7,30),LENGTH=1,ATTRB=ASKIP
+```
+
+> **Différence clé avec CLIAFF** : Tous les champs de données sont en `UNPROT` (saisissables) au lieu de `ASKIP` (affichage seul). Des indications statiques comme `(01=PAR,02=MAR,03=LYO,04=LIL)` remplacent les zones de libellés dynamiques.
 
 **Zones de saisie :**
 
@@ -605,6 +618,33 @@ IF ERREUR-DETECTEE
 END-IF
 ```
 
+### Amélioration future : Conservation des données lors des erreurs
+
+**Problème identifié** : Actuellement, lorsqu'une erreur de validation se produit, l'écran est effacé (`ERASE`) et seul le message d'erreur s'affiche. L'utilisateur doit ressaisir toutes les données, ce qui n'est pas ergonomique.
+
+**Cause technique** : L'option `ERASE` dans la commande `SEND MAP` efface l'écran entier avant d'afficher la MAP. Comme le programme fait `MOVE LOW-VALUES TO MAPAJTO` pour préparer l'affichage, les données ne sont pas renvoyées à l'écran.
+
+**Solution envisagée** : Lors d'une erreur de validation, il faudrait :
+1. **Ne pas faire** `MOVE LOW-VALUES TO MAPAJTO` pour conserver les données
+2. **Ou** recopier les données sauvegardées (WS-SAISIE) vers les zones output (MAPAJTO) avant le `SEND MAP`
+3. Utiliser `SEND MAP ... DATAONLY` au lieu de `ERASE` pour ne rafraîchir que les données sans effacer l'écran
+
+```cobol
+* Amélioration : recopier les données avant affichage erreur
+IF ERREUR-DETECTEE
+    MOVE WS-NUMCPT  TO NUMCPTO
+    MOVE WS-CODREG  TO CODREGO
+    MOVE WS-NOM     TO NOMO
+    ...
+    EXEC CICS SEND MAP('MAPAJT')
+        MAPSET('CLIAJT')
+        DATAONLY            ← Ne rafraîchit que les données
+    END-EXEC
+END-IF
+```
+
+> **Note** : Cette amélioration n'a pas été implémentée dans la version actuelle du projet. Elle constitue une évolution possible pour améliorer l'expérience utilisateur.
+
 ### Captures d'écran
 
 #### Compilation du programme PRGAJT
@@ -672,50 +712,33 @@ La transaction AJOU est le point d'entrée utilisateur pour l'ajout de clients. 
                     +-------------+
 ```
 
-Pour que la transaction fonctionne, trois ressources doivent être définies et installées (voir Partie 1, Exercice 4 pour les explications détaillées sur CEDA) :
+Pour que la transaction fonctionne, quatre ressources doivent être définies et installées dans CICS :
 
-1. **MAPSET CLIAJT** : L'écran BMS compilé
-2. **PROGRAM PRGAJT** : Le programme COBOL-CICS compilé
-3. **TRANSACTION AJOU** : Le code de 4 caractères qui lance le programme
+1. **FILE FCLIENT** : Le fichier VSAM contenant les données (défini dans l'exercice 1)
+2. **MAPSET CLIAJT** : L'écran BMS compilé (défini et installé dans l'exercice 6)
+3. **PROGRAM PRGAJT** : Le programme COBOL-CICS compilé (défini et installé dans l'exercice 7)
+4. **TRANSACTION AJOU** : Le code de 4 caractères qui lance le programme
+
+À ce stade, seule la **transaction** reste à définir. Les autres ressources ont été créées dans les exercices précédents.
 
 ### Résolution
 
-**Étape 1 : Définition des ressources**
+**Définition et installation de la transaction :**
+
+Comme pour la transaction AFFI (voir Partie 1, Exercice 4 pour les explications détaillées sur CEDA), on définit puis on installe la transaction :
 
 ```
-CEDA DEFINE MAPSET(CLIAJT) GROUP(CLIGROUP)
-
-CEDA DEFINE PROGRAM(PRGAJT) GROUP(CLIGROUP) LANGUAGE(COBOL)
-
 CEDA DEFINE TRANSACTION(AJOU) GROUP(CLIGROUP) PROGRAM(PRGAJT)
-```
-
-**Étape 2 : Installation des ressources**
-
-```
-CEDA INSTALL MAPSET(CLIAJT) GROUP(CLIGROUP)
-CEDA INSTALL PROGRAM(PRGAJT) GROUP(CLIGROUP)
 CEDA INSTALL TRANSACTION(AJOU) GROUP(CLIGROUP)
 ```
 
-> **Bonne pratique** : Installer les ressources individuellement plutôt que tout le groupe. Réinstaller le groupe peut causer des erreurs si certaines ressources (comme FCLIENT) sont déjà ouvertes.
-
-**Étape 3 : Vérification**
-
-```
-CEDA VIEW MAPSET(CLIAJT) GROUP(CLIGROUP)
-```
-Résultat attendu : Affichage de la définition du mapset
-
-```
-CEMT INQ PROG(PRGAJT)
-```
-Résultat attendu : `Pro(PRGAJT) Cob Ena`
+**Vérification :**
 
 ```
 CEMT INQ TRAN(AJOU)
 ```
-Résultat attendu : `Tra(AJOU) Pro(PRGAJT) Ena`
+
+Résultat attendu : `Tra(AJOU) Pro(PRGAJT) Ena` confirmant que la transaction est active et liée au bon programme.
 
 ### Tableau récapitulatif du groupe CLIGROUP après exercice 8
 

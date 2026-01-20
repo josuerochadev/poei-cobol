@@ -6,25 +6,48 @@
 
 Cette section couvre les exercices 12 à 15 : MAP de suppression, programme de suppression avec la commande DELETE, et définition de transaction.
 
-## Comparaison des commandes CICS pour suppression
+## La commande DELETE : Supprimer des enregistrements VSAM
 
-| Commande | Usage | Prérequis |
-|----------|-------|-----------|
-| **DELETE** simple | Supprime directement par la clé | Aucun (contrairement à REWRITE) |
-| **READ + DELETE** | Affiche avant suppression | READ pour confirmation visuelle |
+Après avoir maîtrisé READ (lecture), WRITE (ajout) et REWRITE (mise à jour), cette partie introduit la dernière opération CRUD : la suppression avec DELETE.
 
-## Deux approches possibles pour la suppression
+### Caractéristiques de DELETE
 
-L'énoncé original prévoyait deux variantes de programme :
+| Aspect | DELETE | Comparaison avec REWRITE |
+|--------|--------|--------------------------|
+| **Fonction** | Supprimer un enregistrement | Modifier un enregistrement |
+| **Prérequis** | Aucun | READ UPDATE obligatoire |
+| **Verrouillage** | Non nécessaire | Obligatoire |
+| **Erreur si absent** | NOTFND | NOTFND |
+| **Atomicité** | Oui (opération unique) | Non (READ + REWRITE) |
 
-| Approche | Description | Avantage | Inconvénient |
-|----------|-------------|----------|--------------|
-| **DELETE direct** | Saisie numéro → DELETE immédiat | Simple, rapide | Risque d'erreur (pas de vérification visuelle) |
-| **READ + DELETE** | Saisie numéro → READ → Affichage → Confirmation → DELETE | Sécurisé, l'utilisateur voit ce qu'il supprime | Plus d'interactions |
+> **Point clé** : Contrairement à REWRITE, la commande DELETE est autonome et ne nécessite pas de READ UPDATE préalable. Elle supprime directement l'enregistrement identifié par RIDFLD.
 
-**Choix d'implémentation :** J'ai directement implémenté la version complète (READ + DELETE avec affichage) dans l'exercice 13, car c'est la bonne pratique en production. On ne supprime jamais de données sans confirmation visuelle.
+### Variantes de suppression en CICS
 
-> **Note pédagogique** : Un DELETE "direct" (sans affichage préalable) aurait été techniquement plus simple mais moins sécurisé. Dans un contexte réel, on privilégie toujours la confirmation visuelle avant suppression de données.
+CICS offre plusieurs façons de supprimer des enregistrements :
+
+| Variante | Syntaxe | Usage |
+|----------|---------|-------|
+| **DELETE simple** | `DELETE FILE(...) RIDFLD(clé)` | Supprime un enregistrement par sa clé exacte |
+| **DELETE avec GENERIC** | `DELETE FILE(...) RIDFLD(préfixe) KEYLENGTH(...) GENERIC` | Supprime tous les enregistrements dont la clé commence par le préfixe |
+| **DELETE en browse** | `DELETE FILE(...) RIDFLD(...) (après READNEXT)` | Supprime l'enregistrement courant lors d'un parcours |
+
+Dans cette partie, nous implémentons le **DELETE simple** avec confirmation visuelle. Le **DELETE avec GENERIC** sera traité dans la Partie 3 (Exercice 17) pour la suppression de plusieurs clients en une seule opération.
+
+## Mon choix de conception
+
+L'énoncé original prévoyait deux programmes distincts :
+- **Exercice 13** : Suppression directe (DELETE sans affichage préalable)
+- **Exercice 15** : Suppression avec lecture préalable (READ + affichage + DELETE)
+
+**J'ai fait le choix de développer directement la version complète** (avec lecture et confirmation) dès l'exercice 13, car c'est la bonne pratique en environnement de production. On ne supprime jamais de données sans permettre à l'utilisateur de vérifier visuellement ce qu'il supprime.
+
+| Ce qui était prévu | Ce que j'ai implémenté | Justification |
+|--------------------|------------------------|---------------|
+| Ex 13 : DELETE direct | DELETE avec confirmation | Sécurité des données |
+| Ex 15 : READ + DELETE | Déjà couvert par Ex 13 | Évite code redondant |
+
+> **Bonne pratique mainframe** : En production, une suppression accidentelle peut avoir des conséquences graves. L'affichage préalable et la confirmation explicite (O/N) sont des garde-fous essentiels.
 
 ---
 
@@ -74,35 +97,51 @@ Phase 1 (Recherche)           Phase 2 (Confirmation)
 
 Le code source est stocké dans `ROCHA.CICS.SOURCE(CLISUP)`. La structure reprend les mêmes concepts BMS que les MAPs précédentes (voir Partie 1, Exercice 2 pour les explications sur DFHMSD, DFHMDI, DFHMDF et les attributs).
 
-**Maquette de l'écran MAPSUP :**
+**Extrait du code BMS - En-tête avec commentaires explicatifs :**
 
 ```
-+------------------------------------------------------------------------------+
-|                        *** SUPPRESSION CLIENT ***                            |
-|------------------------------------------------------------------------------|
-|                                                                              |
-|  NUMERO COMPTE : ______                                                      |
-|                                                                              |
-|  CODE REGION   : __                     _______________                      |
-|  NATURE COMPTE : __                     _______________                      |
-|  NOM           : __________                                                  |
-|  PRENOM        : __________                                                  |
-|  DATE NAISSANCE: __________                                                  |
-|  SEXE          : _         ________                                          |
-|  ACTIVITE PRO  : __                                                          |
-|  SITUATION SOC : _         ____________                                      |
-|  ADRESSE       : __________                                                  |
-|  SOLDE         : ____________                                                |
-|  POSITION      : __         __________                                       |
-|                                                                              |
-|  CONFIRMER SUPPRESSION (O/N) : _                                             |
-|                                                                              |
-|------------------------------------------------------------------------------|
-|  MESSAGE : ____________________________________________________________      |
-|                                                                              |
-|  ENTER=Rechercher/Confirmer  PF3=Quitter  CLEAR=Effacer                      |
-+------------------------------------------------------------------------------+
+***********************************************************************
+*  MAPSET : CLISUP - Suppression Client
+*  Transaction : SUPP / SULE
+*
+*  PARTICULARITE SUPPRESSION :
+*  ---------------------------
+*  Le numero de compte est saisi pour rechercher le client.
+*  Les donnees sont affichees en lecture seule pour confirmation.
+*  Un champ CONFIRM (O/N) permet de valider la suppression.
+***********************************************************************
+CLISUP   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
+               STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
 ```
+
+**Extrait - Zones d'affichage en lecture seule (ASKIP,BRT) :**
+
+```
+*----------------------------------------------------------------------
+* ZONES D'AFFICHAGE - DONNEES CLIENT (LECTURE SEULE)
+*----------------------------------------------------------------------
+         DFHMDF POS=(6,2),LENGTH=16,ATTRB=ASKIP,                        X
+               INITIAL='CODE REGION   :'
+CODREG   DFHMDF POS=(6,19),LENGTH=2,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(6,25),LENGTH=20,ATTRB=ASKIP
+LIBREG   DFHMDF POS=(6,46),LENGTH=15,ATTRB=(ASKIP,BRT)
+```
+
+> **Différence clé avec les autres MAPs** : Tous les champs de données sont en `ASKIP,BRT` (protégés, brillants) car l'utilisateur ne peut que visualiser, pas modifier. Seuls NUMCPT (recherche) et CONFIRM (O/N) sont saisissables.
+
+**Extrait - Zone de confirmation (élément spécifique à la suppression) :**
+
+```
+*----------------------------------------------------------------------
+* ZONE DE CONFIRMATION
+*----------------------------------------------------------------------
+         DFHMDF POS=(18,2),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
+               INITIAL='CONFIRMER SUPPRESSION (O/N) :'
+CONFIRM  DFHMDF POS=(18,33),LENGTH=1,ATTRB=UNPROT
+         DFHMDF POS=(18,35),LENGTH=1,ATTRB=ASKIP
+```
+
+> **Élément distinctif** : Le champ CONFIRM est unique à cette MAP. Il permet une validation explicite avant la suppression irréversible.
 
 **Zones de la MAP :**
 
@@ -409,6 +448,19 @@ Résultat attendu : `Prog(PRGSUP) Cob Ena`
 
 4. **PERFORM THRU avec GO TO** : Comme pour les autres programmes (voir Partie 2a, Exercice 7), la clause THRU permet aux GO TO de rester dans la plage du PERFORM.
 
+### Difficultés rencontrées et solutions
+
+Le programme PRGSUP a bénéficié des leçons apprises lors du développement des programmes précédents. Les difficultés suivantes ont été anticipées et évitées :
+
+| Problème potentiel | Prévention appliquée |
+|-------------------|----------------------|
+| GO TO hors plage PERFORM | Utilisation systématique de `PERFORM ... THRU paragraphe-FIN` |
+| Écrasement données après RECEIVE | Sauvegarde immédiate dans WS-NUMCPT-SAVED et WS-CONFIRM |
+| Message non visible | `ERASE` systématique sur tous les SEND MAP |
+| Données non transmises (NUMCPT protégé) | Sauvegarde du numéro dans COMMAREA (WS-NUMCPT-SAVED) |
+
+> **Note** : L'approche avec confirmation visuelle (READ + affichage + DELETE) évite les suppressions accidentelles, contrairement à un DELETE direct qui aurait été techniquement plus simple mais risqué.
+
 ### Captures d'écran
 
 #### Définition du programme PRGSUP dans CICS
@@ -677,11 +729,7 @@ En implémentant directement la version sécurisée (avec lecture préalable) da
 - Évité la création d'un programme moins sécurisé (DELETE sans vérification)
 - Couvert les objectifs des exercices 13 et 15 en une seule implémentation
 
-### Captures d'écran
-
-<!--
-Pas de captures supplémentaires nécessaires - voir exercices 13 et 14.
--->
+> **Note** : Toutes les captures d'écran nécessaires sont présentées dans les exercices 13 et 14.
 
 ---
 
