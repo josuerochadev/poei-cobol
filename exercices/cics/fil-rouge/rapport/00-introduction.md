@@ -47,14 +47,14 @@ Le projet consiste à développer un système de gestion de clientèle pour une 
 ### Progression pédagogique
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│  Partie 0         Partie 1          Partie 2a-2c           Partie 3          │
-│  ─────────        ─────────         ─────────────          ────────          │
-│  Préparation      READ              WRITE, REWRITE         STARTBR, READNEXT │
-│  (Libraries)      (Lecture)         DELETE (CRUD)          (Navigation, AIX) │
-│                                                                              │
-│  Environnement →  Fondamentaux  →   Opérations CRUD   →   Techniques avancées│
-└──────────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│  Partie 0       Partie 1        Partie 2a-2c         Partie 3         │
+│  ─────────      ─────────       ─────────────        ────────         │
+│  Préparation    READ            WRITE, REWRITE       STARTBR/READNEXT │
+│  (Libraries)    (Lecture)       DELETE (CRUD)        (Navigation,AIX) │
+│                                                                       │
+│  Environnement → Fondamentaux → Opérations CRUD → Techniques avancées │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
