@@ -20,6 +20,15 @@
       *   - Situation sociale valide (C/M/D/V)
       *   - Position valide (DB ou CR)
       *
+      * OPTIMISATIONS IMPLEMENTEES :
+      * ---------------------------
+      * 1. FSET dans BMS : Tous les champs sont renvoyes
+      *    -> Simplification des validations (pas de test longueur)
+      * 2. DATAONLY : Reaffichage sans renvoyer la structure
+      *    -> Optimisation du trafic reseau
+      * 3. CURSOR dynamique : Positionnement sur le champ en erreur
+      *    -> Meilleure experience utilisateur
+      *
       * FIL ROUGE CICS - EXERCICE 7
       ******************************************************************
        ENVIRONMENT DIVISION.
@@ -153,9 +162,10 @@
            IF WS-RESP = DFHRESP(MAPFAIL)
                MOVE LOW-VALUES TO MAPAJTO
                MOVE 'AUCUNE DONNEE SAISIE - VEUILLEZ REMPLIR' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 2000-FIN
            END-IF
@@ -186,7 +196,7 @@
            IF ERREUR-DETECTEE
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 2000-FIN
            END-IF
@@ -194,9 +204,10 @@
       * Verification doublure (client existe deja ?)
            PERFORM 2200-VERIFIER-DOUBLURE THRU 2200-FIN
            IF ERREUR-DETECTEE
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPAJT')
                    MAPSET('CLIAJT')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 2000-FIN
            END-IF
@@ -223,12 +234,14 @@
       * Controle numero de compte (obligatoire et numerique)
            IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
                MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
+               MOVE -1 TO NUMCPTL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
            IF WS-NUMCPT NOT NUMERIC
                MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
+               MOVE -1 TO NUMCPTL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
@@ -236,6 +249,7 @@
       * Controle code region (01, 02, 03 ou 04)
            IF WS-CODREGL = 0 OR WS-CODREG = SPACES
                MOVE 'CODE REGION OBLIGATOIRE' TO MSGO
+               MOVE -1 TO CODREGL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
@@ -243,6 +257,7 @@
            IF WS-CODREG NOT = '01' AND WS-CODREG NOT = '02'
               AND WS-CODREG NOT = '03' AND WS-CODREG NOT = '04'
                MOVE 'CODE REGION INVALIDE (01/02/03/04)' TO MSGO
+               MOVE -1 TO CODREGL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
@@ -250,6 +265,7 @@
       * Controle nom (obligatoire)
            IF WS-NOML = 0 OR WS-NOM = SPACES
                MOVE 'NOM OBLIGATOIRE' TO MSGO
+               MOVE -1 TO NOML
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
@@ -257,12 +273,14 @@
       * Controle sexe (M ou F)
            IF WS-SEXEL = 0 OR WS-SEXE = SPACES
                MOVE 'SEXE OBLIGATOIRE' TO MSGO
+               MOVE -1 TO SEXEL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
            IF WS-SEXE NOT = 'M' AND WS-SEXE NOT = 'F'
                MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
+               MOVE -1 TO SEXEL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
@@ -270,6 +288,7 @@
       * Controle situation sociale (C, M, D ou V)
            IF WS-SITSOL = 0 OR WS-SITSO = SPACES
                MOVE 'SITUATION SOCIALE OBLIGATOIRE' TO MSGO
+               MOVE -1 TO SITSOL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
@@ -277,6 +296,7 @@
            IF WS-SITSO NOT = 'C' AND WS-SITSO NOT = 'M'
               AND WS-SITSO NOT = 'D' AND WS-SITSO NOT = 'V'
                MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
+               MOVE -1 TO SITSOL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
@@ -284,12 +304,14 @@
       * Controle position (DB ou CR)
            IF WS-POSITL = 0 OR WS-POSITION = SPACES
                MOVE 'POSITION OBLIGATOIRE' TO MSGO
+               MOVE -1 TO POSITL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF
 
            IF WS-POSITION NOT = 'DB' AND WS-POSITION NOT = 'CR'
                MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
+               MOVE -1 TO POSITL
                MOVE 'O' TO WS-ERREUR
                GO TO 2100-FIN
            END-IF.

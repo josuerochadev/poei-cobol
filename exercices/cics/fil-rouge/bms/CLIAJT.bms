@@ -2,6 +2,10 @@
 *  MAPSET : CLIAJT - Ajout Client
 *  Transaction : AJOU
 *  Fil Rouge CICS - Exercice 6
+*
+*  OPTIMISATION FSET :
+*  Les champs ont l'attribut FSET pour simplifier les validations
+*  cote COBOL (plus besoin de verifier les longueurs).
 ***********************************************************************
 CLIAJT   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
                STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
@@ -20,66 +24,66 @@ MAPAJT   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 *----------------------------------------------------------------------
          DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='NUMERO COMPTE :'
-NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC,FSET)
          DFHMDF POS=(4,26),LENGTH=1,ATTRB=ASKIP
 *
          DFHMDF POS=(5,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='CODE REGION   :'
-CODREG   DFHMDF POS=(5,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+CODREG   DFHMDF POS=(5,19),LENGTH=2,ATTRB=(UNPROT,NUM,FSET)
          DFHMDF POS=(5,22),LENGTH=25,ATTRB=ASKIP,                       X
                INITIAL='(01=PAR,02=MAR,03=LYO,04=LIL)'
 *
          DFHMDF POS=(6,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='NATURE COMPTE :'
-NATCPT   DFHMDF POS=(6,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+NATCPT   DFHMDF POS=(6,19),LENGTH=2,ATTRB=(UNPROT,NUM,FSET)
          DFHMDF POS=(6,22),LENGTH=1,ATTRB=ASKIP
 *
          DFHMDF POS=(7,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='NOM           :'
-NOM      DFHMDF POS=(7,19),LENGTH=10,ATTRB=UNPROT
+NOM      DFHMDF POS=(7,19),LENGTH=10,ATTRB=(UNPROT,FSET)
          DFHMDF POS=(7,30),LENGTH=1,ATTRB=ASKIP
 *
          DFHMDF POS=(8,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='PRENOM        :'
-PRENOM   DFHMDF POS=(8,19),LENGTH=10,ATTRB=UNPROT
+PRENOM   DFHMDF POS=(8,19),LENGTH=10,ATTRB=(UNPROT,FSET)
          DFHMDF POS=(8,30),LENGTH=1,ATTRB=ASKIP
 *
          DFHMDF POS=(9,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='DATE NAISSANCE:'
-DATNA    DFHMDF POS=(9,19),LENGTH=8,ATTRB=(UNPROT,NUM)
+DATNA    DFHMDF POS=(9,19),LENGTH=8,ATTRB=(UNPROT,NUM,FSET)
          DFHMDF POS=(9,28),LENGTH=12,ATTRB=ASKIP,                       X
                INITIAL='(AAAAMMJJ)'
 *
          DFHMDF POS=(10,2),LENGTH=16,ATTRB=ASKIP,                       X
                INITIAL='SEXE          :'
-SEXE     DFHMDF POS=(10,19),LENGTH=1,ATTRB=UNPROT
+SEXE     DFHMDF POS=(10,19),LENGTH=1,ATTRB=(UNPROT,FSET)
          DFHMDF POS=(10,21),LENGTH=10,ATTRB=ASKIP,                      X
                INITIAL='(M ou F)'
 *
          DFHMDF POS=(11,2),LENGTH=16,ATTRB=ASKIP,                       X
                INITIAL='ACTIVITE PRO  :'
-ACTPRO   DFHMDF POS=(11,19),LENGTH=2,ATTRB=(UNPROT,NUM)
+ACTPRO   DFHMDF POS=(11,19),LENGTH=2,ATTRB=(UNPROT,NUM,FSET)
          DFHMDF POS=(11,22),LENGTH=1,ATTRB=ASKIP
 *
          DFHMDF POS=(12,2),LENGTH=16,ATTRB=ASKIP,                       X
                INITIAL='SITUATION SOC :'
-SITSO    DFHMDF POS=(12,19),LENGTH=1,ATTRB=UNPROT
+SITSO    DFHMDF POS=(12,19),LENGTH=1,ATTRB=(UNPROT,FSET)
          DFHMDF POS=(12,21),LENGTH=15,ATTRB=ASKIP,                      X
                INITIAL='(C/M/D/V)'
 *
          DFHMDF POS=(13,2),LENGTH=16,ATTRB=ASKIP,                       X
                INITIAL='ADRESSE       :'
-ADRESSE  DFHMDF POS=(13,19),LENGTH=10,ATTRB=UNPROT
+ADRESSE  DFHMDF POS=(13,19),LENGTH=10,ATTRB=(UNPROT,FSET)
          DFHMDF POS=(13,30),LENGTH=1,ATTRB=ASKIP
 *
          DFHMDF POS=(14,2),LENGTH=16,ATTRB=ASKIP,                       X
                INITIAL='SOLDE         :'
-SOLDE    DFHMDF POS=(14,19),LENGTH=10,ATTRB=(UNPROT,NUM)
+SOLDE    DFHMDF POS=(14,19),LENGTH=10,ATTRB=(UNPROT,NUM,FSET)
          DFHMDF POS=(14,30),LENGTH=1,ATTRB=ASKIP
 *
          DFHMDF POS=(15,2),LENGTH=16,ATTRB=ASKIP,                       X
                INITIAL='POSITION      :'
-POSIT    DFHMDF POS=(15,19),LENGTH=2,ATTRB=UNPROT
+POSIT    DFHMDF POS=(15,19),LENGTH=2,ATTRB=(UNPROT,FSET)
          DFHMDF POS=(15,22),LENGTH=12,ATTRB=ASKIP,                      X
                INITIAL='(DB ou CR)'
 *----------------------------------------------------------------------

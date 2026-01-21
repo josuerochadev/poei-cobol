@@ -2,6 +2,11 @@
 *  MAPSET : CLIAFF - Affichage Client
 *  Transaction : AFFI
 *  Fil Rouge CICS - Exercice 2
+*
+*  OPTIMISATION FSET :
+*  -------------------
+*  Le champ NUMCPT a l'attribut FSET pour garantir son renvoi au
+*  programme meme si non modifie par l'utilisateur.
 ***********************************************************************
 CLIAFF   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
                STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
@@ -20,7 +25,7 @@ MAPAFF   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 *----------------------------------------------------------------------
          DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='NUMERO COMPTE :'
-NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC,FSET)
          DFHMDF POS=(4,26),LENGTH=1,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * ZONES D'AFFICHAGE - DONNEES CLIENT

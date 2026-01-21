@@ -17,6 +17,11 @@
 *  MODE PSEUDO-CONVERSATIONNEL :
 *  - Premier passage : Affichage ecran de saisie
 *  - Passages suivants : Calcul et affichage des statistiques
+*
+*  OPTIMISATION FSET :
+*  -------------------
+*  Le champ CODREG a l'attribut FSET pour garantir son renvoi au
+*  programme meme si non modifie par l'utilisateur.
 ***********************************************************************
 CLISTAT  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
                STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
@@ -35,7 +40,7 @@ MAPSTAT  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 *----------------------------------------------------------------------
          DFHMDF POS=(4,2),LENGTH=25,ATTRB=ASKIP,                        X
                INITIAL='CODE REGION           :'
-CODREG   DFHMDF POS=(4,28),LENGTH=2,ATTRB=(UNPROT,NUM,IC)
+CODREG   DFHMDF POS=(4,28),LENGTH=2,ATTRB=(UNPROT,NUM,IC,FSET)
          DFHMDF POS=(4,31),LENGTH=1,ATTRB=ASKIP
          DFHMDF POS=(4,33),LENGTH=40,ATTRB=ASKIP,                       X
                INITIAL='(01=Paris, 02=Marseille, 03=Lyon, 04=Lille)'

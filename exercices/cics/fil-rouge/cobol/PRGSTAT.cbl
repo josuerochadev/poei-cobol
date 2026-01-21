@@ -27,6 +27,12 @@
       * - PATH defini (ROCHA.CICS.CLIENT.PATH)
       * - Definition CICS : FILE(PCLIENT) DSN(PATH)
       *
+      * OPTIMISATIONS IMPLEMENTEES :
+      * ---------------------------
+      * 1. FSET dans BMS : CODREG renvoye automatiquement
+      * 2. DATAONLY : Reaffichage sans renvoyer la structure map
+      * 3. CURSOR dynamique : Positionnement sur le champ en erreur
+      *
       * FIL ROUGE CICS - EXERCICE 19
       ******************************************************************
        ENVIRONMENT DIVISION.
@@ -198,12 +204,13 @@
            IF WS-RESP = DFHRESP(MAPFAIL)
                MOVE LOW-VALUES TO MAPSTATO
                MOVE 'VEUILLEZ SAISIR UN CODE REGION' TO MSGO
+               MOVE -1 TO CODREGL
                EXEC CICS SEND MAP('MAPSTAT')
                    MAPSET('CLISTAT')
                    FROM(MAPSTATO)
                    FREEKB
                    CURSOR
-                   ERASE
+                   DATAONLY
                END-EXEC
                GO TO 2000-FIN
            END-IF
@@ -217,12 +224,13 @@
                MOVE LOW-VALUES TO MAPSTATO
                MOVE 'CODE REGION OBLIGATOIRE (01-04)'
                    TO MSGO
+               MOVE -1 TO CODREGL
                EXEC CICS SEND MAP('MAPSTAT')
                    MAPSET('CLISTAT')
                    FROM(MAPSTATO)
                    FREEKB
                    CURSOR
-                   ERASE
+                   DATAONLY
                END-EXEC
                GO TO 2000-FIN
            END-IF
@@ -235,12 +243,13 @@
                MOVE WS-CODE-REGION TO CODREGO
                MOVE 'CODE REGION INVALIDE (01-04)'
                    TO MSGO
+               MOVE -1 TO CODREGL
                EXEC CICS SEND MAP('MAPSTAT')
                    MAPSET('CLISTAT')
                    FROM(MAPSTATO)
                    FREEKB
                    CURSOR
-                   ERASE
+                   DATAONLY
                END-EXEC
                GO TO 2000-FIN
            END-IF

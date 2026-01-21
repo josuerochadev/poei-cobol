@@ -25,6 +25,12 @@
       * - Supprime directement par la cle (RIDFLD)
       * - Erreur NOTFND si le client n'existe pas
       *
+      * OPTIMISATIONS IMPLEMENTEES :
+      * ---------------------------
+      * 1. FSET dans BMS : NUMCPT et CONFIRM renvoyes automatiquement
+      * 2. DATAONLY : Reaffichage sans renvoyer la structure map
+      * 3. CURSOR dynamique : Positionnement sur le champ en erreur
+      *
       * FIL ROUGE CICS - EXERCICE 13
       ******************************************************************
        ENVIRONMENT DIVISION.
@@ -175,9 +181,10 @@
            IF WS-RESP = DFHRESP(MAPFAIL)
                MOVE LOW-VALUES TO MAPSUPO
                MOVE 'VEUILLEZ SAISIR UN NUMERO DE COMPTE' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPSUP')
                    MAPSET('CLISUP')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -190,9 +197,10 @@
            IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
                MOVE LOW-VALUES TO MAPSUPO
                MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPSUP')
                    MAPSET('CLISUP')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -200,9 +208,10 @@
            IF WS-NUMCPT NOT NUMERIC
                MOVE LOW-VALUES TO MAPSUPO
                MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPSUP')
                    MAPSET('CLISUP')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -220,9 +229,10 @@
            IF WS-RESP = DFHRESP(NOTFND)
                MOVE LOW-VALUES TO MAPSUPO
                MOVE 'CLIENT INEXISTANT - VERIFIEZ LE NUMERO' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPSUP')
                    MAPSET('CLISUP')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -354,9 +364,10 @@
                MOVE WS-NUMCPT-SAVED TO NUMCPTO
                MOVE DFHBMASK TO NUMCPTA
                MOVE 'VEUILLEZ REPONDRE O OU N' TO MSGO
+               MOVE -1 TO CONFIRML
                EXEC CICS SEND MAP('MAPSUP')
                    MAPSET('CLISUP')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 4000-FIN
            END-IF
@@ -372,9 +383,10 @@
                MOVE WS-NUMCPT-SAVED TO NUMCPTO
                MOVE DFHBMASK TO NUMCPTA
                MOVE 'REPONSE INVALIDE - SAISIR O OU N' TO MSGO
+               MOVE -1 TO CONFIRML
                EXEC CICS SEND MAP('MAPSUP')
                    MAPSET('CLISUP')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 4000-FIN
            END-IF

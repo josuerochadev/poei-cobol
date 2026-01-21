@@ -17,6 +17,14 @@
       * - Sauvegarde du prefixe et de la position de navigation
       * - Permet de parcourir tout le fichier par pages
       *
+      * OPTIMISATIONS IMPLEMENTEES :
+      * ---------------------------
+      * 1. FSET dans BMS : PREFIXE renvoye automatiquement
+      * 2. DATAONLY : Reaffichage sans renvoyer la structure map
+      * 3. CURSOR dynamique : Positionnement sur le champ en erreur
+      * 4. REDEFINES sur MAPLGENO : Acces indexe aux lignes
+      *    -> Remplace 60 MOVE par 6 MOVE dans une boucle PERFORM
+      *
       * FIL ROUGE CICS - EXERCICE 18
       ******************************************************************
        ENVIRONMENT DIVISION.
@@ -53,6 +61,41 @@
       * COPYBOOK GENERE PAR ASSEMBLAGE BMS (DSECT)
       *-----------------------------------------------------------------
        COPY CLILIST.
+
+      *-----------------------------------------------------------------
+      * REDEFINES POUR ACCES INDEXE AUX LIGNES DE LA MAP
+      * Structure : PREFIXE(9) + LIGNES(580) + PAGINATION(20) + MSG(63)
+      * Chaque ligne = 58 octets (6 champs x (L:2 + A:1 + O:var))
+      *-----------------------------------------------------------------
+       01  MAPLGENO-REDEF REDEFINES MAPLGENO.
+           05 FILLER                   PIC X(09).
+           05 MAP-LIGNES-ZONE.
+              10 MAP-LN OCCURS 10 TIMES.
+      *          NUMCPT : L(2) + A(1) + O(6) = 9
+                 15 MAP-LN-NUML        PIC S9(4) COMP.
+                 15 MAP-LN-NUMA        PIC X.
+                 15 MAP-LN-NUMO        PIC X(06).
+      *          REGION : L(2) + A(1) + O(2) = 5
+                 15 MAP-LN-REGL        PIC S9(4) COMP.
+                 15 MAP-LN-REGA        PIC X.
+                 15 MAP-LN-REGO        PIC X(02).
+      *          NOM : L(2) + A(1) + O(10) = 13
+                 15 MAP-LN-NOML        PIC S9(4) COMP.
+                 15 MAP-LN-NOMA        PIC X.
+                 15 MAP-LN-NOMO        PIC X(10).
+      *          PRENOM : L(2) + A(1) + O(10) = 13
+                 15 MAP-LN-PREL        PIC S9(4) COMP.
+                 15 MAP-LN-PREA        PIC X.
+                 15 MAP-LN-PREO        PIC X(10).
+      *          SOLDE : L(2) + A(1) + O(10) = 13
+                 15 MAP-LN-SOLL        PIC S9(4) COMP.
+                 15 MAP-LN-SOLA        PIC X.
+                 15 MAP-LN-SOLO        PIC X(10).
+      *          POSITION : L(2) + A(1) + O(2) = 5
+                 15 MAP-LN-POSL        PIC S9(4) COMP.
+                 15 MAP-LN-POSA        PIC X.
+                 15 MAP-LN-POSO        PIC X(02).
+           05 FILLER                   PIC X(83).
 
       *-----------------------------------------------------------------
       * STRUCTURE ENREGISTREMENT CLIENT (80 OCTETS)
@@ -101,6 +144,7 @@
       *-----------------------------------------------------------------
        01  WS-LONGUEUR           PIC 9(01) VALUE 0.
        01  WS-INDEX              PIC 9(02) VALUE 0.
+       01  WS-IDX-LN             PIC 9(02) VALUE 0.
 
       *-----------------------------------------------------------------
       * COMPTEURS
@@ -225,12 +269,13 @@
            IF WS-RESP = DFHRESP(MAPFAIL)
                MOVE LOW-VALUES TO MAPLGENO
                MOVE 'VEUILLEZ SAISIR UN PREFIXE' TO MSGO
+               MOVE -1 TO PREFIXEL
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
                    FROM(MAPLGENO)
                    FREEKB
                    CURSOR
-                   ERASE
+                   DATAONLY
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -243,12 +288,13 @@
            IF WS-PREFIXEL = 0 OR WS-PREFIXE = SPACES
                MOVE LOW-VALUES TO MAPLGENO
                MOVE 'PREFIXE OBLIGATOIRE (1 A 6 CARACTERES)' TO MSGO
+               MOVE -1 TO PREFIXEL
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
                    FROM(MAPLGENO)
                    FREEKB
                    CURSOR
-                   ERASE
+                   DATAONLY
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -260,12 +306,13 @@
            IF WS-LONGUEUR = 0
                MOVE LOW-VALUES TO MAPLGENO
                MOVE 'PREFIXE INVALIDE - MIN 1 CARACTERE' TO MSGO
+               MOVE -1 TO PREFIXEL
                EXEC CICS SEND MAP('MAPLGEN')
                    MAPSET('CLILIST')
                    FROM(MAPLGENO)
                    FREEKB
                    CURSOR
-                   ERASE
+                   DATAONLY
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -514,76 +561,16 @@
 
            EXEC CICS ENDBR FILE('FCLIENT') END-EXEC
 
-      *    Transferer les donnees vers la MAP
-           MOVE WS-CLI-NUM(1)  TO L1NUMO
-           MOVE WS-CLI-REG(1)  TO L1REGO
-           MOVE WS-CLI-NOM(1)  TO L1NOMO
-           MOVE WS-CLI-PRE(1)  TO L1PREO
-           MOVE WS-CLI-SOL(1)  TO L1SOLO
-           MOVE WS-CLI-POS(1)  TO L1POSO
-
-           MOVE WS-CLI-NUM(2)  TO L2NUMO
-           MOVE WS-CLI-REG(2)  TO L2REGO
-           MOVE WS-CLI-NOM(2)  TO L2NOMO
-           MOVE WS-CLI-PRE(2)  TO L2PREO
-           MOVE WS-CLI-SOL(2)  TO L2SOLO
-           MOVE WS-CLI-POS(2)  TO L2POSO
-
-           MOVE WS-CLI-NUM(3)  TO L3NUMO
-           MOVE WS-CLI-REG(3)  TO L3REGO
-           MOVE WS-CLI-NOM(3)  TO L3NOMO
-           MOVE WS-CLI-PRE(3)  TO L3PREO
-           MOVE WS-CLI-SOL(3)  TO L3SOLO
-           MOVE WS-CLI-POS(3)  TO L3POSO
-
-           MOVE WS-CLI-NUM(4)  TO L4NUMO
-           MOVE WS-CLI-REG(4)  TO L4REGO
-           MOVE WS-CLI-NOM(4)  TO L4NOMO
-           MOVE WS-CLI-PRE(4)  TO L4PREO
-           MOVE WS-CLI-SOL(4)  TO L4SOLO
-           MOVE WS-CLI-POS(4)  TO L4POSO
-
-           MOVE WS-CLI-NUM(5)  TO L5NUMO
-           MOVE WS-CLI-REG(5)  TO L5REGO
-           MOVE WS-CLI-NOM(5)  TO L5NOMO
-           MOVE WS-CLI-PRE(5)  TO L5PREO
-           MOVE WS-CLI-SOL(5)  TO L5SOLO
-           MOVE WS-CLI-POS(5)  TO L5POSO
-
-           MOVE WS-CLI-NUM(6)  TO L6NUMO
-           MOVE WS-CLI-REG(6)  TO L6REGO
-           MOVE WS-CLI-NOM(6)  TO L6NOMO
-           MOVE WS-CLI-PRE(6)  TO L6PREO
-           MOVE WS-CLI-SOL(6)  TO L6SOLO
-           MOVE WS-CLI-POS(6)  TO L6POSO
-
-           MOVE WS-CLI-NUM(7)  TO L7NUMO
-           MOVE WS-CLI-REG(7)  TO L7REGO
-           MOVE WS-CLI-NOM(7)  TO L7NOMO
-           MOVE WS-CLI-PRE(7)  TO L7PREO
-           MOVE WS-CLI-SOL(7)  TO L7SOLO
-           MOVE WS-CLI-POS(7)  TO L7POSO
-
-           MOVE WS-CLI-NUM(8)  TO L8NUMO
-           MOVE WS-CLI-REG(8)  TO L8REGO
-           MOVE WS-CLI-NOM(8)  TO L8NOMO
-           MOVE WS-CLI-PRE(8)  TO L8PREO
-           MOVE WS-CLI-SOL(8)  TO L8SOLO
-           MOVE WS-CLI-POS(8)  TO L8POSO
-
-           MOVE WS-CLI-NUM(9)  TO L9NUMO
-           MOVE WS-CLI-REG(9)  TO L9REGO
-           MOVE WS-CLI-NOM(9)  TO L9NOMO
-           MOVE WS-CLI-PRE(9)  TO L9PREO
-           MOVE WS-CLI-SOL(9)  TO L9SOLO
-           MOVE WS-CLI-POS(9)  TO L9POSO
-
-           MOVE WS-CLI-NUM(10) TO L10NUMO
-           MOVE WS-CLI-REG(10) TO L10REGO
-           MOVE WS-CLI-NOM(10) TO L10NOMO
-           MOVE WS-CLI-PRE(10) TO L10PREO
-           MOVE WS-CLI-SOL(10) TO L10SOLO
-           MOVE WS-CLI-POS(10) TO L10POSO
+      *    Transferer les donnees vers la MAP via REDEFINES
+      *    (Optimisation : 60 MOVE -> 6 MOVE dans une boucle)
+           PERFORM VARYING WS-IDX-LN FROM 1 BY 1 UNTIL WS-IDX-LN > 10
+               MOVE WS-CLI-NUM(WS-IDX-LN) TO MAP-LN-NUMO(WS-IDX-LN)
+               MOVE WS-CLI-REG(WS-IDX-LN) TO MAP-LN-REGO(WS-IDX-LN)
+               MOVE WS-CLI-NOM(WS-IDX-LN) TO MAP-LN-NOMO(WS-IDX-LN)
+               MOVE WS-CLI-PRE(WS-IDX-LN) TO MAP-LN-PREO(WS-IDX-LN)
+               MOVE WS-CLI-SOL(WS-IDX-LN) TO MAP-LN-SOLO(WS-IDX-LN)
+               MOVE WS-CLI-POS(WS-IDX-LN) TO MAP-LN-POSO(WS-IDX-LN)
+           END-PERFORM
 
       *    Informations de pagination
            MOVE WS-PREFIXE-SAVED TO PREFIXEO

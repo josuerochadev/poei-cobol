@@ -24,6 +24,12 @@
       * - Permet saisie partielle : '1', '11', '111', etc.
       * - Utilise STARTBR/READNEXT pour parcourir les clients
       *
+      * OPTIMISATIONS IMPLEMENTEES :
+      * ---------------------------
+      * 1. FSET dans BMS : PREFIXE et CONFIRM renvoyes automatiquement
+      * 2. DATAONLY : Reaffichage sans renvoyer la structure map
+      * 3. CURSOR dynamique : Positionnement sur le champ en erreur
+      *
       * FIL ROUGE CICS - EXERCICE 17
       ******************************************************************
        ENVIRONMENT DIVISION.
@@ -218,9 +224,10 @@
            IF WS-RESP = DFHRESP(MAPFAIL)
                MOVE LOW-VALUES TO MAPDELO
                MOVE 'VEUILLEZ SAISIR UN PREFIXE' TO MSGO
+               MOVE -1 TO PREFIXEL
                EXEC CICS SEND MAP('MAPDEL')
                    MAPSET('CLIDEL')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -233,9 +240,10 @@
            IF WS-PREFIXEL = 0 OR WS-PREFIXE = SPACES
                MOVE LOW-VALUES TO MAPDELO
                MOVE 'PREFIXE OBLIGATOIRE (1 A 6 CARACTERES)' TO MSGO
+               MOVE -1 TO PREFIXEL
                EXEC CICS SEND MAP('MAPDEL')
                    MAPSET('CLIDEL')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -247,9 +255,10 @@
            IF WS-LONGUEUR = 0
                MOVE LOW-VALUES TO MAPDELO
                MOVE 'PREFIXE INVALIDE - MIN 1 CARACTERE' TO MSGO
+               MOVE -1 TO PREFIXEL
                EXEC CICS SEND MAP('MAPDEL')
                    MAPSET('CLIDEL')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -396,9 +405,10 @@
                MOVE WS-PREFIXE-SAVED TO PREFIXEO
                MOVE WS-NBCLI-SAVED TO NBCLIO
                MOVE 'VEUILLEZ REPONDRE O OU N' TO MSGO
+               MOVE -1 TO CONFIRML
                EXEC CICS SEND MAP('MAPDEL')
                    MAPSET('CLIDEL')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 4000-FIN
            END-IF
@@ -414,9 +424,10 @@
                MOVE WS-PREFIXE-SAVED TO PREFIXEO
                MOVE WS-NBCLI-SAVED TO NBCLIO
                MOVE 'REPONSE INVALIDE - SAISIR O OU N' TO MSGO
+               MOVE -1 TO CONFIRML
                EXEC CICS SEND MAP('MAPDEL')
                    MAPSET('CLIDEL')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 4000-FIN
            END-IF

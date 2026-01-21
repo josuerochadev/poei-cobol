@@ -12,6 +12,11 @@
 *  Deux modes d'utilisation :
 *  - SUPP : Suppression directe (Ex 13-14)
 *  - SULE : Suppression avec lecture prealable (Ex 15)
+*
+*  OPTIMISATION FSET :
+*  -------------------
+*  Les champs NUMCPT et CONFIRM ont l'attribut FSET pour garantir
+*  leur renvoi au programme meme si non modifies par l'utilisateur.
 ***********************************************************************
 CLISUP   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
                STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
@@ -30,7 +35,7 @@ MAPSUP   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 *----------------------------------------------------------------------
          DFHMDF POS=(4,2),LENGTH=16,ATTRB=ASKIP,                        X
                INITIAL='NUMERO COMPTE :'
-NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC)
+NUMCPT   DFHMDF POS=(4,19),LENGTH=6,ATTRB=(UNPROT,NUM,IC,FSET)
          DFHMDF POS=(4,26),LENGTH=1,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * ZONES D'AFFICHAGE - DONNEES CLIENT (LECTURE SEULE)
@@ -93,7 +98,7 @@ LIBPOS   DFHMDF POS=(16,36),LENGTH=10,ATTRB=(ASKIP,BRT)
 *----------------------------------------------------------------------
          DFHMDF POS=(18,2),LENGTH=30,ATTRB=(ASKIP,BRT),                 X
                INITIAL='CONFIRMER SUPPRESSION (O/N) :'
-CONFIRM  DFHMDF POS=(18,33),LENGTH=1,ATTRB=UNPROT
+CONFIRM  DFHMDF POS=(18,33),LENGTH=1,ATTRB=(UNPROT,FSET)
          DFHMDF POS=(18,35),LENGTH=1,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * ZONE MESSAGE

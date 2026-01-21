@@ -30,6 +30,16 @@
       * - La cle (NUMCPT) ne peut pas etre modifiee
       * - Le client doit exister (pas de creation)
       *
+      * OPTIMISATIONS IMPLEMENTEES :
+      * ---------------------------
+      * 1. FSET dans BMS : Tous les champs sont renvoyes par le terminal
+      *    -> Plus besoin de relire le fichier pour fusionner
+      *    -> Suppression de la logique de fusion (80 lignes en moins)
+      * 2. DATAONLY : Reaffichage sans renvoyer la structure de l'ecran
+      *    -> Optimisation du trafic reseau
+      * 3. CURSOR dynamique : Positionnement sur le champ en erreur
+      *    -> Meilleure experience utilisateur
+      *
       * FIL ROUGE CICS - EXERCICE 10
       ******************************************************************
        ENVIRONMENT DIVISION.
@@ -204,9 +214,10 @@
            IF WS-RESP = DFHRESP(MAPFAIL)
                MOVE LOW-VALUES TO MAPMAJO
                MOVE 'VEUILLEZ SAISIR UN NUMERO DE COMPTE' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPMAJ')
                    MAPSET('CLIMAJ')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -219,9 +230,10 @@
            IF WS-NUMCPTL = 0 OR WS-NUMCPT = SPACES
                MOVE LOW-VALUES TO MAPMAJO
                MOVE 'NUMERO DE COMPTE OBLIGATOIRE' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPMAJ')
                    MAPSET('CLIMAJ')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -229,9 +241,10 @@
            IF WS-NUMCPT NOT NUMERIC
                MOVE LOW-VALUES TO MAPMAJO
                MOVE 'NUMERO DE COMPTE DOIT ETRE NUMERIQUE' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPMAJ')
                    MAPSET('CLIMAJ')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -249,9 +262,10 @@
            IF WS-RESP = DFHRESP(NOTFND)
                MOVE LOW-VALUES TO MAPMAJO
                MOVE 'CLIENT INEXISTANT - VERIFIEZ LE NUMERO' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPMAJ')
                    MAPSET('CLIMAJ')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -259,9 +273,10 @@
            IF WS-RESP NOT = DFHRESP(NORMAL)
                MOVE LOW-VALUES TO MAPMAJO
                MOVE 'ERREUR LECTURE FICHIER - CONTACTEZ SUPPORT' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPMAJ')
                    MAPSET('CLIMAJ')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 3000-FIN
            END-IF
@@ -331,9 +346,10 @@
                MOVE WS-NUMCPT-SAVED TO NUMCPTO
                MOVE DFHBMASK TO NUMCPTA
                MOVE 'AUCUNE MODIFICATION - ENTREZ DES DONNEES' TO MSGO
+               MOVE -1 TO CODREGL
                EXEC CICS SEND MAP('MAPMAJ')
                    MAPSET('CLIMAJ')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 4000-FIN
            END-IF
@@ -358,39 +374,17 @@
            MOVE POSITI    TO WS-POSITION
            MOVE POSITL    TO WS-POSITL
 
-      *    RELECTURE DU CLIENT POUR AVOIR LES DONNEES ACTUELLES
-           MOVE WS-NUMCPT TO CLI-NUMCPT
-           EXEC CICS READ
-               FILE('FCLIENT')
-               INTO(ENR-CLIENT)
-               RIDFLD(CLI-NUMCPT)
-               RESP(WS-RESP)
-           END-EXEC
+      *    AVEC FSET : Tous les champs sont renvoyes par le terminal,
+      *    plus besoin de relire le fichier pour fusionner les donnees.
 
-           IF WS-RESP NOT = DFHRESP(NORMAL)
-               MOVE LOW-VALUES TO MAPMAJO
-               MOVE WS-NUMCPT TO NUMCPTO
-               MOVE DFHBMASK TO NUMCPTA
-               MOVE 'ERREUR RELECTURE CLIENT - REESSAYEZ' TO MSGO
-               EXEC CICS SEND MAP('MAPMAJ')
-                   MAPSET('CLIMAJ')
-                   ERASE
-               END-EXEC
-               GO TO 4000-FIN
-           END-IF
-
-      *    FUSION : Ne remplacer que les champs modifies (longueur > 0)
-      *    Les champs non modifies gardent leur valeur actuelle (CLI-*)
-           PERFORM 4050-FUSIONNER-MODIFICATIONS
-
-      *    Validation des donnees finales
+      *    Validation des donnees saisies
            PERFORM 4100-VALIDER-DONNEES THRU 4100-FIN
 
            IF ERREUR-DETECTEE
                MOVE DFHBMASK TO NUMCPTA
                EXEC CICS SEND MAP('MAPMAJ')
                    MAPSET('CLIMAJ')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 4000-FIN
            END-IF
@@ -408,96 +402,11 @@
            EXIT.
 
       *-----------------------------------------------------------------
-       4050-FUSIONNER-MODIFICATIONS.
-      *-----------------------------------------------------------------
-      * Fusionne les modifications de l'utilisateur avec les donnees
-      * actuelles du client. Seuls les champs modifies (longueur > 0)
-      * remplacent les valeurs existantes.
-      *-----------------------------------------------------------------
-      *    Code region : si modifie, prendre la nouvelle valeur
-           IF WS-CODREGL > 0
-               MOVE WS-CODREG TO CLI-CODREG
-           ELSE
-               MOVE CLI-CODREG TO WS-CODREG
-           END-IF
-
-      *    Nature compte : pas de longueur, on prend si non vide
-           IF WS-NATCPT NOT = SPACES AND WS-NATCPT NOT = LOW-VALUES
-               MOVE WS-NATCPT TO CLI-NATCPT
-           ELSE
-               MOVE CLI-NATCPT TO WS-NATCPT
-           END-IF
-
-      *    Nom
-           IF WS-NOML > 0
-               MOVE WS-NOM TO CLI-NOM
-           ELSE
-               MOVE CLI-NOM TO WS-NOM
-           END-IF
-
-      *    Prenom : pas de longueur obligatoire
-           IF WS-PRENOM NOT = SPACES AND WS-PRENOM NOT = LOW-VALUES
-               MOVE WS-PRENOM TO CLI-PRENOM
-           ELSE
-               MOVE CLI-PRENOM TO WS-PRENOM
-           END-IF
-
-      *    Date naissance
-           IF WS-DATNAISSL > 0
-               MOVE WS-DATNAISS TO CLI-DATNAISS
-           ELSE
-               MOVE CLI-DATNAISS TO WS-DATNAISS
-           END-IF
-
-      *    Sexe
-           IF WS-SEXEL > 0
-               MOVE WS-SEXE TO CLI-SEXE
-           ELSE
-               MOVE CLI-SEXE TO WS-SEXE
-           END-IF
-
-      *    Activite pro : pas de longueur obligatoire
-           IF WS-ACTPRO NOT = SPACES AND WS-ACTPRO NOT = LOW-VALUES
-               MOVE WS-ACTPRO TO CLI-ACTPRO
-           ELSE
-               MOVE CLI-ACTPRO TO WS-ACTPRO
-           END-IF
-
-      *    Situation sociale
-           IF WS-SITSOL > 0
-               MOVE WS-SITSO TO CLI-SITSO
-           ELSE
-               MOVE CLI-SITSO TO WS-SITSO
-           END-IF
-
-      *    Adresse : pas de longueur obligatoire
-           IF WS-ADRESSE NOT = SPACES AND WS-ADRESSE NOT = LOW-VALUES
-               MOVE WS-ADRESSE TO CLI-ADRESSE
-           ELSE
-               MOVE CLI-ADRESSE TO WS-ADRESSE
-           END-IF
-
-      *    Solde : pas de longueur obligatoire
-           IF WS-SOLDE NOT = SPACES AND WS-SOLDE NOT = LOW-VALUES
-               MOVE WS-SOLDE TO CLI-SOLDE
-           ELSE
-               MOVE CLI-SOLDE TO WS-SOLDE
-           END-IF
-
-      *    Position
-           IF WS-POSITL > 0
-               MOVE WS-POSITION TO CLI-POSITION
-           ELSE
-               MOVE CLI-POSITION TO WS-POSITION
-           END-IF.
-
-      *-----------------------------------------------------------------
        4100-VALIDER-DONNEES.
       *-----------------------------------------------------------------
-      * Controles de conformite des donnees finales (apres fusion)
-      * Note: Les variables WS-* contiennent soit la modification de
-      * l'utilisateur, soit la valeur actuelle du client (via fusion)
-      * Donc on ne verifie plus les longueurs, seulement les valeurs.
+      * Controles de conformite des donnees saisies
+      * AVEC FSET : Les variables WS-* contiennent toutes les valeurs
+      * de l'ecran (modifiees ou non). Plus besoin de fusion.
       *-----------------------------------------------------------------
            MOVE LOW-VALUES TO MAPMAJO
            MOVE WS-NUMCPT TO NUMCPTO
@@ -506,6 +415,7 @@
            IF WS-CODREG NOT = '01' AND WS-CODREG NOT = '02'
               AND WS-CODREG NOT = '03' AND WS-CODREG NOT = '04'
                MOVE 'CODE REGION INVALIDE (01/02/03/04)' TO MSGO
+               MOVE -1 TO CODREGL
                MOVE 'O' TO WS-ERREUR
                GO TO 4100-FIN
            END-IF
@@ -513,6 +423,7 @@
       *    Controle nom (obligatoire)
            IF WS-NOM = SPACES
                MOVE 'NOM OBLIGATOIRE' TO MSGO
+               MOVE -1 TO NOML
                MOVE 'O' TO WS-ERREUR
                GO TO 4100-FIN
            END-IF
@@ -520,6 +431,7 @@
       *    Controle sexe (M ou F)
            IF WS-SEXE NOT = 'M' AND WS-SEXE NOT = 'F'
                MOVE 'SEXE INVALIDE (M OU F)' TO MSGO
+               MOVE -1 TO SEXEL
                MOVE 'O' TO WS-ERREUR
                GO TO 4100-FIN
            END-IF
@@ -528,6 +440,7 @@
            IF WS-SITSO NOT = 'C' AND WS-SITSO NOT = 'M'
               AND WS-SITSO NOT = 'D' AND WS-SITSO NOT = 'V'
                MOVE 'SITUATION INVALIDE (C/M/D/V)' TO MSGO
+               MOVE -1 TO SITSOL
                MOVE 'O' TO WS-ERREUR
                GO TO 4100-FIN
            END-IF
@@ -535,6 +448,7 @@
       *    Controle position (DB ou CR)
            IF WS-POSITION NOT = 'DB' AND WS-POSITION NOT = 'CR'
                MOVE 'POSITION INVALIDE (DB OU CR)' TO MSGO
+               MOVE -1 TO POSITL
                MOVE 'O' TO WS-ERREUR
                GO TO 4100-FIN
            END-IF.

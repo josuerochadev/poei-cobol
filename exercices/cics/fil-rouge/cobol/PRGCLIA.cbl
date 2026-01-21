@@ -12,6 +12,12 @@
       *   - Passages suivants : Lit et affiche le client
       *   - PF3 : Quitter la transaction
       *
+      * OPTIMISATIONS IMPLEMENTEES :
+      * ---------------------------
+      * 1. FSET dans BMS : NUMCPT renvoye automatiquement
+      * 2. DATAONLY : Reaffichage sans renvoyer la structure map
+      * 3. CURSOR dynamique : Positionnement sur le champ en erreur
+      *
       * FIL ROUGE CICS - EXERCICE 3
       ******************************************************************
        ENVIRONMENT DIVISION.
@@ -144,9 +150,10 @@
            IF WS-RESP = DFHRESP(MAPFAIL)
                MOVE LOW-VALUES TO MAPAFFO
                MOVE 'ERREUR RECEPTION - RESSAISIR' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPAFF')
                    MAPSET('CLIAFF')
-                   ERASE
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 2000-FIN
            END-IF
@@ -155,8 +162,10 @@
            IF NUMCPTL = 0 OR NUMCPTI = SPACES
                MOVE LOW-VALUES TO MAPAFFO
                MOVE 'VEUILLEZ SAISIR UN NUMERO DE COMPTE' TO MSGO
+               MOVE -1 TO NUMCPTL
                EXEC CICS SEND MAP('MAPAFF')
                    MAPSET('CLIAFF')
+                   DATAONLY CURSOR
                END-EXEC
                GO TO 2000-FIN
            END-IF

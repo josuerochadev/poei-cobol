@@ -15,6 +15,11 @@
 *  MODE PSEUDO-CONVERSATIONNEL A 2 PHASES :
 *  Phase 1 : Saisie prefixe/cle -> Comptage et affichage
 *  Phase 2 : Confirmation O/N -> Suppression effective
+*
+*  OPTIMISATION FSET :
+*  -------------------
+*  Les champs PREFIXE et CONFIRM ont l'attribut FSET pour garantir
+*  leur renvoi au programme meme si non modifies par l'utilisateur.
 ***********************************************************************
 CLIDEL   DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
                STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
@@ -33,7 +38,7 @@ MAPDEL   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 *----------------------------------------------------------------------
          DFHMDF POS=(5,2),LENGTH=25,ATTRB=ASKIP,                        X
                INITIAL='PREFIXE OU CLE COMPLETE :'
-PREFIXE  DFHMDF POS=(5,28),LENGTH=6,ATTRB=(UNPROT,IC)
+PREFIXE  DFHMDF POS=(5,28),LENGTH=6,ATTRB=(UNPROT,IC,FSET)
          DFHMDF POS=(5,35),LENGTH=1,ATTRB=ASKIP
          DFHMDF POS=(5,37),LENGTH=30,ATTRB=ASKIP,                       X
                INITIAL='(1 a 6 caracteres)'
@@ -49,7 +54,7 @@ NBCLI    DFHMDF POS=(8,28),LENGTH=5,ATTRB=(ASKIP,BRT)
 *----------------------------------------------------------------------
          DFHMDF POS=(10,2),LENGTH=25,ATTRB=ASKIP,                       X
                INITIAL='CONFIRMER (O/N)         :'
-CONFIRM  DFHMDF POS=(10,28),LENGTH=1,ATTRB=UNPROT
+CONFIRM  DFHMDF POS=(10,28),LENGTH=1,ATTRB=(UNPROT,FSET)
          DFHMDF POS=(10,30),LENGTH=1,ATTRB=ASKIP
 *----------------------------------------------------------------------
 * ZONE MESSAGE

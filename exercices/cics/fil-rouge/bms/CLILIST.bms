@@ -2,6 +2,11 @@
 *  MAPSET : CLILIST - Liste Generique des Clients
 *  Transaction : LGEN
 *  Fil Rouge CICS - Exercice 18
+*
+*  OPTIMISATION FSET :
+*  -------------------
+*  Le champ PREFIXE a l'attribut FSET pour garantir son renvoi au
+*  programme meme si non modifie par l'utilisateur.
 ***********************************************************************
 CLILIST  DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,                   X
                STORAGE=AUTO,CTRL=(FREEKB,FRSET),TIOAPFX=YES
@@ -16,7 +21,7 @@ MAPLGEN  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
 * ZONE DE SAISIE - PREFIXE
 *----------------------------------------------------------------------
          DFHMDF POS=(3,2),LENGTH=10,ATTRB=ASKIP,INITIAL='PREFIXE :'
-PREFIXE  DFHMDF POS=(3,13),LENGTH=6,ATTRB=(UNPROT,IC)
+PREFIXE  DFHMDF POS=(3,13),LENGTH=6,ATTRB=(UNPROT,IC,FSET)
          DFHMDF POS=(3,20),LENGTH=1,ATTRB=ASKIP
          DFHMDF POS=(3,22),LENGTH=18,ATTRB=ASKIP,                       X
                INITIAL='(1 a 6 caracteres)'
