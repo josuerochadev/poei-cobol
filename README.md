@@ -1,209 +1,180 @@
-# Formation COBOL - POEI
+<div align="center">
 
-Dépôt de suivi de ma formation POEI Développeur Mainframe COBOL dispensée par M2i Formation à Strasbourg (octobre 2025 – janvier 2026).
-Technologies couvertes : z/OS, TSO/ISPF, JCL, VSAM, COBOL, DB2/SQL, CICS
-Ce repository documente ma progression et regroupe les exercices, TP et projets réalisés durant la formation.
+# Formation POEI Mainframe COBOL
 
-## Structure du projet
+**Support de formation complet pour le developpement mainframe : z/OS, JCL, VSAM, COBOL, DB2/SQL, CICS.**
 
-```
-poei-cobol/
-├── cours/                  # Cours par module
-│   ├── zos-tso/            # Module Z/OS et TSO/ISPF (5 chapitres)
-│   │   ├── 01-presentation-zos.md
-│   │   ├── 02-fonctionnement-zos.md
-│   │   ├── 03-tso.md
-│   │   ├── 04-ispf.md
-│   │   └── 05-architecture-zos.md
-│   │
-│   ├── jcl/                # Module JCL (4 chapitres)
-│   │   ├── 01-cartes-job-exec-dd.md
-│   │   ├── 02-fichiers-parametres.md
-│   │   ├── 03-procedures.md
-│   │   └── 04-utilitaires.md
-│   │
-│   ├── algorithmique/      # Module Algorithmique (9 chapitres)
-│   │   ├── 01-introduction-algorithmique.md
-│   │   ├── 02-01-structures-donnees.md
-│   │   ├── 02-02-pointeurs-listes.md
-│   │   ├── 02-03-piles-files.md
-│   │   ├── 03-recursivite.md
-│   │   ├── 04-algorithmes-tri.md
-│   │   ├── 05-complexite-algorithmique.md
-│   │   ├── 06-algorithmes-fichiers.md
-│   │   └── 07-modularite.md
-│   │
-│   ├── cobol/              # Module COBOL (12 chapitres)
-│   │   ├── 01-structure-programme.md
-│   │   ├── ...
-│   │   └── 12-fichier-impression.md
-│   │
-│   ├── cics/               # Module CICS (9 chapitres)
-│   │   ├── 01-presentation-generale.md
-│   │   ├── 02-organisation-systeme.md
-│   │   ├── 03-sgbd-ims.md
-│   │   ├── 04-architecture-multicouches.md
-│   │   ├── 05-couche-presentation.md
-│   │   ├── 06-couche-traitement.md
-│   │   ├── 07-couche-donnees.md
-│   │   ├── 08-travaux-pratiques.md
-│   │   └── 09-architecture-transactions-tsi.md
-│   │
-│   └── db2/                # Module DB2/SQL (10 chapitres)
-│       ├── 01-fondamentaux-bd.md
-│       ├── 02-architecture-db2.md
-│       ├── 03-modelisation.md
-│       ├── 04-modele-relationnel.md
-│       ├── 05-types-db2i.md
-│       ├── 06-sql-ddl.md
-│       ├── 07-sql-dml.md
-│       ├── 08-sql-select.md
-│       ├── 09-sql-avance.md
-│       └── 10-embedded-sql.md
-│
-├── exercices/              # Exercices par module
-│   ├── zos-tso/            # Exercices TSO/ISPF
-│   │
-│   ├── jcl/                # Exercices JCL
-│   │   ├── theorie/        # QCM (4 fichiers)
-│   │   ├── pratique/       # Exercices par chapitre (02, 03, 04)
-│   │   └── tp/             # Travaux pratiques de synthèse
-│   │
-│   ├── algorithmique/      # Exercices Algorithmique (40 exercices + 9 QCM)
-│   │   ├── theorie/        # QCM par chapitre
-│   │   └── pratique/       # Exercices pratiques (5 chapitres)
-│   │
-│   ├── cobol/              # Exercices COBOL (61 programmes)
-│   │   ├── chapitre-02/
-│   │   ├── ...
-│   │   └── chapitre-12/
-│   │
-│   ├── cics/               # Exercices CICS
-│   │   ├── theorie/            # QCM (8 fichiers)
-│   │   ├── pratique/           # Exercices BMS, COBOL, JCL
-│   │   ├── tp-gestion-credits/ # TP complet architecture 3 tiers
-│   │   └── fil-rouge/          # Application bancaire multi-transactions
-│   │
-│   └── db2/                # Exercices DB2/SQL
-│       ├── theorie/        # QCM (71 questions)
-│       ├── tp/             # Travaux pratiques (56 exercices)
-│       ├── pratique/       # Exercices DDL/DML (17 exercices)
-│       └── fil-rouge/      # Mini-projet COBOL-DB2 (25 exercices)
-│
-├── projets/                # Projets complets
-│   └── fil-rouge/          # Projet fil rouge (21 exercices)
-│
-├── hercules/               # Configuration Hercules/z/OS
-├── docs/                   # Documentation et mémos
-├── exemples/               # Exemples de code commentés
-└── utils/                  # Scripts utilitaires
-```
+![COBOL](https://img.shields.io/badge/COBOL_85-005CA5?style=flat&logo=ibm&logoColor=white)
+![z/OS](https://img.shields.io/badge/z%2FOS-054ADA?style=flat&logo=ibm&logoColor=white)
+![JCL](https://img.shields.io/badge/JCL-333333?style=flat)
+![VSAM](https://img.shields.io/badge/VSAM-6C6C6C?style=flat)
+![DB2](https://img.shields.io/badge/DB2-0F62FE?style=flat&logo=ibm&logoColor=white)
+![CICS](https://img.shields.io/badge/CICS_TS-1F70C1?style=flat&logo=ibm&logoColor=white)
+![GnuCOBOL](https://img.shields.io/badge/GnuCOBOL-4E9A06?style=flat)
+
+[Projet fil rouge](https://github.com/josuerochadev/fil-rouge-mainframe) · [Portfolio](https://josuerocha.dev)
+
+</div>
+
+---
+
+## A propos
+
+Depot de suivi de ma formation POEI Developpeur Mainframe COBOL (M2i Formation, Strasbourg, octobre 2025 - janvier 2026). Ce repository regroupe l'ensemble des cours reformules, exercices pratiques, QCM et travaux pratiques realises durant les 3 mois de formation, avant ma prise de poste en tant qu'ingenieur d'etudes mainframe chez CELAD.
+
+Les projets fil rouge (batch, DB2, CICS) sont dans un [repo dedie](https://github.com/josuerochadev/fil-rouge-mainframe) avec une demo web deployable.
+
+## Contenu
+
+- 7 modules de cours (56 chapitres en markdown)
+- 117 programmes COBOL, 139 JCL, 19 maps BMS, 23 scripts SQL
+- Exercices theoriques (QCM) et pratiques par chapitre
+- Configuration emulateur Hercules TK5
+- Scripts utilitaires (compilation, audit)
+
+## Stack technique
+
+| Categorie | Outils |
+|-----------|--------|
+| Langage | COBOL 85 |
+| Systeme | z/OS, TSO/ISPF |
+| Jobs | JCL (Job Control Language) |
+| Fichiers | VSAM KSDS, fichiers sequentiels |
+| Base de donnees | DB2/SQL |
+| Transactionnel | CICS TS, BMS |
+| Emulateur | Hercules TK5 |
+| Compilation locale | GnuCOBOL 3.2.0 |
 
 ## Modules de formation
 
-### Module Z/OS et TSO/ISPF
+### z/OS et TSO/ISPF
 
 | Chapitre | Sujet | Cours | Exercices |
 |----------|-------|-------|-----------|
-| I | Présentation générale de Z/OS | ✅ | - |
-| II | Fonctionnement de Z/OS | ✅ | - |
-| III | TSO (Time Sharing Option) | ✅ | ✅ |
-| IV | ISPF/PDF | ✅ | - |
-| V | Architecture Z/OS | ✅ | - |
+| I | Presentation generale de z/OS | oui | - |
+| II | Fonctionnement de z/OS | oui | - |
+| III | TSO (Time Sharing Option) | oui | oui |
+| IV | ISPF/PDF | oui | - |
+| V | Architecture z/OS | oui | - |
 
-### Module JCL
-
-| Chapitre | Sujet | Cours | Exercices |
-|----------|-------|-------|-----------|
-| I | Cartes JOB, EXEC et DD | ✅ | - |
-| II | Fichiers spéciaux et paramètres | ✅ | ✅ |
-| III | Procédures JCL | ✅ | ✅ |
-| IV | Utilitaires (IEBGENER, IDCAMS, SORT...) | ✅ | ✅ |
-| V | Travaux pratiques (QCM + TPs) | - | ✅ |
-
-### Module Algorithmique
+### JCL
 
 | Chapitre | Sujet | Cours | Exercices |
 |----------|-------|-------|-----------|
-| I | Introduction à l'algorithmique | ✅ | ✅ QCM + 9 ex |
-| II.1 | Structures de données (tableaux, enregistrements) | ✅ | ✅ QCM + 16 ex |
-| II.2 | Pointeurs et listes chaînées | ✅ | ✅ QCM + 3 ex |
-| II.3 | Piles et files (LIFO/FIFO) | ✅ | ✅ QCM + 4 ex |
-| III | Récursivité | ✅ | ✅ QCM + 8 ex |
-| IV | Algorithmes de tri | ✅ | ✅ QCM |
-| V | Complexité algorithmique | ✅ | ✅ QCM |
-| VI | Algorithmes sur fichiers | ✅ | ✅ QCM |
-| VII | Modularité | ✅ | ✅ QCM |
+| I | Cartes JOB, EXEC et DD | oui | - |
+| II | Fichiers speciaux et parametres | oui | oui |
+| III | Procedures JCL | oui | oui |
+| IV | Utilitaires (IEBGENER, IDCAMS, SORT) | oui | oui |
+| V | Travaux pratiques (QCM + TP) | - | oui |
 
-### Module COBOL
+### Algorithmique
 
 | Chapitre | Sujet | Cours | Exercices |
 |----------|-------|-------|-----------|
-| I | Structure d'un programme COBOL | ✅ | - |
-| II | Interface ISPF et commandes | ✅ | ✅ |
-| III | Déclaration des variables | ✅ | ✅ |
-| IV | Opérations sur les données | ✅ | ✅ |
-| V | Traitement conditionnel | ✅ | ✅ |
-| VI | Gestion des Tables | ✅ | ✅ |
-| VII | Gestion des Fichiers | ✅ | ✅ |
-| VIII | Opérations E/S sur les Fichiers | ✅ | ✅ |
-| IX | Programmes et sous-programmes | ✅ | ✅ |
-| X | Traitement des Fichiers | ✅ | ✅ |
-| XI | Tri Interne (SORT/MERGE) | ✅ | ✅ |
-| XII | Fichiers d'impression et édition | ✅ | ✅ |
+| I | Introduction a l'algorithmique | oui | QCM + 9 ex |
+| II.1 | Structures de donnees (tableaux, enregistrements) | oui | QCM + 16 ex |
+| II.2 | Pointeurs et listes chainees | oui | QCM + 3 ex |
+| II.3 | Piles et files (LIFO/FIFO) | oui | QCM + 4 ex |
+| III | Recursivite | oui | QCM + 8 ex |
+| IV | Algorithmes de tri | oui | QCM |
+| V | Complexite algorithmique | oui | QCM |
+| VI | Algorithmes sur fichiers | oui | QCM |
+| VII | Modularite | oui | QCM |
 
-### Module CICS
+### COBOL
 
 | Chapitre | Sujet | Cours | Exercices |
 |----------|-------|-------|-----------|
-| I | Présentation générale | ✅ | ✅ QCM |
-| II | Organisation du système | ✅ | ✅ QCM |
-| III | SGBD IMS | ✅ | ✅ QCM |
-| IV | Architecture Multicouches | ✅ | ✅ QCM |
-| V | Couche de Présentation | ✅ | ✅ QCM |
-| VI | Couche de Traitement | ✅ | ✅ QCM |
-| VII | Couche des Données | ✅ | - |
-| VIII | Travaux Pratiques | ✅ | ✅ TP |
-| IX | Architecture et Transactions TSI | ✅ | ✅ QCM |
+| I | Structure d'un programme COBOL | oui | - |
+| II | Interface ISPF et commandes | oui | oui |
+| III | Declaration des variables | oui | oui |
+| IV | Operations sur les donnees | oui | oui |
+| V | Traitement conditionnel | oui | oui |
+| VI | Gestion des tables | oui | oui |
+| VII | Gestion des fichiers | oui | oui |
+| VIII | Operations E/S sur les fichiers | oui | oui |
+| IX | Programmes et sous-programmes | oui | oui |
+| X | Traitement des fichiers | oui | oui |
+| XI | Tri interne (SORT/MERGE) | oui | oui |
+| XII | Fichiers d'impression et edition | oui | oui |
 
-### Module DB2/SQL
+### CICS
 
 | Chapitre | Sujet | Cours | Exercices |
 |----------|-------|-------|-----------|
-| I | Fondamentaux des bases de données | ✅ | ✅ QCM |
-| II | Architecture DB2 | ✅ | ✅ QCM |
-| III | Modélisation des données | ✅ | ✅ QCM |
-| IV | Modèle relationnel | ✅ | ✅ QCM |
-| V | Types de données et DB2I | ✅ | ✅ QCM |
-| VI | SQL DDL (CREATE, ALTER, DROP) | ✅ | ✅ TP |
-| VII | SQL DML (INSERT, UPDATE, DELETE) | ✅ | ✅ TP |
-| VIII | SQL SELECT et Jointures | ✅ | ✅ TP |
-| IX | Agrégations et Sous-requêtes | ✅ | ✅ TP |
-| X | Embedded SQL COBOL | ✅ | ✅ Fil-rouge |
+| I | Presentation generale | oui | QCM |
+| II | Organisation du systeme | oui | QCM |
+| III | SGBD IMS | oui | QCM |
+| IV | Architecture multicouches | oui | QCM |
+| V | Couche de presentation | oui | QCM |
+| VI | Couche de traitement | oui | QCM |
+| VII | Couche des donnees | oui | - |
+| VIII | Travaux pratiques | oui | TP |
+| IX | Architecture et transactions TSI | oui | QCM |
 
-**Fil-rouge DB2** : Mini-projet COBOL-DB2 (25 exercices) - Suivi clientèle secteur financier
-→ [Voir le rapport](exercices/db2/fil-rouge/RAPPORT-PROJET.pdf)
+### DB2/SQL
 
-## Environnement
+| Chapitre | Sujet | Cours | Exercices |
+|----------|-------|-------|-----------|
+| I | Fondamentaux des bases de donnees | oui | QCM |
+| II | Architecture DB2 | oui | QCM |
+| III | Modelisation des donnees | oui | QCM |
+| IV | Modele relationnel | oui | QCM |
+| V | Types de donnees et DB2I | oui | QCM |
+| VI | SQL DDL (CREATE, ALTER, DROP) | oui | TP |
+| VII | SQL DML (INSERT, UPDATE, DELETE) | oui | TP |
+| VIII | SQL SELECT et jointures | oui | TP |
+| IX | Agregations et sous-requetes | oui | TP |
+| X | Embedded SQL COBOL | oui | Fil rouge |
 
-- **Compilateur** : GnuCOBOL 3.2.0
-- **OS** : macOS
-- **Émulateur** : Hercules (pour JCL/z/OS)
+## Demarrer
 
-## Compilation et exécution
+### Prerequis
+
+- [GnuCOBOL](https://gnucobol.sourceforge.io/) 3.2.0 ou superieur
+- [Hercules TK5](http://wotho.ethz.ch/tk4-/) pour l'emulation z/OS (optionnel)
+
+### Compilation et execution
 
 ```bash
 # Compiler un programme
 cobc -x programme.cbl -o programme
 
-# Compiler avec mode debug
+# Compiler avec mode debug (active les lignes D en colonne 7)
 cobc -x -fdebugging-line programme.cbl -o programme
 
-# Exécuter
+# Executer
 ./programme
 ```
 
-## Ressources
+## Architecture
 
-- [GnuCOBOL Documentation](https://gnucobol.sourceforge.io/)
-- [COBOL Programming Course](https://www.tutorialspoint.com/cobol/index.htm)
+```text
+poei-cobol/
+├── cours/                  Supports de cours par module (56 chapitres)
+│   ├── zos-tso/            z/OS, TSO/ISPF (5 chapitres)
+│   ├── jcl/                Job Control Language (4 chapitres)
+│   ├── vsam/               Virtual Storage Access Method
+│   ├── algorithmique/      Algorithmique (9 chapitres)
+│   ├── cobol/              COBOL (12 chapitres)
+│   ├── cics/               CICS transactionnel (9 chapitres)
+│   └── db2/                DB2/SQL (10 chapitres)
+├── exercices/              Exercices par module
+│   ├── cobol/              84 programmes COBOL par chapitre
+│   ├── cics/               Exercices BMS, COBOL, JCL + fil rouge
+│   ├── db2/                QCM, TP SQL, fil rouge COBOL-DB2
+│   ├── jcl/                QCM + TP
+│   ├── vsam/               TP IDCAMS, KSDS, ESDS, RRDS
+│   └── algorithmique/      40 exercices + 9 QCM
+├── hercules/               Configuration emulateur z/OS
+│   ├── jcl/                JCL pour Hercules
+│   ├── proclib/            Procedures cataloguees
+│   └── data/               Fichiers VSAM et sequentiels
+├── docs/                   Memos et documentation
+├── exemples/               Exemples de code commentes
+└── utils/                  Scripts utilitaires (compilation, audit)
+```
+
+---
+
+Construit par **[Josue Rocha](https://josuerocha.dev)** · [LinkedIn](https://linkedin.com/in/josuerocha) · [GitHub](https://github.com/josuerochadev)
